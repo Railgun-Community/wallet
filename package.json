@@ -1,0 +1,70 @@
+{
+  "name": "@railgun-community/quickstart",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Node shared modules for Railgun private clients.",
+  "main": "dist/main.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "dependencies": {
+    "@noble/ed25519": "^1.7.1",
+    "@railgun-community/lepton": "https://npm.railgun.org/ci/1.17.0/railgun-community-lepton-1.17.0.tgz",
+    "@railgun-community/shared-models": "github:Railgun-Privacy/frontend-shared-models-private#john/quickstart",
+    "@railgun-privacy/native-artifacts": "^0.1.0",
+    "axios": "^0.27.2",
+    "brotli": "^1.3.3"
+  },
+  "peerDependencies": {
+    "@ethersproject/address": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@ethersproject/contracts": "^5.5.0",
+    "@ethersproject/hdnode": "^5.7.0",
+    "@ethersproject/providers": "^5.7.1",
+    "@ethersproject/wallet": "^5.7.0",
+    "frontend-shared-models-private": "github:Railgun-Privacy/frontend-shared-models-private"
+  },
+  "devDependencies": {
+    "@ethersproject/address": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@ethersproject/contracts": "^5.7.0",
+    "@ethersproject/hdnode": "^5.7.0",
+    "@ethersproject/providers": "^5.7.1",
+    "@ethersproject/wallet": "^5.7.0",
+    "@types/chai": "^4.3.3",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/leveldown": "^4.0.3",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.7.21",
+    "@types/sinon": "^10.0.13",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^8.24.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "frontend-shared-models-private": "github:Railgun-Privacy/frontend-shared-models-private",
+    "leveldown": "^6.1.1",
+    "madge": "^5.0.1",
+    "mocha": "^10.0.0",
+    "nyc": "^15.1.0",
+    "sinon": "^14.0.0",
+    "ts-node": "^10.9.1",
+    "tsc-alias": "^1.7.0",
+    "typescript": "^4.8.3"
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "compile": "npm run clean && npm run lint && npm run tsc",
+    "compile-test": "npm run clean && tsc -p tsconfig.test.json && tsc-alias -p tsconfig.test.json",
+    "test-coverage": "npm run compile-test && nyc mocha 'src/**/__tests__/*.test.ts'",
+    "test": "npm run compile-test && mocha 'src/**/__tests__/*.test.ts'",
+    "tsc": "tsc && tsc-alias",
+    "check-circular-deps": "madge --circular .",
+    "eslint": "eslint src --ext .ts,.tsx --fix",
+    "lint": "npm run check-circular-deps && npm run eslint && npm run tsc",
+    "prepare": "npm run compile"
+  }
+}
