@@ -2,7 +2,7 @@
 
 # RAILGUN Quickstart SDK
 
-- RAILGUN SDK compatible with mobile, browser and node environments.
+- RAILGUN SDK compatible with mobile, browser and nodejs environments.
 
 ## Get started
 

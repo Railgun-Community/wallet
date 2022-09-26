@@ -2,7 +2,7 @@
   "name": "@railgun-community/quickstart",
   "version": "1.0.0",
   "private": true,
-  "description": "Node shared modules for Railgun private clients.",
+  "description": "RAILGUN Quickstart SDK, compatible with mobile, browser and nodejs environments.",
   "main": "dist/main.js",
   "files": [
     "dist/**/*"
