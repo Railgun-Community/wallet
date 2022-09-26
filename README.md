@@ -1,8 +1,8 @@
-[![Node.js CI Actions Status](https://github.com/Railgun-Privacy/lepton-clients-shared-private/actions/workflows/node.js.yml/badge.svg?branch=master)](https://github.com/Railgun-Privacy/lepton-clients-shared-private/actions)
+[![Node.js CI Actions Status](https://github.com/Railgun-Privacy/quickstart-private/actions/workflows/node.js.yml/badge.svg?branch=master)](https://github.com/Railgun-Privacy/quickstart-private/actions)
 
-# Shared SDK for RAILGUN clients
+# RAILGUN Quickstart SDK
 
-- SDK compatible with browser and node environments.
+- RAILGUN SDK compatible with mobile, browser and node environments.
 
 ## Get started
 
