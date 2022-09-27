@@ -1,5 +1,5 @@
-import { AddressData } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+import { AddressData } from '@railgun-community/engine/dist/keyderivation/bech32-encode';
+import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
 import { getAddress } from '@ethersproject/address';
 import {
   RailgunWalletInfo,
@@ -12,11 +12,11 @@ import {
   RailgunWalletReceiveTokenAmount,
 } from '@railgun-community/shared-models/dist/models/response-types';
 import {
-  LeptonEvent,
+  EngineEvent,
   ScannedEventData,
-} from '@railgun-community/lepton/dist/models/event-types';
-import { Lepton } from '@railgun-community/lepton';
-import { BytesData } from '@railgun-community/lepton/dist/models/formatted-types';
+} from '@railgun-community/engine/dist/models/event-types';
+import { RailgunEngine } from '@railgun-community/engine';
+import { BytesData } from '@railgun-community/engine/dist/models/formatted-types';
 import { getEngine, walletForID } from '../core/engine';
 import { sendErrorMessage } from '../../../utils/logger';
 import { onBalancesUpdate } from './balance-update';
@@ -26,19 +26,19 @@ import {
   TransactionHistoryTransferTokenAmount,
   TransactionHistoryTokenAmount,
   TransactionHistoryEntry,
-} from '@railgun-community/lepton/dist/models/wallet-types';
+} from '@railgun-community/engine/dist/models/wallet-types';
 import {
   AbstractWallet,
   WalletData,
-} from '@railgun-community/lepton/dist/wallet/abstract-wallet';
-import { Chain } from '@railgun-community/lepton/dist/models/lepton-types';
+} from '@railgun-community/engine/dist/wallet/abstract-wallet';
+import { Chain } from '@railgun-community/engine/dist/models/engine-types';
 import {
   networkForChain,
   NetworkName,
 } from '@railgun-community/shared-models/dist/models/network-config';
 
 const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
-  wallet.on(LeptonEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>
+  wallet.on(EngineEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>
     onBalancesUpdate(wallet, chain),
   );
 };
@@ -75,16 +75,16 @@ const loadExistingWallet = async (
   if (existingWallet) {
     return infoForWallet(existingWallet);
   }
-  const lepton = getEngine();
+  const engine = getEngine();
   let wallet: AbstractWallet;
 
   if (isViewOnlyWallet) {
-    wallet = await lepton.loadExistingViewOnlyWallet(
+    wallet = await engine.loadExistingViewOnlyWallet(
       encryptionKey,
       railgunWalletID,
     );
   } else {
-    wallet = await lepton.loadExistingWallet(encryptionKey, railgunWalletID);
+    wallet = await engine.loadExistingWallet(encryptionKey, railgunWalletID);
   }
 
   subscribeToBalanceEvents(wallet);
@@ -95,8 +95,8 @@ const createWallet = async (
   encryptionKey: string,
   mnemonic: string,
 ): Promise<RailgunWalletInfo> => {
-  const lepton = getEngine();
-  const wallet = await lepton.createWalletFromMnemonic(encryptionKey, mnemonic);
+  const engine = getEngine();
+  const wallet = await engine.createWalletFromMnemonic(encryptionKey, mnemonic);
   subscribeToBalanceEvents(wallet);
   return infoForWallet(wallet);
 };
@@ -105,8 +105,8 @@ const createViewOnlyWallet = async (
   encryptionKey: string,
   shareableViewingKey: string,
 ): Promise<RailgunWalletInfo> => {
-  const lepton = getEngine();
-  const wallet = await lepton.createViewOnlyWalletFromShareableViewingKey(
+  const engine = getEngine();
+  const wallet = await engine.createViewOnlyWalletFromShareableViewingKey(
     encryptionKey,
     shareableViewingKey,
   );
@@ -177,8 +177,8 @@ export const unloadWalletByID = (
   railgunWalletID: string,
 ): UnloadRailgunWalletResponse => {
   try {
-    const lepton = getEngine();
-    lepton.unloadWallet(railgunWalletID);
+    const engine = getEngine();
+    engine.unloadWallet(railgunWalletID);
     const response: UnloadRailgunWalletResponse = {};
     return response;
   } catch (err) {
@@ -210,7 +210,7 @@ export const getWalletMnemonic = async (
 
 export const getRailgunWalletAddressData = (address: string): AddressData => {
   assertValidRailgunAddress(address);
-  return Lepton.decodeAddress(address);
+  return RailgunEngine.decodeAddress(address);
 };
 
 export const assertValidRailgunAddress = (
@@ -221,7 +221,7 @@ export const assertValidRailgunAddress = (
     throw new Error('Invalid RAILGUN address.');
   }
   if (networkName) {
-    const decoded = Lepton.decodeAddress(address);
+    const decoded = RailgunEngine.decodeAddress(address);
     if (decoded.chain) {
       const network = networkForChain(decoded.chain);
       if (network && network.name !== networkName) {
@@ -235,7 +235,7 @@ export const assertValidRailgunAddress = (
 
 export const validateRailgunAddress = (address: string): boolean => {
   try {
-    return Lepton.decodeAddress(address) != null;
+    return RailgunEngine.decodeAddress(address) != null;
   } catch (err) {
     return false;
   }

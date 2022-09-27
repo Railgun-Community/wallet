@@ -1,7 +1,7 @@
 import type { AbstractLevelDOWN } from 'abstract-leveldown';
-import { Lepton } from '@railgun-community/lepton';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
-import { Database } from '@railgun-community/lepton/dist/database';
+import { RailgunEngine } from '@railgun-community/engine';
+import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
+import { Database } from '@railgun-community/engine/dist/database';
 import {
   MerkletreeScanUpdateEvent,
   StartRailgunEngineResponse,
@@ -13,24 +13,24 @@ import {
   setUseNativeArtifacts,
 } from './artifacts';
 import { ArtifactStore } from '../../artifacts/artifact-store';
-import { ViewOnlyWallet } from '@railgun-community/lepton/dist/wallet/view-only-wallet';
-import { AbstractWallet } from '@railgun-community/lepton/dist/wallet/abstract-wallet';
+import { ViewOnlyWallet } from '@railgun-community/engine/dist/wallet/view-only-wallet';
+import { AbstractWallet } from '@railgun-community/engine/dist/wallet/abstract-wallet';
 import { quickSyncLegacy } from '../scan/legacy/quick-sync-legacy';
 import {
-  LeptonEvent,
+  EngineEvent,
   MerkletreeHistoryScanEventData,
   MerkletreeHistoryScanUpdateData,
-} from '@railgun-community/lepton/dist/models/event-types';
+} from '@railgun-community/engine/dist/models/event-types';
 import { MerkletreeScanStatus } from '@railgun-community/shared-models/dist/models/merkletree-scan';
 
-let engine: Optional<Lepton>;
+let engine: Optional<RailgunEngine>;
 
-export type LeptonDebugger = {
+export type EngineDebugger = {
   log: (msg: string) => void;
   error: (error: Error) => void;
 };
 
-export const getEngine = (): Lepton => {
+export const getEngine = (): RailgunEngine => {
   if (!engine) {
     throw new Error('RAILGUN Engine not yet initialized.');
   }
@@ -70,7 +70,7 @@ export const viewOnlyWalletForID = (id: string): RailgunWallet => {
   return wallet as RailgunWallet;
 };
 
-const createLeptonDebugger = (): LeptonDebugger => {
+const createEngineDebugger = (): EngineDebugger => {
   return {
     log: (msg: string) => sendMessage(msg),
     error: (error: Error) => sendErrorMessage(error),
@@ -82,7 +82,7 @@ export const setOnHistoryScanCallback = (
 ) => {
   const engine = getEngine();
   engine.on(
-    LeptonEvent.MerkletreeHistoryScanStarted,
+    EngineEvent.MerkletreeHistoryScanStarted,
     ({ chain }: MerkletreeHistoryScanEventData) =>
       onHistoryScanCallback({
         scanStatus: MerkletreeScanStatus.Started,
@@ -91,7 +91,7 @@ export const setOnHistoryScanCallback = (
       }),
   );
   engine.on(
-    LeptonEvent.MerkletreeHistoryScanUpdate,
+    EngineEvent.MerkletreeHistoryScanUpdate,
     ({ chain, progress }: MerkletreeHistoryScanUpdateData) =>
       onHistoryScanCallback({
         scanStatus: MerkletreeScanStatus.Updated,
@@ -100,7 +100,7 @@ export const setOnHistoryScanCallback = (
       }),
   );
   engine.on(
-    LeptonEvent.MerkletreeHistoryScanComplete,
+    EngineEvent.MerkletreeHistoryScanComplete,
     ({ chain }: MerkletreeHistoryScanEventData) =>
       onHistoryScanCallback({
         scanStatus: MerkletreeScanStatus.Complete,
@@ -109,7 +109,7 @@ export const setOnHistoryScanCallback = (
       }),
   );
   engine.on(
-    LeptonEvent.MerkletreeHistoryScanIncomplete,
+    EngineEvent.MerkletreeHistoryScanIncomplete,
     ({ chain }: MerkletreeHistoryScanEventData) =>
       onHistoryScanCallback({
         scanStatus: MerkletreeScanStatus.Incomplete,
@@ -131,12 +131,12 @@ export const startRailgunEngine = (
     return response;
   }
   try {
-    engine = new Lepton(
+    engine = new Engine(
       walletSource,
       db,
       artifactsGetter,
       quickSyncLegacy,
-      shouldDebug ? createLeptonDebugger() : undefined,
+      shouldDebug ? createEngineDebugger() : undefined,
     );
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(useNativeArtifacts);

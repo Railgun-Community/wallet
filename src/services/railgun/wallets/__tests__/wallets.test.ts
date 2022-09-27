@@ -19,8 +19,8 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MNEMONIC,
 } from '../../../../test/mocks.test';
-import { initTestLepton } from '../../../../test/setup.test';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+import { initTestEngine } from '../../../../test/setup.test';
+import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -29,7 +29,7 @@ let wallet: RailgunWallet;
 
 describe('wallets', () => {
   before(async () => {
-    initTestLepton();
+    initTestEngine();
     const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
@@ -96,7 +96,7 @@ describe('wallets', () => {
     );
   });
 
-  it('Should load wallet from db after Lepton wallet unload', async () => {
+  it('Should load wallet from db after Engine wallet unload', async () => {
     expect(Object.keys(getEngine().wallets)).to.include(wallet.id);
     unloadWalletByID(wallet.id);
     expect(Object.keys(getEngine().wallets)).to.not.include(wallet.id);

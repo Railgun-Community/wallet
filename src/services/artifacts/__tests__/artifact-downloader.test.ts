@@ -1,4 +1,4 @@
-import { PublicInputs } from '@railgun-community/lepton/dist/prover';
+import { PublicInputs } from '@railgun-community/engine/dist/prover';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -6,7 +6,7 @@ import {
   ArtifactName,
   ArtifactVariant,
 } from '@railgun-community/shared-models/dist/models/artifact';
-import { initTestLepton } from '../../../test/setup.test';
+import { initTestEngine } from '../../../test/setup.test';
 import { setLoggerFuncs } from '../../../utils/logger';
 import {
   clearArtifactCache,
@@ -17,9 +17,9 @@ import {
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-describe('lepton', () => {
+describe('engine', () => {
   beforeEach(() => {
-    initTestLepton();
+    initTestEngine();
   });
 
   it('Should set and get artifacts', async () => {

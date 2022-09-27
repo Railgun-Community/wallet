@@ -12,9 +12,9 @@ import { LoadProviderResponse } from '@railgun-community/shared-models/dist/mode
 import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
 import { sendMessage, sendErrorMessage } from '../../../utils/logger';
 import { getEngine } from './engine';
-import { RailgunProxyContract } from '@railgun-community/lepton/dist/contracts/railgun-proxy';
-import { RelayAdaptContract } from '@railgun-community/lepton/dist/contracts/relay-adapt';
-import { Chain } from '@railgun-community/lepton/dist/models/lepton-types';
+import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy';
+import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt';
+import { Chain } from '@railgun-community/engine/dist/models/engine-types';
 
 const providerMap: MapType<BaseProvider> = {};
 export const getProviderForNetwork = (
@@ -93,8 +93,8 @@ const loadProviderForNetwork = async (
   }
 
   // NOTE: This is an async call, but we need not await.
-  // Let Lepton load network and scan events in the background.
-  // The synchronous start of this function will set `lepton.contracts` for this chain.
+  // Let Engine load network and scan events in the background.
+  // The synchronous start of this function will set `engine.contracts` for this chain.
   getEngine().loadNetwork(
     chain,
     proxyContract,

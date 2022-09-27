@@ -10,10 +10,10 @@ import {
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models/dist/models/network-config';
 import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
-import { ERC20Deposit } from '@railgun-community/lepton/dist/note';
-import { Lepton } from '@railgun-community/lepton';
+import { ERC20Deposit } from '@railgun-community/engine/dist/note';
+import { RailgunEngine } from '@railgun-community/engine';
 import { serializeUnsignedTransaction } from '@railgun-community/shared-models/dist/utils/serializer';
-import { DepositInput } from '@railgun-community/lepton/dist/models/formatted-types';
+import { DepositInput } from '@railgun-community/engine/dist/models/formatted-types';
 import {
   getProxyContractForNetwork,
   getProviderForNetwork,
@@ -26,7 +26,7 @@ import {
 import { sendErrorMessage } from '../../utils/logger';
 import { walletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { randomHex } from '@railgun-community/lepton/dist/utils/bytes';
+import { randomHex } from '@railgun-community/engine/dist/utils/bytes';
 
 const generateDepositTransaction = async (
   networkName: NetworkName,
@@ -38,7 +38,7 @@ const generateDepositTransaction = async (
     const { chain } = NETWORK_CONFIG[networkName];
     const railgunAddress = railgunWallet.getAddress(chain);
     const railContract = getProxyContractForNetwork(networkName);
-    const { masterPublicKey } = Lepton.decodeAddress(railgunAddress);
+    const { masterPublicKey } = RailgunEngine.decodeAddress(railgunAddress);
     const vpk = railgunWallet.getViewingKeyPair().privateKey;
     const random = randomHex(16);
 

@@ -1,6 +1,6 @@
-import { Chain } from '@railgun-community/lepton/dist/models/lepton-types';
-import { ByteLength, nToHex } from '@railgun-community/lepton/dist/utils/bytes';
-import { AbstractWallet } from '@railgun-community/lepton/dist/wallet/abstract-wallet';
+import { Chain } from '@railgun-community/engine/dist/models/engine-types';
+import { ByteLength, nToHex } from '@railgun-community/engine/dist/utils/bytes';
+import { AbstractWallet } from '@railgun-community/engine/dist/wallet/abstract-wallet';
 import {
   RailgunBalancesEvent,
   RailgunShieldedTokenBalanceSerialized,

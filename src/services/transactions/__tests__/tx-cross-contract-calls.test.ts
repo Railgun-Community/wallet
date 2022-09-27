@@ -6,7 +6,7 @@ import {
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
 import {
   NetworkName,
@@ -18,10 +18,10 @@ import {
   deserializeTransaction,
   serializeUnsignedTransaction,
 } from '@railgun-community/shared-models/dist/utils/serializer';
-import { SerializedTransaction } from '@railgun-community/lepton/dist/models/formatted-types';
+import { SerializedTransaction } from '@railgun-community/engine/dist/models/formatted-types';
 import {
-  initTestLepton,
-  initTestLeptonNetwork,
+  initTestEngine,
+  initTestEngineNetwork,
 } from '../../../test/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -39,8 +39,8 @@ import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { setCachedProvedTransaction } from '../proof-cache';
 import { decimalToHexString } from '../../../utils/format';
-import { TransactionBatch } from '@railgun-community/lepton/dist/transaction/transaction-batch';
-import { RelayAdaptContract } from '@railgun-community/lepton/dist/contracts/relay-adapt';
+import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
+import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt';
 import {
   gasEstimateForUnprovenCrossContractCalls,
   generateCrossContractCallsProof,
@@ -112,8 +112,8 @@ const spyOnSetWithdraw = () => {
 
 describe('tx-cross-contract-calls', () => {
   before(async () => {
-    initTestLepton();
-    await initTestLeptonNetwork();
+    initTestEngine();
+    await initTestEngineNetwork();
     const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,

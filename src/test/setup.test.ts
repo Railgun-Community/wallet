@@ -67,7 +67,7 @@ const testArtifactStore = new ArtifactStore(
   fileExists,
 );
 
-export const initTestLepton = (useNativeArtifacts = false) => {
+export const initTestEngine = (useNativeArtifacts = false) => {
   const shouldDebug = true;
   const response = startRailgunEngine(
     TEST_WALLET_SOURCE,
@@ -91,7 +91,7 @@ export const setTestArtifacts = () => {
   overrideArtifact(ArtifactVariant.Variant_8_by_2, testArtifacts[8][2]);
 };
 
-export const initTestLeptonNetwork = async () => {
+export const initTestEngineNetwork = async () => {
   const shouldDebug = false;
 
   // Don't wait for async. It will try to load historical events, which takes a while.

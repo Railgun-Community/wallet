@@ -5,7 +5,7 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
 } from '../../../../test/mocks.test';
-import { initTestLepton } from '../../../../test/setup.test';
+import { initTestEngine } from '../../../../test/setup.test';
 import { walletForID } from '../engine';
 import {
   getProxyContractForNetwork,
@@ -24,7 +24,7 @@ const MOCK_MNEMONIC_PROVIDERS_ONLY =
 
 describe('providers', () => {
   before(async () => {
-    initTestLepton();
+    initTestEngine();
   });
   it('Should load provider with json, pull fees, and check created objects', async () => {
     const shouldDebug = true;

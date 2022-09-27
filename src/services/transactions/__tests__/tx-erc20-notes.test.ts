@@ -1,9 +1,9 @@
-import { Lepton } from '@railgun-community/lepton';
-import { OutputType } from '@railgun-community/lepton/dist/models/formatted-types';
-import { Memo } from '@railgun-community/lepton/dist/note/memo';
-import { bytes } from '@railgun-community/lepton/dist/utils';
+import { RailgunEngine } from '@railgun-community/engine';
+import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
+import { Memo } from '@railgun-community/engine/dist/note/memo';
+import { bytes } from '@railgun-community/engine/dist/utils';
 
-import { ByteLength } from '@railgun-community/lepton/dist/utils/bytes';
+import { ByteLength } from '@railgun-community/engine/dist/utils/bytes';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
@@ -15,8 +15,8 @@ import {
   TEST_WALLET_SOURCE,
 } from '../../../test/mocks.test';
 import {
-  initTestLepton,
-  initTestLeptonNetwork,
+  initTestEngine,
+  initTestEngineNetwork,
 } from '../../../test/setup.test';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
@@ -42,8 +42,8 @@ let railgunWalletID: string;
 
 describe('tx-erc20-notes', () => {
   before(async () => {
-    initTestLepton();
-    await initTestLeptonNetwork();
+    initTestEngine();
+    await initTestEngineNetwork();
     const railgunWalletResponse = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
@@ -59,7 +59,9 @@ describe('tx-erc20-notes', () => {
       tokenAddress: MOCK_TOKEN,
       amountString: '0x100',
     };
-    const addressData = Lepton.decodeAddress(MOCK_RAILGUN_WALLET_ADDRESS);
+    const addressData = RailgunEngine.decodeAddress(
+      MOCK_RAILGUN_WALLET_ADDRESS,
+    );
     const railgunWallet = fullWalletForID(railgunWalletID);
     const note = erc20NoteFromTokenAmount(
       tokenAmount,

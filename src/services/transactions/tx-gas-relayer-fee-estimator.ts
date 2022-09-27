@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BaseProvider } from '@ethersproject/providers';
-import { SerializedTransaction } from '@railgun-community/lepton/dist/models/formatted-types';
+import { SerializedTransaction } from '@railgun-community/engine/dist/models/formatted-types';
 import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
 import {
   TransactionGasDetails,

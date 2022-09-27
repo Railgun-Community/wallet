@@ -1,8 +1,8 @@
-import { Prover, Groth16 } from '@railgun-community/lepton/dist/prover';
+import { Prover, Groth16 } from '@railgun-community/engine/dist/prover';
 import {
   FormattedCircuitInputs,
   Proof,
-} from '@railgun-community/lepton/dist/prover/types';
+} from '@railgun-community/engine/dist/prover/types';
 import { getEngine } from './engine';
 
 export const getProver = (): Prover => {

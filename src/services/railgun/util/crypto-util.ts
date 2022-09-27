@@ -2,17 +2,17 @@ import * as ed from '@noble/ed25519';
 import {
   hexlify,
   hexStringToBytes,
-} from '@railgun-community/lepton/dist/utils/bytes';
+} from '@railgun-community/engine/dist/utils/bytes';
 import { EncryptDataWithSharedKeyResponse } from '@railgun-community/shared-models/dist/models/response-types';
 import {
   encryptJSONDataWithSharedKey,
   tryDecryptJSONDataWithSharedKey,
-} from '@railgun-community/lepton/dist/utils/ecies';
+} from '@railgun-community/engine/dist/utils/ecies';
 import {
   getPublicViewingKey,
   verifyED25519,
-} from '@railgun-community/lepton/dist/utils/keys-utils';
-import { EncryptedData } from '@railgun-community/lepton/dist/models/formatted-types';
+} from '@railgun-community/engine/dist/utils/keys-utils';
+import { EncryptedData } from '@railgun-community/engine/dist/models/formatted-types';
 import { getRandomBytes } from './bytes-util';
 
 export const verifyRelayerSignature = (

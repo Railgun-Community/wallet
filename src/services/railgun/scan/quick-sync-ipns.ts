@@ -1,5 +1,5 @@
-import { QuickSync } from '@railgun-community/lepton/dist/models/event-types';
-import { Chain } from '@railgun-community/lepton/dist/models/lepton-types';
+import { QuickSync } from '@railgun-community/engine/dist/models/event-types';
+import { Chain } from '@railgun-community/engine/dist/models/engine-types';
 import { networkForChain } from '@railgun-community/shared-models/dist/models/network-config';
 import {
   DEFAULT_QUICK_SYNC_PAGE_SIZE,
@@ -15,7 +15,7 @@ export const quickSyncIPNS: QuickSync = async (
 ): Promise<QuickSyncEventLog> => {
   const network = networkForChain(chain);
   if (!network || !network.shouldQuickSync) {
-    // Return empty logs, Lepton will default to full scan.
+    // Return empty logs, Engine will default to full scan.
     return {
       commitmentEvents: [],
       nullifierEvents: [],

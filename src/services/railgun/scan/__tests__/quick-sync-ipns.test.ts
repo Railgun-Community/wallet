@@ -1,7 +1,7 @@
 import {
   Chain,
   ChainType,
-} from '@railgun-community/lepton/dist/models/lepton-types';
+} from '@railgun-community/engine/dist/models/engine-types';
 import axios from 'axios';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';

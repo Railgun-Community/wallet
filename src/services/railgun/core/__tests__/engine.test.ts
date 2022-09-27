@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { initTestLepton } from '../../../../test/setup.test';
+import { initTestEngine } from '../../../../test/setup.test';
 import { closeRailgunEngine, getEngine } from '../engine';
 import { getProver } from '../prover';
 
@@ -9,7 +9,7 @@ const { expect } = chai;
 
 describe('engine', () => {
   beforeEach(() => {
-    initTestLepton();
+    initTestEngine();
   });
 
   it('Should get active engine instance', () => {

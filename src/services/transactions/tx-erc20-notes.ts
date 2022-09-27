@@ -1,12 +1,12 @@
-import { Note } from '@railgun-community/lepton';
-import { AddressData } from '@railgun-community/lepton/dist/keyderivation/bech32-encode';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+import { Note } from '@railgun-community/engine';
+import { AddressData } from '@railgun-community/engine/dist/keyderivation/bech32-encode';
+import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
 import {
   hexToBigInt,
   randomHex,
-} from '@railgun-community/lepton/dist/utils/bytes';
+} from '@railgun-community/engine/dist/utils/bytes';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
-import { OutputType } from '@railgun-community/lepton/dist/models/formatted-types';
+import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
 
 export const erc20NoteFromTokenAmount = (
   tokenAmount: RailgunWalletTokenAmount,

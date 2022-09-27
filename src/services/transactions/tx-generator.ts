@@ -1,20 +1,20 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
 import {
   NetworkName,
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models/dist/models/network-config';
 import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
-import { Lepton } from '@railgun-community/lepton';
-import { TransactionBatch } from '@railgun-community/lepton/dist/transaction/transaction-batch';
+import { RailgunEngine } from '@railgun-community/engine';
+import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
 import {
   AdaptID,
   OutputType,
   SerializedTransaction,
   TokenType,
-} from '@railgun-community/lepton/dist/models/formatted-types';
+} from '@railgun-community/engine/dist/models/formatted-types';
 import { fullWalletForID, walletForID } from '../railgun/core/engine';
 import {
   getProxyContractForNetwork,
@@ -22,8 +22,8 @@ import {
 } from '../railgun/core/providers';
 import { erc20NoteFromTokenAmount } from './tx-erc20-notes';
 import { getProver } from '../railgun/core/prover';
-import { ProverProgressCallback } from '@railgun-community/lepton/dist/prover';
-import { averageNumber } from '@railgun-community/lepton/dist/utils/average';
+import { ProverProgressCallback } from '@railgun-community/engine/dist/prover';
+import { averageNumber } from '@railgun-community/engine/dist/utils/average';
 
 const DUMMY_AMOUNT = '0x00';
 export const DUMMY_FROM_ADDRESS = '0x000000000000000000000000000000000000dEaD';
@@ -191,7 +191,7 @@ const erc20TransactionsFromTokenAmounts = async (
     if (relayAdaptID) {
       transactionBatchRelayerFee.setAdaptID(relayAdaptID);
     }
-    const addressData = Lepton.decodeAddress(relayerRailgunAddress);
+    const addressData = RailgunEngine.decodeAddress(relayerRailgunAddress);
     transactionBatchRelayerFee.addOutput(
       erc20NoteFromTokenAmount(
         relayerFeeTokenAmount,
@@ -317,7 +317,7 @@ const setTransactionOutputsTransfer = (
   railgunWallet: RailgunWallet,
   memoText: Optional<string>,
 ) => {
-  const addressData = Lepton.decodeAddress(toWalletAddress);
+  const addressData = RailgunEngine.decodeAddress(toWalletAddress);
   transactionBatch.addOutput(
     erc20NoteFromTokenAmount(
       tokenAmount,

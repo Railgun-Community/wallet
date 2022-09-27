@@ -6,8 +6,8 @@ import Sinon, { SinonStub } from 'sinon';
 import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
 import { deserializeTransaction } from '@railgun-community/shared-models/dist/utils/serializer';
 import {
-  initTestLepton,
-  initTestLeptonNetwork,
+  initTestEngine,
+  initTestEngineNetwork,
 } from '../../../test/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -21,7 +21,7 @@ import {
 } from '../tx-deposit-base-token';
 import { decimalToHexString } from '../../../utils/format';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
-import { RelayAdaptContract } from '@railgun-community/lepton/dist/contracts/relay-adapt';
+import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 
 let gasEstimateStub: SinonStub;
@@ -48,8 +48,8 @@ const stubFailure = () => {
 
 describe('tx-deposit-base-token', () => {
   before(async () => {
-    initTestLepton();
-    await initTestLeptonNetwork();
+    initTestEngine();
+    await initTestEngineNetwork();
     const railgunWalletResponse = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,

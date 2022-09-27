@@ -21,8 +21,8 @@ import {
 import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { randomHex } from '@railgun-community/lepton/dist/utils/bytes';
-import { SerializedTransaction } from '@railgun-community/lepton/dist/models/formatted-types';
+import { randomHex } from '@railgun-community/engine/dist/utils/bytes';
+import { SerializedTransaction } from '@railgun-community/engine/dist/models/formatted-types';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 
 export const populateProvedWithdraw = async (

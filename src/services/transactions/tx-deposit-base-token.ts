@@ -21,11 +21,11 @@ import {
   setGasDetailsForPopulatedTransaction,
 } from './tx-gas-details';
 import { sendErrorMessage } from '../../utils/logger';
-import { ERC20Deposit } from '@railgun-community/lepton/dist/note';
-import { Lepton } from '@railgun-community/lepton';
+import { ERC20Deposit } from '@railgun-community/engine/dist/note';
+import { RailgunEngine } from '@railgun-community/engine';
 import { walletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { randomHex } from '@railgun-community/lepton/dist/utils/bytes';
+import { randomHex } from '@railgun-community/engine/dist/utils/bytes';
 
 const generateDepositBaseTokenTransaction = async (
   networkName: NetworkName,
@@ -37,7 +37,7 @@ const generateDepositBaseTokenTransaction = async (
     const { chain } = NETWORK_CONFIG[networkName];
     const railgunAddress = railgunWallet.getAddress(chain);
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
-    const { masterPublicKey } = Lepton.decodeAddress(railgunAddress);
+    const { masterPublicKey } = RailgunEngine.decodeAddress(railgunAddress);
     const vpk = railgunWallet.getViewingKeyPair().privateKey;
     const random = randomHex(16);
 

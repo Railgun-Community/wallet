@@ -1,5 +1,5 @@
-import { bytes } from '@railgun-community/lepton/dist/utils';
-import { trim, randomHex } from '@railgun-community/lepton/dist/utils/bytes';
+import { bytes } from '@railgun-community/engine/dist/utils';
+import { trim, randomHex } from '@railgun-community/engine/dist/utils/bytes';
 
 export const parseRailgunBalanceAddress = (tokenAddress: string): string => {
   return `0x${trim(tokenAddress, 20)}`;

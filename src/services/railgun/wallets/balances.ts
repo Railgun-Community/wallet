@@ -1,4 +1,4 @@
-import { Chain } from '@railgun-community/lepton/dist/models/lepton-types';
+import { Chain } from '@railgun-community/engine/dist/models/engine-types';
 import { RailgunBalanceRefreshTrigger } from '@railgun-community/shared-models/dist/models/function-types';
 import { RailgunBalanceResponse } from '@railgun-community/shared-models/dist/models/response-types';
 import { getEngine, walletForID } from '../core/engine';
@@ -60,11 +60,11 @@ export const rescanFullMerkletreesAndWallets = async (
 export const fullRescanBalancesAllWallets = async (
   chain: Chain,
 ): Promise<void> => {
-  const lepton = getEngine();
-  const wallets = Object.values(lepton.wallets);
+  const engine = getEngine();
+  const wallets = Object.values(engine.wallets);
   if (!wallets.length) {
     throw new Error(
-      'Cannot rescan all wallet balances - no wallets loaded for Lepton.',
+      'Cannot rescan all wallet balances - no wallets loaded for Engine.',
     );
   }
   await Promise.all(wallets.map(wallet => wallet.fullRescanBalances(chain)));

@@ -1,4 +1,4 @@
-import { Wallet as RailgunWallet } from '@railgun-community/lepton/dist/wallet/wallet';
+import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub } from 'sinon';
@@ -6,7 +6,7 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MNEMONIC,
 } from '../../../../test/mocks.test';
-import { initTestLepton } from '../../../../test/setup.test';
+import { initTestEngine } from '../../../../test/setup.test';
 import { createRailgunWallet } from '../wallets';
 import { refreshRailgunBalances } from '../balances';
 import {
@@ -22,7 +22,7 @@ let knownWalletID: string;
 
 describe('balances', () => {
   before(async () => {
-    initTestLepton();
+    initTestEngine();
     const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,

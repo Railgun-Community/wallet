@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { Nullifier } from '@railgun-community/lepton/dist/models/formatted-types';
+import { Nullifier } from '@railgun-community/engine/dist/models/formatted-types';
 import { sendErrorMessage } from '../../../utils/logger';
-import { CommitmentEvent } from '@railgun-community/lepton/dist/models/event-types';
-import { Chain } from '@railgun-community/lepton/dist/models/lepton-types';
+import { CommitmentEvent } from '@railgun-community/engine/dist/models/event-types';
+import { Chain } from '@railgun-community/engine/dist/models/engine-types';
 
 const MAX_NUM_RETRIES = 3;
 

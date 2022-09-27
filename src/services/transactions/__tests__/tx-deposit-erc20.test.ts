@@ -6,8 +6,8 @@ import Sinon, { SinonStub } from 'sinon';
 import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
 import { deserializeTransaction } from '@railgun-community/shared-models/dist/utils/serializer';
 import {
-  initTestLepton,
-  initTestLeptonNetwork,
+  initTestEngine,
+  initTestEngineNetwork,
 } from '../../../test/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -42,8 +42,8 @@ const stubFailure = () => {
 
 describe('tx-deposit-erc20', () => {
   before(async () => {
-    initTestLepton();
-    await initTestLeptonNetwork();
+    initTestEngine();
+    await initTestEngineNetwork();
     const railgunWalletResponse = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,

@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+version=$1
+yarn add https://npm.railgun.org/ci/${version}/railgun-community-engine-${version}.tgz;
+
+yarn lint;

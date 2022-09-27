@@ -1,4 +1,4 @@
-import { PublicInputs } from '@railgun-community/lepton/dist/prover';
+import { PublicInputs } from '@railgun-community/engine/dist/prover';
 import {
   ArtifactGroup,
   ArtifactVariant,
