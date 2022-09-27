@@ -6,6 +6,18 @@
   "files": [
     "dist/**/*"
   ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "compile": "npm run clean && npm run lint && npm run tsc",
+    "compile-test": "npm run clean && tsc -p tsconfig.test.json && tsc-alias -p tsconfig.test.json",
+    "test-coverage": "npm run compile-test && nyc mocha 'src/**/__tests__/*.test.ts'",
+    "test": "npm run compile-test && mocha 'src/**/__tests__/*.test.ts'",
+    "tsc": "tsc && tsc-alias",
+    "check-circular-deps": "madge --circular .",
+    "eslint": "eslint src --ext .ts,.tsx --fix",
+    "lint": "npm run check-circular-deps && npm run eslint && npm run tsc",
+    "prepare": "npm run compile"
+  },
   "dependencies": {
     "@noble/ed25519": "^1.7.1",
     "@railgun-community/engine": "2.0.0",
@@ -52,17 +64,5 @@
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.7.0",
     "typescript": "^4.8.3"
-  },
-  "scripts": {
-    "clean": "rm -rf dist",
-    "compile": "npm run clean && npm run lint && npm run tsc",
-    "compile-test": "npm run clean && tsc -p tsconfig.test.json && tsc-alias -p tsconfig.test.json",
-    "test-coverage": "npm run compile-test && nyc mocha 'src/**/__tests__/*.test.ts'",
-    "test": "npm run compile-test && mocha 'src/**/__tests__/*.test.ts'",
-    "tsc": "tsc && tsc-alias",
-    "check-circular-deps": "madge --circular .",
-    "eslint": "eslint src --ext .ts,.tsx --fix",
-    "lint": "npm run check-circular-deps && npm run eslint && npm run tsc",
-    "prepare": "npm run compile"
   }
 }
