@@ -1,7 +1,6 @@
 {
   "name": "@railgun-community/quickstart",
   "version": "1.0.0",
-  "private": true,
   "description": "RAILGUN Quickstart SDK, compatible with mobile, browser and nodejs environments.",
   "main": "dist/main.js",
   "files": [
@@ -20,8 +19,7 @@
     "@ethersproject/contracts": "^5.5.0",
     "@ethersproject/hdnode": "^5.7.0",
     "@ethersproject/providers": "^5.7.1",
-    "@ethersproject/wallet": "^5.7.0",
-    "frontend-shared-models-private": "github:Railgun-Privacy/frontend-shared-models-private"
+    "@ethersproject/wallet": "^5.7.0"
   },
   "devDependencies": {
     "@ethersproject/address": "^5.7.0",
