@@ -1,5 +1,6 @@
 import * as ed from '@noble/ed25519';
 import {
+  arrayify,
   hexlify,
   hexStringToBytes,
 } from '@railgun-community/engine/dist/utils/bytes';
@@ -14,6 +15,7 @@ import {
 } from '@railgun-community/engine/dist/utils/keys-utils';
 import { EncryptedData } from '@railgun-community/engine/dist/models/formatted-types';
 import { getRandomBytes } from './bytes-util';
+import crypto from 'crypto';
 
 export const verifyRelayerSignature = (
   signature: Uint8Array,
@@ -40,4 +42,35 @@ export const decryptAESGCM256 = (
   sharedKey: Uint8Array,
 ): Promise<object | null> => {
   return tryDecryptJSONDataWithSharedKey(encryptedData, sharedKey);
+};
+
+/**
+ * Calculates PBKDF2 hash
+ * @param secret - input
+ * @param salt - salt
+ * @param iterations - rounds
+ */
+export const pbkdf2 = async (
+  secret: string,
+  salt: string,
+  iterations: number,
+): Promise<string> => {
+  const secretBuffer = Buffer.from(secret, 'utf-8');
+  const secretFormatted = new Uint8Array(arrayify(secretBuffer));
+  const saltFormatted = new Uint8Array(arrayify(salt));
+
+  const keyLength = 32; // Bytes
+  const digest = 'sha256';
+
+  const key: Buffer = await new Promise(resolve =>
+    crypto.pbkdf2(
+      secretFormatted,
+      saltFormatted,
+      iterations,
+      keyLength,
+      digest,
+      (_err: Error | null, derivedKey: Buffer) => resolve(derivedKey),
+    ),
+  );
+  return hexlify(key);
 };

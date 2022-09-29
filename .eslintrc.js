@@ -46,5 +46,6 @@ module.exports = {
     'prefer-destructuring': 0,
     'lines-between-class-members': 0,
     '@typescript-eslint/no-empty-function': 0,
+    'no-promise-executor-return': 0,
   },
 };
