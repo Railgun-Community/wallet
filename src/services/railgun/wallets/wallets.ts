@@ -9,6 +9,7 @@ import {
   RailgunWalletTokenAmount,
   RailgunWalletSendTokenAmount,
   RailgunWalletReceiveTokenAmount,
+  RailgunWalletAddressDataSerialized,
 } from '@railgun-community/shared-models/dist/models/response-types';
 import {
   EngineEvent,
@@ -220,7 +221,7 @@ export const getRailgunWalletAddressData = (address: string): AddressData => {
 
 export const serializeRailgunWalletAddressData = (
   addressData: AddressData,
-): { viewingPublicKey: string; masterPublicKey: string } => {
+): RailgunWalletAddressDataSerialized => {
   const { viewingPublicKey, masterPublicKey } = addressData;
   const viewingPublicKeySerialized = hexlify(viewingPublicKey);
   const masterPublicKeySerialized = nToHex(
