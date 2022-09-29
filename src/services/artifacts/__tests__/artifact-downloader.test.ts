@@ -1,4 +1,3 @@
-import { PublicInputs } from '@railgun-community/engine/dist/prover';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -13,6 +12,7 @@ import {
   artifactsGetter,
   overrideArtifact,
 } from '../../railgun/core/artifacts';
+import { PublicInputs } from '@railgun-community/engine/dist/prover/types';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

@@ -20,7 +20,7 @@ import {
   MOCK_MNEMONIC,
 } from '../../../../test/mocks.test';
 import { initTestEngine } from '../../../../test/setup.test';
-import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

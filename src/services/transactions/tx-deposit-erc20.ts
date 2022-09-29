@@ -10,8 +10,8 @@ import {
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models/dist/models/network-config';
 import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
-import { ERC20Deposit } from '@railgun-community/engine/dist/note';
-import { RailgunEngine } from '@railgun-community/engine';
+import { ERC20Deposit } from '@railgun-community/engine/dist/note/erc20-deposit';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 import { serializeUnsignedTransaction } from '@railgun-community/shared-models/dist/utils/serializer';
 import { DepositInput } from '@railgun-community/engine/dist/models/formatted-types';
 import {

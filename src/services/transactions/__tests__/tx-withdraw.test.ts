@@ -2,7 +2,7 @@ import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
-import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
 import {
   NetworkName,
@@ -42,8 +42,8 @@ import { fullWalletForID } from '../../railgun/core/engine';
 import { setCachedProvedTransaction } from '../proof-cache';
 import { decimalToHexString } from '../../../utils/format';
 import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
-import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy';
-import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt';
+import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy/railgun-proxy';
+import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
 
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;

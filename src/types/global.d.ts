@@ -3,3 +3,4 @@ declare type MapType<T> = { [id: string]: T };
 declare type NumMapType<T> = { [index: number]: T };
 
 declare module 'brotli/decompress';
+declare module '@railgun-community/test-artifacts';

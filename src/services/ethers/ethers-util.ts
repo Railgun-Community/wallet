@@ -1,5 +1,5 @@
 import { HDNode } from '@ethersproject/hdnode';
-import { mnemonicToSeed } from '@railgun-community/engine/dist/keyderivation/bip39';
+import { mnemonicToSeed } from '@railgun-community/engine/dist/key-derivation/bip39';
 
 const getPath = (index = 0) => {
   return `m/44'/60'/0'/0/${index}`;

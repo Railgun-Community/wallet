@@ -1,7 +1,7 @@
 import type { AbstractLevelDOWN } from 'abstract-leveldown';
-import { RailgunEngine } from '@railgun-community/engine';
-import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
-import { Database } from '@railgun-community/engine/dist/database';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+import { Database } from '@railgun-community/engine/dist/database/database';
 import {
   MerkletreeScanUpdateEvent,
   StartRailgunEngineResponse,
@@ -131,7 +131,7 @@ export const startRailgunEngine = (
     return response;
   }
   try {
-    engine = new Engine(
+    engine = new RailgunEngine(
       walletSource,
       db,
       artifactsGetter,

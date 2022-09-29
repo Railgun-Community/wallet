@@ -18,9 +18,7 @@ import { loadProvider } from '../services/railgun/core/providers';
 import { ArtifactStore } from '../services/artifacts/artifact-store';
 import { overrideArtifact } from '../services/railgun/core/artifacts';
 import { setOnBalanceUpdateCallback } from '../services/railgun/wallets/balance-update';
-
-// @ts-ignore
-import testArtifacts from '@railgun-privacy/native-artifacts';
+import testArtifacts from '@railgun-community/test-artifacts';
 
 const LEPTON_TEST_DB = 'test.db';
 const db = new LevelDOWN(LEPTON_TEST_DB);

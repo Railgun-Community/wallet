@@ -1,13 +1,13 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
 import {
   NetworkName,
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models/dist/models/network-config';
 import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
-import { RailgunEngine } from '@railgun-community/engine';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
 import {
   AdaptID,
@@ -22,7 +22,7 @@ import {
 } from '../railgun/core/providers';
 import { erc20NoteFromTokenAmount } from './tx-erc20-notes';
 import { getProver } from '../railgun/core/prover';
-import { ProverProgressCallback } from '@railgun-community/engine/dist/prover';
+import { ProverProgressCallback } from '@railgun-community/engine/dist/prover/prover';
 import { averageNumber } from '@railgun-community/engine/dist/utils/average';
 
 const DUMMY_AMOUNT = '0x00';

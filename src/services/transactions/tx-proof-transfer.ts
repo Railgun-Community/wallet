@@ -9,7 +9,7 @@ import { generateProofTransactions, generateTransact } from './tx-generator';
 import { sendErrorMessage } from '../../utils/logger';
 import { assertValidRailgunAddress } from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
-import { ProverProgressCallback } from '@railgun-community/engine/dist/prover';
+import { ProverProgressCallback } from '@railgun-community/engine/dist/prover/prover';
 
 export const generateTransferProof = async (
   networkName: NetworkName,

@@ -12,9 +12,9 @@ import { LoadProviderResponse } from '@railgun-community/shared-models/dist/mode
 import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
 import { sendMessage, sendErrorMessage } from '../../../utils/logger';
 import { getEngine } from './engine';
-import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy';
-import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt';
 import { Chain } from '@railgun-community/engine/dist/models/engine-types';
+import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy/railgun-proxy';
+import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
 
 const providerMap: MapType<BaseProvider> = {};
 export const getProviderForNetwork = (

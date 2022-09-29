@@ -1,18 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
 import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
 import { RailgunProveTransactionResponse } from '@railgun-community/shared-models/dist/models/response-types';
-import { RailgunEngine } from '@railgun-community/engine';
 import {
   ByteLength,
   formatToByteLength,
   nToHex,
   randomHex,
 } from '@railgun-community/engine/dist/utils/bytes';
-import { Note } from '@railgun-community/engine/dist/note';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   initTestEngine,
@@ -32,6 +30,8 @@ import { fullWalletForID } from '../../railgun/core/engine';
 import { getCachedProvedTransaction } from '../proof-cache';
 import { generateTransferProof } from '../tx-proof-transfer';
 import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
+import { Note } from '@railgun-community/engine/dist/note/note';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 
 let railgunWallet: RailgunWallet;
 let railgunWalletAddress: string;

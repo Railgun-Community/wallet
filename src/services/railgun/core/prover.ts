@@ -1,4 +1,4 @@
-import { Prover, Groth16 } from '@railgun-community/engine/dist/prover';
+import { Prover, Groth16 } from '@railgun-community/engine/dist/prover/prover';
 import {
   FormattedCircuitInputs,
   Proof,
@@ -13,10 +13,6 @@ export const getProver = (): Prover => {
     );
   }
   return engine.prover;
-};
-
-export const setProverGroth16 = (groth16: Groth16): void => {
-  getProver().setGroth16(groth16);
 };
 
 export { FormattedCircuitInputs, Proof, Groth16 };

@@ -21,8 +21,8 @@ import {
 } from '../tx-deposit-base-token';
 import { decimalToHexString } from '../../../utils/format';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
-import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt';
 import { PopulatedTransaction } from '@ethersproject/contracts';
+import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
 
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;

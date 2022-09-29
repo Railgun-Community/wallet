@@ -1,5 +1,5 @@
-import { QuickSync } from '@railgun-community/lepton/dist/models/event-types';
-import { Chain } from '@railgun-community/lepton/dist/models/lepton-types';
+import { Chain } from '@railgun-community/engine/dist/models/engine-types';
+import { QuickSync } from '@railgun-community/engine/dist/models/event-types';
 import { networkForChain } from '@railgun-community/shared-models/dist/models/network-config';
 import {
   getRailgunEventLogLegacy,

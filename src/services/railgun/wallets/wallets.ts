@@ -1,5 +1,4 @@
-import { AddressData } from '@railgun-community/engine/dist/keyderivation/bech32-encode';
-import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import { getAddress } from '@ethersproject/address';
 import {
   RailgunWalletInfo,
@@ -15,7 +14,6 @@ import {
   EngineEvent,
   ScannedEventData,
 } from '@railgun-community/engine/dist/models/event-types';
-import { RailgunEngine } from '@railgun-community/engine';
 import { BytesData } from '@railgun-community/engine/dist/models/formatted-types';
 import { getEngine, walletForID } from '../core/engine';
 import { sendErrorMessage } from '../../../utils/logger';
@@ -36,6 +34,8 @@ import {
   networkForChain,
   NetworkName,
 } from '@railgun-community/shared-models/dist/models/network-config';
+import { AddressData } from '@railgun-community/engine/dist/key-derivation/bech32';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 
 const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
   wallet.on(EngineEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>

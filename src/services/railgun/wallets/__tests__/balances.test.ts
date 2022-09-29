@@ -1,4 +1,4 @@
-import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub } from 'sinon';

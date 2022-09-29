@@ -1,9 +1,9 @@
-import { RailgunEngine } from '@railgun-community/engine';
 import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
 import { Memo } from '@railgun-community/engine/dist/note/memo';
-import { bytes } from '@railgun-community/engine/dist/utils';
-
-import { ByteLength } from '@railgun-community/engine/dist/utils/bytes';
+import {
+  ByteLength,
+  padToLength,
+} from '@railgun-community/engine/dist/utils/bytes';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
@@ -24,6 +24,7 @@ import {
   compareTokenAmountArrays,
   erc20NoteFromTokenAmount,
 } from '../tx-erc20-notes';
+import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 
 const MOCK_TOKEN = '0x236c614a38362644deb15c9789779faf508bc6fe';
 
@@ -31,7 +32,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const padTo32BytesUnHex = (str: string) => {
-  return bytes.padToLength(str.replace('0x', ''), ByteLength.UINT_256);
+  return padToLength(str.replace('0x', ''), ByteLength.UINT_256);
 };
 
 const formatAmountString = (tokenAmount: RailgunWalletTokenAmount) => {
@@ -40,8 +41,9 @@ const formatAmountString = (tokenAmount: RailgunWalletTokenAmount) => {
 
 let railgunWalletID: string;
 
-describe('tx-erc20-notes', () => {
-  before(async () => {
+describe.only('tx-erc20-notes', () => {
+  before(async function run() {
+    this.timeout(10000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletResponse = await createRailgunWallet(

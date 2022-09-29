@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { Wallet as RailgunWallet } from '@railgun-community/engine/dist/wallet/wallet';
+import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import Sinon, { SinonStub } from 'sinon';
 import { RailgunBalancesEvent } from '@railgun-community/shared-models/dist/models/response-types';
 import { ByteLength, nToHex } from '@railgun-community/engine/dist/utils/bytes';

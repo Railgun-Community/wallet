@@ -35,10 +35,10 @@ import {
 } from '@railgun-community/engine/dist/models/formatted-types';
 import { hexlify, randomHex } from '@railgun-community/engine/dist/utils/bytes';
 import { fullWalletForID } from '../railgun/core/engine';
-import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt';
+import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
 import { TransactionReceiptLog } from '@railgun-community/shared-models/dist/models/transaction';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { ProverProgressCallback } from '@railgun-community/engine/dist/prover';
+import { ProverProgressCallback } from '@railgun-community/engine/dist/prover/prover';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { FeeTokenDetails } from '@railgun-community/shared-models/dist/models/fee-token';
 
