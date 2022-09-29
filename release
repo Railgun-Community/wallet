@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+# patch by default.
+# Use `./release minor` or `./release major`.
+VERSION_TYPE=${1-patch}
+
+git fetch;
+git checkout release --;
+git rebase origin/main;
+npm version $VERSION_TYPE;
+git push -f;
+git checkout main;
+git rebase origin/release;
+git push --tags --no-verify;
+echo https://github.com/Railgun-Community/quickstart/actions;
