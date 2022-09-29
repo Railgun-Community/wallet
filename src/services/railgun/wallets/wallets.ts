@@ -36,6 +36,11 @@ import {
 } from '@railgun-community/shared-models/dist/models/network-config';
 import { AddressData } from '@railgun-community/engine/dist/key-derivation/bech32';
 import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
+import {
+  ByteLength,
+  hexlify,
+  nToHex,
+} from '@railgun-community/engine/dist/utils/bytes';
 
 const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
   wallet.on(EngineEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>
@@ -211,6 +216,21 @@ export const getWalletMnemonic = async (
 export const getRailgunWalletAddressData = (address: string): AddressData => {
   assertValidRailgunAddress(address);
   return RailgunEngine.decodeAddress(address);
+};
+
+export const serializeRailgunWalletAddressData = (
+  addressData: AddressData,
+): { viewingPublicKey: string; masterPublicKey: string } => {
+  const { viewingPublicKey, masterPublicKey } = addressData;
+  const viewingPublicKeySerialized = hexlify(viewingPublicKey);
+  const masterPublicKeySerialized = nToHex(
+    masterPublicKey,
+    ByteLength.UINT_256,
+  );
+  return {
+    viewingPublicKey: viewingPublicKeySerialized,
+    masterPublicKey: masterPublicKeySerialized,
+  };
 };
 
 export const assertValidRailgunAddress = (
