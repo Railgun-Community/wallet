@@ -43,6 +43,7 @@ describe('tx-erc20-notes', () => {
     const railgunWalletResponse = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
+      undefined, // creationBlockNumbers
     );
     if (!railgunWalletResponse.railgunWalletInfo) {
       throw new Error('No railgun wallet created.');
