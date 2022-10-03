@@ -6,7 +6,7 @@ import {
   ArtifactVariant,
 } from '@railgun-community/shared-models/dist/models/artifact';
 import { initTestEngine } from '../../../test/setup.test';
-import { setLoggerFuncs } from '../../../utils/logger';
+import { setLoggers } from '../../../utils/logger';
 import {
   clearArtifactCache,
   artifactsGetter,
@@ -56,7 +56,7 @@ describe('engine', () => {
   // Skip because this runs an actual artifact download.
   it.skip('Should download artifacts', async () => {
     // eslint-disable-next-line no-console
-    setLoggerFuncs(console.log, console.error);
+    setLoggers(console.log, console.error);
 
     clearArtifactCache();
 

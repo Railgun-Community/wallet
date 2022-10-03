@@ -27,7 +27,7 @@ const setupTests = () => {
   setTestArtifacts();
 
   // Uncomment to enable logger during tests (Do not commit).
-  // setLoggerFuncs(console.log, console.error);
+  // setLoggers(console.log, console.error);
 
   // Remove artifacts.
   const { warn } = console;

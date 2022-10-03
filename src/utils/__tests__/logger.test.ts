@@ -1,20 +1,20 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
-import { sendErrorMessage, sendMessage, setLoggerFuncs } from '../logger';
+import { sendErrorMessage, sendMessage, setLoggers } from '../logger';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('logger', () => {
   after(() => {
-    setLoggerFuncs(undefined, undefined);
+    setLoggers(undefined, undefined);
   });
 
   it('Should test out logger setters', () => {
     const messageSpy = Sinon.spy();
     const errorSpy = Sinon.spy();
-    setLoggerFuncs(messageSpy, errorSpy);
+    setLoggers(messageSpy, errorSpy);
 
     expect(messageSpy.notCalled).to.be.true;
     expect(errorSpy.notCalled).to.be.true;

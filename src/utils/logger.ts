@@ -9,7 +9,7 @@ export const sendErrorMessage = (err: any) => {
   if (error) error(err);
 };
 
-export const setLoggerFuncs = (
+export const setLoggers = (
   logFunc: Optional<(msg: any) => void>,
   errorFunc: Optional<(err: any) => void>,
 ) => {
