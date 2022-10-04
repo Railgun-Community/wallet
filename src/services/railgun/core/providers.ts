@@ -3,13 +3,11 @@ import { BigNumber } from '@ethersproject/bignumber';
 import {
   FallbackProviderJsonConfig,
   createFallbackProviderFromJsonConfig,
-} from '@railgun-community/shared-models/dist/models/fallback-provider';
-import {
   NetworkName,
   NETWORK_CONFIG,
-} from '@railgun-community/shared-models/dist/models/network-config';
-import { LoadProviderResponse } from '@railgun-community/shared-models/dist/models/response-types';
-import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
+  LoadProviderResponse,
+} from '@railgun-community/shared-models';
+import { sanitizeError } from '@railgun-community/shared-models';
 import { sendMessage, sendErrorMessage } from '../../../utils/logger';
 import { getEngine } from './engine';
 import { Chain } from '@railgun-community/engine/dist/models/engine-types';

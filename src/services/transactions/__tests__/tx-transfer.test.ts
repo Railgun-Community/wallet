@@ -3,11 +3,13 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
 import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
-import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
-import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
+import {
+  RailgunWalletTokenAmount,
+  NetworkName,
+} from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { deserializeTransaction } from '@railgun-community/shared-models/dist/utils/serializer';
+import { deserializeTransaction } from '@railgun-community/shared-models';
 import { SerializedTransaction } from '@railgun-community/engine/dist/models/formatted-types';
 import {
   initTestEngine,

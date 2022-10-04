@@ -2,8 +2,7 @@
 /* eslint-disable no-console */
 import LevelDOWN from 'leveldown';
 import fs from 'fs';
-import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
-import { ArtifactVariant } from '@railgun-community/shared-models/dist/models/artifact';
+import { NetworkName , ArtifactVariant } from '@railgun-community/shared-models';
 import {
   setOnMerkletreeScanCallback,
   startRailgunEngine,

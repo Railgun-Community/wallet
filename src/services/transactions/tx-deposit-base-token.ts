@@ -4,13 +4,11 @@ import {
   RailgunTransactionGasEstimateResponse,
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
-} from '@railgun-community/shared-models/dist/models/response-types';
-import {
   NetworkName,
   NETWORK_CONFIG,
-} from '@railgun-community/shared-models/dist/models/network-config';
-import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
-import { serializeUnsignedTransaction } from '@railgun-community/shared-models/dist/utils/serializer';
+} from '@railgun-community/shared-models';
+import { sanitizeError } from '@railgun-community/shared-models';
+import { serializeUnsignedTransaction } from '@railgun-community/shared-models';
 import {
   getProviderForNetwork,
   getRelayAdaptContractForNetwork,

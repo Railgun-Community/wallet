@@ -4,7 +4,7 @@ import {
   ArtifactMapping,
   ArtifactVariantMapping,
   ARTIFACT_URL_PATHS_VARIANTS_V1,
-} from '@railgun-community/shared-models/dist/models/artifact';
+} from '@railgun-community/shared-models';
 import brotliDecompress from 'brotli/decompress';
 import { createHash } from 'crypto';
 import { sendErrorMessage } from '../../utils/logger';

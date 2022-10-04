@@ -1,10 +1,9 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
-import {
+import { ProofType ,
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
   ValidateCachedProvedTransactionResponse,
-} from '@railgun-community/shared-models/dist/models/response-types';
+} from '@railgun-community/shared-models';
 import { sendErrorMessage } from '../../utils/logger';
 import { compareStringArrays } from '../../utils/utils';
 import { setGasDetailsForPopulatedTransaction } from './tx-gas-details';

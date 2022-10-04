@@ -2,7 +2,7 @@ import {
   hexToBigInt,
   randomHex,
 } from '@railgun-community/engine/dist/utils/bytes';
-import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
+import { RailgunWalletTokenAmount } from '@railgun-community/shared-models';
 import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
 import { AddressData } from '@railgun-community/engine/dist/key-derivation/bech32';
 import { Note } from '@railgun-community/engine/dist/note/note';

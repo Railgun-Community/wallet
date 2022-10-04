@@ -2,7 +2,7 @@ import { FallbackProvider, TransactionRequest } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub } from 'sinon';
-import { createFallbackProviderFromJsonConfig } from '@railgun-community/shared-models/dist/models/fallback-provider';
+import { createFallbackProviderFromJsonConfig , EVMGasType , TransactionGasDetailsSerialized } from '@railgun-community/shared-models';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import {
@@ -15,8 +15,6 @@ import {
   getGasEstimate,
   setGasDetailsForPopulatedTransaction,
 } from '../tx-gas-details';
-import { EVMGasType } from '@railgun-community/shared-models/dist/models/network-config';
-import { TransactionGasDetailsSerialized } from '@railgun-community/shared-models/dist/models/response-types';
 
 let gasEstimateStub: SinonStub;
 

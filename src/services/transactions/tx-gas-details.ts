@@ -5,10 +5,10 @@ import {
   RailgunTransactionGasEstimateResponse,
   TransactionGasDetails,
   TransactionGasDetailsSerialized,
-} from '@railgun-community/shared-models/dist/models/response-types';
-import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
-import { calculateGasLimit } from '@railgun-community/shared-models/dist/utils/gas';
-import { EVMGasType } from '@railgun-community/shared-models/dist/models/network-config';
+  EVMGasType,
+} from '@railgun-community/shared-models';
+import { sanitizeError } from '@railgun-community/shared-models';
+import { calculateGasLimit } from '@railgun-community/shared-models';
 import { sendErrorMessage } from '../../utils/logger';
 
 export const getGasEstimate = async (

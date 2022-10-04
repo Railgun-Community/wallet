@@ -1,7 +1,7 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
+import { ProofType } from '@railgun-community/shared-models';
 import {
   MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_AMOUNTS,

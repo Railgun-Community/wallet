@@ -2,16 +2,16 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BaseProvider } from '@ethersproject/providers';
 import { SerializedTransaction } from '@railgun-community/engine/dist/models/formatted-types';
-import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
 import {
+  NetworkName,
   TransactionGasDetails,
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
   RailgunTransactionGasEstimateResponse,
-} from '@railgun-community/shared-models/dist/models/response-types';
-import { calculateMaximumGas } from '@railgun-community/shared-models/dist/utils/gas';
+  FeeTokenDetails,
+  calculateMaximumGas,
+} from '@railgun-community/shared-models';
 import { getProviderForNetwork } from '../railgun/core/providers';
-import { FeeTokenDetails } from '@railgun-community/shared-models/dist/models/fee-token';
 import {
   DUMMY_FROM_ADDRESS,
   createDummyRelayerFeeTokenAmount,

@@ -3,12 +3,12 @@ import {
   RailgunTransactionGasEstimateResponse,
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
-} from '@railgun-community/shared-models/dist/models/response-types';
-import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
-import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
-import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
-import { serializeUnsignedTransaction } from '@railgun-community/shared-models/dist/utils/serializer';
-import { FeeTokenDetails } from '@railgun-community/shared-models/dist/models/fee-token';
+  NetworkName,
+  ProofType,
+  FeeTokenDetails,
+} from '@railgun-community/shared-models';
+import { sanitizeError } from '@railgun-community/shared-models';
+import { serializeUnsignedTransaction } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
   generateTransact,

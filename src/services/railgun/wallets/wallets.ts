@@ -10,7 +10,7 @@ import {
   RailgunWalletSendTokenAmount,
   RailgunWalletReceiveTokenAmount,
   RailgunWalletAddressDataSerialized,
-} from '@railgun-community/shared-models/dist/models/response-types';
+ networkForChain, NetworkName } from '@railgun-community/shared-models';
 import {
   EngineEvent,
   ScannedEventData,
@@ -31,10 +31,6 @@ import {
   WalletData,
 } from '@railgun-community/engine/dist/wallet/abstract-wallet';
 import { Chain } from '@railgun-community/engine/dist/models/engine-types';
-import {
-  networkForChain,
-  NetworkName,
-} from '@railgun-community/shared-models/dist/models/network-config';
 import { AddressData } from '@railgun-community/engine/dist/key-derivation/bech32';
 import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 import {

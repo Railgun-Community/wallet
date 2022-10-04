@@ -2,7 +2,7 @@ import {
   ArtifactGroup,
   ArtifactName,
   ArtifactVariant,
-} from '@railgun-community/shared-models/dist/models/artifact';
+} from '@railgun-community/shared-models';
 import axios, { ResponseType } from 'axios';
 import { sendErrorMessage } from '../../utils/logger';
 import {

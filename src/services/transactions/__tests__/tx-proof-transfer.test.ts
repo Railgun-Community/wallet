@@ -2,9 +2,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
-import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
-import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
-import { RailgunProveTransactionResponse } from '@railgun-community/shared-models/dist/models/response-types';
+import { NetworkName , ProofType , RailgunProveTransactionResponse } from '@railgun-community/shared-models';
 import {
   ByteLength,
   formatToByteLength,

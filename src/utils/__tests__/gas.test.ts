@@ -4,9 +4,11 @@ import { BigNumber } from '@ethersproject/bignumber';
 import {
   calculateGasLimit,
   calculateMaximumGas,
-} from '@railgun-community/shared-models/dist/utils/gas';
-import { TransactionGasDetails } from '@railgun-community/shared-models/dist/models/response-types';
-import { EVMGasType } from '@railgun-community/shared-models/dist/models/network-config';
+} from '@railgun-community/shared-models';
+import {
+  TransactionGasDetails,
+  EVMGasType,
+} from '@railgun-community/shared-models';
 import { decimalStringToHexString } from '../format';
 
 chai.use(chaiAsPromised);

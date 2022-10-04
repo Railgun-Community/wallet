@@ -5,7 +5,7 @@ import { Database } from '@railgun-community/engine/dist/database/database';
 import {
   MerkletreeScanUpdateEvent,
   StartRailgunEngineResponse,
-} from '@railgun-community/shared-models/dist/models/response-types';
+ MerkletreeScanStatus } from '@railgun-community/shared-models';
 import { sendErrorMessage, sendMessage } from '../../../utils/logger';
 import {
   artifactsGetter,
@@ -21,7 +21,6 @@ import {
   MerkletreeHistoryScanEventData,
   MerkletreeHistoryScanUpdateData,
 } from '@railgun-community/engine/dist/models/event-types';
-import { MerkletreeScanStatus } from '@railgun-community/shared-models/dist/models/merkletree-scan';
 
 let engine: Optional<RailgunEngine>;
 

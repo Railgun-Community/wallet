@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
+import { NetworkName , FallbackProviderJsonConfig } from '@railgun-community/shared-models';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
@@ -14,7 +14,6 @@ import {
   loadProvider,
 } from '../providers';
 import { createRailgunWallet } from '../../wallets/wallets';
-import { FallbackProviderJsonConfig } from '@railgun-community/shared-models/dist/models/fallback-provider';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

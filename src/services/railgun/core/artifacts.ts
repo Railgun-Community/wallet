@@ -2,7 +2,7 @@ import { PublicInputs } from '@railgun-community/engine/dist/prover/prover';
 import {
   ArtifactGroup,
   ArtifactVariant,
-} from '@railgun-community/shared-models/dist/models/artifact';
+} from '@railgun-community/shared-models';
 import { ArtifactDownloader } from '../../artifacts/artifact-downloader';
 import { ArtifactStore } from '../../artifacts/artifact-store';
 

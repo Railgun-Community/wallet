@@ -4,7 +4,7 @@ import {
   hexlify,
   hexStringToBytes,
 } from '@railgun-community/engine/dist/utils/bytes';
-import { EncryptDataWithSharedKeyResponse } from '@railgun-community/shared-models/dist/models/response-types';
+import { EncryptDataWithSharedKeyResponse } from '@railgun-community/shared-models';
 import {
   encryptJSONDataWithSharedKey,
   tryDecryptJSONDataWithSharedKey,

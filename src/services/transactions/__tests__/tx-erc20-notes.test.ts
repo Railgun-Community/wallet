@@ -6,7 +6,7 @@ import {
 } from '@railgun-community/engine/dist/utils/bytes';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
+import { RailgunWalletTokenAmount } from '@railgun-community/shared-models';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MEMO,
@@ -41,7 +41,7 @@ const formatAmountString = (tokenAmount: RailgunWalletTokenAmount) => {
 
 let railgunWalletID: string;
 
-describe.only('tx-erc20-notes', () => {
+describe('tx-erc20-notes', () => {
   before(async function run() {
     this.timeout(10000);
     initTestEngine();

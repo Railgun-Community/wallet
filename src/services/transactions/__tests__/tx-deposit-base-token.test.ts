@@ -3,8 +3,8 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from '@ethersproject/bignumber';
 import Sinon, { SinonStub } from 'sinon';
-import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
-import { deserializeTransaction } from '@railgun-community/shared-models/dist/utils/serializer';
+import { NetworkName } from '@railgun-community/shared-models';
+import { deserializeTransaction } from '@railgun-community/shared-models';
 import {
   initTestEngine,
   initTestEngineNetwork,

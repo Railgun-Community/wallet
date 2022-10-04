@@ -1,12 +1,7 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
-import { RailgunWalletTokenAmount } from '@railgun-community/shared-models/dist/models/response-types';
-import {
-  NetworkName,
-  NETWORK_CONFIG,
-} from '@railgun-community/shared-models/dist/models/network-config';
-import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
+import { RailgunWalletTokenAmount , NetworkName, NETWORK_CONFIG , ProofType } from '@railgun-community/shared-models';
 import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
 import {

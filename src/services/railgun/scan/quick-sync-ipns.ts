@@ -1,6 +1,6 @@
 import { QuickSync } from '@railgun-community/engine/dist/models/event-types';
 import { Chain } from '@railgun-community/engine/dist/models/engine-types';
-import { networkForChain } from '@railgun-community/shared-models/dist/models/network-config';
+import { networkForChain } from '@railgun-community/shared-models';
 import {
   DEFAULT_QUICK_SYNC_PAGE_SIZE,
   getRailgunEventLogIPNS,

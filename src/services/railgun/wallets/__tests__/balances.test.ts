@@ -9,10 +9,7 @@ import {
 import { initTestEngine } from '../../../../test/setup.test';
 import { createRailgunWallet } from '../wallets';
 import { refreshRailgunBalances } from '../balances';
-import {
-  Chain,
-  ChainType,
-} from '@railgun-community/shared-models/dist/models/response-types';
+import { Chain, ChainType } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

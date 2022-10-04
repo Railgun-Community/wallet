@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 import Sinon, { SinonStub } from 'sinon';
-import { RailgunBalancesEvent } from '@railgun-community/shared-models/dist/models/response-types';
+import { RailgunBalancesEvent } from '@railgun-community/shared-models';
 import { ByteLength, nToHex } from '@railgun-community/engine/dist/utils/bytes';
 import {
   onBalancesUpdate,

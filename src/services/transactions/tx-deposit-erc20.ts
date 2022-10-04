@@ -4,15 +4,13 @@ import {
   RailgunTransactionGasEstimateResponse,
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
-} from '@railgun-community/shared-models/dist/models/response-types';
-import {
   NetworkName,
   NETWORK_CONFIG,
-} from '@railgun-community/shared-models/dist/models/network-config';
-import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
+} from '@railgun-community/shared-models';
+import { sanitizeError } from '@railgun-community/shared-models';
 import { ERC20Deposit } from '@railgun-community/engine/dist/note/erc20-deposit';
 import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
-import { serializeUnsignedTransaction } from '@railgun-community/shared-models/dist/utils/serializer';
+import { serializeUnsignedTransaction } from '@railgun-community/shared-models';
 import { DepositInput } from '@railgun-community/engine/dist/models/formatted-types';
 import {
   getProxyContractForNetwork,

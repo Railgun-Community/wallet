@@ -4,17 +4,17 @@ import {
   RailgunTransactionGasEstimateResponse,
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
-} from '@railgun-community/shared-models/dist/models/response-types';
-import {
   NetworkName,
   NETWORK_CONFIG,
-} from '@railgun-community/shared-models/dist/models/network-config';
-import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
-import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
+  ProofType,
+  TransactionReceiptLog,
+  FeeTokenDetails,
+} from '@railgun-community/shared-models';
+import { sanitizeError } from '@railgun-community/shared-models';
 import {
   deserializeTransaction,
   serializeUnsignedTransaction,
-} from '@railgun-community/shared-models/dist/utils/serializer';
+} from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
   generateDummyProofTransactions,
@@ -36,11 +36,9 @@ import {
 import { hexlify, randomHex } from '@railgun-community/engine/dist/utils/bytes';
 import { fullWalletForID } from '../railgun/core/engine';
 import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
-import { TransactionReceiptLog } from '@railgun-community/shared-models/dist/models/transaction';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { ProverProgressCallback } from '@railgun-community/engine/dist/prover/prover';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
-import { FeeTokenDetails } from '@railgun-community/shared-models/dist/models/fee-token';
 
 const createPopulatedCrossContractCalls = (
   crossContractCallsSerialized: string[],

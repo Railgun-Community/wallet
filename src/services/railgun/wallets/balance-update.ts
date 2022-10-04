@@ -4,7 +4,7 @@ import { AbstractWallet } from '@railgun-community/engine/dist/wallet/abstract-w
 import {
   RailgunBalancesEvent,
   RailgunShieldedTokenBalanceSerialized,
-} from '@railgun-community/shared-models/dist/models/response-types';
+} from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
 import { parseRailgunBalanceAddress } from '../util/bytes-util';
 

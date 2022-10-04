@@ -4,7 +4,7 @@ import {
   ArtifactGroup,
   ArtifactName,
   ArtifactVariant,
-} from '@railgun-community/shared-models/dist/models/artifact';
+} from '@railgun-community/shared-models';
 import { initTestEngine } from '../../../test/setup.test';
 import { setLoggers } from '../../../utils/logger';
 import {

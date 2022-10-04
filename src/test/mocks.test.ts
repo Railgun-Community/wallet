@@ -1,10 +1,7 @@
-import { FallbackProviderJsonConfig } from '@railgun-community/shared-models/dist/models/fallback-provider';
-import { FeeTokenDetails } from '@railgun-community/shared-models/dist/models/fee-token';
-import { EVMGasType } from '@railgun-community/shared-models/dist/models/network-config';
-import {
+import { FallbackProviderJsonConfig , FeeTokenDetails , EVMGasType ,
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
-} from '@railgun-community/shared-models/dist/models/response-types';
+} from '@railgun-community/shared-models';
 import { BalancesUpdatedCallback } from '../services/railgun/wallets/balance-update';
 
 export const MOCK_MNEMONIC =

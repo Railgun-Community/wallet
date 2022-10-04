@@ -1,10 +1,10 @@
 import {
   RailgunProveTransactionResponse,
   RailgunWalletTokenAmount,
-} from '@railgun-community/shared-models/dist/models/response-types';
-import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
-import { ProofType } from '@railgun-community/shared-models/dist/models/proof';
-import { sanitizeError } from '@railgun-community/shared-models/dist/utils/error';
+  NetworkName,
+  ProofType,
+} from '@railgun-community/shared-models';
+import { sanitizeError } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
   generateProofTransactions,
