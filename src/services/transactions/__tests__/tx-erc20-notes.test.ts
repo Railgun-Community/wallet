@@ -1,9 +1,4 @@
-import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
-import { Memo } from '@railgun-community/engine/dist/note/memo';
-import {
-  ByteLength,
-  padToLength,
-} from '@railgun-community/engine/dist/utils/bytes';
+import { OutputType , Memo , ByteLength, padToLength , RailgunEngine } from '@railgun-community/engine';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models';
@@ -24,7 +19,6 @@ import {
   compareTokenAmountArrays,
   erc20NoteFromTokenAmount,
 } from '../tx-erc20-notes';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 
 const MOCK_TOKEN = '0x236c614a38362644deb15c9789779faf508bc6fe';
 

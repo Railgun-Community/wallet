@@ -1,6 +1,9 @@
-import { Chain } from '@railgun-community/engine/dist/models/engine-types';
-import { ByteLength, nToHex } from '@railgun-community/engine/dist/utils/bytes';
-import { AbstractWallet } from '@railgun-community/engine/dist/wallet/abstract-wallet';
+import {
+  Chain,
+  ByteLength,
+  nToHex,
+  AbstractWallet,
+} from '@railgun-community/engine';
 import {
   RailgunBalancesEvent,
   RailgunShieldedTokenBalanceSerialized,

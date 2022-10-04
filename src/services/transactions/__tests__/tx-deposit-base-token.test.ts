@@ -3,8 +3,10 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from '@ethersproject/bignumber';
 import Sinon, { SinonStub } from 'sinon';
-import { NetworkName } from '@railgun-community/shared-models';
-import { deserializeTransaction } from '@railgun-community/shared-models';
+import {
+  NetworkName,
+  deserializeTransaction,
+} from '@railgun-community/shared-models';
 import {
   initTestEngine,
   initTestEngineNetwork,
@@ -22,7 +24,7 @@ import {
 import { decimalToHexString } from '../../../utils/format';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
+import { RelayAdaptContract } from '@railgun-community/engine';
 
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;

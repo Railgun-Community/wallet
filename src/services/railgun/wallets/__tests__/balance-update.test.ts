@@ -1,9 +1,8 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+import { RailgunWallet , ByteLength, nToHex , Balances , Chain, ChainType } from '@railgun-community/engine';
 import Sinon, { SinonStub } from 'sinon';
 import { RailgunBalancesEvent } from '@railgun-community/shared-models';
-import { ByteLength, nToHex } from '@railgun-community/engine/dist/utils/bytes';
 import {
   onBalancesUpdate,
   setOnBalanceUpdateCallback,
@@ -15,11 +14,6 @@ import {
   MOCK_MNEMONIC,
 } from '../../../../test/mocks.test';
 import { initTestEngine } from '../../../../test/setup.test';
-import { Balances } from '@railgun-community/engine/dist/models/wallet-types';
-import {
-  Chain,
-  ChainType,
-} from '@railgun-community/engine/dist/models/engine-types';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

@@ -1,15 +1,22 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
-import { RailgunWalletTokenAmount , NetworkName, NETWORK_CONFIG , ProofType } from '@railgun-community/shared-models';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
-import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
 import {
+  RailgunWallet,
+  RailgunEngine,
+  TransactionBatch,
   AdaptID,
   OutputType,
   SerializedTransaction,
   TokenType,
-} from '@railgun-community/engine/dist/models/formatted-types';
+  ProverProgressCallback,
+  averageNumber,
+} from '@railgun-community/engine';
+import {
+  RailgunWalletTokenAmount,
+  NetworkName,
+  NETWORK_CONFIG,
+  ProofType,
+} from '@railgun-community/shared-models';
 import { fullWalletForID, walletForID } from '../railgun/core/engine';
 import {
   getProxyContractForNetwork,
@@ -17,8 +24,6 @@ import {
 } from '../railgun/core/providers';
 import { erc20NoteFromTokenAmount } from './tx-erc20-notes';
 import { getProver } from '../railgun/core/prover';
-import { ProverProgressCallback } from '@railgun-community/engine/dist/prover/prover';
-import { averageNumber } from '@railgun-community/engine/dist/utils/average';
 
 const DUMMY_AMOUNT = '0x00';
 export const DUMMY_FROM_ADDRESS = '0x000000000000000000000000000000000000dEaD';

@@ -12,7 +12,7 @@ import {
   artifactsGetter,
   overrideArtifact,
 } from '../../railgun/core/artifacts';
-import { PublicInputs } from '@railgun-community/engine/dist/prover/types';
+import { PublicInputs } from '@railgun-community/engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

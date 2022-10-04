@@ -6,12 +6,10 @@ import {
   TransactionGasDetailsSerialized,
   NetworkName,
   NETWORK_CONFIG,
+  sanitizeError,
+  serializeUnsignedTransaction,
 } from '@railgun-community/shared-models';
-import { sanitizeError } from '@railgun-community/shared-models';
-import { ERC20Deposit } from '@railgun-community/engine/dist/note/erc20-deposit';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
-import { serializeUnsignedTransaction } from '@railgun-community/shared-models';
-import { DepositInput } from '@railgun-community/engine/dist/models/formatted-types';
+import { ERC20Deposit , RailgunEngine , DepositInput , randomHex } from '@railgun-community/engine';
 import {
   getProxyContractForNetwork,
   getProviderForNetwork,
@@ -24,7 +22,6 @@ import {
 import { sendErrorMessage } from '../../utils/logger';
 import { walletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { randomHex } from '@railgun-community/engine/dist/utils/bytes';
 
 const generateDepositTransaction = async (
   networkName: NetworkName,

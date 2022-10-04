@@ -4,8 +4,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import {
   calculateGasLimit,
   calculateMaximumGas,
-} from '@railgun-community/shared-models';
-import {
+
   TransactionGasDetails,
   EVMGasType,
 } from '@railgun-community/shared-models';

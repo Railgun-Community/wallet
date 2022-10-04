@@ -6,13 +6,11 @@ import {
   NetworkName,
   NETWORK_CONFIG,
   LoadProviderResponse,
+  sanitizeError,
 } from '@railgun-community/shared-models';
-import { sanitizeError } from '@railgun-community/shared-models';
 import { sendMessage, sendErrorMessage } from '../../../utils/logger';
 import { getEngine } from './engine';
-import { Chain } from '@railgun-community/engine/dist/models/engine-types';
-import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy/railgun-proxy';
-import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
+import { Chain , RailgunProxyContract , RelayAdaptContract } from '@railgun-community/engine';
 
 const providerMap: MapType<BaseProvider> = {};
 export const getProviderForNetwork = (

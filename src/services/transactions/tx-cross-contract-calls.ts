@@ -9,9 +9,7 @@ import {
   ProofType,
   TransactionReceiptLog,
   FeeTokenDetails,
-} from '@railgun-community/shared-models';
-import { sanitizeError } from '@railgun-community/shared-models';
-import {
+  sanitizeError,
   deserializeTransaction,
   serializeUnsignedTransaction,
 } from '@railgun-community/shared-models';
@@ -28,16 +26,9 @@ import {
 import { sendErrorMessage } from '../../utils/logger';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { RelayAdaptHelper } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt-helper';
-import {
-  AdaptID,
-  SerializedTransaction,
-} from '@railgun-community/engine/dist/models/formatted-types';
-import { hexlify, randomHex } from '@railgun-community/engine/dist/utils/bytes';
+import { RelayAdaptHelper , AdaptID, SerializedTransaction , hexlify, randomHex , RelayAdaptContract , ProverProgressCallback } from '@railgun-community/engine';
 import { fullWalletForID } from '../railgun/core/engine';
-import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { ProverProgressCallback } from '@railgun-community/engine/dist/prover/prover';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 
 const createPopulatedCrossContractCalls = (

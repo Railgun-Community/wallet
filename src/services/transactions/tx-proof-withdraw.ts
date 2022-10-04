@@ -3,8 +3,8 @@ import {
   RailgunWalletTokenAmount,
   NetworkName,
   ProofType,
+  sanitizeError,
 } from '@railgun-community/shared-models';
-import { sanitizeError } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
   generateProofTransactions,
@@ -18,10 +18,8 @@ import {
 } from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
-import { AdaptID } from '@railgun-community/engine/dist/models/formatted-types';
+import { AdaptID , ProverProgressCallback , randomHex } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { ProverProgressCallback } from '@railgun-community/engine/dist/prover/prover';
-import { randomHex } from '@railgun-community/engine/dist/utils/bytes';
 
 export const generateWithdrawProof = async (
   networkName: NetworkName,

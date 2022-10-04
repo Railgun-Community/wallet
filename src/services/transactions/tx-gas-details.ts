@@ -6,9 +6,7 @@ import {
   TransactionGasDetails,
   TransactionGasDetailsSerialized,
   EVMGasType,
-} from '@railgun-community/shared-models';
-import { sanitizeError } from '@railgun-community/shared-models';
-import { calculateGasLimit } from '@railgun-community/shared-models';
+ sanitizeError , calculateGasLimit } from '@railgun-community/shared-models';
 import { sendErrorMessage } from '../../utils/logger';
 
 export const getGasEstimate = async (

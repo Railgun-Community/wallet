@@ -2,15 +2,14 @@ import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+import { RailgunWallet , SerializedTransaction , TransactionBatch , RailgunProxyContract , RelayAdaptContract } from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
   NetworkName,
+  deserializeTransaction,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { deserializeTransaction } from '@railgun-community/shared-models';
-import { SerializedTransaction } from '@railgun-community/engine/dist/models/formatted-types';
 import {
   initTestEngine,
   initTestEngineNetwork,
@@ -36,10 +35,7 @@ import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { setCachedProvedTransaction } from '../proof-cache';
 import { decimalToHexString } from '../../../utils/format';
-import { TransactionBatch } from '@railgun-community/engine/dist/transaction/transaction-batch';
 import * as txErc20Notes from '../tx-erc20-notes';
-import { RailgunProxyContract } from '@railgun-community/engine/dist/contracts/railgun-proxy/railgun-proxy';
-import { RelayAdaptContract } from '@railgun-community/engine/dist/contracts/relay-adapt/relay-adapt';
 
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;

@@ -1,5 +1,4 @@
-import { QuickSync } from '@railgun-community/engine/dist/models/event-types';
-import { Chain } from '@railgun-community/engine/dist/models/engine-types';
+import { QuickSync , Chain } from '@railgun-community/engine';
 import { networkForChain } from '@railgun-community/shared-models';
 import {
   DEFAULT_QUICK_SYNC_PAGE_SIZE,

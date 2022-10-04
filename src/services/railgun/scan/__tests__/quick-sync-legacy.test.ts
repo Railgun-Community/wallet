@@ -1,7 +1,4 @@
-import {
-  Chain,
-  ChainType,
-} from '@railgun-community/engine/dist/models/engine-types';
+import { Chain, ChainType } from '@railgun-community/engine';
 import axios from 'axios';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';

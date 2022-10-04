@@ -6,9 +6,9 @@ import {
   NetworkName,
   ProofType,
   FeeTokenDetails,
+  sanitizeError,
+  serializeUnsignedTransaction,
 } from '@railgun-community/shared-models';
-import { sanitizeError } from '@railgun-community/shared-models';
-import { serializeUnsignedTransaction } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
   generateTransact,
@@ -21,8 +21,7 @@ import {
 import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { randomHex } from '@railgun-community/engine/dist/utils/bytes';
-import { SerializedTransaction } from '@railgun-community/engine/dist/models/formatted-types';
+import { randomHex , SerializedTransaction } from '@railgun-community/engine';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 
 export const populateProvedWithdraw = async (

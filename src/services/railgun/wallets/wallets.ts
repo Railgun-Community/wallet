@@ -1,4 +1,20 @@
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
+import {
+  RailgunWallet,
+  EngineEvent,
+  ScannedEventData,
+  BytesData,
+  TransactionHistoryTransferTokenAmount,
+  TransactionHistoryTokenAmount,
+  TransactionHistoryEntry,
+  AbstractWallet,
+  WalletData,
+  Chain,
+  AddressData,
+  RailgunEngine,
+  ByteLength,
+  hexlify,
+  nToHex,
+} from '@railgun-community/engine';
 import { getAddress } from '@ethersproject/address';
 import {
   RailgunWalletInfo,
@@ -10,34 +26,14 @@ import {
   RailgunWalletSendTokenAmount,
   RailgunWalletReceiveTokenAmount,
   RailgunWalletAddressDataSerialized,
- networkForChain, NetworkName } from '@railgun-community/shared-models';
-import {
-  EngineEvent,
-  ScannedEventData,
-} from '@railgun-community/engine/dist/models/event-types';
-import { BytesData } from '@railgun-community/engine/dist/models/formatted-types';
+  networkForChain,
+  NetworkName,
+} from '@railgun-community/shared-models';
 import { getEngine, walletForID } from '../core/engine';
 import { sendErrorMessage } from '../../../utils/logger';
 import { onBalancesUpdate } from './balance-update';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseRailgunBalanceAddress } from '../util/bytes-util';
-import {
-  TransactionHistoryTransferTokenAmount,
-  TransactionHistoryTokenAmount,
-  TransactionHistoryEntry,
-} from '@railgun-community/engine/dist/models/wallet-types';
-import {
-  AbstractWallet,
-  WalletData,
-} from '@railgun-community/engine/dist/wallet/abstract-wallet';
-import { Chain } from '@railgun-community/engine/dist/models/engine-types';
-import { AddressData } from '@railgun-community/engine/dist/key-derivation/bech32';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
-import {
-  ByteLength,
-  hexlify,
-  nToHex,
-} from '@railgun-community/engine/dist/utils/bytes';
 
 const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
   wallet.on(EngineEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>

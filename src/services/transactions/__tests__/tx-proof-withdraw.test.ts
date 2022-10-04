@@ -1,14 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
-import { NetworkName , ProofType , RailgunProveTransactionResponse } from '@railgun-community/shared-models';
 import {
+  RailgunWallet,
   ByteLength,
   formatToByteLength,
   nToHex,
   randomHex,
-} from '@railgun-community/engine/dist/utils/bytes';
+  OutputType,
+  Note,
+  RailgunEngine,
+} from '@railgun-community/engine';
+import {
+  NetworkName,
+  ProofType,
+  RailgunProveTransactionResponse,
+} from '@railgun-community/shared-models';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   initTestEngine,
@@ -28,9 +35,6 @@ import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { getCachedProvedTransaction } from '../proof-cache';
 import { generateWithdrawProof } from '../tx-proof-withdraw';
-import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
-import { Note } from '@railgun-community/engine/dist/note/note';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
 
 let railgunWallet: RailgunWallet;
 let railgunWalletAddress: string;

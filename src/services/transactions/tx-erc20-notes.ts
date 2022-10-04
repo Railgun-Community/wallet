@@ -1,12 +1,5 @@
-import {
-  hexToBigInt,
-  randomHex,
-} from '@railgun-community/engine/dist/utils/bytes';
+import { hexToBigInt, randomHex , OutputType , AddressData , Note , RailgunWallet } from '@railgun-community/engine';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models';
-import { OutputType } from '@railgun-community/engine/dist/models/formatted-types';
-import { AddressData } from '@railgun-community/engine/dist/key-derivation/bech32';
-import { Note } from '@railgun-community/engine/dist/note/note';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
 
 export const erc20NoteFromTokenAmount = (
   tokenAmount: RailgunWalletTokenAmount,

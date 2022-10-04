@@ -1,4 +1,4 @@
-import { trim, randomHex } from '@railgun-community/engine/dist/utils/bytes';
+import { trim, randomHex } from '@railgun-community/engine';
 
 export const parseRailgunBalanceAddress = (tokenAddress: string): string => {
   return `0x${trim(tokenAddress, 20)}`;

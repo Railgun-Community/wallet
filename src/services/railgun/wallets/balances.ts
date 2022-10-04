@@ -1,5 +1,8 @@
-import { Chain } from '@railgun-community/engine/dist/models/engine-types';
-import { RailgunBalanceRefreshTrigger , RailgunBalanceResponse } from '@railgun-community/shared-models';
+import { Chain } from '@railgun-community/engine';
+import {
+  RailgunBalanceRefreshTrigger,
+  RailgunBalanceResponse,
+} from '@railgun-community/shared-models';
 import { getEngine, walletForID } from '../core/engine';
 
 export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (

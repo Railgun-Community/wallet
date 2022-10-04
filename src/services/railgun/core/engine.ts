@@ -1,11 +1,19 @@
 import type { AbstractLevelDOWN } from 'abstract-leveldown';
-import { RailgunEngine } from '@railgun-community/engine/dist/railgun-engine';
-import { RailgunWallet } from '@railgun-community/engine/dist/wallet/railgun-wallet';
-import { Database } from '@railgun-community/engine/dist/database/database';
+import {
+  RailgunEngine,
+  RailgunWallet,
+  Database,
+  ViewOnlyWallet,
+  AbstractWallet,
+  EngineEvent,
+  MerkletreeHistoryScanEventData,
+  MerkletreeHistoryScanUpdateData,
+} from '@railgun-community/engine';
 import {
   MerkletreeScanUpdateEvent,
   StartRailgunEngineResponse,
- MerkletreeScanStatus } from '@railgun-community/shared-models';
+  MerkletreeScanStatus,
+} from '@railgun-community/shared-models';
 import { sendErrorMessage, sendMessage } from '../../../utils/logger';
 import {
   artifactsGetter,
@@ -13,14 +21,7 @@ import {
   setUseNativeArtifacts,
 } from './artifacts';
 import { ArtifactStore } from '../../artifacts/artifact-store';
-import { ViewOnlyWallet } from '@railgun-community/engine/dist/wallet/view-only-wallet';
-import { AbstractWallet } from '@railgun-community/engine/dist/wallet/abstract-wallet';
 import { quickSyncLegacy } from '../scan/legacy/quick-sync-legacy';
-import {
-  EngineEvent,
-  MerkletreeHistoryScanEventData,
-  MerkletreeHistoryScanUpdateData,
-} from '@railgun-community/engine/dist/models/event-types';
 
 let engine: Optional<RailgunEngine>;
 

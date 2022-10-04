@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BaseProvider } from '@ethersproject/providers';
-import { SerializedTransaction } from '@railgun-community/engine/dist/models/formatted-types';
+import { SerializedTransaction } from '@railgun-community/engine';
 import {
   NetworkName,
   TransactionGasDetails,

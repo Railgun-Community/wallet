@@ -1,4 +1,4 @@
-import { PublicInputs } from '@railgun-community/engine/dist/prover/prover';
+import { PublicInputs } from '@railgun-community/engine';
 import {
   ArtifactGroup,
   ArtifactVariant,
