@@ -77,14 +77,14 @@ const createEngineDebugger = (): EngineDebugger => {
   };
 };
 
-export const setOnHistoryScanCallback = (
-  onHistoryScanCallback: (scanData: MerkletreeScanUpdateEvent) => void,
+export const setOnMerkletreeScanCallback = (
+  onMerkletreeScanCallback: (scanData: MerkletreeScanUpdateEvent) => void,
 ) => {
   const engine = getEngine();
   engine.on(
     EngineEvent.MerkletreeHistoryScanStarted,
     ({ chain }: MerkletreeHistoryScanEventData) =>
-      onHistoryScanCallback({
+      onMerkletreeScanCallback({
         scanStatus: MerkletreeScanStatus.Started,
         chain,
         progress: 0.0,
@@ -93,7 +93,7 @@ export const setOnHistoryScanCallback = (
   engine.on(
     EngineEvent.MerkletreeHistoryScanUpdate,
     ({ chain, progress }: MerkletreeHistoryScanUpdateData) =>
-      onHistoryScanCallback({
+      onMerkletreeScanCallback({
         scanStatus: MerkletreeScanStatus.Updated,
         chain,
         progress,
@@ -102,7 +102,7 @@ export const setOnHistoryScanCallback = (
   engine.on(
     EngineEvent.MerkletreeHistoryScanComplete,
     ({ chain }: MerkletreeHistoryScanEventData) =>
-      onHistoryScanCallback({
+      onMerkletreeScanCallback({
         scanStatus: MerkletreeScanStatus.Complete,
         chain,
         progress: 1.0,
@@ -111,7 +111,7 @@ export const setOnHistoryScanCallback = (
   engine.on(
     EngineEvent.MerkletreeHistoryScanIncomplete,
     ({ chain }: MerkletreeHistoryScanEventData) =>
-      onHistoryScanCallback({
+      onMerkletreeScanCallback({
         scanStatus: MerkletreeScanStatus.Incomplete,
         chain,
         progress: 1.0,

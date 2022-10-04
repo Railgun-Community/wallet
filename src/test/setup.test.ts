@@ -5,7 +5,7 @@ import fs from 'fs';
 import { NetworkName } from '@railgun-community/shared-models/dist/models/network-config';
 import { ArtifactVariant } from '@railgun-community/shared-models/dist/models/artifact';
 import {
-  setOnHistoryScanCallback,
+  setOnMerkletreeScanCallback,
   startRailgunEngine,
 } from '../services/railgun/core/engine';
 import {
@@ -78,7 +78,7 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     throw new Error(response.error);
   }
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);
-  setOnHistoryScanCallback(MOCK_HISTORY_SCAN_CALLBACK);
+  setOnMerkletreeScanCallback(MOCK_HISTORY_SCAN_CALLBACK);
 };
 
 export const setTestArtifacts = () => {
