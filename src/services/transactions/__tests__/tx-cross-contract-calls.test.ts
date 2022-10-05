@@ -112,6 +112,7 @@ describe('tx-cross-contract-calls', () => {
     const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
+      undefined, // creationBlockNumbers
     );
     if (!railgunWalletInfo) {
       throw new Error('Expected railgunWalletInfo');
@@ -122,6 +123,7 @@ describe('tx-cross-contract-calls', () => {
     const { railgunWalletInfo: relayerWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
+      undefined, // creationBlockNumbers
     );
     if (!relayerWalletInfo) {
       throw new Error('Expected relayerWalletInfo');

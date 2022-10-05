@@ -1,6 +1,6 @@
 import { Chain } from '@railgun-community/engine/dist/models/engine-types';
 import { QuickSync } from '@railgun-community/engine/dist/models/event-types';
-import { networkForChain } from '@railgun-community/shared-models';
+import { ChainType, networkForChain } from '@railgun-community/shared-models';
 import {
   getRailgunEventLogLegacy,
   QuickSyncEventLog,
@@ -8,7 +8,7 @@ import {
 
 export const quickSyncURLForEVMChain = (chain: Chain) => {
   const network = networkForChain(chain);
-  if (!network || !network.isEVM) {
+  if (!network || network.chain.type !== ChainType.EVM) {
     return undefined;
   }
   return `https://events.railgun.org/chain/${chain.id}`;

@@ -21,6 +21,7 @@ import {
 } from '../../../../test/mocks.test';
 import { initTestEngine } from '../../../../test/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
+import { NetworkName } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -33,6 +34,7 @@ describe('wallets', () => {
     const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
+      { [NetworkName.Ethereum]: 0, [NetworkName.Polygon]: 2 }, // creationBlockNumbers
     );
     if (!railgunWalletInfo) {
       throw new Error('Could not create wallet');
@@ -44,6 +46,7 @@ describe('wallets', () => {
     const { railgunWalletInfo } = await createViewOnlyRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       await wallet.generateShareableViewingKey(),
+      undefined, // creationBlockNumbers
     );
     if (!railgunWalletInfo) {
       throw new Error('Could not create view-only wallet');
@@ -77,6 +80,7 @@ describe('wallets', () => {
     const response = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
+      undefined, // creationBlockNumbers
     );
     expect(response.railgunWalletInfo).to.not.be.undefined;
     expect(response.railgunWalletInfo?.id).to.be.a('string');
@@ -86,6 +90,8 @@ describe('wallets', () => {
     const loadWalletResponse = await loadWalletByID(
       MOCK_DB_ENCRYPTION_KEY,
       response.railgunWalletInfo?.id ?? '',
+      false, // isViewOnlyWallet
+      undefined, // creationBlockNumbers
     );
     expect(loadWalletResponse.railgunWalletInfo).to.not.be.undefined;
     expect(loadWalletResponse.railgunWalletInfo?.id).to.equal(
@@ -103,6 +109,8 @@ describe('wallets', () => {
     const loadWalletResponse = await loadWalletByID(
       MOCK_DB_ENCRYPTION_KEY,
       wallet.id,
+      false, // isViewOnlyWallet
+      undefined, // creationBlockNumbers
     );
     expect(loadWalletResponse.railgunWalletInfo).to.not.be.undefined;
     expect(loadWalletResponse.railgunWalletInfo?.id).to.equal(wallet.id);
@@ -115,6 +123,8 @@ describe('wallets', () => {
     const loadWalletResponse = await loadWalletByID(
       MOCK_DB_ENCRYPTION_KEY,
       'unknown',
+      false, // isViewOnlyWallet
+      undefined, // creationBlockNumbers
     );
     expect(loadWalletResponse.error).to.equal('Could not load RAILGUN wallet.');
   });

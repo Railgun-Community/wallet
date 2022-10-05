@@ -28,6 +28,7 @@ import {
   RailgunWalletAddressDataSerialized,
   networkForChain,
   NetworkName,
+  NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import { getEngine, walletForID } from '../core/engine';
 import { sendErrorMessage } from '../../../utils/logger';
@@ -67,7 +68,8 @@ const getExistingWallet = (
 const loadExistingWallet = async (
   encryptionKey: string,
   railgunWalletID: string,
-  isViewOnlyWallet?: boolean,
+  isViewOnlyWallet: boolean,
+  creationBlockNumbers: Optional<MapType<number>>,
 ): Promise<RailgunWalletInfo> => {
   const existingWallet = getExistingWallet(railgunWalletID);
   if (existingWallet) {
@@ -76,13 +78,20 @@ const loadExistingWallet = async (
   const engine = getEngine();
   let wallet: AbstractWallet;
 
+  const formattedCreationBlockNumbers =
+    formatCreationBlockNumbers(creationBlockNumbers);
   if (isViewOnlyWallet) {
     wallet = await engine.loadExistingViewOnlyWallet(
       encryptionKey,
       railgunWalletID,
+      formattedCreationBlockNumbers,
     );
   } else {
-    wallet = await engine.loadExistingWallet(encryptionKey, railgunWalletID);
+    wallet = await engine.loadExistingWallet(
+      encryptionKey,
+      railgunWalletID,
+      formattedCreationBlockNumbers,
+    );
   }
 
   subscribeToBalanceEvents(wallet);
@@ -92,9 +101,18 @@ const loadExistingWallet = async (
 const createWallet = async (
   encryptionKey: string,
   mnemonic: string,
+  creationBlockNumbers: Optional<MapType<number>>,
 ): Promise<RailgunWalletInfo> => {
+  const formattedCreationBlockNumbers =
+    formatCreationBlockNumbers(creationBlockNumbers);
+
   const engine = getEngine();
-  const wallet = await engine.createWalletFromMnemonic(encryptionKey, mnemonic);
+  const wallet = await engine.createWalletFromMnemonic(
+    encryptionKey,
+    mnemonic,
+    0,
+    formattedCreationBlockNumbers,
+  );
   subscribeToBalanceEvents(wallet);
   return infoForWallet(wallet);
 };
@@ -102,11 +120,16 @@ const createWallet = async (
 const createViewOnlyWallet = async (
   encryptionKey: string,
   shareableViewingKey: string,
+  creationBlockNumbers: Optional<MapType<number>>,
 ): Promise<RailgunWalletInfo> => {
+  const formattedCreationBlockNumbers =
+    formatCreationBlockNumbers(creationBlockNumbers);
+
   const engine = getEngine();
   const wallet = await engine.createViewOnlyWalletFromShareableViewingKey(
     encryptionKey,
     shareableViewingKey,
+    formattedCreationBlockNumbers,
   );
   subscribeToBalanceEvents(wallet);
   return infoForWallet(wallet);
@@ -115,9 +138,14 @@ const createViewOnlyWallet = async (
 export const createRailgunWallet = async (
   encryptionKey: string,
   mnemonic: string,
+  creationBlockNumbers: Optional<MapType<number>>,
 ): Promise<LoadRailgunWalletResponse> => {
   try {
-    const railgunWalletInfo = await createWallet(encryptionKey, mnemonic);
+    const railgunWalletInfo = await createWallet(
+      encryptionKey,
+      mnemonic,
+      creationBlockNumbers,
+    );
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
   } catch (err) {
@@ -132,11 +160,13 @@ export const createRailgunWallet = async (
 export const createViewOnlyRailgunWallet = async (
   encryptionKey: string,
   shareableViewingKey: string,
+  creationBlockNumbers: Optional<MapType<number>>,
 ): Promise<LoadRailgunWalletResponse> => {
   try {
     const railgunWalletInfo = await createViewOnlyWallet(
       encryptionKey,
       shareableViewingKey,
+      creationBlockNumbers,
     );
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
@@ -152,13 +182,15 @@ export const createViewOnlyRailgunWallet = async (
 export const loadWalletByID = async (
   encryptionKey: string,
   railgunWalletID: string,
-  isViewOnlyWallet?: boolean,
+  isViewOnlyWallet: boolean,
+  creationBlockNumbers: Optional<MapType<number>>,
 ): Promise<LoadRailgunWalletResponse> => {
   try {
     const railgunWalletInfo = await loadExistingWallet(
       encryptionKey,
       railgunWalletID,
       isViewOnlyWallet,
+      creationBlockNumbers,
     );
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
@@ -374,4 +406,23 @@ export const getWalletTransactionHistory = async (
     };
     return response;
   }
+};
+
+const formatCreationBlockNumbers = (
+  creationBlockNumbers: Optional<MapType<number>>,
+): Optional<number[][]> => {
+  // Format creationBlockNumbers from client side { <NetworkName>: <BlockNumber> } map to @railgun-community/engine's number[][] type
+  if (!creationBlockNumbers) return;
+
+  const formattedCreationBlockNumbers: number[][] = [];
+  for (const networkName of Object.keys(creationBlockNumbers)) {
+    const network = NETWORK_CONFIG[networkName];
+
+    formattedCreationBlockNumbers[network.chain.type] ??= [];
+
+    formattedCreationBlockNumbers[network.chain.type][network.chain.id] =
+      creationBlockNumbers[networkName];
+  }
+
+  return formattedCreationBlockNumbers;
 };

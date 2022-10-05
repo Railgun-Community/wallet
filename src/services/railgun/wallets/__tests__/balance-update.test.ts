@@ -30,6 +30,7 @@ describe('balance-update', () => {
     const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
+      undefined, // creationBlockNumbers
     );
     if (!railgunWalletInfo) {
       throw new Error('Expected railgunWalletInfo');

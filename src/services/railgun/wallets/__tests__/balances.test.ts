@@ -23,6 +23,7 @@ describe('balances', () => {
     const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
+      undefined, // creationBlockNumbers
     );
     if (!railgunWalletInfo) {
       return;
