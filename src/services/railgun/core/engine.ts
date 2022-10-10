@@ -21,7 +21,7 @@ import {
   setUseNativeArtifacts,
 } from './artifacts';
 import { ArtifactStore } from '../../artifacts/artifact-store';
-import { quickSyncLegacy } from '../scan/legacy/quick-sync-legacy';
+import { quickSyncIPNS } from '../scan/quick-sync-ipns';
 
 let engine: Optional<RailgunEngine>;
 
@@ -135,7 +135,7 @@ export const startRailgunEngine = (
       walletSource,
       db,
       artifactsGetter,
-      quickSyncLegacy,
+      quickSyncIPNS,
       shouldDebug ? createEngineDebugger() : undefined,
     );
     setArtifactStore(artifactStore);
