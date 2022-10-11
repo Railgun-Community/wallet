@@ -2,17 +2,13 @@
 
 # RAILGUN Quickstart SDK
 
-- RAILGUN SDK compatible with mobile, browser and nodejs environments.
-
-# Overview
-
 The RAILGUN Quickstart SDK is an open-source project developed by RAILGUN contributors.
 
 RAILGUN Quickstart enables dApp and DeFi developers to provide privacy to users safely and conveniently on Ethereum, Polygon and BNB Chain.
 
 The repo is written in TypeScript, and compatible with node.js and modern web browsers.
 
-### Use cases
+## Use cases
 
 RAILGUN Quickstart SDK enables dApp and DeFi developers to:
 
@@ -23,4 +19,4 @@ RAILGUN Quickstart SDK enables dApp and DeFi developers to:
 
 # Developer Guide
 
-Please see our [full developer guide](https://railgun-privacy.gitbook.io/developer-guide/quickstart). 
+Please see our [full developer guide](https://railgun-privacy.gitbook.io/developer-guide/quickstart) for details on implementation.
