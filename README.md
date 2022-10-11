@@ -1,4 +1,4 @@
-[![Node.js CI Actions Status](https://github.com/Railgun-Community/quickstart/actions/workflows/node.js.yml/badge.svg?branch=master)](https://github.com/Railgun-Community/quickstart/actions)
+[![Node.js CI Actions Status](https://github.com/Railgun-Community/quickstart/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/quickstart/actions)
 
 # RAILGUN Quickstart SDK
 
