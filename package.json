@@ -1,6 +1,6 @@
 {
   "name": "@railgun-community/quickstart",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "RAILGUN Quickstart SDK, compatible with mobile, browser and nodejs environments.",
   "main": "dist/index.js",
   "license": "MIT",
