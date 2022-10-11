@@ -18,7 +18,7 @@
     "test": "npm run compile-test && mocha 'src/**/__tests__/*.test.ts'",
     "tsc": "tsc && tsc-alias",
     "check-circular-deps": "madge --circular .",
-    "eslint": "eslint src --ext .ts,.tsx --fix",
+    "eslint": "eslint src/**/* --ext .ts,.tsx --fix",
     "lint": "npm run check-circular-deps && npm run eslint && npm run tsc",
     "prepare": "npm run compile",
     "postinstall": "npm run lint"
