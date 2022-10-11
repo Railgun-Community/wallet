@@ -1,4 +1,7 @@
-import { FallbackProviderJsonConfig , FeeTokenDetails , EVMGasType ,
+import {
+  FallbackProviderJsonConfig,
+  FeeTokenDetails,
+  EVMGasType,
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
 } from '@railgun-community/shared-models';
@@ -75,11 +78,21 @@ export const MOCK_HISTORY_SCAN_CALLBACK = () => {
 };
 
 export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG: FallbackProviderJsonConfig = {
-  chainId: 3,
+  chainId: 137,
   providers: [
     {
-      provider: 'https://ropsten.infura.io/v3/84842078b09946638c03157f83405213',
-      priority: 1,
+      provider: 'https://rpc.ankr.com/polygon',
+      priority: 3,
+      weight: 1,
+    },
+    {
+      provider: 'https://polygon-rpc.com',
+      priority: 3,
+      weight: 1,
+    },
+    {
+      provider: 'https://rpc-mainnet.maticvigil.com',
+      priority: 3,
       weight: 1,
     },
   ],

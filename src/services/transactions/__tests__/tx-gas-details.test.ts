@@ -2,7 +2,11 @@ import { FallbackProvider, TransactionRequest } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub } from 'sinon';
-import { createFallbackProviderFromJsonConfig , EVMGasType , TransactionGasDetailsSerialized } from '@railgun-community/shared-models';
+import {
+  createFallbackProviderFromJsonConfig,
+  EVMGasType,
+  TransactionGasDetailsSerialized,
+} from '@railgun-community/shared-models';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import {
@@ -54,7 +58,7 @@ describe('tx-gas', () => {
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     );
     const tx: TransactionRequest = {
-      chainId: 3,
+      chainId: 1,
       to: MOCK_ETH_WALLET_ADDRESS,
       value: BigNumber.from('100'),
     };

@@ -2,7 +2,13 @@ import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
-import { RailgunWallet , SerializedTransaction , TransactionBatch , RailgunProxyContract , RelayAdaptContract } from '@railgun-community/engine';
+import {
+  RailgunWallet,
+  SerializedTransaction,
+  TransactionBatch,
+  RailgunProxyContract,
+  RelayAdaptContract,
+} from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
   NetworkName,
@@ -146,7 +152,7 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateSuccess();
     spyOnERC20Note();
     const rsp = await gasEstimateForUnprovenTransfer(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -172,7 +178,7 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateSuccess();
     spyOnERC20Note();
     const rsp = await gasEstimateForUnprovenTransfer(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -193,7 +199,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on gas estimates for invalid transfer', async () => {
     stubGasEstimateSuccess();
     const rsp = await gasEstimateForUnprovenTransfer(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -209,7 +215,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on transfer gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
     const rsp = await gasEstimateForUnprovenTransfer(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -229,7 +235,7 @@ describe('tx-withdraw-transfer', () => {
     setCachedProvedTransaction(undefined);
     spyOnERC20Note();
     const proofResponse = await generateTransferProof(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -246,7 +252,7 @@ describe('tx-withdraw-transfer', () => {
     );
     expect(proofResponse.error).to.be.undefined;
     const populateResponse = await populateProvedTransfer(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_MEMO,
@@ -280,7 +286,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on populate tx for invalid transfer', async () => {
     stubGasEstimateSuccess();
     const rsp = await populateProvedTransfer(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_MEMO,
@@ -297,7 +303,7 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
     const rsp = await populateProvedTransfer(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_MEMO,
@@ -313,7 +319,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on populate transfer tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
     const proofResponse = await generateTransferProof(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -326,7 +332,7 @@ describe('tx-withdraw-transfer', () => {
     );
     expect(proofResponse.error).to.be.undefined;
     const rsp = await populateProvedTransfer(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_MEMO,

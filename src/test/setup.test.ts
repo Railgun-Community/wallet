@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import LevelDOWN from 'leveldown';
 import fs from 'fs';
-import { NetworkName , ArtifactVariant } from '@railgun-community/shared-models';
+import { NetworkName, ArtifactVariant } from '@railgun-community/shared-models';
 import {
   setOnMerkletreeScanCallback,
   startRailgunEngine,
@@ -94,7 +94,7 @@ export const initTestEngineNetwork = async () => {
   // Don't wait for async. It will try to load historical events, which takes a while.
   return loadProvider(
     MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
-    NetworkName.EthereumRopsten,
+    NetworkName.Polygon,
     shouldDebug,
   );
 };

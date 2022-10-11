@@ -91,7 +91,6 @@ describe('wallets', () => {
       MOCK_DB_ENCRYPTION_KEY,
       response.railgunWalletInfo?.id ?? '',
       false, // isViewOnlyWallet
-      undefined, // creationBlockNumbers
     );
     expect(loadWalletResponse.railgunWalletInfo).to.not.be.undefined;
     expect(loadWalletResponse.railgunWalletInfo?.id).to.equal(
@@ -110,7 +109,6 @@ describe('wallets', () => {
       MOCK_DB_ENCRYPTION_KEY,
       wallet.id,
       false, // isViewOnlyWallet
-      undefined, // creationBlockNumbers
     );
     expect(loadWalletResponse.railgunWalletInfo).to.not.be.undefined;
     expect(loadWalletResponse.railgunWalletInfo?.id).to.equal(wallet.id);
@@ -124,7 +122,6 @@ describe('wallets', () => {
       MOCK_DB_ENCRYPTION_KEY,
       'unknown',
       false, // isViewOnlyWallet
-      undefined, // creationBlockNumbers
     );
     expect(loadWalletResponse.error).to.equal('Could not load RAILGUN wallet.');
   });

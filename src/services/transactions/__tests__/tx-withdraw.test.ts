@@ -2,7 +2,13 @@ import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
-import { RailgunWallet , SerializedTransaction , TransactionBatch , RailgunProxyContract , RelayAdaptContract } from '@railgun-community/engine';
+import {
+  RailgunWallet,
+  SerializedTransaction,
+  TransactionBatch,
+  RailgunProxyContract,
+  RelayAdaptContract,
+} from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
   NetworkName,
@@ -54,7 +60,7 @@ let railgunWalletAddress: string;
 let relayerRailgunAddress: string;
 
 const ropstenRelayAdaptContract =
-  NETWORK_CONFIG[NetworkName.EthereumRopsten].relayAdaptContract;
+  NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -153,7 +159,7 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateSuccess();
     spyOnSetWithdraw();
     const rsp = await gasEstimateForUnprovenWithdraw(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -176,7 +182,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on gas estimates for invalid Withdraw', async () => {
     stubGasEstimateSuccess();
     const rsp = await gasEstimateForUnprovenWithdraw(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -191,7 +197,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on withdraw gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
     const rsp = await gasEstimateForUnprovenWithdraw(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -209,7 +215,7 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateSuccess();
     spyOnSetWithdraw();
     const rsp = await gasEstimateForUnprovenWithdrawBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -231,7 +237,7 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateSuccess();
     spyOnSetWithdraw();
     const rsp = await gasEstimateForUnprovenWithdrawBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -251,7 +257,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on gas estimates for invalid Withdraw base token', async () => {
     stubGasEstimateSuccess();
     const rsp = await gasEstimateForUnprovenWithdrawBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -266,7 +272,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on withdraw base token gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
     const rsp = await gasEstimateForUnprovenWithdrawBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -285,7 +291,7 @@ describe('tx-withdraw-transfer', () => {
     setCachedProvedTransaction(undefined);
     spyOnSetWithdraw();
     const proofResponse = await generateWithdrawProof(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -302,7 +308,7 @@ describe('tx-withdraw-transfer', () => {
       [MOCK_ETH_WALLET_ADDRESS, '0x0200', false], // 1st iteration - token2
     ]);
     const populateResponse = await populateProvedWithdraw(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
@@ -336,7 +342,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on populate tx for invalid Withdraw', async () => {
     stubGasEstimateSuccess();
     const rsp = await populateProvedWithdraw(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
@@ -352,7 +358,7 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
     const rsp = await populateProvedWithdraw(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
@@ -367,7 +373,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on populate withdraw tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
     const proofResponse = await generateWithdrawProof(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -379,7 +385,7 @@ describe('tx-withdraw-transfer', () => {
     );
     expect(proofResponse.error).to.be.undefined;
     const rsp = await populateProvedWithdraw(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS_DIFFERENT,
@@ -398,7 +404,7 @@ describe('tx-withdraw-transfer', () => {
     setCachedProvedTransaction(undefined);
     spyOnSetWithdraw();
     const proofResponse = await generateWithdrawBaseTokenProof(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -415,7 +421,7 @@ describe('tx-withdraw-transfer', () => {
       [ropstenRelayAdaptContract, '0x0100', false], // Actual prove.
     ]);
     const populateResponse = await populateProvedWithdrawBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS[0],
@@ -449,7 +455,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on populate tx for invalid Withdraw Base Token', async () => {
     stubGasEstimateSuccess();
     const rsp = await populateProvedWithdrawBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS[0],
@@ -465,7 +471,7 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
     const rsp = await populateProvedWithdrawBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS[0],
@@ -480,7 +486,7 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on populate Withdraw Base Token tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
     const proofResponse = await generateWithdrawBaseTokenProof(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -492,7 +498,7 @@ describe('tx-withdraw-transfer', () => {
     );
     expect(proofResponse.error).to.be.undefined;
     const rsp = await populateProvedWithdrawBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS_DIFFERENT[0],

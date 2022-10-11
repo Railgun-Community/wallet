@@ -75,7 +75,7 @@ describe('tx-deposit-base-token', () => {
   it('Should get gas estimate for valid deposit base token', async () => {
     stubSuccess();
     const rsp = await gasEstimateForDepositBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletID,
       MOCK_TOKEN_AMOUNTS[0],
       MOCK_ETH_WALLET_ADDRESS,
@@ -87,7 +87,7 @@ describe('tx-deposit-base-token', () => {
   it('Should error on gas estimates for invalid deposit base token', async () => {
     stubSuccess();
     const rsp = await gasEstimateForDepositBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       '12345',
       MOCK_TOKEN_AMOUNTS[0],
       MOCK_ETH_WALLET_ADDRESS,
@@ -98,7 +98,7 @@ describe('tx-deposit-base-token', () => {
   it('Should error for ethers rejections', async () => {
     stubFailure();
     const rsp = await gasEstimateForDepositBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletID,
       MOCK_TOKEN_AMOUNTS[0],
       MOCK_ETH_WALLET_ADDRESS,
@@ -109,7 +109,7 @@ describe('tx-deposit-base-token', () => {
   it('Should send tx for valid deposit base token', async () => {
     stubSuccess();
     const rsp = await populateDepositBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletID,
       MOCK_TOKEN_AMOUNTS[0],
       undefined, // gasDetailsSerialized
@@ -128,7 +128,7 @@ describe('tx-deposit-base-token', () => {
   it('Should error on send tx for invalid deposit base token', async () => {
     stubSuccess();
     const rsp = await populateDepositBaseToken(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       '12345',
       MOCK_TOKEN_AMOUNTS[0],
       undefined, // gasDetailsSerialized

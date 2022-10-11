@@ -6,7 +6,12 @@ import {
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
-import { RailgunWallet , SerializedTransaction , TransactionBatch , RelayAdaptContract } from '@railgun-community/engine';
+import {
+  RailgunWallet,
+  SerializedTransaction,
+  TransactionBatch,
+  RelayAdaptContract,
+} from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
   NetworkName,
@@ -55,7 +60,7 @@ let railgunWalletAddress: string;
 let relayerRailgunAddress: string;
 
 const ropstenRelayAdaptContract =
-  NETWORK_CONFIG[NetworkName.EthereumRopsten].relayAdaptContract;
+  NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -165,7 +170,7 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     spyOnSetWithdraw();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -191,7 +196,7 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     spyOnSetWithdraw();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -214,7 +219,7 @@ describe('tx-cross-contract-calls', () => {
   it('Should error on gas estimates for invalid cross contract calls', async () => {
     stubGasEstimateSuccess();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -231,7 +236,7 @@ describe('tx-cross-contract-calls', () => {
   it('Should error on cross contract calls gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -252,7 +257,7 @@ describe('tx-cross-contract-calls', () => {
     setCachedProvedTransaction(undefined);
     spyOnSetWithdraw();
     const proofResponse = await generateCrossContractCallsProof(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -273,7 +278,7 @@ describe('tx-cross-contract-calls', () => {
       [ropstenRelayAdaptContract, '0x0200', false], // actual proof #2
     ]);
     const populateResponse = await populateProvedCrossContractCalls(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
@@ -309,7 +314,7 @@ describe('tx-cross-contract-calls', () => {
   it('Should error on populate tx for invalid cross contract calls', async () => {
     stubGasEstimateSuccess();
     const rsp = await populateProvedCrossContractCalls(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
@@ -327,7 +332,7 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
     const rsp = await populateProvedCrossContractCalls(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
@@ -344,7 +349,7 @@ describe('tx-cross-contract-calls', () => {
   it('Should error on populate cross contract calls tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
     const proofResponse = await generateCrossContractCallsProof(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -358,7 +363,7 @@ describe('tx-cross-contract-calls', () => {
     );
     expect(proofResponse.error).to.be.undefined;
     const rsp = await populateProvedCrossContractCalls(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS_DIFFERENT,

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Nullifier , CommitmentEvent , Chain } from '@railgun-community/engine';
+import { Nullifier, CommitmentEvent, Chain } from '@railgun-community/engine';
 import { sendErrorMessage } from '../../../utils/logger';
 
 const MAX_NUM_RETRIES = 3;
@@ -55,8 +55,7 @@ const getIpnsUrl = (gateway: string) => {
 };
 
 const ipnsUrlForChain = (gateway: string, chain: Chain) => {
-  return `${getIpnsUrl(gateway)}/${chain.id}`;
-  // return `${getIpnsUrl(gateway)}/${chain.type}/${chain.id}`;
+  return `${getIpnsUrl(gateway)}/${chain.type}/${chain.id}`;
 };
 
 const getChainPageMetadataURL = (
@@ -202,9 +201,6 @@ const fetchJsonData = async <ReturnType>(
   url: string,
   retryCount = 1,
 ): Promise<ReturnType> => {
-  // console.log(
-  //   `${retryCount > 1 ? `(Retry ${retryCount}) ` : ''}Fetch JSON data: ${url}`,
-  // );
   try {
     const rsp = await axios.get(url, {
       method: 'GET',
@@ -213,15 +209,12 @@ const fetchJsonData = async <ReturnType>(
         'Content-Type': 'application/json',
       },
     });
-    // console.log(`Got data: ${url}`);
     return rsp.data;
   } catch (err) {
     if (retryCount < MAX_NUM_RETRIES) {
       return fetchJsonData(url, retryCount + 1);
     }
     sendErrorMessage(err);
-    // console.log(url);
-    // console.log(err.message);
     throw new Error(
       'Could not pull historical transactions. Please try again.',
     );

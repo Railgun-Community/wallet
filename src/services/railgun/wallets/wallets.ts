@@ -69,7 +69,6 @@ const loadExistingWallet = async (
   encryptionKey: string,
   railgunWalletID: string,
   isViewOnlyWallet: boolean,
-  creationBlockNumbers: Optional<MapType<number>>,
 ): Promise<RailgunWalletInfo> => {
   const existingWallet = getExistingWallet(railgunWalletID);
   if (existingWallet) {
@@ -78,20 +77,13 @@ const loadExistingWallet = async (
   const engine = getEngine();
   let wallet: AbstractWallet;
 
-  const formattedCreationBlockNumbers =
-    formatCreationBlockNumbers(creationBlockNumbers);
   if (isViewOnlyWallet) {
     wallet = await engine.loadExistingViewOnlyWallet(
       encryptionKey,
       railgunWalletID,
-      formattedCreationBlockNumbers,
     );
   } else {
-    wallet = await engine.loadExistingWallet(
-      encryptionKey,
-      railgunWalletID,
-      formattedCreationBlockNumbers,
-    );
+    wallet = await engine.loadExistingWallet(encryptionKey, railgunWalletID);
   }
 
   subscribeToBalanceEvents(wallet);
@@ -183,14 +175,12 @@ export const loadWalletByID = async (
   encryptionKey: string,
   railgunWalletID: string,
   isViewOnlyWallet: boolean,
-  creationBlockNumbers: Optional<MapType<number>>,
 ): Promise<LoadRailgunWalletResponse> => {
   try {
     const railgunWalletInfo = await loadExistingWallet(
       encryptionKey,
       railgunWalletID,
       isViewOnlyWallet,
-      creationBlockNumbers,
     );
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;

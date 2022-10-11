@@ -3,7 +3,10 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { BigNumber } from '@ethersproject/bignumber';
 import Sinon, { SinonStub } from 'sinon';
-import { NetworkName , deserializeTransaction } from '@railgun-community/shared-models';
+import {
+  NetworkName,
+  deserializeTransaction,
+} from '@railgun-community/shared-models';
 import {
   initTestEngine,
   initTestEngineNetwork,
@@ -61,7 +64,7 @@ describe('tx-deposit-erc20', () => {
   it('Should get gas estimate for valid deposit', async () => {
     stubSuccess();
     const rsp = await gasEstimateForDeposit(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletID,
       MOCK_TOKEN_AMOUNTS,
       MOCK_ETH_WALLET_ADDRESS,
@@ -73,7 +76,7 @@ describe('tx-deposit-erc20', () => {
   it('Should error on gas estimates for invalid deposit', async () => {
     stubSuccess();
     const rsp = await gasEstimateForDeposit(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       '12345',
       MOCK_TOKEN_AMOUNTS,
       MOCK_ETH_WALLET_ADDRESS,
@@ -84,7 +87,7 @@ describe('tx-deposit-erc20', () => {
   it('Should error for ethers rejections', async () => {
     stubFailure();
     const rsp = await gasEstimateForDeposit(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletID,
       MOCK_TOKEN_AMOUNTS,
       MOCK_ETH_WALLET_ADDRESS,
@@ -95,7 +98,7 @@ describe('tx-deposit-erc20', () => {
   it('Should send tx for valid deposit', async () => {
     stubSuccess();
     const rsp = await populateDeposit(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       railgunWalletID,
       MOCK_TOKEN_AMOUNTS,
       undefined, // gasDetailsSerialized
@@ -114,7 +117,7 @@ describe('tx-deposit-erc20', () => {
   it('Should error on send tx for invalid deposit', async () => {
     stubSuccess();
     const rsp = await populateDeposit(
-      NetworkName.EthereumRopsten,
+      NetworkName.Polygon,
       '12345',
       MOCK_TOKEN_AMOUNTS,
       undefined, // gasDetailsSerialized
