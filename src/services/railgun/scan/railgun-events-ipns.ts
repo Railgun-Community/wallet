@@ -21,7 +21,8 @@ export enum QuickSyncPageSize {
 }
 
 // CDN automatically pulls XL on a timer, making sure its cache is
-//  updated regularly. Consider this if modifying this default setting.
+//  updated regularly. This will pull data the fastest.
+// Consider this if modifying this default setting.
 export const DEFAULT_QUICK_SYNC_PAGE_SIZE = QuickSyncPageSize.XLarge;
 
 type PageMetadata = {
