@@ -21,7 +21,7 @@ import {
 import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { randomHex , SerializedTransaction } from '@railgun-community/engine';
+import { randomHex, SerializedTransaction } from '@railgun-community/engine';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 
 export const populateProvedWithdraw = async (
@@ -145,6 +145,8 @@ export const gasEstimateForUnprovenWithdraw = async (
           true, // useDummyProof
         ),
       networkName,
+      railgunWalletID,
+      tokenAmounts,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
@@ -201,6 +203,8 @@ export const gasEstimateForUnprovenWithdrawBaseToken = async (
         );
       },
       networkName,
+      railgunWalletID,
+      [wrappedTokenAmount],
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,

@@ -26,7 +26,15 @@ import {
 import { sendErrorMessage } from '../../utils/logger';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { RelayAdaptHelper , AdaptID, SerializedTransaction , hexlify, randomHex , RelayAdaptContract , ProverProgressCallback } from '@railgun-community/engine';
+import {
+  RelayAdaptHelper,
+  AdaptID,
+  SerializedTransaction,
+  hexlify,
+  randomHex,
+  RelayAdaptContract,
+  ProverProgressCallback,
+} from '@railgun-community/engine';
 import { fullWalletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
@@ -164,6 +172,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
         );
       },
       networkName,
+      railgunWalletID,
+      withdrawTokenAmounts,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,

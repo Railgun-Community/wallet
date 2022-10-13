@@ -10,6 +10,7 @@ import {
   RailgunTransactionGasEstimateResponse,
   FeeTokenDetails,
   calculateMaximumGas,
+  NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import { getProviderForNetwork } from '../railgun/core/providers';
 import {
@@ -21,6 +22,8 @@ import {
   deserializeTransactionGasDetails,
   gasEstimateResponse,
 } from './tx-gas-details';
+import { balanceForToken } from '../railgun/wallets/balance-update';
+import { walletForID } from '../railgun';
 
 const MAX_ITERATIONS_RELAYER_FEE_REESTIMATION = 5;
 
@@ -73,11 +76,14 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     serializedTransactions: SerializedTransaction[],
   ) => Promise<PopulatedTransaction>,
   networkName: NetworkName,
+  railgunWalletID: string,
+  tokenAmounts: RailgunWalletTokenAmount[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: FeeTokenDetails,
   sendWithPublicWallet: boolean,
   multiplierBasisPoints: Optional<number>,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
+  const wallet = walletForID(railgunWalletID);
   const provider = getProviderForNetwork(networkName);
   const originalGasDetails = deserializeTransactionGasDetails(
     originalGasDetailsSerialized,
@@ -108,6 +114,21 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     return gasEstimateResponse(gasEstimate);
   }
 
+  // Find tokenAmount that matches token of relayer fee, if exists.
+  const relayerFeeMatchingSendingTokenAmount = tokenAmounts.find(
+    tokenAmount =>
+      tokenAmount.tokenAddress.toLowerCase() ===
+      feeTokenDetails.tokenAddress.toLowerCase(),
+  );
+
+  // Get private balance of matching token.
+  const matchingSendingTokenBalance: Optional<BigNumber> =
+    await balanceForToken(
+      wallet,
+      NETWORK_CONFIG[networkName].chain,
+      feeTokenDetails.tokenAddress,
+    );
+
   // Iteratively calculate new relayer fee and estimate new gas amount.
   // This change if the number of circuits changes because of the additional Relayer Fees.
   for (let i = 0; i < MAX_ITERATIONS_RELAYER_FEE_REESTIMATION; i += 1) {
@@ -120,6 +141,23 @@ export const gasEstimateResponseIterativeRelayerFee = async (
       feeTokenDetails,
       multiplierBasisPoints,
     );
+
+    // If Relayer fee causes overflow with the token balance,
+    // then use the MAX amount for Relayer Fee, which is BALANCE - SENDING AMOUNT.
+    if (
+      relayerFeeMatchingSendingTokenAmount &&
+      matchingSendingTokenBalance &&
+      // eslint-disable-next-line no-await-in-loop
+      (await relayerFeeWillOverflowBalance(
+        matchingSendingTokenBalance,
+        relayerFeeMatchingSendingTokenAmount,
+        updatedRelayerFee,
+      ))
+    ) {
+      updatedRelayerFee.amountString = matchingSendingTokenBalance
+        .sub(relayerFeeMatchingSendingTokenAmount.amountString)
+        .toHexString();
+    }
 
     // eslint-disable-next-line no-await-in-loop
     const newSerializedTransactions = await generateSerializedTransactions(
@@ -178,4 +216,15 @@ const compareCircuitSizesSerializedTransactions = (
     }
   }
   return true;
+};
+
+const relayerFeeWillOverflowBalance = async (
+  tokenBalance: BigNumber,
+  sendingTokenAmount: RailgunWalletTokenAmount,
+  relayerFeeTokenAmount: RailgunWalletTokenAmount,
+) => {
+  const sendingAmount = BigNumber.from(sendingTokenAmount.amountString);
+  const relayerFeeAmount = BigNumber.from(relayerFeeTokenAmount.amountString);
+
+  return sendingAmount.add(relayerFeeAmount).gt(tokenBalance);
 };

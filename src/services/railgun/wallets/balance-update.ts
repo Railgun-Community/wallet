@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   Chain,
   ByteLength,
@@ -23,17 +24,7 @@ export const setOnBalanceUpdateCallback = (
   onBalanceUpdateCallback = callback;
 };
 
-export const onBalancesUpdate = async (
-  wallet: AbstractWallet,
-  chain: Chain,
-): Promise<void> => {
-  sendMessage(
-    `Wallet balance SCANNED. Getting balances for chain ${chain.type}:${chain.id}.`,
-  );
-  if (!onBalanceUpdateCallback) {
-    return;
-  }
-
+const getSerializedBalances = async (wallet: AbstractWallet, chain: Chain) => {
   const balances = await wallet.balances(chain);
 
   const tokenAddresses = Object.keys(balances);
@@ -51,11 +42,48 @@ export const onBalancesUpdate = async (
       };
     });
 
-  const balancesFormatted: RailgunBalancesEvent = {
+  return tokenBalancesSerialized;
+};
+
+export const onBalancesUpdate = async (
+  wallet: AbstractWallet,
+  chain: Chain,
+): Promise<void> => {
+  sendMessage(
+    `Wallet balance SCANNED. Getting balances for chain ${chain.type}:${chain.id}.`,
+  );
+  if (!onBalanceUpdateCallback) {
+    return;
+  }
+
+  const tokenBalancesSerialized: RailgunShieldedTokenBalanceSerialized[] =
+    await getSerializedBalances(wallet, chain);
+
+  const balancesEvent: RailgunBalancesEvent = {
     chain,
     tokenBalancesSerialized,
     railgunWalletID: wallet.id,
   };
 
-  onBalanceUpdateCallback(balancesFormatted);
+  onBalanceUpdateCallback(balancesEvent);
+};
+
+export const balanceForToken = async (
+  wallet: AbstractWallet,
+  chain: Chain,
+  tokenAddress: string,
+): Promise<Optional<BigNumber>> => {
+  const tokenBalancesSerialized: RailgunShieldedTokenBalanceSerialized[] =
+    await getSerializedBalances(wallet, chain);
+
+  const matchingTokenBalance: Optional<RailgunShieldedTokenBalanceSerialized> =
+    tokenBalancesSerialized.find(
+      tokenBalance => tokenBalance.tokenAddress.toLowerCase() === tokenAddress,
+    );
+
+  if (!matchingTokenBalance) {
+    return undefined;
+  }
+
+  return BigNumber.from(matchingTokenBalance.balanceString);
 };

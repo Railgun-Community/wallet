@@ -96,6 +96,8 @@ export const gasEstimateForUnprovenTransfer = async (
           true, // useDummyProof
         ),
       networkName,
+      railgunWalletID,
+      tokenAmounts,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
