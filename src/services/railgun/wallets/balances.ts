@@ -20,6 +20,13 @@ export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
 
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
     // which calls `onBalancesUpdate` (balance-update.ts).
+
+    // Also kick off a background merkletree scan.
+    // This will also call wallet.scanBalances when it's done, but may take longer.
+    // So the user will see balances refresh from existing merkletree first.
+    const engine = getEngine();
+    await engine.scanHistory(chain);
+
     return {};
   } catch (err: any) {
     const response: RailgunBalanceResponse = { error: err.message };
