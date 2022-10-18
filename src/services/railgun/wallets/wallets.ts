@@ -292,12 +292,11 @@ export const validateEthAddress = (address: string): boolean => {
 };
 
 export const getRailgunAddress = (
-  chain: Optional<Chain>,
   railgunWalletID: string,
 ): Optional<string> => {
   try {
     const wallet = walletForID(railgunWalletID);
-    return wallet.getAddress(chain);
+    return wallet.getAddress();
   } catch (err) {
     sendErrorMessage(err.stack);
     return undefined;
