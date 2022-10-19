@@ -4,6 +4,7 @@ import * as ed from '@noble/ed25519';
 import {
   decryptAESGCM256,
   encryptDataWithSharedKey,
+  pbkdf2,
   verifyRelayerSignature,
 } from '../crypto-util';
 
@@ -35,5 +36,12 @@ describe('crypto-util', () => {
     const decrypted = await decryptAESGCM256(encryptedData, sharedKey);
 
     expect(decrypted).to.deep.equal(data);
+  });
+
+  it('Should calculate PBKDF2 hash', async () => {
+    const hash = await pbkdf2('secret', '0c6c732c2b03dfb6cf5f5893', 1000000);
+    expect(hash).to.equal(
+      'ac0323bc154cc4b7ac0440eee6414356801faa198bb635d0b60441e3a043a706',
+    );
   });
 });

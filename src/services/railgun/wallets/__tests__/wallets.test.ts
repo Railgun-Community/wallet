@@ -9,9 +9,12 @@ import {
   createRailgunWallet,
   createViewOnlyRailgunWallet,
   getRailgunAddress,
+  getRailgunWalletAddressData,
   getWalletMnemonic,
   getWalletShareableViewingKey,
+  getWalletTransactionHistory,
   loadWalletByID,
+  serializeRailgunWalletAddressData,
   unloadWalletByID,
   validateRailgunAddress,
 } from '../wallets';
@@ -21,11 +24,16 @@ import {
 } from '../../../../test/mocks.test';
 import { initTestEngine } from '../../../../test/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
-import { NetworkName } from '@railgun-community/shared-models';
+import {
+  Chain,
+  ChainType,
+  NetworkName,
+} from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
+const POLYGON_CHAIN: Chain = { type: ChainType.EVM, id: 137 };
 let wallet: RailgunWallet;
 
 describe('wallets', () => {
@@ -57,8 +65,7 @@ describe('wallets', () => {
   });
 
   it('Should get wallet address', async () => {
-    const chain = undefined;
-    const addressAny = await getRailgunAddress(chain, wallet.id);
+    const addressAny = await getRailgunAddress(wallet.id);
     expect(addressAny).to.equal(
       '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53lama02nutwtcqc979wnce0qwly4y7w4rls5cq040g7z8eagshxrw5ajy990',
     );
@@ -149,7 +156,19 @@ describe('wallets', () => {
   });
 
   it('Should get wallet transaction history', async () => {
-    const mnemonic = await getWalletMnemonic(MOCK_DB_ENCRYPTION_KEY, wallet.id);
-    expect(mnemonic).to.equal(MOCK_MNEMONIC);
+    const resp = await getWalletTransactionHistory(POLYGON_CHAIN, wallet.id);
+    expect(resp.items?.length).to.equal(0);
+  });
+
+  it('Should serialize wallet address data', async () => {
+    const addressData = getRailgunWalletAddressData(wallet.getAddress());
+    const serializedAddressData =
+      serializeRailgunWalletAddressData(addressData);
+    expect(serializedAddressData.viewingPublicKey).to.equal(
+      '77d7aa7c5b978060be2ba78cbc0ef92a4f3aa3fc29803eaf47847cf510b986ea',
+    );
+    expect(serializedAddressData.masterPublicKey).to.equal(
+      '2c59cd4733f911ba740da68fb7ba3b873f21daece4e3a105aef12d6414e54ebf',
+    );
   });
 });
