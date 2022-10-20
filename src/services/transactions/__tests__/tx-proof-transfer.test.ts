@@ -124,7 +124,7 @@ describe.skip('tx-proofs', () => {
     //   'balances',
     // ).resolves(balances);
 
-    // const network = NETWORK_CONFIG[NetworkName.HardHat];
+    // const network = NETWORK_CONFIG[NetworkName.Hardhat];
     // const chainID = network.chainId;
 
     // const vpk = railgunWallet.getViewingKeyPair().privateKey;
@@ -161,7 +161,7 @@ describe.skip('tx-proofs', () => {
     const sendWithPublicWallet = false;
     const response: RailgunProveTransactionResponse =
       await generateTransferProof(
-        NetworkName.HardHat,
+        NetworkName.Hardhat,
         railgunWalletAddress,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,

@@ -404,7 +404,9 @@ const formatCreationBlockNumbers = (
   if (!creationBlockNumbers) return;
 
   const formattedCreationBlockNumbers: number[][] = [];
-  for (const networkName of Object.keys(creationBlockNumbers)) {
+  const networksNames = Object.keys(creationBlockNumbers) as NetworkName[];
+
+  for (const networkName of networksNames) {
     const network = NETWORK_CONFIG[networkName];
 
     formattedCreationBlockNumbers[network.chain.type] ??= [];

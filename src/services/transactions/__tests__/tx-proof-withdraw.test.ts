@@ -125,7 +125,7 @@ describe.skip('tx-proof-withdraw', () => {
     //   'balances',
     // ).resolves(balances);
 
-    // const network = NETWORK_CONFIG[NetworkName.HardHat];
+    // const network = NETWORK_CONFIG[NetworkName.Hardhat];
     // const chainID = network.chainId;
 
     // const vpk = railgunWallet.getViewingKeyPair().privateKey;
@@ -162,7 +162,7 @@ describe.skip('tx-proof-withdraw', () => {
     const sendWithPublicWallet = false;
     const response: RailgunProveTransactionResponse =
       await generateWithdrawProof(
-        NetworkName.HardHat,
+        NetworkName.Hardhat,
         MOCK_ETH_WALLET_ADDRESS,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,

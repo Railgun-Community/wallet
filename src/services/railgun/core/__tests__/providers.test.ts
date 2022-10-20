@@ -71,7 +71,7 @@ describe('providers', () => {
     const shouldDebug = true;
     const response = await loadProvider(
       {} as FallbackProviderJsonConfig,
-      NetworkName.BNBSmartChain,
+      NetworkName.BNBChain,
       shouldDebug,
     );
     expect(response.error).to.equal(
