@@ -20,10 +20,12 @@ import {
 } from '../wallets';
 import {
   MOCK_DB_ENCRYPTION_KEY,
-  MOCK_MNEMONIC,
   MOCK_MNEMONIC_2,
 } from '../../../../test/mocks.test';
-import { initTestEngine } from '../../../../test/setup.test';
+import {
+  initTestEngine,
+  initTestEngineNetwork,
+} from '../../../../test/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
 import {
   Chain,
@@ -40,13 +42,14 @@ let wallet: RailgunWallet;
 describe('wallets', () => {
   before(async () => {
     initTestEngine();
-    const { railgunWalletInfo } = await createRailgunWallet(
+    await initTestEngineNetwork();
+    const { railgunWalletInfo, error } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
       { [NetworkName.Ethereum]: 0, [NetworkName.Polygon]: 2 }, // creationBlockNumbers
     );
     if (!railgunWalletInfo) {
-      throw new Error('Could not create wallet');
+      throw new Error(`Could not create wallet: ${error}`);
     }
     wallet = fullWalletForID(railgunWalletInfo.id);
   });
@@ -68,26 +71,26 @@ describe('wallets', () => {
   it('Should get wallet address', async () => {
     const addressAny = await getRailgunAddress(wallet.id);
     expect(addressAny).to.equal(
-      '0zk1qyk9nn28x0u3rwn5pknglda68wrn7gw6anjw8gg94mcj6eq5u48tlrv7j6fe3z53lama02nutwtcqc979wnce0qwly4y7w4rls5cq040g7z8eagshxrw5ajy990',
+      '0zk1qykzjxctynyz4z43pukckpv43jyzhyvy0ehrd5wuc54l5enqf9qfrrv7j6fe3z53la7enqphqvxys9aqyp9xx0km95ehqslx8apmu8l7anc7emau4tvsultrkvd',
     );
   });
 
   it('Should get wallet shareable viewing key', async () => {
     const shareableKey = await getWalletShareableViewingKey(wallet.id);
     expect(shareableKey).to.equal(
-      '82a57670726976d94039646134623466306235343933613662613366376466303631316333653038343266376532626233643634306633313362323335663162373563316438306239a473707562d94030346164336335393738653064646561373030613336393932313861333461616336663736303437646661656131323966643530313464636338306534333961',
+      '82a57670726976d94032643030623234396632646337313236303565336263653364373665376631313931373933363436393365333931666566643963323764303161396262336433a473707562d94030633661376436386331663437303262613764666134613361353236323035303765386637366632393139326363666637653861366231303637393062316165',
     );
   });
 
   it('Should get wallet mnemonic', async () => {
     const mnemonic = await getWalletMnemonic(MOCK_DB_ENCRYPTION_KEY, wallet.id);
-    expect(mnemonic).to.equal(MOCK_MNEMONIC);
+    expect(mnemonic).to.equal(MOCK_MNEMONIC_2);
   });
 
   it('Should create and load wallet from valid mnemonic', async () => {
     const response = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
-      MOCK_MNEMONIC,
+      MOCK_MNEMONIC_2,
       undefined, // creationBlockNumbers
     );
     expect(response.railgunWalletInfo).to.not.be.undefined;
@@ -158,7 +161,7 @@ describe('wallets', () => {
 
   it('Should get wallet transaction history', async () => {
     const resp = await getWalletTransactionHistory(POLYGON_CHAIN, wallet.id);
-    expect(resp.items?.length).to.equal(0);
+    expect(resp.items?.length).to.be.greaterThanOrEqual(6);
   });
 
   it('Should serialize wallet address data', async () => {
@@ -166,10 +169,10 @@ describe('wallets', () => {
     const serializedAddressData =
       serializeRailgunWalletAddressData(addressData);
     expect(serializedAddressData.viewingPublicKey).to.equal(
-      '77d7aa7c5b978060be2ba78cbc0ef92a4f3aa3fc29803eaf47847cf510b986ea',
+      '7d998037030c4817a0204a633edb2d337043e63f43be1ffeecf1ecefbcaad90e',
     );
     expect(serializedAddressData.masterPublicKey).to.equal(
-      '2c59cd4733f911ba740da68fb7ba3b873f21daece4e3a105aef12d6414e54ebf',
+      '2c291b0b24c82a8ab10f2d8b05958c882b91847e6e36d1dcc52bfa6660494091',
     );
   });
 });

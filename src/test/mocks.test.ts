@@ -11,7 +11,7 @@ export const MOCK_MNEMONIC =
   'test test test test test test test test test test test junk';
 
 export const MOCK_MNEMONIC_2 =
-  'pause crystal tornado alcohol genre cement fade large song like bag where ';
+  'pause crystal tornado alcohol genre cement fade large song like bag where';
 
 export const MOCK_DB_ENCRYPTION_KEY =
   '0101010101010101010101010101010101010101010101010101010101010101';
