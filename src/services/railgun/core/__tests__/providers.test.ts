@@ -43,14 +43,18 @@ describe('providers', () => {
     });
 
     expect(getProviderForNetwork(NetworkName.Polygon)).to.not.be.undefined;
-    expect(() => getProviderForNetwork(NetworkName.EthereumRopsten)).to.throw;
+    expect(() => getProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED))
+      .to.throw;
 
     expect(getMerkleTreeForNetwork(NetworkName.Polygon)).to.not.be.undefined;
-    expect(() => getMerkleTreeForNetwork(NetworkName.EthereumRopsten)).to.throw;
+    expect(() =>
+      getMerkleTreeForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
+    ).to.throw;
 
     expect(getProxyContractForNetwork(NetworkName.Polygon)).to.not.be.undefined;
-    expect(() => getProxyContractForNetwork(NetworkName.EthereumRopsten)).to
-      .throw;
+    expect(() =>
+      getProxyContractForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
+    ).to.throw;
 
     // Check that new wallet has merkletree.
     const { railgunWalletInfo } = await createRailgunWallet(

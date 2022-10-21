@@ -21,6 +21,7 @@ import {
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MNEMONIC,
+  MOCK_MNEMONIC_2,
 } from '../../../../test/mocks.test';
 import { initTestEngine } from '../../../../test/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
@@ -41,7 +42,7 @@ describe('wallets', () => {
     initTestEngine();
     const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
-      MOCK_MNEMONIC,
+      MOCK_MNEMONIC_2,
       { [NetworkName.Ethereum]: 0, [NetworkName.Polygon]: 2 }, // creationBlockNumbers
     );
     if (!railgunWalletInfo) {
