@@ -70,14 +70,14 @@ export const gasEstimateForUnprovenTransfer = async (
   memoText: Optional<string>,
   tokenAmounts: RailgunWalletTokenAmount[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
-  feeTokenDetails: FeeTokenDetails,
+  feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     assertValidRailgunAddress(railgunAddress, networkName);
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: RailgunWalletTokenAmount) =>
+      (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
         generateDummyProofTransactions(
           ProofType.Transfer,
           networkName,

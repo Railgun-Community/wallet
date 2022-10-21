@@ -118,7 +118,7 @@ export const gasEstimateForUnprovenWithdraw = async (
   encryptionKey: string,
   tokenAmounts: RailgunWalletTokenAmount[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
-  feeTokenDetails: FeeTokenDetails,
+  feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
@@ -126,7 +126,7 @@ export const gasEstimateForUnprovenWithdraw = async (
     assertValidEthAddress(publicWalletAddress);
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: RailgunWalletTokenAmount) =>
+      (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
         generateDummyProofTransactions(
           ProofType.Withdraw,
           networkName,
@@ -170,7 +170,7 @@ export const gasEstimateForUnprovenWithdrawBaseToken = async (
   encryptionKey: string,
   wrappedTokenAmount: RailgunWalletTokenAmount,
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
-  feeTokenDetails: FeeTokenDetails,
+  feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
@@ -180,7 +180,7 @@ export const gasEstimateForUnprovenWithdrawBaseToken = async (
     const tokenAmounts = [wrappedTokenAmount];
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: RailgunWalletTokenAmount) =>
+      (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
         generateDummyProofTransactions(
           ProofType.WithdrawBaseToken,
           networkName,

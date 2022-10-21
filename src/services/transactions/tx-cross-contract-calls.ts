@@ -121,7 +121,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
   depositTokenAddresses: string[],
   crossContractCallsSerialized: string[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
-  feeTokenDetails: FeeTokenDetails,
+  feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
@@ -150,7 +150,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
     const multiplierBasisPoints = 14000;
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: RailgunWalletTokenAmount) =>
+      (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
         generateDummyProofTransactions(
           ProofType.CrossContractCalls,
           networkName,

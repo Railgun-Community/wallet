@@ -70,7 +70,7 @@ const getUpdatedRelayerFeeForGasEstimation = async (
 
 export const gasEstimateResponseIterativeRelayerFee = async (
   generateSerializedTransactions: (
-    relayerFeeTokenAmount: RailgunWalletTokenAmount,
+    relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
   ) => Promise<SerializedTransaction[]>,
   generatePopulatedTransaction: (
     serializedTransactions: SerializedTransaction[],
@@ -79,7 +79,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   railgunWalletID: string,
   tokenAmounts: RailgunWalletTokenAmount[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
-  feeTokenDetails: FeeTokenDetails,
+  feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
   multiplierBasisPoints: Optional<number>,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
@@ -92,9 +92,9 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   // Use dead address for private transaction gas estimate
   const fromWalletAddress = DUMMY_FROM_ADDRESS;
 
-  const dummyRelayerFee = createDummyRelayerFeeTokenAmount(
-    feeTokenDetails.tokenAddress,
-  );
+  const dummyRelayerFee = feeTokenDetails
+    ? createDummyRelayerFeeTokenAmount(feeTokenDetails.tokenAddress)
+    : undefined;
 
   let serializedTransactions = await generateSerializedTransactions(
     dummyRelayerFee,
@@ -112,6 +112,12 @@ export const gasEstimateResponseIterativeRelayerFee = async (
 
   if (sendWithPublicWallet) {
     return gasEstimateResponse(gasEstimate);
+  }
+
+  if (!feeTokenDetails) {
+    throw new Error(
+      'Must have Relayer Fee details or sendWithPublicWallet field.',
+    );
   }
 
   // Find tokenAmount that matches token of relayer fee, if exists.
