@@ -1,30 +1,42 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import {
   RailgunTransactionGasEstimateResponse,
   TransactionGasDetails,
   TransactionGasDetailsSerialized,
   EVMGasType,
- sanitizeError , calculateGasLimit } from '@railgun-community/shared-models';
+  sanitizeError,
+  calculateGasLimit,
+  NetworkName,
+  getEVMGasTypeForTransaction,
+} from '@railgun-community/shared-models';
 import { sendErrorMessage } from '../../utils/logger';
+import { getProviderForNetwork } from '../railgun';
 
 export const getGasEstimate = async (
+  networkName: NetworkName,
   transaction: PopulatedTransaction | TransactionRequest,
-  provider: Provider,
   fromWalletAddress: string,
+  sendWithPublicWallet: boolean,
   multiplierBasisPoints = 10000,
 ): Promise<BigNumber> => {
+  const evmGasType = getEVMGasTypeForTransaction(
+    networkName,
+    sendWithPublicWallet,
+  );
+
   // Add 'from' field, which is required, as a mock address.
   // Note that DEPOSIT needs a real address, as it checks the balance for transfer.
-  // eslint-disable-next-line no-param-reassign
-  const transactionWithFrom: TransactionRequest = {
+  const estimateGasTransaction: TransactionRequest = {
     ...transaction,
     from: fromWalletAddress,
+    type: evmGasType,
   };
 
   try {
-    const gasEstimate = await provider.estimateGas(transactionWithFrom);
+    const provider = getProviderForNetwork(networkName);
+    const gasEstimate = await provider.estimateGas(estimateGasTransaction);
     return gasEstimate.mul(multiplierBasisPoints).div(10000);
   } catch (err) {
     sendErrorMessage(err.message);
@@ -65,6 +77,7 @@ export const deserializeTransactionGasDetails = (
 ): TransactionGasDetails => {
   switch (gasDetailsSerialized.evmGasType) {
     case EVMGasType.Type0:
+    case EVMGasType.Type1:
       return {
         evmGasType: gasDetailsSerialized.evmGasType,
         gasEstimate: BigNumber.from(gasDetailsSerialized.gasEstimateString),
@@ -83,22 +96,42 @@ export const deserializeTransactionGasDetails = (
 };
 
 export const setGasDetailsForPopulatedTransaction = (
+  networkName: NetworkName,
   populatedTransaction: PopulatedTransaction,
-  gasDetailsSerialized?: TransactionGasDetailsSerialized,
+  gasDetailsSerialized: TransactionGasDetailsSerialized,
+  sendWithPublicWallet: boolean,
 ) => {
-  if (!gasDetailsSerialized) {
-    return;
-  }
   const gasEstimate = BigNumber.from(gasDetailsSerialized.gasEstimateString);
 
   // eslint-disable-next-line no-param-reassign
   populatedTransaction.gasLimit = calculateGasLimit(gasEstimate);
 
+  const evmGasType = getEVMGasTypeForTransaction(
+    networkName,
+    sendWithPublicWallet,
+  );
+
+  if (gasDetailsSerialized.evmGasType !== evmGasType) {
+    const transactionType = sendWithPublicWallet ? 'self-signed' : 'Relayer';
+    throw new Error(
+      `Invalid evmGasType for ${networkName} (${transactionType}): expected Type${evmGasType}, received Type${gasDetailsSerialized.evmGasType} in gasDetailsSerialized. Retrieve appropriate gas type with getEVMGasTypeForTransaction (@railgun-community/shared-models).`,
+    );
+  }
+
+  // eslint-disable-next-line no-param-reassign
+  populatedTransaction.type = gasDetailsSerialized.evmGasType;
+
   switch (gasDetailsSerialized.evmGasType) {
     case EVMGasType.Type0: {
       const gasPrice = BigNumber.from(gasDetailsSerialized.gasPriceString);
       // eslint-disable-next-line no-param-reassign
-      populatedTransaction.type = 0;
+      populatedTransaction.gasPrice = gasPrice;
+      // eslint-disable-next-line no-param-reassign
+      populatedTransaction.accessList = undefined;
+      break;
+    }
+    case EVMGasType.Type1: {
+      const gasPrice = BigNumber.from(gasDetailsSerialized.gasPriceString);
       // eslint-disable-next-line no-param-reassign
       populatedTransaction.gasPrice = gasPrice;
       break;
@@ -110,8 +143,6 @@ export const setGasDetailsForPopulatedTransaction = (
       const maxPriorityFeePerGas = BigNumber.from(
         gasDetailsSerialized.maxPriorityFeePerGasString,
       );
-      // eslint-disable-next-line no-param-reassign
-      populatedTransaction.type = 2;
       // eslint-disable-next-line no-param-reassign
       populatedTransaction.maxFeePerGas = maxFeePerGas;
       // eslint-disable-next-line no-param-reassign

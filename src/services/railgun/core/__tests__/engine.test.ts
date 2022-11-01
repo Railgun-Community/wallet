@@ -1,7 +1,11 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { initTestEngine } from '../../../../test/setup.test';
-import { closeRailgunEngine, getEngine } from '../engine';
+import {
+  closeRailgunEngine,
+  formatTempEngineV3StartBlockNumbersEVM,
+  getEngine,
+} from '../engine';
 import { getProver } from '../prover';
 
 chai.use(chaiAsPromised);
@@ -20,5 +24,11 @@ describe('engine', () => {
     closeRailgunEngine();
     expect(() => getEngine()).to.throw('RAILGUN Engine not yet initialized.');
     expect(() => getProver()).to.throw('RAILGUN Engine not yet initialized.');
+  });
+
+  it('Should format temp engine v3 start block number', () => {
+    expect(
+      formatTempEngineV3StartBlockNumbersEVM({ '1': 10, '3': 30 }),
+    ).to.deep.equal([[undefined, 10, undefined, 30]]);
   });
 });

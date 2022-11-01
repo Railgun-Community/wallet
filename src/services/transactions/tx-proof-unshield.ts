@@ -1,16 +1,16 @@
 import {
   RailgunProveTransactionResponse,
+  RailgunWalletTokenAmount,
   NetworkName,
   ProofType,
   sanitizeError,
   RailgunWalletTokenAmountRecipient,
-  RailgunWalletTokenAmount,
 } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
   generateProofTransactions,
   generateTransact,
-  generateWithdrawBaseToken,
+  generateUnshieldBaseToken,
 } from './tx-generator';
 import { sendErrorMessage } from '../../utils/logger';
 import { assertValidEthAddress } from '../railgun/wallets/wallets';
@@ -22,44 +22,51 @@ import {
   randomHex,
 } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { createRelayAdaptWithdrawTokenAmountRecipients } from './tx-cross-contract-calls';
+import { createRelayAdaptUnshieldTokenAmountRecipients } from './tx-cross-contract-calls';
 
-export const generateWithdrawProof = async (
+export const generateUnshieldProof = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
+  overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
 ): Promise<RailgunProveTransactionResponse> => {
   try {
     setCachedProvedTransaction(undefined);
 
     const txs = await generateProofTransactions(
-      ProofType.Withdraw,
+      ProofType.Unshield,
       networkName,
       railgunWalletID,
       encryptionKey,
+      false, // showSenderAddressToRecipient
       undefined, // memoText
       tokenAmountRecipients,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
+      undefined, // relayAdaptID
+      false, // useDummyProof
+      overallBatchMinGasPrice,
       progressCallback,
     );
     const populatedTransaction = await generateTransact(txs, networkName);
 
     setCachedProvedTransaction({
-      proofType: ProofType.Withdraw,
+      proofType: ProofType.Unshield,
       railgunWalletID,
+      showSenderAddressToRecipient: false,
       memoText: undefined,
       tokenAmountRecipients,
-      relayAdaptWithdrawTokenAmountRecipients: undefined,
-      relayAdaptDepositTokenAddresses: undefined,
+      relayAdaptUnshieldTokenAmounts: undefined,
+      relayAdaptShieldTokenAddresses: undefined,
       crossContractCallsSerialized: undefined,
       relayerFeeTokenAmountRecipient,
       populatedTransaction,
       sendWithPublicWallet,
+      overallBatchMinGasPrice,
     });
     return {};
   } catch (err) {
@@ -71,7 +78,7 @@ export const generateWithdrawProof = async (
   }
 };
 
-export const generateWithdrawBaseTokenProof = async (
+export const generateUnshieldBaseTokenProof = async (
   networkName: NetworkName,
   publicWalletAddress: string,
   railgunWalletID: string,
@@ -79,11 +86,12 @@ export const generateWithdrawBaseTokenProof = async (
   wrappedTokenAmount: RailgunWalletTokenAmount,
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
+  overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
 ): Promise<RailgunProveTransactionResponse> => {
   try {
-    assertValidEthAddress(publicWalletAddress);
     assertNotBlockedAddress(publicWalletAddress);
+    assertValidEthAddress(publicWalletAddress);
 
     setCachedProvedTransaction(undefined);
 
@@ -94,8 +102,12 @@ export const generateWithdrawBaseTokenProof = async (
       },
     ];
 
-    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
-      createRelayAdaptWithdrawTokenAmountRecipients(networkName, [
+    const relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[] = [
+      wrappedTokenAmount,
+    ];
+
+    const relayAdaptUnshieldTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+      createRelayAdaptUnshieldTokenAmountRecipients(networkName, [
         wrappedTokenAmount,
       ]);
 
@@ -103,19 +115,21 @@ export const generateWithdrawBaseTokenProof = async (
 
     // Generate dummy txs for relay adapt params.
     const dummyTxs = await generateDummyProofTransactions(
-      ProofType.WithdrawBaseToken,
+      ProofType.UnshieldBaseToken,
       networkName,
       railgunWalletID,
       encryptionKey,
+      false, // showSenderAddressToRecipient
       undefined, // memoText
-      relayAdaptWithdrawTokenAmountRecipients,
+      relayAdaptUnshieldTokenAmountRecipients,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
+      overallBatchMinGasPrice,
     );
 
-    const relayAdaptParamsRandom = randomHex(16);
+    const relayAdaptParamsRandom = randomHex(31);
     const relayAdaptParams =
-      await relayAdaptContract.getRelayAdaptParamsWithdrawBaseToken(
+      await relayAdaptContract.getRelayAdaptParamsUnshieldBaseToken(
         dummyTxs,
         publicWalletAddress,
         relayAdaptParamsRandom,
@@ -125,22 +139,27 @@ export const generateWithdrawBaseTokenProof = async (
       parameters: relayAdaptParams,
     };
 
+    const showSenderAddressToRecipient = false;
+    const memoText: Optional<string> = undefined;
+
     // Generate final txs with relay adapt ID.
     const txs = await generateProofTransactions(
-      ProofType.WithdrawBaseToken,
+      ProofType.UnshieldBaseToken,
       networkName,
       railgunWalletID,
       encryptionKey,
-      undefined, // memoText
-      relayAdaptWithdrawTokenAmountRecipients,
+      showSenderAddressToRecipient,
+      memoText,
+      relayAdaptUnshieldTokenAmountRecipients,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
-      progressCallback,
       relayAdaptID,
       false, // useDummyProof
+      overallBatchMinGasPrice,
+      progressCallback,
     );
 
-    const populatedTransaction = await generateWithdrawBaseToken(
+    const populatedTransaction = await generateUnshieldBaseToken(
       txs,
       networkName,
       publicWalletAddress,
@@ -149,16 +168,18 @@ export const generateWithdrawBaseTokenProof = async (
     );
 
     setCachedProvedTransaction({
-      proofType: ProofType.WithdrawBaseToken,
+      proofType: ProofType.UnshieldBaseToken,
       railgunWalletID,
-      memoText: undefined,
+      showSenderAddressToRecipient,
+      memoText,
       tokenAmountRecipients,
-      relayAdaptWithdrawTokenAmountRecipients,
-      relayAdaptDepositTokenAddresses: undefined,
+      relayAdaptUnshieldTokenAmounts,
+      relayAdaptShieldTokenAddresses: undefined,
       crossContractCallsSerialized: undefined,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       populatedTransaction,
+      overallBatchMinGasPrice,
     });
     return {};
   } catch (err) {

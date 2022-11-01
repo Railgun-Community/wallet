@@ -14,10 +14,12 @@ export const generateTransferProof = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
+  showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
+  overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
 ): Promise<RailgunProveTransactionResponse> => {
   try {
@@ -28,10 +30,14 @@ export const generateTransferProof = async (
       networkName,
       railgunWalletID,
       encryptionKey,
+      showSenderAddressToRecipient,
       memoText,
       tokenAmountRecipients,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
+      undefined, // relayAdaptID
+      false, // useDummyProof
+      overallBatchMinGasPrice,
       progressCallback,
     );
     const populatedTransaction = await generateTransact(txs, networkName);
@@ -39,14 +45,16 @@ export const generateTransferProof = async (
     setCachedProvedTransaction({
       proofType: ProofType.Transfer,
       railgunWalletID,
+      showSenderAddressToRecipient,
       memoText,
       tokenAmountRecipients,
-      relayAdaptWithdrawTokenAmountRecipients: undefined,
-      relayAdaptDepositTokenAddresses: undefined,
+      relayAdaptUnshieldTokenAmounts: undefined,
+      relayAdaptShieldTokenAddresses: undefined,
       crossContractCallsSerialized: undefined,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       populatedTransaction,
+      overallBatchMinGasPrice,
     });
     return {};
   } catch (err) {

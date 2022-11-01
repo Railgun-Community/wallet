@@ -1,8 +1,18 @@
 import axios from 'axios';
-import { Nullifier, CommitmentEvent, Chain } from '@railgun-community/engine';
+import {
+  Nullifier,
+  CommitmentEvent,
+  Chain,
+  UnshieldStoredEvent,
+  AccumulatedEvents,
+  promiseTimeout,
+} from '@railgun-community/engine';
 import { sendErrorMessage } from '../../../utils/logger';
 
 const MAX_NUM_RETRIES = 3;
+
+// 2 sec to look up chain page metadata.
+const CHAIN_PAGE_METADATA_TIMEOUT = 2000;
 
 const GATEWAY_URLS = [
   'https://railgun1.b-cdn.net',
@@ -25,6 +35,8 @@ export enum QuickSyncPageSize {
 // Consider this if modifying this default setting.
 export const DEFAULT_QUICK_SYNC_PAGE_SIZE = QuickSyncPageSize.XLarge;
 
+type QuickSyncPath = 'commitment' | 'unshield' | 'nullifier';
+
 type PageMetadata = {
   start_block: number;
   end_block: number;
@@ -35,7 +47,10 @@ type CommitmentPageData = {
   num_pages: number;
   pages_metadata: PagesMetadata;
 };
-
+type UnshieldPageData = {
+  num_pages: number;
+  pages_metadata: PagesMetadata;
+};
 type NullifierPageData = {
   num_pages: number;
   pages_metadata: PagesMetadata;
@@ -43,12 +58,13 @@ type NullifierPageData = {
 
 type QuickSyncChainPageMetadataResponse = {
   commitment: CommitmentPageData;
+  unshield: UnshieldPageData;
   nullifier: NullifierPageData;
 };
 
-export type QuickSyncEventLog = {
-  commitmentEvents: CommitmentEvent[];
-  nullifierEvents: Nullifier[];
+type ChainPageMetadataAndGateway = {
+  chainPageMetadata: QuickSyncChainPageMetadataResponse;
+  gateway: string;
 };
 
 const getIpnsUrl = (gateway: string) => {
@@ -70,7 +86,7 @@ const getChainPageMetadataURL = (
 const getPageURLs = (
   gateway: string,
   chain: Chain,
-  path: 'commitment' | 'nullifier',
+  path: QuickSyncPath,
   pageSize: QuickSyncPageSize,
   numPages: number,
   startPageIndex: number,
@@ -103,8 +119,11 @@ const getChainPageMatadata = async (
   pageSize: QuickSyncPageSize,
 ): Promise<Optional<QuickSyncChainPageMetadataResponse>> => {
   try {
-    const data = await fetchJsonData<QuickSyncChainPageMetadataResponse>(
-      getChainPageMetadataURL(gateway, chain, pageSize),
+    const data = await promiseTimeout(
+      fetchJsonData<QuickSyncChainPageMetadataResponse>(
+        getChainPageMetadataURL(gateway, chain, pageSize),
+      ),
+      CHAIN_PAGE_METADATA_TIMEOUT,
     );
     return data;
   } catch {
@@ -112,35 +131,60 @@ const getChainPageMatadata = async (
   }
 };
 
-const getFirstLookupChainPageMetadataAndGateway = async (
+const getBestLookupChainPageMetadataAndGateway = async (
   chain: Chain,
   pageSize: QuickSyncPageSize,
-): Promise<{
-  chainPageMetadata: QuickSyncChainPageMetadataResponse;
-  gateway: string;
-}> => {
-  for (const gateway of GATEWAY_URLS) {
-    // eslint-disable-next-line no-await-in-loop
-    const chainPageMetadata = await getChainPageMatadata(
-      gateway,
-      chain,
-      pageSize,
-    );
-    if (!chainPageMetadata) {
+): Promise<ChainPageMetadataAndGateway> => {
+  const chainPageMetadataAndGateways = await Promise.all(
+    GATEWAY_URLS.map(async gateway => {
+      const chainPageMetadata = await getChainPageMatadata(
+        gateway,
+        chain,
+        pageSize,
+      );
+      if (!chainPageMetadata) {
+        return undefined;
+      }
+      return {
+        chainPageMetadata,
+        gateway,
+      };
+    }),
+  );
+
+  let latestBlock = 0;
+  let latestChainPageMetadataAndGateway: Optional<ChainPageMetadataAndGateway>;
+
+  for (const chainPageMetadataAndGateway of chainPageMetadataAndGateways) {
+    if (!chainPageMetadataAndGateway) {
       continue;
     }
-    return { chainPageMetadata, gateway };
+    const { chainPageMetadata } = chainPageMetadataAndGateway;
+    const latestPage = chainPageMetadata.commitment.num_pages - 1;
+    const latestCommitmentBlock =
+      chainPageMetadata.commitment.pages_metadata[latestPage].end_block;
+    if (latestBlock < latestCommitmentBlock) {
+      latestBlock = latestCommitmentBlock;
+      latestChainPageMetadataAndGateway = chainPageMetadataAndGateway;
+    }
   }
-  throw new Error('Could not get historical event metadata from any gateway.');
+
+  if (!latestChainPageMetadataAndGateway) {
+    throw new Error(
+      'Could not get historical event metadata from any gateway.',
+    );
+  }
+
+  return latestChainPageMetadataAndGateway;
 };
 
 export const getRailgunEventLogIPNS = async (
   chain: Chain,
   pageSize: QuickSyncPageSize,
   startingBlock: number,
-): Promise<QuickSyncEventLog> => {
+): Promise<AccumulatedEvents> => {
   const { chainPageMetadata, gateway } =
-    await getFirstLookupChainPageMetadataAndGateway(chain, pageSize);
+    await getBestLookupChainPageMetadataAndGateway(chain, pageSize);
 
   const numPagesCommitments = chainPageMetadata.commitment.num_pages;
   const startPageCommitments = getStartingPageIndex(
@@ -148,6 +192,16 @@ export const getRailgunEventLogIPNS = async (
     chainPageMetadata.commitment.pages_metadata,
     startingBlock,
   );
+
+  // TODO: Add this when quicksync updated.
+  const numPagesUnshields = 0;
+  const startPageUnshields = 0;
+  // const numPagesUnshields = chainPageMetadata.unshield.num_pages;
+  // const startPageUnshields = getStartingPageIndex(
+  //   numPagesUnshields,
+  //   chainPageMetadata.unshield.pages_metadata,
+  //   startingBlock,
+  // );
 
   const numPagesNullifiers = chainPageMetadata.nullifier.num_pages;
   const startPageNullifiers = getStartingPageIndex(
@@ -164,6 +218,14 @@ export const getRailgunEventLogIPNS = async (
     numPagesCommitments,
     startPageCommitments,
   );
+  const unshieldPageURLs: string[] = getPageURLs(
+    gateway,
+    chain,
+    'unshield',
+    pageSize,
+    numPagesUnshields,
+    startPageUnshields,
+  );
   const nullifierPageURLs: string[] = getPageURLs(
     gateway,
     chain,
@@ -173,26 +235,33 @@ export const getRailgunEventLogIPNS = async (
     startPageNullifiers,
   );
 
-  const [commitmentLogBatchUnordered, nullifierLogBatchUnordered] =
-    await Promise.all([
-      Promise.all(
-        commitmentPageURLs.map(url => fetchJsonData<CommitmentEvent[]>(url)),
-      ),
-      Promise.all(
-        nullifierPageURLs.map(url => fetchJsonData<Nullifier[]>(url)),
-      ),
-    ]);
+  const [
+    commitmentLogBatchUnordered,
+    unshieldLogBatchUnordered,
+    nullifierLogBatchUnordered,
+  ] = await Promise.all([
+    Promise.all(
+      commitmentPageURLs.map(url => fetchJsonData<CommitmentEvent[]>(url)),
+    ),
+    Promise.all(
+      unshieldPageURLs.map(url => fetchJsonData<UnshieldStoredEvent[]>(url)),
+    ),
+    Promise.all(nullifierPageURLs.map(url => fetchJsonData<Nullifier[]>(url))),
+  ]);
 
-  const eventLogUnordered: QuickSyncEventLog = {
+  const eventLogUnordered: AccumulatedEvents = {
     commitmentEvents: commitmentLogBatchUnordered
       .flat()
       .filter(commitmentEvent => commitmentEvent.blockNumber >= startingBlock),
+    unshieldEvents: unshieldLogBatchUnordered
+      .flat()
+      .filter(unshieldEvent => unshieldEvent.blockNumber >= startingBlock),
     nullifierEvents: nullifierLogBatchUnordered
       .flat()
       .filter(nullifierEvent => nullifierEvent.blockNumber >= startingBlock),
   };
 
-  const eventLogOrdered: QuickSyncEventLog = {
+  const eventLogOrdered: AccumulatedEvents = {
     commitmentEvents: eventLogUnordered.commitmentEvents.sort(
       (a: CommitmentEvent, b: CommitmentEvent) => {
         return a.treeNumber < b.treeNumber || a.startPosition < b.startPosition
@@ -200,11 +269,15 @@ export const getRailgunEventLogIPNS = async (
           : 1;
       },
     ),
+    unshieldEvents: eventLogUnordered.unshieldEvents,
     nullifierEvents: eventLogUnordered.nullifierEvents,
   };
 
   if (typeof eventLogOrdered.commitmentEvents !== 'object') {
     throw new Error('Expected object `commitmentEvents` response.');
+  }
+  if (typeof eventLogOrdered.unshieldEvents !== 'object') {
+    throw new Error('Expected object `unshieldEvents` response.');
   }
   if (typeof eventLogOrdered.nullifierEvents !== 'object') {
     throw new Error('Expected object `nullifierEvents` response.');

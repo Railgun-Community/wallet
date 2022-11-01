@@ -29,7 +29,7 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   RelayAdaptHelper,
   AdaptID,
-  SerializedTransaction,
+  TransactionStruct,
   hexlify,
   randomHex,
   RelayAdaptContract,
@@ -71,7 +71,7 @@ const createPopulatedCrossContractCalls = (
   }
 };
 
-export const createRelayAdaptWithdrawTokenAmountRecipients = (
+export const createRelayAdaptUnshieldTokenAmountRecipients = (
   networkName: NetworkName,
   withdrawTokenAmounts: RailgunWalletTokenAmount[],
 ): RailgunWalletTokenAmountRecipient[] => {
@@ -87,30 +87,28 @@ export const createRelayAdaptWithdrawTokenAmountRecipients = (
 export const populateProvedCrossContractCalls = async (
   networkName: NetworkName,
   railgunWalletID: string,
-  relayAdaptWithdrawTokenAmounts: RailgunWalletTokenAmount[],
-  relayAdaptDepositTokenAddresses: string[],
+  relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[],
+  relayAdaptShieldTokenAddresses: string[],
   crossContractCallsSerialized: string[],
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
-  gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
+  overallBatchMinGasPrice: Optional<string>,
+  gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
-      createRelayAdaptWithdrawTokenAmountRecipients(
-        networkName,
-        relayAdaptWithdrawTokenAmounts,
-      );
-
     const populatedTransaction = await populateProvedTransaction(
+      networkName,
       ProofType.CrossContractCalls,
       railgunWalletID,
+      false, // showSenderAddressToRecipient
       undefined, // memoText
       [], // tokenAmountRecipients
-      relayAdaptWithdrawTokenAmountRecipients,
-      relayAdaptDepositTokenAddresses,
+      relayAdaptUnshieldTokenAmounts,
+      relayAdaptShieldTokenAddresses,
       crossContractCallsSerialized,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
+      overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     delete populatedTransaction.from;
@@ -132,8 +130,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
-  relayAdaptWithdrawTokenAmounts: RailgunWalletTokenAmount[],
-  relayAdaptDepositTokenAddresses: string[],
+  relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[],
+  relayAdaptShieldTokenAddresses: string[],
   crossContractCallsSerialized: string[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
@@ -144,6 +142,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
     setCachedProvedTransaction(undefined);
 
+    const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
+
     const crossContractCalls = createPopulatedCrossContractCalls(
       crossContractCallsSerialized,
       networkName,
@@ -151,18 +151,19 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
-    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
-      createRelayAdaptWithdrawTokenAmountRecipients(
+    const relayAdaptUnshieldTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+      createRelayAdaptUnshieldTokenAmountRecipients(
         networkName,
-        relayAdaptWithdrawTokenAmounts,
+        relayAdaptUnshieldTokenAmounts,
       );
 
-    const depositRandom = randomHex(16);
-    const relayDepositInputs = RelayAdaptHelper.generateRelayDepositInputs(
-      wallet,
-      depositRandom,
-      relayAdaptDepositTokenAddresses,
-    );
+    const shieldRandom = randomHex(16);
+    const relayShieldRequests =
+      await RelayAdaptHelper.generateRelayShieldRequests(
+        wallet,
+        shieldRandom,
+        relayAdaptShieldTokenAddresses,
+      );
 
     // Add 40% to the gas fee to ensure that it's successful.
     // The final gas estimate changes depending on the Relayer Fee, which can impact the number of circuit inputs.
@@ -176,23 +177,25 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           networkName,
           railgunWalletID,
           encryptionKey,
+          false, // showSenderAddressToRecipient
           undefined, // memoText
-          relayAdaptWithdrawTokenAmountRecipients,
+          relayAdaptUnshieldTokenAmountRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
+          overallBatchMinGasPrice,
         ),
-      (txs: SerializedTransaction[]) => {
-        const relayAdaptParamsRandom = randomHex(16);
+      (txs: TransactionStruct[]) => {
+        const relayAdaptParamsRandom = randomHex(31);
         return relayAdaptContract.populateCrossContractCalls(
           txs,
           crossContractCalls,
-          relayDepositInputs,
+          relayShieldRequests,
           relayAdaptParamsRandom,
         );
       },
       networkName,
       railgunWalletID,
-      relayAdaptWithdrawTokenAmountRecipients,
+      relayAdaptUnshieldTokenAmountRecipients,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
@@ -213,11 +216,12 @@ export const generateCrossContractCallsProof = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
-  relayAdaptWithdrawTokenAmounts: RailgunWalletTokenAmount[],
-  relayAdaptDepositTokenAddresses: string[],
+  relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[],
+  relayAdaptShieldTokenAddresses: string[],
   crossContractCallsSerialized: string[],
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
+  overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
 ): Promise<RailgunProveTransactionResponse> => {
   try {
@@ -232,38 +236,41 @@ export const generateCrossContractCallsProof = async (
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
-    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
-      createRelayAdaptWithdrawTokenAmountRecipients(
+    const relayAdaptUnshieldTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+      createRelayAdaptUnshieldTokenAmountRecipients(
         networkName,
-        relayAdaptWithdrawTokenAmounts,
+        relayAdaptUnshieldTokenAmounts,
       );
 
     // Generate dummy txs for relay adapt params.
-    const dummyWithdrawTxs = await generateDummyProofTransactions(
+    const dummyUnshieldTxs = await generateDummyProofTransactions(
       ProofType.CrossContractCalls,
       networkName,
       railgunWalletID,
       encryptionKey,
+      false, // showSenderAddressToRecipient
       undefined, // memoText
-      relayAdaptWithdrawTokenAmountRecipients,
+      relayAdaptUnshieldTokenAmountRecipients,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
+      overallBatchMinGasPrice,
     );
 
     // Generate relay adapt params from dummy transactions.
-    const depositRandom = randomHex(16);
-    const relayDepositInputs = RelayAdaptHelper.generateRelayDepositInputs(
-      wallet,
-      depositRandom,
-      relayAdaptDepositTokenAddresses,
-    );
+    const shieldRandom = randomHex(16);
+    const relayShieldRequests =
+      await RelayAdaptHelper.generateRelayShieldRequests(
+        wallet,
+        shieldRandom,
+        relayAdaptShieldTokenAddresses,
+      );
 
-    const relayAdaptParamsRandom = randomHex(16);
+    const relayAdaptParamsRandom = randomHex(31);
     const relayAdaptParams =
       await relayAdaptContract.getRelayAdaptParamsCrossContractCalls(
-        dummyWithdrawTxs,
+        dummyUnshieldTxs,
         crossContractCalls,
-        relayDepositInputs,
+        relayShieldRequests,
         relayAdaptParamsRandom,
       );
     const relayAdaptID: AdaptID = {
@@ -277,20 +284,22 @@ export const generateCrossContractCallsProof = async (
       networkName,
       railgunWalletID,
       encryptionKey,
+      false, // showSenderAddressToRecipient
       undefined, // memoText
-      relayAdaptWithdrawTokenAmountRecipients,
+      relayAdaptUnshieldTokenAmountRecipients,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
-      progressCallback,
       relayAdaptID,
       false, // useDummyProof
+      overallBatchMinGasPrice,
+      progressCallback,
     );
 
     const populatedTransaction =
       await relayAdaptContract.populateCrossContractCalls(
         transactions,
         crossContractCalls,
-        relayDepositInputs,
+        relayShieldRequests,
         relayAdaptParamsRandom,
       );
     delete populatedTransaction.from;
@@ -298,14 +307,16 @@ export const generateCrossContractCallsProof = async (
     setCachedProvedTransaction({
       proofType: ProofType.CrossContractCalls,
       railgunWalletID,
+      showSenderAddressToRecipient: false,
       memoText: undefined,
       tokenAmountRecipients: [],
-      relayAdaptWithdrawTokenAmountRecipients,
-      relayAdaptDepositTokenAddresses,
+      relayAdaptUnshieldTokenAmounts,
+      relayAdaptShieldTokenAddresses,
       crossContractCallsSerialized,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       populatedTransaction,
+      overallBatchMinGasPrice,
     });
     return {};
   } catch (err) {
@@ -321,7 +332,8 @@ export const getRelayAdaptTransactionError = (
   receiptLogs: TransactionReceiptLog[],
 ): Optional<string> => {
   try {
-    const relayAdaptError = RelayAdaptContract.getCallResultError(receiptLogs);
+    const relayAdaptError =
+      RelayAdaptContract.getRelayAdaptCallError(receiptLogs);
     if (relayAdaptError) {
       sendErrorMessage(relayAdaptError);
       return relayAdaptError;

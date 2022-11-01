@@ -10,7 +10,11 @@ import {
 } from '@railgun-community/shared-models';
 import { sendMessage, sendErrorMessage } from '../../../utils/logger';
 import { getEngine } from './engine';
-import { Chain , RailgunProxyContract , RelayAdaptContract } from '@railgun-community/engine';
+import {
+  Chain,
+  RailgunProxyContract,
+  RelayAdaptContract,
+} from '@railgun-community/engine';
 
 const providerMap: MapType<BaseProvider> = {};
 export const getProviderForNetwork = (
@@ -21,6 +25,13 @@ export const getProviderForNetwork = (
     throw new Error(`Provider not yet loaded for network ${networkName}`);
   }
   return provider;
+};
+
+export const setProviderForNetwork = (
+  networkName: NetworkName,
+  provider: BaseProvider,
+): void => {
+  providerMap[networkName] = provider;
 };
 
 export const getMerkleTreeForNetwork = (networkName: NetworkName) => {
@@ -122,13 +133,13 @@ export const loadProvider = async (
     const contract = getProxyContractForNetwork(networkName);
 
     // Returned as Hex strings.
-    const { deposit, withdraw, nft } = await contract.fees();
+    const { shield, unshield, nft } = await contract.fees();
 
-    // Note: Deposit and Withdraw fees are in basis points.
+    // Note: Shield and Unshield fees are in basis points.
     //  NFT fee is in wei.
     const feesSerialized = {
-      deposit: BigNumber.from(deposit).toHexString(),
-      withdraw: BigNumber.from(withdraw).toHexString(),
+      shield: BigNumber.from(shield).toHexString(),
+      unshield: BigNumber.from(unshield).toHexString(),
       nft: BigNumber.from(nft).toHexString(),
     };
 

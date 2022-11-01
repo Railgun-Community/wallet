@@ -1,14 +1,10 @@
-import {
-  FallbackProvider,
-  JsonRpcProvider,
-  TransactionReceipt,
-} from '@ethersproject/providers';
+import { FallbackProvider, TransactionReceipt } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
 import {
   RailgunWallet,
-  SerializedTransaction,
+  TransactionStruct,
   TransactionBatch,
   RelayAdaptContract,
 } from '@railgun-community/engine';
@@ -18,6 +14,8 @@ import {
   NETWORK_CONFIG,
   deserializeTransaction,
   serializeUnsignedTransaction,
+  EVMGasType,
+  TransactionGasDetailsSerialized,
   RailgunWalletTokenAmountRecipient,
   createFallbackProviderFromJsonConfig,
 } from '@railgun-community/shared-models';
@@ -38,7 +36,6 @@ import {
   MOCK_TOKEN_AMOUNTS,
   MOCK_TOKEN_FEE,
   MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-  TEST_POLYGON_RPC,
 } from '../../../test/mocks.test';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
@@ -55,7 +52,7 @@ let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
 let relayAdaptPopulateCrossContractCalls: SinonStub;
-let setWithdrawSpy: SinonSpy;
+let setUnshieldSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
@@ -94,6 +91,14 @@ const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunWalletTokenAmount[] = [
   },
 ];
 
+const overallBatchMinGasPrice = '0x1000';
+
+const gasDetailsSerialized: TransactionGasDetailsSerialized = {
+  evmGasType: EVMGasType.Type1,
+  gasEstimateString: '0x00',
+  gasPriceString: overallBatchMinGasPrice,
+};
+
 const stubGasEstimateSuccess = () => {
   gasEstimateStub = Sinon.stub(
     FallbackProvider.prototype,
@@ -108,8 +113,8 @@ const stubGasEstimateFailure = () => {
   ).rejects(new Error('test rejection - gas estimate'));
 };
 
-const spyOnSetWithdraw = () => {
-  setWithdrawSpy = Sinon.spy(TransactionBatch.prototype, 'setWithdraw');
+const spyOnSetUnshield = () => {
+  setUnshieldSpy = Sinon.spy(TransactionBatch.prototype, 'setUnshield');
 };
 
 describe('tx-cross-contract-calls', () => {
@@ -143,17 +148,22 @@ describe('tx-cross-contract-calls', () => {
 
     railProveStub = Sinon.stub(
       TransactionBatch.prototype,
-      'generateSerializedTransactions',
-    ).resolves([{}] as SerializedTransaction[]);
+      'generateTransactions',
+    ).resolves([{}] as TransactionStruct[]);
     railDummyProveStub = Sinon.stub(
       TransactionBatch.prototype,
-      'generateDummySerializedTransactions',
+      'generateDummyTransactions',
     ).resolves([
       {
-        commitments: [BigInt(2)],
-        nullifiers: [BigInt(1), BigInt(2)],
+        commitments: [
+          '0x0000000000000000000000000000000000000000000000000000000000000003',
+        ],
+        nullifiers: [
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+          '0x0000000000000000000000000000000000000000000000000000000000000002',
+        ],
       },
-    ] as SerializedTransaction[]);
+    ] as unknown as TransactionStruct[]);
     relayAdaptPopulateCrossContractCalls = Sinon.stub(
       RelayAdaptContract.prototype,
       'populateCrossContractCalls',
@@ -161,7 +171,7 @@ describe('tx-cross-contract-calls', () => {
   });
   afterEach(() => {
     gasEstimateStub?.restore();
-    setWithdrawSpy?.restore();
+    setUnshieldSpy?.restore();
     erc20NoteSpy?.restore();
   });
   after(() => {
@@ -174,7 +184,7 @@ describe('tx-cross-contract-calls', () => {
 
   it('Should get gas estimates for valid cross contract calls', async () => {
     stubGasEstimateSuccess();
-    spyOnSetWithdraw();
+    spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       NetworkName.Polygon,
       railgunWallet.id,
@@ -187,8 +197,8 @@ describe('tx-cross-contract-calls', () => {
       false, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [polygonRelayAdaptContract, '0x0100', false], // run 1 - token 1
       [polygonRelayAdaptContract, '0x0200', false], // run 1 - token 2
       [polygonRelayAdaptContract, '0x0100', false], // run 2 - token 1
@@ -199,7 +209,7 @@ describe('tx-cross-contract-calls', () => {
 
   it('Should get gas estimates for valid cross contract calls: public wallet', async () => {
     stubGasEstimateSuccess();
-    spyOnSetWithdraw();
+    spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       NetworkName.Polygon,
       railgunWallet.id,
@@ -212,8 +222,8 @@ describe('tx-cross-contract-calls', () => {
       true, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [polygonRelayAdaptContract, '0x0100', false],
       [polygonRelayAdaptContract, '0x0200', false],
     ]);
@@ -257,7 +267,7 @@ describe('tx-cross-contract-calls', () => {
   it('Should populate tx for valid cross contract calls', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    spyOnSetWithdraw();
+    spyOnSetUnshield();
     const proofResponse = await generateCrossContractCallsProof(
       NetworkName.Polygon,
       railgunWallet.id,
@@ -266,12 +276,13 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
       relayerFeeTokenAmountRecipient,
-      false, // sendWithPublicAddress
+      false, // sendWithPublicWallet
+      overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [polygonRelayAdaptContract, '0x0100', false], // dummy proof #1
       [polygonRelayAdaptContract, '0x0200', false], // dummy proof #2
       [polygonRelayAdaptContract, '0x0100', false], // actual proof #1
@@ -284,12 +295,13 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
       relayerFeeTokenAmountRecipient,
-      false, // sendWithPublicAddress
-      undefined, // gasDetailsSerialized
+      false, // sendWithPublicWallet
+      overallBatchMinGasPrice,
+      gasDetailsSerialized, // gasDetailsSerialized
     );
     expect(populateResponse.error).to.be.undefined;
     expect(populateResponse.serializedTransaction).to.equal(
-      '0xc88080808080820123',
+      '0x01cc8080821000808080820123c0',
     );
 
     const deserialized = deserializeTransaction(
@@ -299,14 +311,14 @@ describe('tx-cross-contract-calls', () => {
     );
 
     expect(deserialized.nonce).to.equal(2);
-    expect(deserialized.gasPrice?.toString()).to.equal('0');
+    expect(deserialized.gasPrice?.toString()).to.equal('4096');
     expect(deserialized.gasLimit?.toString()).to.equal('0');
     expect(deserialized.value?.toString()).to.equal('0');
     expect(deserialized.data).to.equal('0x0123');
     expect(deserialized.to).to.equal(null);
     expect(deserialized.chainId).to.equal(1);
-    expect(deserialized.type).to.equal(undefined);
-    expect(Object.keys(deserialized).length).to.equal(8);
+    expect(deserialized.type).to.equal(1);
+    expect(Object.keys(deserialized).length).to.equal(9);
   });
 
   it('Should error on populate tx for invalid cross contract calls', async () => {
@@ -318,11 +330,12 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       ['123'], // Invalid
       relayerFeeTokenAmountRecipient,
-      false, // sendWithPublicAddress
-      undefined, // gasDetailsSerialized
+      false, // sendWithPublicWallet
+      overallBatchMinGasPrice,
+      gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. Mismatch: relayAdaptWithdrawTokenAmountRecipients.',
+      'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldTokenAmounts.',
     );
   });
 
@@ -336,8 +349,9 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
       relayerFeeTokenAmountRecipient,
-      false, // sendWithPublicAddress
-      undefined, // gasDetailsSerialized
+      false, // sendWithPublicWallet
+      overallBatchMinGasPrice,
+      gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
       'Invalid proof for this transaction. No proof found.',
@@ -354,7 +368,8 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
       relayerFeeTokenAmountRecipient,
-      false, // sendWithPublicAddress
+      false, // sendWithPublicWallet
+      overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
@@ -365,15 +380,16 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
       relayerFeeTokenAmountRecipient,
-      false, // sendWithPublicAddress
-      undefined, // gasDetailsSerialized
+      false, // sendWithPublicWallet
+      overallBatchMinGasPrice,
+      gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. Mismatch: relayAdaptWithdrawTokenAmountRecipients.',
+      'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldTokenAmounts.',
     );
   });
 
-  it('Should invalidate cross contract call as unsuccessful', async () => {
+  it.skip('Should invalidate cross contract call as unsuccessful', async () => {
     const provider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     );

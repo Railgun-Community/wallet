@@ -12,7 +12,6 @@ import {
   getRailgunWalletAddressData,
   getWalletMnemonic,
   getWalletShareableViewingKey,
-  getWalletTransactionHistory,
   loadWalletByID,
   serializeRailgunWalletAddressData,
   unloadWalletByID,
@@ -27,16 +26,11 @@ import {
   initTestEngineNetwork,
 } from '../../../../test/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
-import {
-  Chain,
-  ChainType,
-  NetworkName,
-} from '@railgun-community/shared-models';
+import { NetworkName } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const POLYGON_CHAIN: Chain = { type: ChainType.EVM, id: 137 };
 let wallet: RailgunWallet;
 
 describe('wallets', () => {
@@ -157,11 +151,6 @@ describe('wallets', () => {
         '0zk1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhshkca',
       ),
     ).to.be.true;
-  });
-
-  it('Should get wallet transaction history', async () => {
-    const resp = await getWalletTransactionHistory(POLYGON_CHAIN, wallet.id);
-    expect(resp.items?.length).to.be.greaterThanOrEqual(6);
   });
 
   it('Should serialize wallet address data', async () => {

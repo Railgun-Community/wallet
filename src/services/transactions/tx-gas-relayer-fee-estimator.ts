@@ -1,7 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { BaseProvider } from '@ethersproject/providers';
-import { SerializedTransaction } from '@railgun-community/engine';
+import { TransactionStruct } from '@railgun-community/engine';
 import {
   NetworkName,
   TransactionGasDetails,
@@ -13,7 +12,6 @@ import {
   NETWORK_CONFIG,
   RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
-import { getProviderForNetwork } from '../railgun/core/providers';
 import {
   DUMMY_FROM_ADDRESS,
   createDummyRelayerFeeTokenAmount,
@@ -44,17 +42,19 @@ export const calculateRelayerFeeTokenAmount = (
 };
 
 const getUpdatedRelayerFeeForGasEstimation = async (
-  provider: BaseProvider,
+  networkName: NetworkName,
   populatedTransaction: PopulatedTransaction,
   fromWalletAddress: string,
   originalGasDetails: TransactionGasDetails,
   feeTokenDetails: FeeTokenDetails,
+  sendWithPublicWallet: boolean,
   multiplierBasisPoints?: number,
 ): Promise<RailgunWalletTokenAmount> => {
   const gasEstimate = await getGasEstimate(
+    networkName,
     populatedTransaction,
-    provider,
     fromWalletAddress,
+    sendWithPublicWallet,
     multiplierBasisPoints,
   );
 
@@ -70,11 +70,11 @@ const getUpdatedRelayerFeeForGasEstimation = async (
 };
 
 export const gasEstimateResponseIterativeRelayerFee = async (
-  generateSerializedTransactions: (
+  generateTransactionStructs: (
     relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
-  ) => Promise<SerializedTransaction[]>,
+  ) => Promise<TransactionStruct[]>,
   generatePopulatedTransaction: (
-    serializedTransactions: SerializedTransaction[],
+    serializedTransactions: TransactionStruct[],
   ) => Promise<PopulatedTransaction>,
   networkName: NetworkName,
   railgunWalletID: string,
@@ -85,7 +85,6 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   multiplierBasisPoints: Optional<number>,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   const wallet = walletForID(railgunWalletID);
-  const provider = getProviderForNetwork(networkName);
   const originalGasDetails = deserializeTransactionGasDetails(
     originalGasDetailsSerialized,
   );
@@ -97,7 +96,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     ? createDummyRelayerFeeTokenAmount(feeTokenDetails.tokenAddress)
     : undefined;
 
-  let serializedTransactions = await generateSerializedTransactions(
+  let serializedTransactions = await generateTransactionStructs(
     dummyRelayerFee,
   );
   let populatedTransaction = await generatePopulatedTransaction(
@@ -105,9 +104,10 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   );
 
   let gasEstimate = await getGasEstimate(
+    networkName,
     populatedTransaction,
-    provider,
     fromWalletAddress,
+    sendWithPublicWallet,
     multiplierBasisPoints,
   );
 
@@ -141,11 +141,12 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   for (let i = 0; i < MAX_ITERATIONS_RELAYER_FEE_REESTIMATION; i += 1) {
     // eslint-disable-next-line no-await-in-loop
     const updatedRelayerFee = await getUpdatedRelayerFeeForGasEstimation(
-      provider,
+      networkName,
       populatedTransaction,
       fromWalletAddress,
       originalGasDetails,
       feeTokenDetails,
+      sendWithPublicWallet,
       multiplierBasisPoints,
     );
 
@@ -167,13 +168,13 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     }
 
     // eslint-disable-next-line no-await-in-loop
-    const newSerializedTransactions = await generateSerializedTransactions(
+    const newTransactionStructs = await generateTransactionStructs(
       updatedRelayerFee,
     );
 
     if (
-      compareCircuitSizesSerializedTransactions(
-        newSerializedTransactions,
+      compareCircuitSizesTransactionStructs(
+        newTransactionStructs,
         serializedTransactions,
       )
     ) {
@@ -181,7 +182,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
       return gasEstimateResponse(gasEstimate);
     }
 
-    serializedTransactions = newSerializedTransactions;
+    serializedTransactions = newTransactionStructs;
 
     // eslint-disable-next-line no-await-in-loop
     populatedTransaction = await generatePopulatedTransaction(
@@ -190,9 +191,10 @@ export const gasEstimateResponseIterativeRelayerFee = async (
 
     // eslint-disable-next-line no-await-in-loop
     const newGasEstimate = await getGasEstimate(
+      networkName,
       populatedTransaction,
-      provider,
       fromWalletAddress,
+      sendWithPublicWallet,
       multiplierBasisPoints,
     );
 
@@ -205,9 +207,9 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   return gasEstimateResponse(gasEstimate);
 };
 
-const compareCircuitSizesSerializedTransactions = (
-  serializedA: SerializedTransaction[],
-  serializedB: SerializedTransaction[],
+const compareCircuitSizesTransactionStructs = (
+  serializedA: TransactionStruct[],
+  serializedB: TransactionStruct[],
 ) => {
   if (serializedA.length !== serializedB.length) {
     return false;

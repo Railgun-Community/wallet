@@ -6,6 +6,8 @@ import Sinon, { SinonStub } from 'sinon';
 import {
   NetworkName,
   deserializeTransaction,
+  EVMGasType,
+  TransactionGasDetailsSerialized,
 } from '@railgun-community/shared-models';
 import {
   initTestEngine,
@@ -17,16 +19,31 @@ import {
   MOCK_MNEMONIC,
   MOCK_TOKEN_AMOUNTS,
 } from '../../../test/mocks.test';
-import { populateDeposit, gasEstimateForDeposit } from '../tx-deposit-erc20';
+import {
+  populateShieldBaseToken,
+  gasEstimateForShieldBaseToken,
+} from '../tx-shield-base-token';
 import { decimalToHexString } from '../../../utils/format';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
+import { PopulatedTransaction } from '@ethersproject/contracts';
+import { randomHex, RelayAdaptContract } from '@railgun-community/engine';
 
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;
-let railgunWalletID: string;
+let relayAdaptPopulateShieldBaseToken: SinonStub;
+let railgunAddress: string;
+
+const shieldPrivateKey = randomHex(32);
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+
+const gasDetailsSerialized: TransactionGasDetailsSerialized = {
+  evmGasType: EVMGasType.Type2,
+  gasEstimateString: '0x00',
+  maxFeePerGasString: '0x1000',
+  maxPriorityFeePerGasString: '0x100',
+};
 
 const stubSuccess = () => {
   gasEstimateStub = Sinon.stub(
@@ -42,7 +59,7 @@ const stubFailure = () => {
   ).rejects(new Error('test rejection - gas estimate'));
 };
 
-describe('tx-deposit-erc20', () => {
+describe('tx-shield-base-token', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
@@ -54,54 +71,63 @@ describe('tx-deposit-erc20', () => {
     if (!railgunWalletResponse.railgunWalletInfo) {
       throw new Error('No railgun wallet created.');
     }
-    railgunWalletID = railgunWalletResponse.railgunWalletInfo.id;
+    railgunAddress = railgunWalletResponse.railgunWalletInfo.railgunAddress;
+    relayAdaptPopulateShieldBaseToken = Sinon.stub(
+      RelayAdaptContract.prototype,
+      'populateShieldBaseToken',
+    ).resolves({ data: '0x0123' } as PopulatedTransaction);
   });
   afterEach(() => {
     gasEstimateStub?.restore();
     sendTxStub?.restore();
+    relayAdaptPopulateShieldBaseToken?.restore();
   });
 
-  it('Should get gas estimate for valid deposit', async () => {
+  it('Should get gas estimate for valid shield base token', async () => {
     stubSuccess();
-    const rsp = await gasEstimateForDeposit(
+    const rsp = await gasEstimateForShieldBaseToken(
       NetworkName.Polygon,
-      railgunWalletID,
-      MOCK_TOKEN_AMOUNTS,
+      railgunAddress,
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS[0],
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
 
-  it('Should error on gas estimates for invalid deposit', async () => {
+  it('Should error on gas estimates for invalid shield base token', async () => {
     stubSuccess();
-    const rsp = await gasEstimateForDeposit(
+    const rsp = await gasEstimateForShieldBaseToken(
       NetworkName.Polygon,
-      '12345',
-      MOCK_TOKEN_AMOUNTS,
+      '123456789',
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS[0],
       MOCK_ETH_WALLET_ADDRESS,
     );
-    expect(rsp.error).to.equal('No RAILGUN wallet for ID');
+    expect(rsp.error).to.equal('Invalid RAILGUN address.');
   });
 
   it('Should error for ethers rejections', async () => {
     stubFailure();
-    const rsp = await gasEstimateForDeposit(
+    const rsp = await gasEstimateForShieldBaseToken(
       NetworkName.Polygon,
-      railgunWalletID,
-      MOCK_TOKEN_AMOUNTS,
+      railgunAddress,
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS[0],
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.equal('test rejection - gas estimate');
   });
 
-  it('Should send tx for valid deposit', async () => {
+  it('Should send tx for valid shield base token', async () => {
     stubSuccess();
-    const rsp = await populateDeposit(
+    const rsp = await populateShieldBaseToken(
       NetworkName.Polygon,
-      railgunWalletID,
-      MOCK_TOKEN_AMOUNTS,
-      undefined, // gasDetailsSerialized
+      railgunAddress,
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS[0],
+      gasDetailsSerialized,
     );
     expect(rsp.error).to.be.undefined;
     const parsedTx = deserializeTransaction(
@@ -114,14 +140,15 @@ describe('tx-deposit-erc20', () => {
     expect(parsedTx.to).to.be.a('string');
   });
 
-  it('Should error on send tx for invalid deposit', async () => {
+  it('Should error on send tx for invalid shield base token', async () => {
     stubSuccess();
-    const rsp = await populateDeposit(
+    const rsp = await populateShieldBaseToken(
       NetworkName.Polygon,
-      '12345',
-      MOCK_TOKEN_AMOUNTS,
-      undefined, // gasDetailsSerialized
+      '123456789',
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS[0],
+      gasDetailsSerialized,
     );
-    expect(rsp.error).to.equal('No RAILGUN wallet for ID');
+    expect(rsp.error).to.equal('Invalid RAILGUN address.');
   });
 });

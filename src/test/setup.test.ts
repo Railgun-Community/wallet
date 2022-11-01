@@ -72,10 +72,13 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     shouldDebug,
     testArtifactStore,
     useNativeArtifacts,
+    {},
   );
   if (response.error) {
     throw new Error(response.error);
   }
+
+  // TODO: Clear listeners when test engine is reset.
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);
   setOnMerkletreeScanCallback(MOCK_HISTORY_SCAN_CALLBACK);
 };

@@ -8,7 +8,7 @@ import {
   nToHex,
   randomHex,
   OutputType,
-  Note,
+  TransactNote,
   RailgunEngine,
 } from '@railgun-community/engine';
 import {
@@ -35,7 +35,7 @@ import {
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { getCachedProvedTransaction } from '../proof-cache';
-import { generateWithdrawProof } from '../tx-proof-withdraw';
+import { generateUnshieldProof } from '../tx-proof-unshield';
 
 let railgunWallet: RailgunWallet;
 let railgunWalletAddress: string;
@@ -47,7 +47,9 @@ const { expect } = chai;
 
 const MOCK_POPULATED_TX = {} as PopulatedTransaction;
 
-describe.skip('tx-proof-withdraw', () => {
+const overallBatchMinGasPrice = '0x1000';
+
+describe.skip('tx-proof-unshield', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
@@ -62,7 +64,8 @@ describe.skip('tx-proof-withdraw', () => {
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
     railgunWalletAddress = railgunWallet.getAddress();
-    const addressData = RailgunEngine.decodeAddress(railgunWalletAddress);
+    const receiverAddressData =
+      RailgunEngine.decodeAddress(railgunWalletAddress);
 
     tokenAmountRecipients = MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY.map(
       tokenAmount => ({
@@ -85,7 +88,7 @@ describe.skip('tx-proof-withdraw', () => {
       recipientAddress: relayerRailgunAddress,
     };
 
-    const mockDepositAmount = BigInt('12500000000');
+    const mockShieldAmount = BigInt('12500000000');
     const tokenAddress = formatToByteLength(
       MOCK_TOKEN_ADDRESS,
       ByteLength.UINT_256,
@@ -96,24 +99,23 @@ describe.skip('tx-proof-withdraw', () => {
       ByteLength.UINT_128,
     );
 
-    const senderBlindingKey = randomHex(15);
-
-    const depositNote = Note.create(
-      addressData,
+    const shieldNote = TransactNote.create(
+      receiverAddressData,
+      railgunWallet.addressKeys,
       random,
-      mockDepositAmount,
+      mockShieldAmount,
       MOCK_TOKEN_ADDRESS,
       railgunWallet.getViewingKeyPair(),
-      senderBlindingKey,
+      true, // showSenderAddressToRecipient
       OutputType.Transfer,
       MOCK_MEMO,
     );
-    expect(depositNote.notePublicKey).to.equal(
+    expect(shieldNote.notePublicKey).to.equal(
       BigInt(
         '8646677792808778106426841491192581170072532636409694279739894688473037283422',
       ),
     );
-    expect(depositNote.hash).to.equal(
+    expect(shieldNote.hash).to.equal(
       BigInt(
         '17847544257240351011885349052582675772817264504940544227356428415831210506037',
       ),
@@ -121,14 +123,14 @@ describe.skip('tx-proof-withdraw', () => {
 
     // const balances: Balances = {
     //   [tokenAddress]: {
-    //     balance: mockDepositAmount,
+    //     balance: mockShieldAmount,
     //     utxos: [
     //       {
     //         tree: 0,
     //         position: 0,
     //         txid: '123',
     //         spendtxid: '123',
-    //         note: depositNote,
+    //         note: shieldNote,
     //       },
     //     ],
     //   },
@@ -142,19 +144,19 @@ describe.skip('tx-proof-withdraw', () => {
     // const chainID = network.chainId;
 
     // const vpk = railgunWallet.getViewingKeyPair().privateKey;
-    // const deposit = new ERC20Deposit(
+    // const shield = new ShieldNote(
     //   addressData.masterPublicKey,
     //   randomHex(16),
-    //   mockDepositAmount,
+    //   mockShieldAmount,
     //   MOCK_TOKEN_ADDRESS,
     // );
-    // const { preImage, encryptedRandom } = deposit.serialize(vpk);
+    // const { preImage, encryptedRandom } = shield.serialize(vpk);
 
     // const commitment: GeneratedCommitment = {
     //   hash: '',
     //   txid: '123',
     //   preImage: {
-    //     value: nToHex(deposit.value, ByteLength.UINT_128),
+    //     value: nToHex(shield.value, ByteLength.UINT_128),
     //     npk: preImage.npk,
     //     token: preImage.token,
     //   },
@@ -171,21 +173,22 @@ describe.skip('tx-proof-withdraw', () => {
     // console.log(await railgunWallet.balances(chainID));
   });
 
-  it('Should prove withdraw', async () => {
+  it('Should prove unshield', async () => {
     const sendWithPublicWallet = false;
     const response: RailgunProveTransactionResponse =
-      await generateWithdrawProof(
+      await generateUnshieldProof(
         NetworkName.Hardhat,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,
         tokenAmountRecipients,
         relayerFeeTokenAmountRecipient,
         sendWithPublicWallet,
+        overallBatchMinGasPrice,
         () => {}, // progressCallback
       );
     expect(response.error).to.equal(undefined, `Error: ${response.error}`);
     expect(getCachedProvedTransaction()).to.deep.equal({
-      proofType: ProofType.Withdraw,
+      proofType: ProofType.Unshield,
       populatedTransaction: MOCK_POPULATED_TX,
       railgunWalletID: railgunWallet.id,
       memoText: undefined,

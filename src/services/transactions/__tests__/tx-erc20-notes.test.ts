@@ -72,6 +72,7 @@ describe('tx-erc20-notes', () => {
       tokenAmountRecipient,
       railgunWallet,
       OutputType.Transfer,
+      true, // showSenderAddressToRecipient
       MOCK_MEMO,
     );
     const viewingPrivateKey = railgunWallet.getViewingKeyPair().privateKey;
@@ -81,16 +82,16 @@ describe('tx-erc20-notes', () => {
     );
 
     expect(note.value).to.equal(formatAmountString(tokenAmountRecipient));
-    expect(note.masterPublicKey).to.equal(addressData.masterPublicKey);
+    expect(note.receiverAddressData.masterPublicKey).to.equal(addressData.masterPublicKey);
     expect(note.token).to.equal(padTo32BytesUnHex(MOCK_TOKEN));
 
-    const decrypted = Memo.decryptNoteExtraData(
-      note.memoField,
+    const decrypted = Memo.decryptNoteAnnotationData(
+      note.annotationData,
       viewingPrivateKey,
     );
 
     expect(decrypted?.outputType).to.equal(OutputType.Transfer);
-    expect(decrypted?.senderBlindingKey).to.be.a('string');
+    expect(decrypted?.senderRandom).to.be.a('string');
     expect(decrypted?.walletSource).to.equal(TEST_WALLET_SOURCE);
   });
 

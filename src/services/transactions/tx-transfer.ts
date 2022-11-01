@@ -16,28 +16,35 @@ import {
 } from './tx-generator';
 import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
-import { SerializedTransaction } from '@railgun-community/engine';
+import { TransactionStruct } from '@railgun-community/engine';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
+import { BigNumber } from '@ethersproject/bignumber';
 
 export const populateProvedTransfer = async (
+  networkName: NetworkName,
   railgunWalletID: string,
+  showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
-  gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
+  overallBatchMinGasPrice: Optional<string>,
+  gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     const populatedTransaction = await populateProvedTransaction(
+      networkName,
       ProofType.Transfer,
       railgunWalletID,
+      showSenderAddressToRecipient,
       memoText,
       tokenAmountRecipients,
-      undefined, // relayAdaptWithdrawTokenAmountRecipients
-      undefined, // relayAdaptDepositTokenAddresses
+      undefined, // relayAdaptUnshieldTokenAmountRecipients
+      undefined, // relayAdaptShieldTokenAddresses
       undefined, // crossContractCallsSerialized
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
+      overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     return {
@@ -64,6 +71,8 @@ export const gasEstimateForUnprovenTransfer = async (
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
+    const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
+
     const response = await gasEstimateResponseIterativeRelayerFee(
       (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
         generateDummyProofTransactions(
@@ -71,12 +80,14 @@ export const gasEstimateForUnprovenTransfer = async (
           networkName,
           railgunWalletID,
           encryptionKey,
+          false, // showSenderAddressToRecipient - doesn't matter for gas estimate.
           memoText,
           tokenAmountRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
+          overallBatchMinGasPrice,
         ),
-      (txs: SerializedTransaction[]) =>
+      (txs: TransactionStruct[]) =>
         generateTransact(
           txs,
           networkName,

@@ -5,51 +5,54 @@ import {
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
   NetworkName,
-  NETWORK_CONFIG,
   sanitizeError,
   serializeUnsignedTransaction,
 } from '@railgun-community/shared-models';
-import {
-  getProviderForNetwork,
-  getRelayAdaptContractForNetwork,
-} from '../railgun/core/providers';
+import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
   gasEstimateResponse,
   getGasEstimate,
   setGasDetailsForPopulatedTransaction,
 } from './tx-gas-details';
 import { sendErrorMessage } from '../../utils/logger';
-import { walletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { randomHex , ERC20Deposit , RailgunEngine } from '@railgun-community/engine';
+import {
+  randomHex,
+  ShieldNote,
+  RailgunEngine,
+  hexToBytes,
+} from '@railgun-community/engine';
+import { assertValidRailgunAddress } from '../railgun';
 
-const generateDepositBaseTokenTransaction = async (
+const generateShieldBaseTokenTransaction = async (
   networkName: NetworkName,
-  railgunWalletID: string,
+  railgunAddress: string,
+  shieldPrivateKey: string,
   wrappedTokenAmount: RailgunWalletTokenAmount,
 ): Promise<PopulatedTransaction> => {
   try {
-    const railgunWallet = walletForID(railgunWalletID);
-    const { chain } = NETWORK_CONFIG[networkName];
-    const railgunAddress = railgunWallet.getAddress(chain);
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
-    const { masterPublicKey } = RailgunEngine.decodeAddress(railgunAddress);
-    const vpk = railgunWallet.getViewingKeyPair().privateKey;
+    const { masterPublicKey, viewingPublicKey } =
+      RailgunEngine.decodeAddress(railgunAddress);
     const random = randomHex(16);
 
     const amount = BigInt(wrappedTokenAmount.amountString);
     const wrappedAddress = wrappedTokenAmount.tokenAddress;
 
-    const deposit = new ERC20Deposit(
+    const shield = new ShieldNote(
       masterPublicKey,
       random,
       amount,
       wrappedAddress,
     );
-    const depositInput = deposit.serialize(vpk);
+
+    const shieldRequest = await shield.serialize(
+      hexToBytes(shieldPrivateKey),
+      viewingPublicKey,
+    );
 
     const populatedTransaction =
-      await relayAdaptContract.populateDepositBaseToken(depositInput);
+      await relayAdaptContract.populateShieldBaseToken(shieldRequest);
 
     return populatedTransaction;
   } catch (err) {
@@ -59,22 +62,30 @@ const generateDepositBaseTokenTransaction = async (
   }
 };
 
-export const populateDepositBaseToken = async (
+export const populateShieldBaseToken = async (
   networkName: NetworkName,
-  railgunWalletID: string,
+  railgunAddress: string,
+  shieldPrivateKey: string,
   wrappedTokenAmount: RailgunWalletTokenAmount,
-  gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
+  gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const populatedTransaction = await generateDepositBaseTokenTransaction(
+    assertValidRailgunAddress(railgunAddress);
+
+    const populatedTransaction = await generateShieldBaseTokenTransaction(
       networkName,
-      railgunWalletID,
+      railgunAddress,
+      shieldPrivateKey,
       wrappedTokenAmount,
     );
 
+    const sendWithPublicWallet = true;
+
     setGasDetailsForPopulatedTransaction(
+      networkName,
       populatedTransaction,
       gasDetailsSerialized,
+      sendWithPublicWallet,
     );
 
     return {
@@ -90,24 +101,32 @@ export const populateDepositBaseToken = async (
   }
 };
 
-export const gasEstimateForDepositBaseToken = async (
+export const gasEstimateForShieldBaseToken = async (
   networkName: NetworkName,
-  railgunWalletID: string,
+  railgunAddress: string,
+  shieldPrivateKey: string,
   wrappedTokenAmount: RailgunWalletTokenAmount,
   fromWalletAddress: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
+    assertValidRailgunAddress(railgunAddress);
     assertNotBlockedAddress(fromWalletAddress);
 
-    const populatedTransaction = await generateDepositBaseTokenTransaction(
+    const populatedTransaction = await generateShieldBaseTokenTransaction(
       networkName,
-      railgunWalletID,
+      railgunAddress,
+      shieldPrivateKey,
       wrappedTokenAmount,
     );
 
-    const provider = getProviderForNetwork(networkName);
+    const sendWithPublicWallet = true;
     return gasEstimateResponse(
-      await getGasEstimate(populatedTransaction, provider, fromWalletAddress),
+      await getGasEstimate(
+        networkName,
+        populatedTransaction,
+        fromWalletAddress,
+        sendWithPublicWallet,
+      ),
     );
   } catch (err) {
     sendErrorMessage(err.message);

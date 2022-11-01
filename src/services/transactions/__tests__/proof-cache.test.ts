@@ -3,10 +3,10 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   ProofType,
+  RailgunWalletTokenAmount,
   RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
 import {
-  MOCK_ETH_WALLET_ADDRESS,
   MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_AMOUNTS,
   MOCK_TOKEN_FEE,
@@ -21,6 +21,7 @@ const { expect } = chai;
 
 const proofType = ProofType.Transfer;
 const railgunWalletID = '123';
+const showSenderAddressToRecipient = true;
 const memoText = 'Some memo';
 const recipientAddress = '0x12345';
 const tokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
@@ -33,14 +34,13 @@ const relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient = {
   recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
 };
 const crossContractCallsSerialized = ['0x4567'];
-const relayAdaptDepositTokenAddresses = ['0x123'];
-const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
-  [
-    {
-      ...MOCK_TOKEN_FEE,
-      recipientAddress: MOCK_ETH_WALLET_ADDRESS,
-    },
-  ];
+const relayAdaptShieldTokenAddresses = ['0x123'];
+const relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[] = [
+  MOCK_TOKEN_FEE,
+];
+
+const sendWithPublicWallet = false;
+const overallBatchMinGasPrice = '0x1000';
 
 describe('proof-cache', () => {
   it('Should validate cached transaction correctly', () => {
@@ -49,27 +49,31 @@ describe('proof-cache', () => {
       validateCachedProvedTransaction(
         proofType,
         railgunWalletID,
+        showSenderAddressToRecipient,
         memoText,
         tokenAmountRecipients,
-        relayAdaptWithdrawTokenAmountRecipients,
-        relayAdaptDepositTokenAddresses,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
         crossContractCallsSerialized,
         relayerFeeTokenAmountRecipient,
-        false, // sendWithPublicAddress
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
       ).isValid,
     ).to.be.false;
 
     setCachedProvedTransaction({
       populatedTransaction: {} as PopulatedTransaction,
       proofType,
+      showSenderAddressToRecipient,
       memoText,
       railgunWalletID,
       tokenAmountRecipients,
-      relayAdaptWithdrawTokenAmountRecipients,
-      relayAdaptDepositTokenAddresses,
-      relayerFeeTokenAmountRecipient,
+      relayAdaptUnshieldTokenAmounts,
+      relayAdaptShieldTokenAddresses,
       crossContractCallsSerialized,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet: false,
+      overallBatchMinGasPrice,
     });
 
     // Same same
@@ -77,27 +81,47 @@ describe('proof-cache', () => {
       validateCachedProvedTransaction(
         proofType,
         railgunWalletID,
+        showSenderAddressToRecipient,
         memoText,
         tokenAmountRecipients,
-        relayAdaptWithdrawTokenAmountRecipients,
-        relayAdaptDepositTokenAddresses,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
         crossContractCallsSerialized,
         relayerFeeTokenAmountRecipient,
-        false, // sendWithPublicAddress
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
       ).isValid,
     ).to.be.true;
 
     expect(
       validateCachedProvedTransaction(
-        ProofType.Withdraw,
+        ProofType.Unshield,
         railgunWalletID,
+        showSenderAddressToRecipient,
         memoText,
         tokenAmountRecipients,
-        relayAdaptWithdrawTokenAmountRecipients,
-        relayAdaptDepositTokenAddresses,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
         crossContractCallsSerialized,
         relayerFeeTokenAmountRecipient,
-        false, // sendWithPublicAddress
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ).isValid,
+    ).to.be.false;
+
+    expect(
+      validateCachedProvedTransaction(
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        tokenAmountRecipients,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
       ).isValid,
     ).to.be.false;
 
@@ -105,13 +129,15 @@ describe('proof-cache', () => {
       validateCachedProvedTransaction(
         proofType,
         '987',
+        showSenderAddressToRecipient,
         memoText,
         tokenAmountRecipients,
-        relayAdaptWithdrawTokenAmountRecipients,
-        relayAdaptDepositTokenAddresses,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
         crossContractCallsSerialized,
         relayerFeeTokenAmountRecipient,
-        false, // sendWithPublicAddress
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
       ).isValid,
     ).to.be.false;
 
@@ -119,13 +145,31 @@ describe('proof-cache', () => {
       validateCachedProvedTransaction(
         proofType,
         railgunWalletID,
+        false,
+        memoText,
+        tokenAmountRecipients,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ).isValid,
+    ).to.be.false;
+
+    expect(
+      validateCachedProvedTransaction(
+        proofType,
+        railgunWalletID,
+        showSenderAddressToRecipient,
         'different memo',
         tokenAmountRecipients,
-        relayAdaptWithdrawTokenAmountRecipients,
-        relayAdaptDepositTokenAddresses,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
         crossContractCallsSerialized,
         relayerFeeTokenAmountRecipient,
-        false, // sendWithPublicAddress
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
       ).isValid,
     ).to.be.false;
 
@@ -133,19 +177,21 @@ describe('proof-cache', () => {
       validateCachedProvedTransaction(
         proofType,
         railgunWalletID,
+        showSenderAddressToRecipient,
         memoText,
         [
           {
             tokenAddress: '0x765',
             amountString: '100',
-            recipientAddress: '0x345',
+            recipientAddress: '0x123',
           },
         ],
-        relayAdaptWithdrawTokenAmountRecipients,
-        relayAdaptDepositTokenAddresses,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
         crossContractCallsSerialized,
         relayerFeeTokenAmountRecipient,
-        false, // sendWithPublicAddress
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
       ).isValid,
     ).to.be.false;
 
@@ -153,27 +199,20 @@ describe('proof-cache', () => {
       validateCachedProvedTransaction(
         proofType,
         railgunWalletID,
+        showSenderAddressToRecipient,
         memoText,
         tokenAmountRecipients,
-        [], // relayAdaptWithdrawTokenAmountRecipients
-        relayAdaptDepositTokenAddresses,
-        crossContractCallsSerialized,
-        relayerFeeTokenAmountRecipient,
-        false, // sendWithPublicAddress
-      ).isValid,
-    ).to.be.false;
-
-    expect(
-      validateCachedProvedTransaction(
-        proofType,
-        railgunWalletID,
-        memoText,
-        tokenAmountRecipients,
-        relayAdaptWithdrawTokenAmountRecipients,
+        [
+          {
+            tokenAddress: '0x765',
+            amountString: '100',
+          },
+        ],
         ['test'],
         crossContractCallsSerialized,
         relayerFeeTokenAmountRecipient,
-        false, // sendWithPublicAddress
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
       ).isValid,
     ).to.be.false;
 
@@ -181,13 +220,31 @@ describe('proof-cache', () => {
       validateCachedProvedTransaction(
         proofType,
         railgunWalletID,
+        showSenderAddressToRecipient,
         memoText,
         tokenAmountRecipients,
-        relayAdaptWithdrawTokenAmountRecipients,
-        relayAdaptDepositTokenAddresses,
+        relayAdaptUnshieldTokenAmounts,
+        ['test'],
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ).isValid,
+    ).to.be.false;
+
+    expect(
+      validateCachedProvedTransaction(
+        proofType,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        tokenAmountRecipients,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
         ['test'],
         relayerFeeTokenAmountRecipient,
-        false, // sendWithPublicAddress
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
       ).isValid,
     ).to.be.false;
 
@@ -195,17 +252,19 @@ describe('proof-cache', () => {
       validateCachedProvedTransaction(
         proofType,
         railgunWalletID,
+        showSenderAddressToRecipient,
         memoText,
         tokenAmountRecipients,
-        relayAdaptWithdrawTokenAmountRecipients,
-        relayAdaptDepositTokenAddresses,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
         crossContractCallsSerialized,
         {
           tokenAddress: '0x765',
           amountString: '100',
-          recipientAddress: '0x123',
+          recipientAddress: '0x1233',
         },
-        false, // sendWithPublicAddress
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
       ).isValid,
     ).to.be.false;
 
@@ -213,13 +272,31 @@ describe('proof-cache', () => {
       validateCachedProvedTransaction(
         proofType,
         railgunWalletID,
+        showSenderAddressToRecipient,
         memoText,
         tokenAmountRecipients,
-        relayAdaptWithdrawTokenAmountRecipients,
-        relayAdaptDepositTokenAddresses,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
         crossContractCallsSerialized,
         relayerFeeTokenAmountRecipient,
-        true, // sendWithPublicAddress
+        true, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+      ).isValid,
+    ).to.be.false;
+
+    expect(
+      validateCachedProvedTransaction(
+        proofType,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        tokenAmountRecipients,
+        relayAdaptUnshieldTokenAmounts,
+        relayAdaptShieldTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
+        sendWithPublicWallet,
+        '0x2000',
       ).isValid,
     ).to.be.false;
   });

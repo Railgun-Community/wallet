@@ -13,32 +13,38 @@ import {
 import {
   generateDummyProofTransactions,
   generateTransact,
-  generateWithdrawBaseToken,
+  generateUnshieldBaseToken,
 } from './tx-generator';
 import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
-import { randomHex, SerializedTransaction } from '@railgun-community/engine';
+import { randomHex, TransactionStruct } from '@railgun-community/engine';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
-import { createRelayAdaptWithdrawTokenAmountRecipients } from './tx-cross-contract-calls';
+import { createRelayAdaptUnshieldTokenAmountRecipients } from './tx-cross-contract-calls';
+import { BigNumber } from '@ethersproject/bignumber';
 
-export const populateProvedWithdraw = async (
+export const populateProvedUnshield = async (
+  networkName: NetworkName,
   railgunWalletID: string,
   withdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
-  gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
+  overallBatchMinGasPrice: Optional<string>,
+  gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     const populatedTransaction = await populateProvedTransaction(
-      ProofType.Withdraw,
+      networkName,
+      ProofType.Unshield,
       railgunWalletID,
+      false, // showSenderAddressToRecipient
       undefined, // memoText
       withdrawTokenAmountRecipients,
-      undefined, // relayAdaptWithdrawTokenAmountRecipients
-      undefined, // relayAdaptDepositTokenAddresses
+      undefined, // relayAdaptUnshieldTokenAmountRecipients
+      undefined, // relayAdaptShieldTokenAddresses
       undefined, // crossContractCallsSerialized
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
+      overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     return {
@@ -54,14 +60,15 @@ export const populateProvedWithdraw = async (
   }
 };
 
-export const populateProvedWithdrawBaseToken = async (
+export const populateProvedUnshieldBaseToken = async (
   networkName: NetworkName,
   publicWalletAddress: string,
   railgunWalletID: string,
   wrappedTokenAmount: RailgunWalletTokenAmount,
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
-  gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
+  overallBatchMinGasPrice: Optional<string>,
+  gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     const tokenAmountRecipients: RailgunWalletTokenAmountRecipient[] = [
@@ -70,20 +77,22 @@ export const populateProvedWithdrawBaseToken = async (
         recipientAddress: publicWalletAddress,
       },
     ];
-    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
-      createRelayAdaptWithdrawTokenAmountRecipients(networkName, [
-        wrappedTokenAmount,
-      ]);
+    const relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[] = [
+      wrappedTokenAmount,
+    ];
     const populatedTransaction = await populateProvedTransaction(
-      ProofType.WithdrawBaseToken,
+      networkName,
+      ProofType.UnshieldBaseToken,
       railgunWalletID,
+      false, // showSenderAddressToRecipient
       undefined, // memoText
       tokenAmountRecipients,
-      relayAdaptWithdrawTokenAmountRecipients,
-      undefined, // relayAdaptDepositTokenAddresses
+      relayAdaptUnshieldTokenAmounts,
+      undefined, // relayAdaptShieldTokenAddresses
       undefined, // crossContractCallsSerialized
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
+      overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     return {
@@ -99,7 +108,7 @@ export const populateProvedWithdrawBaseToken = async (
   }
 };
 
-export const gasEstimateForUnprovenWithdraw = async (
+export const gasEstimateForUnprovenUnshield = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
@@ -109,19 +118,23 @@ export const gasEstimateForUnprovenWithdraw = async (
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
+    const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
+
     const response = await gasEstimateResponseIterativeRelayerFee(
       (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
         generateDummyProofTransactions(
-          ProofType.Withdraw,
+          ProofType.Unshield,
           networkName,
           railgunWalletID,
           encryptionKey,
+          false, // showSenderAddressToRecipient
           undefined, // memoText
           tokenAmountRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
+          overallBatchMinGasPrice,
         ),
-      (txs: SerializedTransaction[]) =>
+      (txs: TransactionStruct[]) =>
         generateTransact(
           txs,
           networkName,
@@ -146,7 +159,7 @@ export const gasEstimateForUnprovenWithdraw = async (
   }
 };
 
-export const gasEstimateForUnprovenWithdrawBaseToken = async (
+export const gasEstimateForUnprovenUnshieldBaseToken = async (
   networkName: NetworkName,
   publicWalletAddress: string,
   railgunWalletID: string,
@@ -157,26 +170,30 @@ export const gasEstimateForUnprovenWithdrawBaseToken = async (
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
-    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
-      createRelayAdaptWithdrawTokenAmountRecipients(networkName, [
+    const relayAdaptUnshieldTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+      createRelayAdaptUnshieldTokenAmountRecipients(networkName, [
         wrappedTokenAmount,
       ]);
+
+    const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
 
     const response = await gasEstimateResponseIterativeRelayerFee(
       (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
         generateDummyProofTransactions(
-          ProofType.WithdrawBaseToken,
+          ProofType.UnshieldBaseToken,
           networkName,
           railgunWalletID,
           encryptionKey,
+          false, // showSenderAddressToRecipient
           undefined, // memoText
-          relayAdaptWithdrawTokenAmountRecipients,
+          relayAdaptUnshieldTokenAmountRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
+          overallBatchMinGasPrice,
         ),
-      (txs: SerializedTransaction[]) => {
-        const relayAdaptParamsRandom = randomHex(16);
-        return generateWithdrawBaseToken(
+      (txs: TransactionStruct[]) => {
+        const relayAdaptParamsRandom = randomHex(31);
+        return generateUnshieldBaseToken(
           txs,
           networkName,
           publicWalletAddress,
@@ -186,7 +203,7 @@ export const gasEstimateForUnprovenWithdrawBaseToken = async (
       },
       networkName,
       railgunWalletID,
-      relayAdaptWithdrawTokenAmountRecipients,
+      relayAdaptUnshieldTokenAmountRecipients,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,

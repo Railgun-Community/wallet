@@ -4,7 +4,6 @@ import { BigNumber } from '@ethersproject/bignumber';
 import {
   calculateGasLimit,
   calculateMaximumGas,
-
   TransactionGasDetails,
   EVMGasType,
 } from '@railgun-community/shared-models';
@@ -28,6 +27,6 @@ describe('gas', () => {
       maxPriorityFeePerGas: BigNumber.from('500'),
     };
     const gasLimitString = calculateMaximumGas(gasDetails).toHexString();
-    expect(gasLimitString).to.equal(decimalStringToHexString('2460000000'));
+    expect(gasLimitString).to.equal(decimalStringToHexString('2400000000'));
   });
 });

@@ -3,12 +3,8 @@ import {
   EngineEvent,
   ScannedEventData,
   BytesData,
-  TransactionHistoryTransferTokenAmount,
-  TransactionHistoryTokenAmount,
-  TransactionHistoryEntry,
   AbstractWallet,
   WalletData,
-  Chain,
   AddressData,
   RailgunEngine,
   ByteLength,
@@ -20,11 +16,6 @@ import {
   RailgunWalletInfo,
   LoadRailgunWalletResponse,
   UnloadRailgunWalletResponse,
-  TransactionHistorySerializedResponse,
-  TransactionHistoryItem,
-  RailgunWalletTokenAmount,
-  RailgunWalletSendTokenAmount,
-  RailgunWalletReceiveTokenAmount,
   RailgunWalletAddressDataSerialized,
   NetworkName,
   NETWORK_CONFIG,
@@ -32,8 +23,6 @@ import {
 import { getEngine, walletForID } from '../core/engine';
 import { sendErrorMessage } from '../../../utils/logger';
 import { onBalancesUpdate } from './balance-update';
-import { BigNumber } from '@ethersproject/bignumber';
-import { parseRailgunBalanceAddress } from '../util/bytes-util';
 
 const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
   wallet.on(EngineEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>
@@ -297,88 +286,6 @@ export const getWalletShareableViewingKey = async (
   } catch (err) {
     sendErrorMessage(err.stack);
     return undefined;
-  }
-};
-
-const transactionHistoryReceiveTokenAmountToRailgunTokenAmount = (
-  transactionHistoryTokenAmount: TransactionHistoryTokenAmount,
-): RailgunWalletReceiveTokenAmount => {
-  return {
-    ...transactionHistoryTokenAmountToRailgunTokenAmount(
-      transactionHistoryTokenAmount,
-    ),
-    memoText: transactionHistoryTokenAmount.memoText,
-  };
-};
-
-const transactionHistoryTransferTokenAmountToRailgunTokenAmount = (
-  transactionHistoryTokenAmount: TransactionHistoryTransferTokenAmount,
-): RailgunWalletSendTokenAmount => {
-  const walletSource = transactionHistoryTokenAmount.noteExtraData
-    ? transactionHistoryTokenAmount.noteExtraData.walletSource
-    : undefined;
-  return {
-    ...transactionHistoryTokenAmountToRailgunTokenAmount(
-      transactionHistoryTokenAmount,
-    ),
-    recipientAddress: transactionHistoryTokenAmount.recipientAddress,
-    memoText: transactionHistoryTokenAmount.memoText,
-    walletSource,
-  };
-};
-
-const transactionHistoryTokenAmountToRailgunTokenAmount = (
-  transactionHistoryTokenAmount: TransactionHistoryTokenAmount,
-): RailgunWalletTokenAmount => {
-  return {
-    tokenAddress: parseRailgunBalanceAddress(
-      transactionHistoryTokenAmount.token,
-    ).toLowerCase(),
-    amountString: BigNumber.from(
-      transactionHistoryTokenAmount.amount,
-    ).toHexString(),
-  };
-};
-
-const serializeTransactionHistory = (
-  transactionHistory: TransactionHistoryEntry[],
-): TransactionHistoryItem[] => {
-  return transactionHistory.map(historyItem => ({
-    txid: `0x${historyItem.txid}`,
-    transferTokenAmounts: historyItem.transferTokenAmounts.map(
-      transactionHistoryTransferTokenAmountToRailgunTokenAmount,
-    ),
-    relayerFeeTokenAmount: historyItem.relayerFeeTokenAmount
-      ? transactionHistoryTokenAmountToRailgunTokenAmount(
-          historyItem.relayerFeeTokenAmount,
-        )
-      : undefined,
-    changeTokenAmounts: historyItem.changeTokenAmounts.map(
-      transactionHistoryTokenAmountToRailgunTokenAmount,
-    ),
-    receiveTokenAmounts: historyItem.receiveTokenAmounts.map(
-      transactionHistoryReceiveTokenAmountToRailgunTokenAmount,
-    ),
-    version: historyItem.version,
-  }));
-};
-
-export const getWalletTransactionHistory = async (
-  chain: Chain,
-  railgunWalletID: string,
-): Promise<TransactionHistorySerializedResponse> => {
-  try {
-    const wallet = walletForID(railgunWalletID);
-    const transactionHistory = await wallet.getTransactionHistory(chain);
-    return {
-      items: serializeTransactionHistory(transactionHistory),
-    };
-  } catch (err) {
-    sendErrorMessage(err.stack);
-    const response: LoadRailgunWalletResponse = {
-      error: 'Could not load RAILGUN wallet transaction history.',
-    };
-    return response;
   }
 };
 
