@@ -8,7 +8,7 @@ import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
 import {
   RailgunWallet,
-  SerializedTransaction,
+  TransactionStruct,
   TransactionBatch,
   RelayAdaptContract,
 } from '@railgun-community/engine';
@@ -52,7 +52,7 @@ let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
 let relayAdaptPopulateCrossContractCalls: SinonStub;
-let setWithdrawSpy: SinonSpy;
+let setUnshieldSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
@@ -106,8 +106,8 @@ const stubGasEstimateFailure = () => {
   ).rejects(new Error('test rejection - gas estimate'));
 };
 
-const spyOnSetWithdraw = () => {
-  setWithdrawSpy = Sinon.spy(TransactionBatch.prototype, 'setWithdraw');
+const spyOnSetUnshield = () => {
+  setUnshieldSpy = Sinon.spy(TransactionBatch.prototype, 'setUnshield');
 };
 
 describe('tx-cross-contract-calls', () => {
@@ -137,17 +137,17 @@ describe('tx-cross-contract-calls', () => {
 
     railProveStub = Sinon.stub(
       TransactionBatch.prototype,
-      'generateSerializedTransactions',
-    ).resolves([{}] as SerializedTransaction[]);
+      'generateTransactions',
+    ).resolves([{}] as TransactionStruct[]);
     railDummyProveStub = Sinon.stub(
       TransactionBatch.prototype,
-      'generateDummySerializedTransactions',
+      'generateDummyTransactions',
     ).resolves([
       {
-        commitments: [BigInt(2)],
-        nullifiers: [BigInt(1), BigInt(2)],
+        commitments: ['0x01'],
+        nullifiers: ['0x01', '0x02'],
       },
-    ] as SerializedTransaction[]);
+    ] as unknown as TransactionStruct[]);
     relayAdaptPopulateCrossContractCalls = Sinon.stub(
       RelayAdaptContract.prototype,
       'populateCrossContractCalls',
@@ -155,7 +155,7 @@ describe('tx-cross-contract-calls', () => {
   });
   afterEach(() => {
     gasEstimateStub?.restore();
-    setWithdrawSpy?.restore();
+    setUnshieldSpy?.restore();
     erc20NoteSpy?.restore();
   });
   after(() => {
@@ -168,7 +168,7 @@ describe('tx-cross-contract-calls', () => {
 
   it('Should get gas estimates for valid cross contract calls', async () => {
     stubGasEstimateSuccess();
-    spyOnSetWithdraw();
+    spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       NetworkName.Polygon,
       railgunWalletAddress,
@@ -182,8 +182,8 @@ describe('tx-cross-contract-calls', () => {
       false, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [ropstenRelayAdaptContract, '0x0100', false], // run 1 - token 1
       [ropstenRelayAdaptContract, '0x0200', false], // run 1 - token 2
       [ropstenRelayAdaptContract, '0x0100', false], // run 2 - token 1
@@ -194,7 +194,7 @@ describe('tx-cross-contract-calls', () => {
 
   it('Should get gas estimates for valid cross contract calls: public wallet', async () => {
     stubGasEstimateSuccess();
-    spyOnSetWithdraw();
+    spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       NetworkName.Polygon,
       railgunWalletAddress,
@@ -208,8 +208,8 @@ describe('tx-cross-contract-calls', () => {
       true, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [ropstenRelayAdaptContract, '0x0100', false],
       [ropstenRelayAdaptContract, '0x0200', false],
     ]);
@@ -255,7 +255,7 @@ describe('tx-cross-contract-calls', () => {
   it('Should populate tx for valid cross contract calls', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    spyOnSetWithdraw();
+    spyOnSetUnshield();
     const proofResponse = await generateCrossContractCallsProof(
       NetworkName.Polygon,
       railgunWalletAddress,
@@ -270,8 +270,8 @@ describe('tx-cross-contract-calls', () => {
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [ropstenRelayAdaptContract, '0x0100', false], // dummy proof #1
       [ropstenRelayAdaptContract, '0x0200', false], // dummy proof #2
       [ropstenRelayAdaptContract, '0x0100', false], // actual proof #1

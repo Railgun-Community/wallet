@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BaseProvider } from '@ethersproject/providers';
-import { SerializedTransaction } from '@railgun-community/engine';
+import { TransactionStruct } from '@railgun-community/engine';
 import {
   NetworkName,
   TransactionGasDetails,
@@ -69,11 +69,11 @@ const getUpdatedRelayerFeeForGasEstimation = async (
 };
 
 export const gasEstimateResponseIterativeRelayerFee = async (
-  generateSerializedTransactions: (
+  generateTransactionStructs: (
     relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
-  ) => Promise<SerializedTransaction[]>,
+  ) => Promise<TransactionStruct[]>,
   generatePopulatedTransaction: (
-    serializedTransactions: SerializedTransaction[],
+    serializedTransactions: TransactionStruct[],
   ) => Promise<PopulatedTransaction>,
   networkName: NetworkName,
   railgunWalletID: string,
@@ -96,7 +96,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     ? createDummyRelayerFeeTokenAmount(feeTokenDetails.tokenAddress)
     : undefined;
 
-  let serializedTransactions = await generateSerializedTransactions(
+  let serializedTransactions = await generateTransactionStructs(
     dummyRelayerFee,
   );
   let populatedTransaction = await generatePopulatedTransaction(
@@ -166,13 +166,13 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     }
 
     // eslint-disable-next-line no-await-in-loop
-    const newSerializedTransactions = await generateSerializedTransactions(
+    const newTransactionStructs = await generateTransactionStructs(
       updatedRelayerFee,
     );
 
     if (
-      compareCircuitSizesSerializedTransactions(
-        newSerializedTransactions,
+      compareCircuitSizesTransactionStructs(
+        newTransactionStructs,
         serializedTransactions,
       )
     ) {
@@ -180,7 +180,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
       return gasEstimateResponse(gasEstimate);
     }
 
-    serializedTransactions = newSerializedTransactions;
+    serializedTransactions = newTransactionStructs;
 
     // eslint-disable-next-line no-await-in-loop
     populatedTransaction = await generatePopulatedTransaction(
@@ -204,9 +204,9 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   return gasEstimateResponse(gasEstimate);
 };
 
-const compareCircuitSizesSerializedTransactions = (
-  serializedA: SerializedTransaction[],
-  serializedB: SerializedTransaction[],
+const compareCircuitSizesTransactionStructs = (
+  serializedA: TransactionStruct[],
+  serializedB: TransactionStruct[],
 ) => {
   if (serializedA.length !== serializedB.length) {
     return false;

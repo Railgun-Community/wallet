@@ -29,7 +29,7 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   RelayAdaptHelper,
   AdaptID,
-  SerializedTransaction,
+  TransactionStruct,
   hexlify,
   randomHex,
   RelayAdaptContract,
@@ -70,8 +70,8 @@ export const populateProvedCrossContractCalls = async (
   networkName: NetworkName,
   fromWalletAddress: string,
   railgunWalletID: string,
-  withdrawTokenAmounts: RailgunWalletTokenAmount[],
-  depositTokenAddresses: string[],
+  unshieldTokenAmounts: RailgunWalletTokenAmount[],
+  shieldTokenAddresses: string[],
   crossContractCallsSerialized: string[],
   relayerRailgunAddress: Optional<string>,
   relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
@@ -89,8 +89,8 @@ export const populateProvedCrossContractCalls = async (
       fromWalletAddress,
       railgunWalletID,
       undefined, // memoText
-      withdrawTokenAmounts,
-      depositTokenAddresses,
+      unshieldTokenAmounts,
+      shieldTokenAddresses,
       crossContractCallsSerialized,
       relayerRailgunAddress,
       relayerFeeTokenAmount,
@@ -117,8 +117,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
   fromWalletAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
-  withdrawTokenAmounts: RailgunWalletTokenAmount[],
-  depositTokenAddresses: string[],
+  unshieldTokenAmounts: RailgunWalletTokenAmount[],
+  shieldTokenAddresses: string[],
   crossContractCallsSerialized: string[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
@@ -137,12 +137,13 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
-    const depositRandom = randomHex(16);
-    const relayDepositInputs = RelayAdaptHelper.generateRelayDepositInputs(
-      wallet,
-      depositRandom,
-      depositTokenAddresses,
-    );
+    const shieldRandom = randomHex(16);
+    const relayShieldRequests =
+      await RelayAdaptHelper.generateRelayShieldRequests(
+        wallet,
+        shieldRandom,
+        shieldTokenAddresses,
+      );
 
     // Add 40% to the gas fee to ensure that it's successful.
     // The final gas estimate changes depending on the Relayer Fee, which can impact the number of circuit inputs.
@@ -158,22 +159,22 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           relayAdaptContract.address,
           encryptionKey,
           undefined, // memoText
-          withdrawTokenAmounts,
+          unshieldTokenAmounts,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
         ),
-      (txs: SerializedTransaction[]) => {
+      (txs: TransactionStruct[]) => {
         const relayAdaptParamsRandom = randomHex(16);
         return relayAdaptContract.populateCrossContractCalls(
           txs,
           crossContractCalls,
-          relayDepositInputs,
+          relayShieldRequests,
           relayAdaptParamsRandom,
         );
       },
       networkName,
       railgunWalletID,
-      withdrawTokenAmounts,
+      unshieldTokenAmounts,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
@@ -195,8 +196,8 @@ export const generateCrossContractCallsProof = async (
   fromWalletAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
-  withdrawTokenAmounts: RailgunWalletTokenAmount[],
-  depositTokenAddresses: string[],
+  unshieldTokenAmounts: RailgunWalletTokenAmount[],
+  shieldTokenAddresses: string[],
   crossContractCallsSerialized: string[],
   relayerRailgunAddress: Optional<string>,
   relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
@@ -221,32 +222,33 @@ export const generateCrossContractCallsProof = async (
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
     // Generate dummy txs for relay adapt params.
-    const dummyWithdrawTxs = await generateDummyProofTransactions(
+    const dummyUnshieldTxs = await generateDummyProofTransactions(
       ProofType.CrossContractCalls,
       networkName,
       railgunWalletID,
       relayAdaptContract.address,
       encryptionKey,
       undefined, // memoText
-      withdrawTokenAmounts,
+      unshieldTokenAmounts,
       relayerFeeTokenAmount,
       sendWithPublicWallet,
     );
 
     // Generate relay adapt params from dummy transactions.
-    const depositRandom = randomHex(16);
-    const relayDepositInputs = RelayAdaptHelper.generateRelayDepositInputs(
-      wallet,
-      depositRandom,
-      depositTokenAddresses,
-    );
+    const shieldRandom = randomHex(16);
+    const relayShieldRequests =
+      await RelayAdaptHelper.generateRelayShieldRequests(
+        wallet,
+        shieldRandom,
+        shieldTokenAddresses,
+      );
 
     const relayAdaptParamsRandom = randomHex(16);
     const relayAdaptParams =
       await relayAdaptContract.getRelayAdaptParamsCrossContractCalls(
-        dummyWithdrawTxs,
+        dummyUnshieldTxs,
         crossContractCalls,
-        relayDepositInputs,
+        relayShieldRequests,
         relayAdaptParamsRandom,
       );
     const relayAdaptID: AdaptID = {
@@ -259,10 +261,10 @@ export const generateCrossContractCallsProof = async (
       ProofType.CrossContractCalls,
       networkName,
       railgunWalletID,
-      relayAdaptContract.address, // Withdraw to relay contract.
+      relayAdaptContract.address, // Unshield to relay contract.
       encryptionKey,
       undefined, // memoText
-      withdrawTokenAmounts,
+      unshieldTokenAmounts,
       relayerRailgunAddress,
       relayerFeeTokenAmount,
       sendWithPublicWallet,
@@ -275,7 +277,7 @@ export const generateCrossContractCallsProof = async (
       await relayAdaptContract.populateCrossContractCalls(
         transactions,
         crossContractCalls,
-        relayDepositInputs,
+        relayShieldRequests,
         relayAdaptParamsRandom,
       );
     delete populatedTransaction.from;
@@ -285,8 +287,8 @@ export const generateCrossContractCallsProof = async (
       toWalletAddress: railgunWalletAddress,
       railgunWalletID,
       memoText: undefined,
-      tokenAmounts: withdrawTokenAmounts,
-      relayAdaptDepositTokenAddresses: depositTokenAddresses,
+      tokenAmounts: unshieldTokenAmounts,
+      relayAdaptShieldTokenAddresses: shieldTokenAddresses,
       crossContractCallsSerialized,
       relayerRailgunAddress,
       relayerFeeTokenAmount,

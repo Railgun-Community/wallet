@@ -1,4 +1,10 @@
-import { OutputType , Memo , ByteLength, padToLength , RailgunEngine } from '@railgun-community/engine';
+import {
+  OutputType,
+  Memo,
+  ByteLength,
+  padToLength,
+  RailgunEngine,
+} from '@railgun-community/engine';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models';
@@ -70,16 +76,18 @@ describe('tx-erc20-notes', () => {
     const viewingPrivateKey = railgunWallet.getViewingKeyPair().privateKey;
 
     expect(note.value).to.equal(formatAmountString(tokenAmount));
-    expect(note.masterPublicKey).to.equal(addressData.masterPublicKey);
+    expect(note.receiverAddressData.masterPublicKey).to.equal(
+      addressData.masterPublicKey,
+    );
     expect(note.token).to.equal(padTo32BytesUnHex(MOCK_TOKEN));
 
-    const decrypted = Memo.decryptNoteExtraData(
-      note.memoField,
+    const decrypted = Memo.decryptNoteAnnotationData(
+      note.annotationData,
       viewingPrivateKey,
     );
 
     expect(decrypted?.outputType).to.equal(OutputType.Transfer);
-    expect(decrypted?.senderBlindingKey).to.be.a('string');
+    expect(decrypted?.senderRandom).to.be.a('string');
     expect(decrypted?.walletSource).to.equal(TEST_WALLET_SOURCE);
   });
 

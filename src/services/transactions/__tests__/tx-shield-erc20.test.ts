@@ -17,19 +17,16 @@ import {
   MOCK_MNEMONIC,
   MOCK_TOKEN_AMOUNTS,
 } from '../../../test/mocks.test';
-import {
-  populateDepositBaseToken,
-  gasEstimateForDepositBaseToken,
-} from '../tx-deposit-base-token';
+import { populateShield, gasEstimateForShield } from '../tx-shield-erc20';
 import { decimalToHexString } from '../../../utils/format';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
-import { PopulatedTransaction } from '@ethersproject/contracts';
-import { RelayAdaptContract } from '@railgun-community/engine';
+import { getRandomBytes } from '../../railgun';
 
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;
-let relayAdaptPopulateDepositBaseToken: SinonStub;
-let railgunWalletID: string;
+let railgunAddress: string;
+
+const shieldPrivateKey = getRandomBytes(32);
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -48,7 +45,7 @@ const stubFailure = () => {
   ).rejects(new Error('test rejection - gas estimate'));
 };
 
-describe('tx-deposit-base-token', () => {
+describe('tx-shield-erc20', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
@@ -60,58 +57,57 @@ describe('tx-deposit-base-token', () => {
     if (!railgunWalletResponse.railgunWalletInfo) {
       throw new Error('No railgun wallet created.');
     }
-    railgunWalletID = railgunWalletResponse.railgunWalletInfo.id;
-    relayAdaptPopulateDepositBaseToken = Sinon.stub(
-      RelayAdaptContract.prototype,
-      'populateDepositBaseToken',
-    ).resolves({ data: '0x0123' } as PopulatedTransaction);
+    railgunAddress = railgunWalletResponse.railgunWalletInfo.railgunAddress;
   });
   afterEach(() => {
     gasEstimateStub?.restore();
     sendTxStub?.restore();
-    relayAdaptPopulateDepositBaseToken?.restore();
   });
 
-  it('Should get gas estimate for valid deposit base token', async () => {
+  it('Should get gas estimate for valid shield', async () => {
     stubSuccess();
-    const rsp = await gasEstimateForDepositBaseToken(
+    const rsp = await gasEstimateForShield(
       NetworkName.Polygon,
-      railgunWalletID,
-      MOCK_TOKEN_AMOUNTS[0],
+      railgunAddress,
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
 
-  it('Should error on gas estimates for invalid deposit base token', async () => {
+  it('Should error on gas estimates for invalid shield', async () => {
     stubSuccess();
-    const rsp = await gasEstimateForDepositBaseToken(
+    const rsp = await gasEstimateForShield(
       NetworkName.Polygon,
-      '12345',
-      MOCK_TOKEN_AMOUNTS[0],
+      '123456789',
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
-    expect(rsp.error).to.equal('No RAILGUN wallet for ID');
+    expect(rsp.error).to.equal('Invalid RAILGUN address.');
   });
 
   it('Should error for ethers rejections', async () => {
     stubFailure();
-    const rsp = await gasEstimateForDepositBaseToken(
+    const rsp = await gasEstimateForShield(
       NetworkName.Polygon,
-      railgunWalletID,
-      MOCK_TOKEN_AMOUNTS[0],
+      railgunAddress,
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.equal('test rejection - gas estimate');
   });
 
-  it('Should send tx for valid deposit base token', async () => {
+  it('Should send tx for valid shield', async () => {
     stubSuccess();
-    const rsp = await populateDepositBaseToken(
+    const rsp = await populateShield(
       NetworkName.Polygon,
-      railgunWalletID,
-      MOCK_TOKEN_AMOUNTS[0],
+      railgunAddress,
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS,
       undefined, // gasDetailsSerialized
     );
     expect(rsp.error).to.be.undefined;
@@ -125,14 +121,15 @@ describe('tx-deposit-base-token', () => {
     expect(parsedTx.to).to.be.a('string');
   });
 
-  it('Should error on send tx for invalid deposit base token', async () => {
+  it('Should error on send tx for invalid shield', async () => {
     stubSuccess();
-    const rsp = await populateDepositBaseToken(
+    const rsp = await populateShield(
       NetworkName.Polygon,
-      '12345',
-      MOCK_TOKEN_AMOUNTS[0],
+      '123456789',
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNTS,
       undefined, // gasDetailsSerialized
     );
-    expect(rsp.error).to.equal('No RAILGUN wallet for ID');
+    expect(rsp.error).to.equal('Invalid RAILGUN address.');
   });
 });

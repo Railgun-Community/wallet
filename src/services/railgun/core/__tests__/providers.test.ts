@@ -37,9 +37,9 @@ describe('providers', () => {
     );
     expect(response.error).to.be.undefined;
     expect(response.feesSerialized).to.deep.equal({
-      deposit: '0x19',
+      shield: '0x19',
       nft: '0x00',
-      withdraw: '0x19',
+      unshield: '0x19',
     });
 
     expect(getProviderForNetwork(NetworkName.Polygon)).to.not.be.undefined;
@@ -66,9 +66,9 @@ describe('providers', () => {
       throw new Error('Expected railgunWalletInfo.');
     }
     const wallet = walletForID(railgunWalletInfo.id);
-    expect(wallet.merkletrees[0][137]).to.not.be.undefined;
-    expect(wallet.merkletrees[0][1]).to.be.undefined;
-    expect(wallet.merkletrees[0][3]).to.be.undefined;
+    expect(wallet.erc20Merkletrees[0][137]).to.not.be.undefined;
+    expect(wallet.erc20Merkletrees[0][1]).to.be.undefined;
+    expect(wallet.erc20Merkletrees[0][3]).to.be.undefined;
   }).timeout(20000);
 
   it('Should fail with invalid json', async () => {

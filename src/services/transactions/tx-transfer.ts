@@ -16,7 +16,7 @@ import {
 import { assertValidRailgunAddress } from '../railgun/wallets/wallets';
 import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
-import { SerializedTransaction } from '@railgun-community/engine';
+import { TransactionStruct } from '@railgun-community/engine';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 
 export const populateProvedTransfer = async (
@@ -42,7 +42,7 @@ export const populateProvedTransfer = async (
       railgunWalletID,
       memoText,
       tokenAmounts,
-      undefined, // relayAdaptDepositTokenAddresses
+      undefined, // relayAdaptShieldTokenAddresses
       undefined, // crossContractCallsSerialized
       relayerRailgunAddress,
       relayerFeeTokenAmount,
@@ -89,7 +89,7 @@ export const gasEstimateForUnprovenTransfer = async (
           relayerFeeTokenAmount,
           sendWithPublicWallet,
         ),
-      (txs: SerializedTransaction[]) =>
+      (txs: TransactionStruct[]) =>
         generateTransact(
           txs,
           networkName,

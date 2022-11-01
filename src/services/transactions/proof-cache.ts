@@ -1,5 +1,6 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { ProofType ,
+import {
+  ProofType,
   RailgunWalletTokenAmount,
   TransactionGasDetailsSerialized,
   ValidateCachedProvedTransactionResponse,
@@ -19,7 +20,7 @@ export type ProvedTransaction = {
   toWalletAddress: string;
   memoText: Optional<string>;
   tokenAmounts: RailgunWalletTokenAmount[];
-  relayAdaptDepositTokenAddresses?: string[];
+  relayAdaptShieldTokenAddresses?: string[];
   crossContractCallsSerialized?: string[];
   relayerRailgunAddress?: string;
   relayerFeeTokenAmount?: RailgunWalletTokenAmount;
@@ -34,7 +35,7 @@ export const populateProvedTransaction = async (
   railgunWalletID: string,
   memoText: Optional<string>,
   tokenAmounts: RailgunWalletTokenAmount[],
-  relayAdaptDepositTokenAddresses: Optional<string[]>,
+  relayAdaptShieldTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
   relayerRailgunAddress: Optional<string>,
   relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
@@ -48,7 +49,7 @@ export const populateProvedTransaction = async (
       railgunWalletID,
       memoText,
       tokenAmounts,
-      relayAdaptDepositTokenAddresses,
+      relayAdaptShieldTokenAddresses,
       crossContractCallsSerialized,
       relayerRailgunAddress,
       relayerFeeTokenAmount,
@@ -85,7 +86,7 @@ export const validateCachedProvedTransaction = (
   railgunWalletID: string,
   memoText: Optional<string>,
   tokenAmounts: RailgunWalletTokenAmount[],
-  relayAdaptDepositTokenAddresses: Optional<string[]>,
+  relayAdaptShieldTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
   relayerRailgunAddress: Optional<string>,
   relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
@@ -121,13 +122,13 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'mismatch: tokenAmounts';
   } else if (
-    relayAdaptDepositTokenAddresses &&
+    relayAdaptShieldTokenAddresses &&
     !compareStringArrays(
-      relayAdaptDepositTokenAddresses,
-      cachedProvedTransaction.relayAdaptDepositTokenAddresses,
+      relayAdaptShieldTokenAddresses,
+      cachedProvedTransaction.relayAdaptShieldTokenAddresses,
     )
   ) {
-    error = 'mismatch: relayAdaptDepositTokenAddresses';
+    error = 'mismatch: relayAdaptShieldTokenAddresses';
   } else if (
     crossContractCallsSerialized &&
     !compareStringArrays(

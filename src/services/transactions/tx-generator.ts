@@ -1,12 +1,11 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { BigNumber } from '@ethersproject/bignumber';
 import {
   RailgunWallet,
   RailgunEngine,
   TransactionBatch,
   AdaptID,
   OutputType,
-  SerializedTransaction,
+  TransactionStruct,
   TokenType,
   ProverProgressCallback,
   averageNumber,
@@ -24,6 +23,7 @@ import {
 } from '../railgun/core/providers';
 import { erc20NoteFromTokenAmount } from './tx-erc20-notes';
 import { getProver } from '../railgun/core/prover';
+import { BigNumber } from '@ethersproject/bignumber';
 
 const DUMMY_AMOUNT = '0x00';
 export const DUMMY_FROM_ADDRESS = '0x000000000000000000000000000000000000dEaD';
@@ -42,10 +42,10 @@ export const generateProofTransactions = async (
   progressCallback: ProverProgressCallback,
   relayAdaptID: Optional<AdaptID> = undefined,
   useDummyProof = false,
-): Promise<SerializedTransaction[]> => {
+): Promise<TransactionStruct[]> => {
   const railgunWallet = fullWalletForID(railgunWalletID);
 
-  const txs: SerializedTransaction[] = await erc20TransactionsFromTokenAmounts(
+  const txs: TransactionStruct[] = await erc20TransactionsFromTokenAmounts(
     proofType,
     tokenAmounts,
     railgunWallet,
@@ -81,7 +81,7 @@ export const generateDummyProofTransactions = async (
   tokenAmounts: RailgunWalletTokenAmount[],
   relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
   sendWithPublicWallet: boolean,
-): Promise<SerializedTransaction[]> => {
+): Promise<TransactionStruct[]> => {
   if (!relayerFeeTokenAmount && !sendWithPublicWallet) {
     throw new Error('Must send with relayer or public wallet.');
   }
@@ -109,7 +109,7 @@ export const generateDummyProofTransactions = async (
 };
 
 export const generateTransact = async (
-  txs: SerializedTransaction[],
+  txs: TransactionStruct[],
   networkName: NetworkName,
   useDummyProof = false,
 ): Promise<PopulatedTransaction> => {
@@ -124,20 +124,22 @@ export const generateTransact = async (
   return populatedTransaction;
 };
 
-export const generateWithdrawBaseToken = async (
-  txs: SerializedTransaction[],
+export const generateUnshieldBaseToken = async (
+  txs: TransactionStruct[],
   networkName: NetworkName,
   toWalletAddress: string,
   relayAdaptParamsRandom: string,
+  value: string,
   useDummyProof = false,
 ): Promise<PopulatedTransaction> => {
   const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
   const populatedTransaction =
-    await relayAdaptContract.populateWithdrawBaseToken(
+    await relayAdaptContract.populateUnshieldBaseToken(
       txs,
       toWalletAddress,
       relayAdaptParamsRandom,
+      value,
     );
   if (useDummyProof) {
     return {
@@ -162,7 +164,7 @@ const erc20TransactionsFromTokenAmounts = async (
   progressCallback: ProverProgressCallback,
   relayAdaptID: Optional<AdaptID>,
   useDummyProof: boolean,
-): Promise<SerializedTransaction[]> => {
+): Promise<TransactionStruct[]> => {
   const network = NETWORK_CONFIG[networkName];
   const { chain } = network;
 
@@ -180,7 +182,7 @@ const erc20TransactionsFromTokenAmounts = async (
     updateOverallProgress();
   };
 
-  const txBatchPromises: Promise<SerializedTransaction[]>[] = [];
+  const txBatchPromises: Promise<TransactionStruct[]>[] = [];
 
   if (relayerRailgunAddress && relayerFeeTokenAmount && !sendWithPublicWallet) {
     const transactionBatchRelayerFee = new TransactionBatch(
@@ -202,7 +204,7 @@ const erc20TransactionsFromTokenAmounts = async (
       ),
     );
 
-    // If paying Relayer fee in the same token that is any output/withdraw in transaction.
+    // If paying Relayer fee in the same token that is any output/unshield in transaction.
     // Combine into same Transaction to save gas.
     const matchingOutputTokenAmounts = tokenAmounts.filter(
       ta => ta.tokenAddress === relayerFeeTokenAmount.tokenAddress,
@@ -295,9 +297,9 @@ const setTransactionOutputs = (
       break;
     }
     case ProofType.CrossContractCalls:
-    case ProofType.WithdrawBaseToken:
-    case ProofType.Withdraw: {
-      setTransactionOutputsWithdraw(
+    case ProofType.UnshieldBaseToken:
+    case ProofType.Unshield: {
+      setTransactionOutputsUnshield(
         transactionBatch,
         toWalletAddress,
         tokenAmount,
@@ -329,16 +331,15 @@ const setTransactionOutputsTransfer = (
   );
 };
 
-const setTransactionOutputsWithdraw = (
+const setTransactionOutputsUnshield = (
   transactionBatch: TransactionBatch,
   toWalletAddress: string,
   tokenAmount: RailgunWalletTokenAmount,
   allowOverride?: boolean,
 ) => {
-  const withdrawAmount = BigNumber.from(tokenAmount.amountString);
-  const value = withdrawAmount.toHexString();
+  const value = BigNumber.from(tokenAmount.amountString).toHexString();
 
-  transactionBatch.setWithdraw(toWalletAddress, value, allowOverride);
+  transactionBatch.setUnshield(toWalletAddress, value, allowOverride);
 };
 
 const generateAllProofs = (
@@ -347,15 +348,15 @@ const generateAllProofs = (
   encryptionKey: string,
   useDummyProof: boolean,
   progressCallback: ProverProgressCallback,
-): Promise<SerializedTransaction[]> => {
+): Promise<TransactionStruct[]> => {
   const prover = getProver();
   return useDummyProof
-    ? transactionBatch.generateDummySerializedTransactions(
+    ? transactionBatch.generateDummyTransactions(
         prover,
         railgunWallet,
         encryptionKey,
       )
-    : transactionBatch.generateSerializedTransactions(
+    : transactionBatch.generateTransactions(
         prover,
         railgunWallet,
         encryptionKey,

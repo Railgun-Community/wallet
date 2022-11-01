@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
 import {
   RailgunWallet,
-  SerializedTransaction,
+  TransactionStruct,
   TransactionBatch,
   RailgunProxyContract,
   RelayAdaptContract,
@@ -33,15 +33,15 @@ import {
   MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
 } from '../../../test/mocks.test';
 import {
-  populateProvedWithdraw,
-  gasEstimateForUnprovenWithdraw,
-  populateProvedWithdrawBaseToken,
-  gasEstimateForUnprovenWithdrawBaseToken,
-} from '../tx-withdraw';
+  populateProvedUnshield,
+  gasEstimateForUnprovenUnshield,
+  populateProvedUnshieldBaseToken,
+  gasEstimateForUnprovenUnshieldBaseToken,
+} from '../tx-unshield';
 import {
-  generateWithdrawBaseTokenProof,
-  generateWithdrawProof,
-} from '../tx-proof-withdraw';
+  generateUnshieldBaseTokenProof,
+  generateUnshieldProof,
+} from '../tx-proof-unshield';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { setCachedProvedTransaction } from '../proof-cache';
@@ -51,8 +51,8 @@ let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
 let railTransactStub: SinonStub;
-let relayAdaptPopulateWithdrawBaseToken: SinonStub;
-let setWithdrawSpy: SinonSpy;
+let relayAdaptPopulateUnshieldBaseToken: SinonStub;
+let setUnshieldSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
@@ -68,11 +68,11 @@ const { expect } = chai;
 const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunWalletTokenAmount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
-    amountString: '100',
+    amountString: '0x0100',
   },
   {
     tokenAddress: MOCK_TOKEN_ADDRESS_2,
-    amountString: '300',
+    amountString: '0x0300',
   },
 ];
 
@@ -90,11 +90,11 @@ const stubGasEstimateFailure = () => {
   ).rejects(new Error('test rejection - gas estimate'));
 };
 
-const spyOnSetWithdraw = () => {
-  setWithdrawSpy = Sinon.spy(TransactionBatch.prototype, 'setWithdraw');
+const spyOnSetUnshield = () => {
+  setUnshieldSpy = Sinon.spy(TransactionBatch.prototype, 'setUnshield');
 };
 
-describe('tx-withdraw-transfer', () => {
+describe('tx-unshield-transfer', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
@@ -121,44 +121,44 @@ describe('tx-withdraw-transfer', () => {
 
     railProveStub = Sinon.stub(
       TransactionBatch.prototype,
-      'generateSerializedTransactions',
-    ).resolves([{}] as SerializedTransaction[]);
+      'generateTransactions',
+    ).resolves([{}] as TransactionStruct[]);
     railDummyProveStub = Sinon.stub(
       TransactionBatch.prototype,
-      'generateDummySerializedTransactions',
+      'generateDummyTransactions',
     ).resolves([
       {
-        commitments: [BigInt(2)],
-        nullifiers: [BigInt(1), BigInt(2)],
+        commitments: ['0x01'],
+        nullifiers: ['0x01', '0x02'],
       },
-    ] as SerializedTransaction[]);
+    ] as unknown as TransactionStruct[]);
     railTransactStub = Sinon.stub(
       RailgunProxyContract.prototype,
       'transact',
     ).resolves({ data: '0x0123' } as PopulatedTransaction);
-    relayAdaptPopulateWithdrawBaseToken = Sinon.stub(
+    relayAdaptPopulateUnshieldBaseToken = Sinon.stub(
       RelayAdaptContract.prototype,
-      'populateWithdrawBaseToken',
+      'populateUnshieldBaseToken',
     ).resolves({ data: '0x0123' } as PopulatedTransaction);
   });
   afterEach(() => {
     gasEstimateStub?.restore();
-    setWithdrawSpy?.restore();
+    setUnshieldSpy?.restore();
     erc20NoteSpy?.restore();
   });
   after(() => {
     railProveStub.restore();
     railDummyProveStub.restore();
     railTransactStub.restore();
-    relayAdaptPopulateWithdrawBaseToken.restore();
+    relayAdaptPopulateUnshieldBaseToken.restore();
   });
 
   // WITHDRAW - GAS ESTIMATE
 
-  it('Should get gas estimates for valid Withdraw', async () => {
+  it('Should get gas estimates for valid Unshield', async () => {
     stubGasEstimateSuccess();
-    spyOnSetWithdraw();
-    const rsp = await gasEstimateForUnprovenWithdraw(
+    spyOnSetUnshield();
+    const rsp = await gasEstimateForUnprovenUnshield(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -169,8 +169,8 @@ describe('tx-withdraw-transfer', () => {
       false, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [MOCK_ETH_WALLET_ADDRESS, '0x0100', false], // 1st iteration - token1
       [MOCK_ETH_WALLET_ADDRESS, '0x0200', false], // 1st iteration - token2
       [MOCK_ETH_WALLET_ADDRESS, '0x0100', false], // 2nd iteration - token1
@@ -179,9 +179,9 @@ describe('tx-withdraw-transfer', () => {
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
 
-  it('Should error on gas estimates for invalid Withdraw', async () => {
+  it('Should error on gas estimates for invalid Unshield', async () => {
     stubGasEstimateSuccess();
-    const rsp = await gasEstimateForUnprovenWithdraw(
+    const rsp = await gasEstimateForUnprovenUnshield(
       NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
@@ -194,9 +194,9 @@ describe('tx-withdraw-transfer', () => {
     expect(rsp.error).to.equal('Invalid wallet address.');
   });
 
-  it('Should error on withdraw gas estimate for ethers rejections', async () => {
+  it('Should error on unshield gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
-    const rsp = await gasEstimateForUnprovenWithdraw(
+    const rsp = await gasEstimateForUnprovenUnshield(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -211,10 +211,10 @@ describe('tx-withdraw-transfer', () => {
 
   // WITHDRAW BASE TOKEN - GAS ESTIMATE
 
-  it('Should get gas estimates for valid Withdraw base token', async () => {
+  it('Should get gas estimates for valid Unshield base token', async () => {
     stubGasEstimateSuccess();
-    spyOnSetWithdraw();
-    const rsp = await gasEstimateForUnprovenWithdrawBaseToken(
+    spyOnSetUnshield();
+    const rsp = await gasEstimateForUnprovenUnshieldBaseToken(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -225,18 +225,18 @@ describe('tx-withdraw-transfer', () => {
       false, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [MOCK_ETH_WALLET_ADDRESS, '0x0100', false],
       [MOCK_ETH_WALLET_ADDRESS, '0x0100', false],
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
 
-  it('Should get gas estimates for valid Withdraw base token: public wallet', async () => {
+  it('Should get gas estimates for valid Unshield base token: public wallet', async () => {
     stubGasEstimateSuccess();
-    spyOnSetWithdraw();
-    const rsp = await gasEstimateForUnprovenWithdrawBaseToken(
+    spyOnSetUnshield();
+    const rsp = await gasEstimateForUnprovenUnshieldBaseToken(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -247,16 +247,16 @@ describe('tx-withdraw-transfer', () => {
       true, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [MOCK_ETH_WALLET_ADDRESS, '0x0100', false],
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
 
-  it('Should error on gas estimates for invalid Withdraw base token', async () => {
+  it('Should error on gas estimates for invalid Unshield base token', async () => {
     stubGasEstimateSuccess();
-    const rsp = await gasEstimateForUnprovenWithdrawBaseToken(
+    const rsp = await gasEstimateForUnprovenUnshieldBaseToken(
       NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
@@ -269,9 +269,9 @@ describe('tx-withdraw-transfer', () => {
     expect(rsp.error).to.equal('Invalid wallet address.');
   });
 
-  it('Should error on withdraw base token gas estimate for ethers rejections', async () => {
+  it('Should error on unshield base token gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
-    const rsp = await gasEstimateForUnprovenWithdrawBaseToken(
+    const rsp = await gasEstimateForUnprovenUnshieldBaseToken(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -286,11 +286,11 @@ describe('tx-withdraw-transfer', () => {
 
   // WITHDRAW - PROVE AND SEND
 
-  it('Should populate tx for valid Withdraw', async () => {
+  it('Should populate tx for valid Unshield', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    spyOnSetWithdraw();
-    const proofResponse = await generateWithdrawProof(
+    spyOnSetUnshield();
+    const proofResponse = await generateUnshieldProof(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -302,12 +302,12 @@ describe('tx-withdraw-transfer', () => {
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [MOCK_ETH_WALLET_ADDRESS, '0x0100', false], // 1st iteration - token1
       [MOCK_ETH_WALLET_ADDRESS, '0x0200', false], // 1st iteration - token2
     ]);
-    const populateResponse = await populateProvedWithdraw(
+    const populateResponse = await populateProvedUnshield(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -339,9 +339,9 @@ describe('tx-withdraw-transfer', () => {
     expect(Object.keys(deserialized).length).to.equal(8);
   });
 
-  it('Should error on populate tx for invalid Withdraw', async () => {
+  it('Should error on populate tx for invalid Unshield', async () => {
     stubGasEstimateSuccess();
-    const rsp = await populateProvedWithdraw(
+    const rsp = await populateProvedUnshield(
       NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
@@ -354,10 +354,10 @@ describe('tx-withdraw-transfer', () => {
     expect(rsp.error).to.equal('Invalid wallet address.');
   });
 
-  it('Should error on populate withdraw tx for unproved transaction', async () => {
+  it('Should error on populate unshield tx for unproved transaction', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    const rsp = await populateProvedWithdraw(
+    const rsp = await populateProvedUnshield(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -370,9 +370,9 @@ describe('tx-withdraw-transfer', () => {
     expect(rsp.error).to.equal('Transaction has not been proven.');
   });
 
-  it('Should error on populate withdraw tx when params changed (invalid cached proof)', async () => {
+  it('Should error on populate unshield tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
-    const proofResponse = await generateWithdrawProof(
+    const proofResponse = await generateUnshieldProof(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -384,7 +384,7 @@ describe('tx-withdraw-transfer', () => {
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
-    const rsp = await populateProvedWithdraw(
+    const rsp = await populateProvedUnshield(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -399,11 +399,11 @@ describe('tx-withdraw-transfer', () => {
 
   // WITHDRAW BASE TOKEN - PROVE AND SEND
 
-  it('Should populate tx for valid Withdraw Base Token', async () => {
+  it('Should populate tx for valid Unshield Base Token', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    spyOnSetWithdraw();
-    const proofResponse = await generateWithdrawBaseTokenProof(
+    spyOnSetUnshield();
+    const proofResponse = await generateUnshieldBaseTokenProof(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -415,12 +415,12 @@ describe('tx-withdraw-transfer', () => {
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
-    expect(setWithdrawSpy.called).to.be.true;
-    expect(setWithdrawSpy.args).to.deep.equal([
+    expect(setUnshieldSpy.called).to.be.true;
+    expect(setUnshieldSpy.args).to.deep.equal([
       [ropstenRelayAdaptContract, '0x0100', false], // Dummy prove.
       [ropstenRelayAdaptContract, '0x0100', false], // Actual prove.
     ]);
-    const populateResponse = await populateProvedWithdrawBaseToken(
+    const populateResponse = await populateProvedUnshieldBaseToken(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -452,9 +452,9 @@ describe('tx-withdraw-transfer', () => {
     expect(Object.keys(deserialized).length).to.equal(8);
   });
 
-  it('Should error on populate tx for invalid Withdraw Base Token', async () => {
+  it('Should error on populate tx for invalid Unshield Base Token', async () => {
     stubGasEstimateSuccess();
-    const rsp = await populateProvedWithdrawBaseToken(
+    const rsp = await populateProvedUnshieldBaseToken(
       NetworkName.Polygon,
       railgunWalletAddress,
       railgunWallet.id,
@@ -467,10 +467,10 @@ describe('tx-withdraw-transfer', () => {
     expect(rsp.error).to.equal('Invalid wallet address.');
   });
 
-  it('Should error on populate Withdraw Base Token tx for unproved transaction', async () => {
+  it('Should error on populate Unshield Base Token tx for unproved transaction', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    const rsp = await populateProvedWithdrawBaseToken(
+    const rsp = await populateProvedUnshieldBaseToken(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -483,9 +483,9 @@ describe('tx-withdraw-transfer', () => {
     expect(rsp.error).to.equal('Transaction has not been proven.');
   });
 
-  it('Should error on populate Withdraw Base Token tx when params changed (invalid cached proof)', async () => {
+  it('Should error on populate Unshield Base Token tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
-    const proofResponse = await generateWithdrawBaseTokenProof(
+    const proofResponse = await generateUnshieldBaseTokenProof(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -497,7 +497,7 @@ describe('tx-withdraw-transfer', () => {
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
-    const rsp = await populateProvedWithdrawBaseToken(
+    const rsp = await populateProvedUnshieldBaseToken(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,

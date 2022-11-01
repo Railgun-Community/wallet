@@ -27,7 +27,7 @@ const getArtifactVariant = (inputs: PublicInputs): ArtifactVariant => {
     `${inputs.nullifiers.length}x${inputs.commitmentsOut.length}` as ArtifactVariant;
   if (!artifactVariantExists(artifactVariant)) {
     throw new Error(
-      `Circuit not supported by RAILGUN at this time: ${inputs.nullifiers.length}x${inputs.commitmentsOut.length}. If withdrawing, try exact amount in wallet. Or, select a different Relayer fee token.`,
+      `Circuit not supported by RAILGUN at this time: ${inputs.nullifiers.length}x${inputs.commitmentsOut.length}. If unshielding, try exact amount in wallet. Or, select a different Relayer fee token.`,
     );
   }
   return artifactVariant;

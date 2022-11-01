@@ -33,7 +33,7 @@ describe('proof-cache', () => {
         railgunWalletID,
         memoText,
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         relayerRailgunAddress,
         relayerFeeTokenAmount,
@@ -48,7 +48,7 @@ describe('proof-cache', () => {
       memoText,
       railgunWalletID,
       tokenAmounts,
-      relayAdaptDepositTokenAddresses: undefined,
+      relayAdaptShieldTokenAddresses: undefined,
       relayerRailgunAddress,
       relayerFeeTokenAmount,
       sendWithPublicWallet: false,
@@ -62,7 +62,7 @@ describe('proof-cache', () => {
         railgunWalletID,
         memoText,
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         relayerRailgunAddress,
         relayerFeeTokenAmount,
@@ -72,12 +72,12 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
-        ProofType.Withdraw,
+        ProofType.Unshield,
         toWalletAddress,
         railgunWalletID,
         memoText,
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         relayerRailgunAddress,
         relayerFeeTokenAmount,
@@ -92,7 +92,7 @@ describe('proof-cache', () => {
         railgunWalletID,
         memoText,
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         relayerRailgunAddress,
         relayerFeeTokenAmount,
@@ -107,7 +107,7 @@ describe('proof-cache', () => {
         '987',
         memoText,
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         relayerRailgunAddress,
         relayerFeeTokenAmount,
@@ -122,7 +122,7 @@ describe('proof-cache', () => {
         railgunWalletID,
         'different memo',
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         relayerRailgunAddress,
         relayerFeeTokenAmount,
@@ -137,7 +137,7 @@ describe('proof-cache', () => {
         railgunWalletID,
         memoText,
         [{ tokenAddress: '0x765', amountString: '100' }],
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         relayerRailgunAddress,
         relayerFeeTokenAmount,
@@ -167,7 +167,7 @@ describe('proof-cache', () => {
         railgunWalletID,
         memoText,
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         ['test'],
         relayerRailgunAddress,
         relayerFeeTokenAmount,
@@ -182,7 +182,7 @@ describe('proof-cache', () => {
         railgunWalletID,
         memoText,
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         '87654',
         relayerFeeTokenAmount,
@@ -197,7 +197,7 @@ describe('proof-cache', () => {
         railgunWalletID,
         memoText,
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         relayerRailgunAddress,
         { tokenAddress: '0x765', amountString: '100' },
@@ -212,7 +212,7 @@ describe('proof-cache', () => {
         railgunWalletID,
         memoText,
         tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        undefined, // relayAdaptShieldTokenAddresses
         undefined, // crossContractCallsSerialized
         relayerRailgunAddress,
         { tokenAddress: '0x765', amountString: '100' },

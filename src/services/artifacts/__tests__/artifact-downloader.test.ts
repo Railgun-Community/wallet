@@ -32,7 +32,7 @@ describe('engine', () => {
       commitmentsOut: [BigInt(0), BigInt(1)],
     };
     await expect(artifactsGetter(inputs)).to.be.rejectedWith(
-      'Circuit not supported by RAILGUN at this time: 5x2. If withdrawing, try exact amount in wallet. Or, select a different Relayer fee token.',
+      'Circuit not supported by RAILGUN at this time: 5x2. If unshielding, try exact amount in wallet. Or, select a different Relayer fee token.',
     );
 
     const artifactGroup: ArtifactGroup = {

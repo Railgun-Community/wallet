@@ -1,24 +1,32 @@
-import { hexToBigInt, randomHex , OutputType , AddressData , Note , RailgunWallet } from '@railgun-community/engine';
+import {
+  hexToBigInt,
+  randomHex,
+  OutputType,
+  AddressData,
+  TransactNote,
+  RailgunWallet,
+} from '@railgun-community/engine';
 import { RailgunWalletTokenAmount } from '@railgun-community/shared-models';
 
 export const erc20NoteFromTokenAmount = (
   tokenAmount: RailgunWalletTokenAmount,
-  addressData: AddressData,
+  receiverAddressData: AddressData,
   railgunWallet: RailgunWallet,
   outputType: OutputType,
   memoText: Optional<string>,
-): Note => {
+): TransactNote => {
   const random = randomHex(16);
   const value = hexToBigInt(tokenAmount.amountString);
-  const senderBlindingKey = randomHex(15);
+  const senderRandom = randomHex(15);
 
-  return Note.create(
-    addressData,
+  return TransactNote.create(
+    receiverAddressData,
+    railgunWallet.addressKeys,
     random,
     value,
     tokenAmount.tokenAddress.replace('0x', ''),
     railgunWallet.getViewingKeyPair(),
-    senderBlindingKey,
+    senderRandom,
     outputType,
     memoText,
   );

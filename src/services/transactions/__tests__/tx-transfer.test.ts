@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
 import {
   RailgunWallet,
-  SerializedTransaction,
+  TransactionStruct,
   TransactionBatch,
   RailgunProxyContract,
   RelayAdaptContract,
@@ -47,8 +47,8 @@ let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
 let railTransactStub: SinonStub;
-let relayAdaptPopulateWithdrawBaseToken: SinonStub;
-let setWithdrawSpy: SinonSpy;
+let relayAdaptPopulateUnshieldBaseToken: SinonStub;
+let setUnshieldSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
@@ -87,7 +87,7 @@ const spyOnERC20Note = () => {
   erc20NoteSpy = Sinon.spy(txErc20Notes, 'erc20NoteFromTokenAmount');
 };
 
-describe('tx-withdraw-transfer', () => {
+describe('tx-unshield-transfer', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
@@ -114,36 +114,33 @@ describe('tx-withdraw-transfer', () => {
 
     railProveStub = Sinon.stub(
       TransactionBatch.prototype,
-      'generateSerializedTransactions',
-    ).resolves([{}] as SerializedTransaction[]);
+      'generateTransactions',
+    ).resolves([{}] as TransactionStruct[]);
     railDummyProveStub = Sinon.stub(
       TransactionBatch.prototype,
-      'generateDummySerializedTransactions',
+      'generateDummyTransactions',
     ).resolves([
-      {
-        commitments: [BigInt(2)],
-        nullifiers: [BigInt(1), BigInt(2)],
-      },
-    ] as SerializedTransaction[]);
+      { commitments: ['0x01'], nullifiers: ['0x01', '0x02'] },
+    ] as unknown as TransactionStruct[]);
     railTransactStub = Sinon.stub(
       RailgunProxyContract.prototype,
       'transact',
     ).resolves({ data: '0x0123' } as PopulatedTransaction);
-    relayAdaptPopulateWithdrawBaseToken = Sinon.stub(
+    relayAdaptPopulateUnshieldBaseToken = Sinon.stub(
       RelayAdaptContract.prototype,
-      'populateWithdrawBaseToken',
+      'populateUnshieldBaseToken',
     ).resolves({ data: '0x0123' } as PopulatedTransaction);
   });
   afterEach(() => {
     gasEstimateStub?.restore();
-    setWithdrawSpy?.restore();
+    setUnshieldSpy?.restore();
     erc20NoteSpy?.restore();
   });
   after(() => {
     railProveStub.restore();
     railDummyProveStub.restore();
     railTransactStub.restore();
-    relayAdaptPopulateWithdrawBaseToken.restore();
+    relayAdaptPopulateUnshieldBaseToken.restore();
   });
 
   // TRANSFER - GAS ESTIMATE

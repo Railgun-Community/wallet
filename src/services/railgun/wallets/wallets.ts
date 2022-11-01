@@ -329,9 +329,8 @@ const transactionHistoryReceiveTokenAmountToRailgunTokenAmount = (
 const transactionHistoryTransferTokenAmountToRailgunTokenAmount = (
   transactionHistoryTokenAmount: TransactionHistoryTransferTokenAmount,
 ): RailgunWalletSendTokenAmount => {
-  const walletSource = transactionHistoryTokenAmount.noteExtraData
-    ? transactionHistoryTokenAmount.noteExtraData.walletSource
-    : undefined;
+  const walletSource =
+    transactionHistoryTokenAmount.noteAnnotationData?.walletSource;
   return {
     ...transactionHistoryTokenAmountToRailgunTokenAmount(
       transactionHistoryTokenAmount,
@@ -373,6 +372,9 @@ const serializeTransactionHistory = (
     ),
     receiveTokenAmounts: historyItem.receiveTokenAmounts.map(
       transactionHistoryReceiveTokenAmountToRailgunTokenAmount,
+    ),
+    unshieldTokenAmounts: historyItem.unshieldTokenAmounts.map(
+      transactionHistoryTransferTokenAmountToRailgunTokenAmount,
     ),
     version: historyItem.version,
   }));
