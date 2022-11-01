@@ -10,8 +10,8 @@ const { expect } = chai;
 
 const POLYGON_CHAIN: Chain = { type: ChainType.EVM, id: 137 };
 
-const EXPECTED_COMMITMENT_EVENTS = 1700;
-const EXPECTED_NULLIFIER_EVENTS = 1800;
+const EXPECTED_COMMITMENT_EVENTS = 2500;
+const EXPECTED_NULLIFIER_EVENTS = 2600;
 
 describe('quick-sync-ipns', () => {
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - Small', async () => {
