@@ -14,21 +14,18 @@ const POLYGON_CHAIN: Chain = { type: ChainType.EVM, id: 137 };
 const EXPECTED_COMMITMENT_EVENTS = 2500;
 const EXPECTED_NULLIFIER_EVENTS = 2600;
 
-describe('quick-sync-ipns', () => {
+describe.only('quick-sync-ipns', () => {
   it('Should make sure IPNS Event Log has no data gaps in commitments', async () => {
-    const eventLog = await quickSyncIPNS(
-      POLYGON_CHAIN,
-      0,
-      QuickSyncPageSize.Small,
-    );
+    const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
+    expect(eventLog.commitmentEvents.length).to.be.at.least(
+      EXPECTED_COMMITMENT_EVENTS,
+    );
+    expect(eventLog.nullifierEvents.length).to.be.at.least(
+      EXPECTED_NULLIFIER_EVENTS,
+    );
 
-    eventLog.commitmentEvents.sort((a: CommitmentEvent, b: CommitmentEvent) => {
-      return a.treeNumber < b.treeNumber || a.startPosition < b.startPosition
-        ? -1
-        : 1;
-    });
     let nextTreeNumber = eventLog.commitmentEvents[0].treeNumber;
     let nextStartPosition = eventLog.commitmentEvents[0].startPosition;
     eventLog.commitmentEvents.forEach(event => {
@@ -47,10 +44,6 @@ describe('quick-sync-ipns', () => {
         nextStartPosition = 0;
       }
     });
-
-    // console.log(
-    //   `checked ${eventLog.commitmentEvents.length} commitments for data gaps`,
-    // );
   }).timeout(90000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - Small', async () => {

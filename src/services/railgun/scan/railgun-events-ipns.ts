@@ -192,14 +192,25 @@ export const getRailgunEventLogIPNS = async (
       .filter(nullifierEvent => nullifierEvent.blockNumber >= startingBlock),
   };
 
-  if (typeof eventLogUnordered.commitmentEvents !== 'object') {
+  const eventLogOrdered: QuickSyncEventLog = {
+    commitmentEvents: eventLogUnordered.commitmentEvents.sort(
+      (a: CommitmentEvent, b: CommitmentEvent) => {
+        return a.treeNumber < b.treeNumber || a.startPosition < b.startPosition
+          ? -1
+          : 1;
+      },
+    ),
+    nullifierEvents: eventLogUnordered.nullifierEvents,
+  };
+
+  if (typeof eventLogOrdered.commitmentEvents !== 'object') {
     throw new Error('Expected object `commitmentEvents` response.');
   }
-  if (typeof eventLogUnordered.nullifierEvents !== 'object') {
+  if (typeof eventLogOrdered.nullifierEvents !== 'object') {
     throw new Error('Expected object `nullifierEvents` response.');
   }
 
-  return eventLogUnordered;
+  return eventLogOrdered;
 };
 
 const fetchJsonData = async <ReturnType>(
