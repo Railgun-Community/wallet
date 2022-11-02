@@ -9,7 +9,6 @@ import {
 import { initTestEngine } from '../../../../test/setup.test';
 import { createRailgunWallet } from '../wallets';
 import {
-  fullRescanBalancesAllWallets,
   refreshRailgunBalances,
   rescanFullMerkletreesAndWallets,
   scanUpdatesForMerkletreeAndWallets,
