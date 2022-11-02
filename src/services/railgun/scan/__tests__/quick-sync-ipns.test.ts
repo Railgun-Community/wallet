@@ -14,7 +14,7 @@ const POLYGON_CHAIN: Chain = { type: ChainType.EVM, id: 137 };
 const EXPECTED_COMMITMENT_EVENTS = 2500;
 const EXPECTED_NULLIFIER_EVENTS = 2600;
 
-describe.only('quick-sync-ipns', () => {
+describe('quick-sync-ipns', () => {
   it('Should make sure IPNS Event Log has no data gaps in commitments', async () => {
     const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 0);
     expect(eventLog).to.be.an('object');
