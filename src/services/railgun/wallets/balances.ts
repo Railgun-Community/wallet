@@ -9,13 +9,14 @@ export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
   chain: Chain,
   railgunWalletID: string,
   fullRescan: boolean,
+  progressCallback?: (progress: number) => void,
 ): Promise<RailgunBalanceResponse> => {
   try {
     const wallet = walletForID(railgunWalletID);
     if (fullRescan) {
-      await wallet.fullRescanBalances(chain);
+      await wallet.fullRescanBalances(chain, progressCallback);
     } else {
-      await wallet.scanBalances(chain);
+      await wallet.scanBalances(chain, progressCallback);
     }
 
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
@@ -68,13 +69,8 @@ export const rescanFullMerkletreesAndWallets = async (
 
 export const fullRescanBalancesAllWallets = async (
   chain: Chain,
+  progressCallback?: (progress: number) => void,
 ): Promise<void> => {
   const engine = getEngine();
-  const wallets = Object.values(engine.wallets);
-  if (!wallets.length) {
-    throw new Error(
-      'Cannot rescan all wallet balances - no wallets loaded for Engine.',
-    );
-  }
-  await Promise.all(wallets.map(wallet => wallet.fullRescanBalances(chain)));
+  await engine.scanAllWallets(chain, progressCallback);
 };
