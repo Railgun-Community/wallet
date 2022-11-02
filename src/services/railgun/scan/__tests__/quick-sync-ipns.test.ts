@@ -4,6 +4,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import { quickSyncIPNS } from '../quick-sync-ipns';
+import { QuickSyncPageSize } from '../railgun-events-ipns';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -13,9 +14,13 @@ const POLYGON_CHAIN: Chain = { type: ChainType.EVM, id: 137 };
 const EXPECTED_COMMITMENT_EVENTS = 2500;
 const EXPECTED_NULLIFIER_EVENTS = 2600;
 
-describe('quick-sync-ipns', () => {
+describe.only('quick-sync-ipns', () => {
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - Small', async () => {
-    const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 0);
+    const eventLog = await quickSyncIPNS(
+      POLYGON_CHAIN,
+      0,
+      QuickSyncPageSize.Small,
+    );
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
@@ -28,7 +33,11 @@ describe('quick-sync-ipns', () => {
   }).timeout(90000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - Medium', async () => {
-    const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 0);
+    const eventLog = await quickSyncIPNS(
+      POLYGON_CHAIN,
+      0,
+      QuickSyncPageSize.Medium,
+    );
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
@@ -41,7 +50,11 @@ describe('quick-sync-ipns', () => {
   }).timeout(90000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - Large', async () => {
-    const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 0);
+    const eventLog = await quickSyncIPNS(
+      POLYGON_CHAIN,
+      0,
+      QuickSyncPageSize.Large,
+    );
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
@@ -54,7 +67,11 @@ describe('quick-sync-ipns', () => {
   }).timeout(90000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - XLarge', async () => {
-    const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 0);
+    const eventLog = await quickSyncIPNS(
+      POLYGON_CHAIN,
+      0,
+      QuickSyncPageSize.XLarge,
+    );
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');

@@ -184,8 +184,12 @@ export const getRailgunEventLogIPNS = async (
     ]);
 
   const eventLogUnordered: QuickSyncEventLog = {
-    commitmentEvents: commitmentLogBatchUnordered.flat(),
-    nullifierEvents: nullifierLogBatchUnordered.flat(),
+    commitmentEvents: commitmentLogBatchUnordered
+      .flat()
+      .filter(commitmentEvent => commitmentEvent.blockNumber >= startingBlock),
+    nullifierEvents: nullifierLogBatchUnordered
+      .flat()
+      .filter(nullifierEvent => nullifierEvent.blockNumber >= startingBlock),
   };
 
   if (typeof eventLogUnordered.commitmentEvents !== 'object') {
