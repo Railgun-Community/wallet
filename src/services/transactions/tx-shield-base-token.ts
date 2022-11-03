@@ -25,7 +25,7 @@ import {
   RailgunEngine,
   hexToBytes,
 } from '@railgun-community/engine';
-import { assertValidRailgunAddress, getRandomBytes } from '../railgun';
+import { assertValidRailgunAddress } from '../railgun';
 
 const generateShieldBaseTokenTransaction = async (
   networkName: NetworkName,

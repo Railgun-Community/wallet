@@ -121,7 +121,7 @@ export const generateUnshieldBaseTokenProof = async (
     sendWithPublicWallet,
   );
 
-  const relayAdaptParamsRandom = randomHex(16);
+  const relayAdaptParamsRandom = randomHex(31);
   const value = BigNumber.from(wrappedTokenAmount.amountString).toHexString();
   const relayAdaptParams =
     await relayAdaptContract.getRelayAdaptParamsUnshieldBaseToken(

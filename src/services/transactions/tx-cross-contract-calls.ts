@@ -164,7 +164,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           sendWithPublicWallet,
         ),
       (txs: TransactionStruct[]) => {
-        const relayAdaptParamsRandom = randomHex(16);
+        const relayAdaptParamsRandom = randomHex(31);
         return relayAdaptContract.populateCrossContractCalls(
           txs,
           crossContractCalls,
@@ -243,7 +243,7 @@ export const generateCrossContractCallsProof = async (
         shieldTokenAddresses,
       );
 
-    const relayAdaptParamsRandom = randomHex(16);
+    const relayAdaptParamsRandom = randomHex(31);
     const relayAdaptParams =
       await relayAdaptContract.getRelayAdaptParamsCrossContractCalls(
         dummyUnshieldTxs,

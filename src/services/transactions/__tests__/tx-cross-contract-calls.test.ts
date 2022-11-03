@@ -144,8 +144,13 @@ describe('tx-cross-contract-calls', () => {
       'generateDummyTransactions',
     ).resolves([
       {
-        commitments: ['0x01'],
-        nullifiers: ['0x01', '0x02'],
+        commitments: [
+          '0x0000000000000000000000000000000000000000000000000000000000000003',
+        ],
+        nullifiers: [
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+          '0x0000000000000000000000000000000000000000000000000000000000000002',
+        ],
       },
     ] as unknown as TransactionStruct[]);
     relayAdaptPopulateCrossContractCalls = Sinon.stub(

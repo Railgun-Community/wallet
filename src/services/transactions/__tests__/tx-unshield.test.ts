@@ -94,7 +94,7 @@ const spyOnSetUnshield = () => {
   setUnshieldSpy = Sinon.spy(TransactionBatch.prototype, 'setUnshield');
 };
 
-describe('tx-unshield-transfer', () => {
+describe('tx-unshield', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
@@ -128,8 +128,13 @@ describe('tx-unshield-transfer', () => {
       'generateDummyTransactions',
     ).resolves([
       {
-        commitments: ['0x01'],
-        nullifiers: ['0x01', '0x02'],
+        commitments: [
+          '0x0000000000000000000000000000000000000000000000000000000000000003',
+        ],
+        nullifiers: [
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+          '0x0000000000000000000000000000000000000000000000000000000000000002',
+        ],
       },
     ] as unknown as TransactionStruct[]);
     railTransactStub = Sinon.stub(

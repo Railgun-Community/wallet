@@ -87,7 +87,7 @@ const spyOnERC20Note = () => {
   erc20NoteSpy = Sinon.spy(txErc20Notes, 'erc20NoteFromTokenAmount');
 };
 
-describe('tx-unshield-transfer', () => {
+describe('tx-transfer', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
@@ -120,7 +120,15 @@ describe('tx-unshield-transfer', () => {
       TransactionBatch.prototype,
       'generateDummyTransactions',
     ).resolves([
-      { commitments: ['0x01'], nullifiers: ['0x01', '0x02'] },
+      {
+        commitments: [
+          '0x0000000000000000000000000000000000000000000000000000000000000003',
+        ],
+        nullifiers: [
+          '0x0000000000000000000000000000000000000000000000000000000000000001',
+          '0x0000000000000000000000000000000000000000000000000000000000000002',
+        ],
+      },
     ] as unknown as TransactionStruct[]);
     railTransactStub = Sinon.stub(
       RailgunProxyContract.prototype,

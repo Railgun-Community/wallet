@@ -194,7 +194,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           sendWithPublicWallet,
         ),
       (txs: TransactionStruct[]) => {
-        const relayAdaptParamsRandom = randomHex(16);
+        const relayAdaptParamsRandom = randomHex(31);
         const value = BigNumber.from(
           wrappedTokenAmount.amountString,
         ).toHexString();
