@@ -23,6 +23,7 @@ import {
   randomHex,
   ShieldNote,
   RailgunEngine,
+  hexToBytes,
 } from '@railgun-community/engine';
 import { assertValidRailgunAddress, getRandomBytes } from '../railgun';
 
@@ -49,10 +50,10 @@ const generateShieldBaseTokenTransaction = async (
     );
 
     // Relay Adapt shieldPrivateKey is randomly generated.
-    const shieldPrivateKey = getRandomBytes(32);
+    const shieldPrivateKey = hexToBytes(randomHex(32));
 
     const shieldRequest = await shield.serialize(
-      Buffer.from(shieldPrivateKey),
+      shieldPrivateKey,
       receiverViewingPublicKey,
     );
 

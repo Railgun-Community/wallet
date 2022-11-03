@@ -13,6 +13,7 @@ import {
   RailgunEngine,
   ShieldRequestStruct,
   randomHex,
+  hexToBytes,
 } from '@railgun-community/engine';
 import {
   getProxyContractForNetwork,
@@ -50,7 +51,7 @@ const generateShieldTransaction = async (
           tokenAmount.tokenAddress,
         );
         return shield.serialize(
-          Buffer.from(shieldPrivateKey),
+          hexToBytes(shieldPrivateKey),
           receiverViewingPublicKey,
         );
       }),
