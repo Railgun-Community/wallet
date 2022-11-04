@@ -1,4 +1,5 @@
-import { Chain, ChainType, CommitmentEvent } from '@railgun-community/engine';
+import { Chain, CommitmentEvent } from '@railgun-community/engine';
+import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import axios from 'axios';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -9,41 +10,96 @@ import { QuickSyncPageSize } from '../railgun-events-ipns';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const POLYGON_CHAIN: Chain = { type: ChainType.EVM, id: 137 };
+const ETH_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Ethereum].chain;
+const EXPECTED_COMMITMENT_EVENTS_ETH = 1611;
+const EXPECTED_NULLIFIER_EVENTS_ETH = 1425;
 
-const EXPECTED_COMMITMENT_EVENTS = 2500;
-const EXPECTED_NULLIFIER_EVENTS = 2600;
+const POLYGON_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Polygon].chain;
+const EXPECTED_COMMITMENT_EVENTS_POLYGON = 2500;
+const EXPECTED_NULLIFIER_EVENTS_POLYGON = 2600;
+
+const BNB_CHAIN: Chain = NETWORK_CONFIG[NetworkName.BNBChain].chain;
+const EXPECTED_COMMITMENT_EVENTS_BNB = 614;
+const EXPECTED_NULLIFIER_EVENTS_BNB = 515;
+
+const assertContiguousCommitmentEvents = (
+  commitmentEvents: CommitmentEvent[],
+  shouldThrow: boolean,
+) => {
+  let nextTreeNumber = commitmentEvents[0].treeNumber;
+  let nextStartPosition = commitmentEvents[0].startPosition;
+  for (const event of commitmentEvents) {
+    if (
+      event.treeNumber !== nextTreeNumber ||
+      event.startPosition !== nextStartPosition
+    ) {
+      if (shouldThrow) {
+        throw new Error(
+          `Could not find treeNumber ${nextTreeNumber}, startPosition ${nextStartPosition}`,
+        );
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(
+          `Could not find treeNumber ${nextTreeNumber}, startPosition ${nextStartPosition}`,
+        );
+        nextStartPosition = event.startPosition + event.commitments.length;
+      }
+    } else {
+      nextStartPosition += event.commitments.length;
+    }
+
+    if (nextStartPosition >= 65536) {
+      // Roll over to next tree.
+      nextTreeNumber += 1;
+      nextStartPosition = 0;
+    }
+  }
+};
 
 describe('quick-sync-ipns', () => {
-  it('Should make sure IPNS Event Log has no data gaps in commitments', async () => {
+  it('Should make sure IPNS Event Log has no data gaps in commitments - Ethereum', async () => {
+    const eventLog = await quickSyncIPNS(ETH_CHAIN, 0);
+    expect(eventLog).to.be.an('object');
+    expect(eventLog.commitmentEvents).to.be.an('array');
+    expect(eventLog.commitmentEvents.length).to.be.at.least(
+      EXPECTED_COMMITMENT_EVENTS_ETH,
+    );
+    expect(eventLog.nullifierEvents.length).to.be.at.least(
+      EXPECTED_NULLIFIER_EVENTS_ETH,
+    );
+
+    const shouldThrow = true;
+    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+  }).timeout(90000);
+
+  it('Should make sure IPNS Event Log has no data gaps in commitments - Polygon', async () => {
     const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_EVENTS,
+      EXPECTED_COMMITMENT_EVENTS_POLYGON,
     );
     expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS,
+      EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
 
-    let nextTreeNumber = eventLog.commitmentEvents[0].treeNumber;
-    let nextStartPosition = eventLog.commitmentEvents[0].startPosition;
-    eventLog.commitmentEvents.forEach(event => {
-      if (
-        event.treeNumber !== nextTreeNumber &&
-        event.startPosition !== nextStartPosition
-      ) {
-        throw new Error(
-          `Could not find treeNumber ${nextTreeNumber}, startPosition ${nextStartPosition}`,
-        );
-      }
-      nextStartPosition += event.commitments.length;
-      if (nextStartPosition >= 65536) {
-        // Roll over to next tree.
-        nextTreeNumber += 1;
-        nextStartPosition = 0;
-      }
-    });
+    const shouldThrow = true;
+    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+  }).timeout(90000);
+
+  it('Should make sure IPNS Event Log has no data gaps in commitments - BNB Chain', async () => {
+    const eventLog = await quickSyncIPNS(BNB_CHAIN, 0);
+    expect(eventLog).to.be.an('object');
+    expect(eventLog.commitmentEvents).to.be.an('array');
+    expect(eventLog.commitmentEvents.length).to.be.at.least(
+      EXPECTED_COMMITMENT_EVENTS_BNB,
+    );
+    expect(eventLog.nullifierEvents.length).to.be.at.least(
+      EXPECTED_NULLIFIER_EVENTS_BNB,
+    );
+
+    const shouldThrow = true;
+    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(90000);
 
   it('Should run Railgun Event Log fetch on Polygon for corrupted block', async () => {
@@ -91,10 +147,10 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_EVENTS,
+      EXPECTED_COMMITMENT_EVENTS_POLYGON,
     );
     expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS,
+      EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
   }).timeout(90000);
 
@@ -108,10 +164,10 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_EVENTS,
+      EXPECTED_COMMITMENT_EVENTS_POLYGON,
     );
     expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS,
+      EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
   }).timeout(90000);
 
@@ -125,10 +181,10 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_EVENTS,
+      EXPECTED_COMMITMENT_EVENTS_POLYGON,
     );
     expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS,
+      EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
   }).timeout(90000);
 
@@ -142,10 +198,10 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_EVENTS,
+      EXPECTED_COMMITMENT_EVENTS_POLYGON,
     );
     expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS,
+      EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
   }).timeout(90000);
 
