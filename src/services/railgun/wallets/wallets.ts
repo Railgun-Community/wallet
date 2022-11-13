@@ -26,7 +26,6 @@ import {
   RailgunWalletSendTokenAmount,
   RailgunWalletReceiveTokenAmount,
   RailgunWalletAddressDataSerialized,
-  networkForChain,
   NetworkName,
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
@@ -248,23 +247,9 @@ export const serializeRailgunWalletAddressData = (
   };
 };
 
-export const assertValidRailgunAddress = (
-  address: string,
-  networkName?: NetworkName,
-): void => {
+export const assertValidRailgunAddress = (address: string): void => {
   if (!validateRailgunAddress(address)) {
     throw new Error('Invalid RAILGUN address.');
-  }
-  if (networkName) {
-    const decoded = RailgunEngine.decodeAddress(address);
-    if (decoded.chain) {
-      const network = networkForChain(decoded.chain);
-      if (network && network.name !== networkName) {
-        throw new Error(
-          `RAILGUN address ${address} can only accept tokens on network ${network.publicName}.`,
-        );
-      }
-    }
   }
 };
 

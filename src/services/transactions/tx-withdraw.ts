@@ -8,49 +8,36 @@ import {
   FeeTokenDetails,
   sanitizeError,
   serializeUnsignedTransaction,
+  RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
   generateTransact,
   generateWithdrawBaseToken,
 } from './tx-generator';
-import {
-  assertValidEthAddress,
-  assertValidRailgunAddress,
-} from '../railgun/wallets/wallets';
 import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
-import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { randomHex, SerializedTransaction } from '@railgun-community/engine';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
+import { createRelayAdaptWithdrawTokenAmountRecipients } from './tx-cross-contract-calls';
 
 export const populateProvedWithdraw = async (
-  networkName: NetworkName,
-  publicWalletAddress: string,
   railgunWalletID: string,
-  tokenAmounts: RailgunWalletTokenAmount[],
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  withdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    assertNotBlockedAddress(publicWalletAddress);
-    assertValidEthAddress(publicWalletAddress);
-    if (relayerRailgunAddress) {
-      assertValidRailgunAddress(relayerRailgunAddress, networkName);
-    }
-
     const populatedTransaction = await populateProvedTransaction(
       ProofType.Withdraw,
-      publicWalletAddress,
       railgunWalletID,
       undefined, // memoText
-      tokenAmounts,
+      withdrawTokenAmountRecipients,
+      undefined, // relayAdaptWithdrawTokenAmountRecipients
       undefined, // relayAdaptDepositTokenAddresses
       undefined, // crossContractCallsSerialized
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       gasDetailsSerialized,
     );
@@ -72,29 +59,30 @@ export const populateProvedWithdrawBaseToken = async (
   publicWalletAddress: string,
   railgunWalletID: string,
   wrappedTokenAmount: RailgunWalletTokenAmount,
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    assertNotBlockedAddress(publicWalletAddress);
-    assertValidEthAddress(publicWalletAddress);
-    if (relayerRailgunAddress) {
-      assertValidRailgunAddress(relayerRailgunAddress, networkName);
-    }
-
-    const tokenAmounts = [wrappedTokenAmount];
+    const tokenAmountRecipients: RailgunWalletTokenAmountRecipient[] = [
+      {
+        ...wrappedTokenAmount,
+        recipientAddress: publicWalletAddress,
+      },
+    ];
+    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+      createRelayAdaptWithdrawTokenAmountRecipients(networkName, [
+        wrappedTokenAmount,
+      ]);
     const populatedTransaction = await populateProvedTransaction(
       ProofType.WithdrawBaseToken,
-      publicWalletAddress,
       railgunWalletID,
       undefined, // memoText
-      tokenAmounts,
+      tokenAmountRecipients,
+      relayAdaptWithdrawTokenAmountRecipients,
       undefined, // relayAdaptDepositTokenAddresses
       undefined, // crossContractCallsSerialized
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       gasDetailsSerialized,
     );
@@ -113,28 +101,23 @@ export const populateProvedWithdrawBaseToken = async (
 
 export const gasEstimateForUnprovenWithdraw = async (
   networkName: NetworkName,
-  publicWalletAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
-  tokenAmounts: RailgunWalletTokenAmount[],
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
-    assertNotBlockedAddress(publicWalletAddress);
-    assertValidEthAddress(publicWalletAddress);
-
     const response = await gasEstimateResponseIterativeRelayerFee(
       (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
         generateDummyProofTransactions(
           ProofType.Withdraw,
           networkName,
           railgunWalletID,
-          publicWalletAddress,
           encryptionKey,
           undefined, // memoText
-          tokenAmounts,
+          tokenAmountRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
         ),
@@ -146,7 +129,7 @@ export const gasEstimateForUnprovenWithdraw = async (
         ),
       networkName,
       railgunWalletID,
-      tokenAmounts,
+      tokenAmountRecipients,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
@@ -174,10 +157,10 @@ export const gasEstimateForUnprovenWithdrawBaseToken = async (
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
-    assertNotBlockedAddress(publicWalletAddress);
-    assertValidEthAddress(publicWalletAddress);
-
-    const tokenAmounts = [wrappedTokenAmount];
+    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+      createRelayAdaptWithdrawTokenAmountRecipients(networkName, [
+        wrappedTokenAmount,
+      ]);
 
     const response = await gasEstimateResponseIterativeRelayerFee(
       (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
@@ -185,10 +168,9 @@ export const gasEstimateForUnprovenWithdrawBaseToken = async (
           ProofType.WithdrawBaseToken,
           networkName,
           railgunWalletID,
-          publicWalletAddress,
           encryptionKey,
           undefined, // memoText
-          tokenAmounts,
+          relayAdaptWithdrawTokenAmountRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
         ),
@@ -204,7 +186,7 @@ export const gasEstimateForUnprovenWithdrawBaseToken = async (
       },
       networkName,
       railgunWalletID,
-      [wrappedTokenAmount],
+      relayAdaptWithdrawTokenAmountRecipients,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,

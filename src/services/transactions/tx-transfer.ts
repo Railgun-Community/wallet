@@ -8,44 +8,35 @@ import {
   FeeTokenDetails,
   sanitizeError,
   serializeUnsignedTransaction,
+  RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
   generateTransact,
 } from './tx-generator';
-import { assertValidRailgunAddress } from '../railgun/wallets/wallets';
 import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
 import { SerializedTransaction } from '@railgun-community/engine';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 
 export const populateProvedTransfer = async (
-  networkName: NetworkName,
-  railgunAddress: string,
   railgunWalletID: string,
   memoText: Optional<string>,
-  tokenAmounts: RailgunWalletTokenAmount[],
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    assertValidRailgunAddress(railgunAddress, networkName);
-    if (relayerRailgunAddress) {
-      assertValidRailgunAddress(relayerRailgunAddress, networkName);
-    }
-
     const populatedTransaction = await populateProvedTransaction(
       ProofType.Transfer,
-      railgunAddress,
       railgunWalletID,
       memoText,
-      tokenAmounts,
+      tokenAmountRecipients,
+      undefined, // relayAdaptWithdrawTokenAmountRecipients
       undefined, // relayAdaptDepositTokenAddresses
       undefined, // crossContractCallsSerialized
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       gasDetailsSerialized,
     );
@@ -64,28 +55,24 @@ export const populateProvedTransfer = async (
 
 export const gasEstimateForUnprovenTransfer = async (
   networkName: NetworkName,
-  railgunAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
   memoText: Optional<string>,
-  tokenAmounts: RailgunWalletTokenAmount[],
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
-    assertValidRailgunAddress(railgunAddress, networkName);
-
     const response = await gasEstimateResponseIterativeRelayerFee(
       (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
         generateDummyProofTransactions(
           ProofType.Transfer,
           networkName,
           railgunWalletID,
-          railgunAddress,
           encryptionKey,
           memoText,
-          tokenAmounts,
+          tokenAmountRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
         ),
@@ -97,7 +84,7 @@ export const gasEstimateForUnprovenTransfer = async (
         ),
       networkName,
       railgunWalletID,
-      tokenAmounts,
+      tokenAmountRecipients,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,

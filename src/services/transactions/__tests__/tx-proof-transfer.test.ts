@@ -15,6 +15,7 @@ import {
   NetworkName,
   ProofType,
   RailgunProveTransactionResponse,
+  RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
@@ -37,7 +38,8 @@ import { generateTransferProof } from '../tx-proof-transfer';
 
 let railgunWallet: RailgunWallet;
 let railgunWalletAddress: string;
-let relayerRailgunAddress: string;
+let relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient;
+let tokenAmountRecipients: RailgunWalletTokenAmountRecipient[];
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -61,6 +63,13 @@ describe.skip('tx-proofs', () => {
     railgunWalletAddress = railgunWallet.getAddress();
     const addressData = RailgunEngine.decodeAddress(railgunWalletAddress);
 
+    tokenAmountRecipients = MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY.map(
+      tokenAmount => ({
+        ...tokenAmount,
+        recipientAddress: railgunWalletAddress,
+      }),
+    );
+
     const { railgunWalletInfo: relayerWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
@@ -69,7 +78,11 @@ describe.skip('tx-proofs', () => {
     if (!relayerWalletInfo) {
       throw new Error('Expected relayerWalletInfo');
     }
-    relayerRailgunAddress = relayerWalletInfo.railgunAddress;
+    const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
+    relayerFeeTokenAmountRecipient = {
+      ...MOCK_TOKEN_FEE,
+      recipientAddress: relayerRailgunAddress,
+    };
 
     const mockDepositAmount = BigInt('12500000000');
     const tokenAddress = formatToByteLength(
@@ -162,13 +175,11 @@ describe.skip('tx-proofs', () => {
     const response: RailgunProveTransactionResponse =
       await generateTransferProof(
         NetworkName.Hardhat,
-        railgunWalletAddress,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,
         MOCK_MEMO,
-        MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY,
-        relayerRailgunAddress,
-        MOCK_TOKEN_FEE,
+        tokenAmountRecipients,
+        relayerFeeTokenAmountRecipient,
         sendWithPublicWallet,
         () => {}, // progressCallback
       );
@@ -178,8 +189,8 @@ describe.skip('tx-proofs', () => {
       populatedTransaction: MOCK_POPULATED_TX,
       railgunWalletID: railgunWallet.id,
       toWalletAddress: railgunWalletAddress,
-      tokenAmounts: MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY,
-      relayerRailgunAddress,
+      tokenAmountRecipients,
+      relayerFeeTokenAmountRecipient,
       relayerFeeTokenAmount: MOCK_TOKEN_FEE,
     });
   }).timeout(30000);

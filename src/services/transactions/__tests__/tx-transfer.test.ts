@@ -13,6 +13,7 @@ import {
   RailgunWalletTokenAmount,
   NetworkName,
   deserializeTransaction,
+  RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
@@ -26,6 +27,7 @@ import {
   MOCK_FEE_TOKEN_DETAILS,
   MOCK_MEMO,
   MOCK_MNEMONIC,
+  MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_ADDRESS,
   MOCK_TOKEN_ADDRESS_2,
   MOCK_TOKEN_AMOUNTS,
@@ -52,8 +54,7 @@ let setWithdrawSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let railgunWalletAddress: string;
-let relayerRailgunAddress: string;
+let relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient;
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -68,6 +69,24 @@ const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunWalletTokenAmount[] = [
     amountString: '300',
   },
 ];
+
+const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunWalletTokenAmountRecipient[] =
+  MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
+    ...tokenAmount,
+    recipientAddress: MOCK_ETH_WALLET_ADDRESS,
+  }));
+
+const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunWalletTokenAmountRecipient[] =
+  MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
+    ...tokenAmount,
+    recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
+  }));
+
+const MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT: RailgunWalletTokenAmountRecipient[] =
+  MOCK_TOKEN_AMOUNTS_DIFFERENT.map(tokenAmount => ({
+    ...tokenAmount,
+    recipientAddress: MOCK_ETH_WALLET_ADDRESS,
+  }));
 
 const stubGasEstimateSuccess = () => {
   gasEstimateStub = Sinon.stub(
@@ -100,7 +119,6 @@ describe('tx-withdraw-transfer', () => {
       throw new Error('Expected railgunWalletInfo');
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
-    railgunWalletAddress = railgunWallet.getAddress(undefined);
 
     const { railgunWalletInfo: relayerWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
@@ -110,7 +128,13 @@ describe('tx-withdraw-transfer', () => {
     if (!relayerWalletInfo) {
       throw new Error('Expected relayerWalletInfo');
     }
-    relayerRailgunAddress = relayerWalletInfo.railgunAddress;
+
+    const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
+
+    relayerFeeTokenAmountRecipient = {
+      ...MOCK_TOKEN_FEE,
+      recipientAddress: relayerRailgunAddress,
+    };
 
     railProveStub = Sinon.stub(
       TransactionBatch.prototype,
@@ -153,11 +177,10 @@ describe('tx-withdraw-transfer', () => {
     spyOnERC20Note();
     const rsp = await gasEstimateForUnprovenTransfer(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -179,11 +202,10 @@ describe('tx-withdraw-transfer', () => {
     spyOnERC20Note();
     const rsp = await gasEstimateForUnprovenTransfer(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       true, // sendWithPublicWallet
@@ -200,11 +222,10 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateSuccess();
     const rsp = await gasEstimateForUnprovenTransfer(
       NetworkName.Polygon,
-      MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -216,11 +237,10 @@ describe('tx-withdraw-transfer', () => {
     stubGasEstimateFailure();
     const rsp = await gasEstimateForUnprovenTransfer(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -236,13 +256,11 @@ describe('tx-withdraw-transfer', () => {
     spyOnERC20Note();
     const proofResponse = await generateTransferProof(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       () => {}, // progressCallback
     );
@@ -252,13 +270,10 @@ describe('tx-withdraw-transfer', () => {
     );
     expect(proofResponse.error).to.be.undefined;
     const populateResponse = await populateProvedTransfer(
-      NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       undefined, // gasDetailsSerialized
     );
@@ -286,62 +301,57 @@ describe('tx-withdraw-transfer', () => {
   it('Should error on populate tx for invalid transfer', async () => {
     stubGasEstimateSuccess();
     const rsp = await populateProvedTransfer(
-      NetworkName.Polygon,
-      MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       undefined, // gasDetailsSerialized
     );
-    expect(rsp.error).to.equal('Invalid RAILGUN address.');
+    expect(rsp.error).to.equal(
+      'Invalid proof for this transaction. Mismatch: tokenAmountRecipients.',
+    );
   });
 
   it('Should error on populate transfer tx for unproved transaction', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
     const rsp = await populateProvedTransfer(
-      NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       undefined, // gasDetailsSerialized
     );
-    expect(rsp.error).to.equal('Transaction has not been proven.');
+    expect(rsp.error).to.equal(
+      'Invalid proof for this transaction. No proof found.',
+    );
   });
 
   it('Should error on populate transfer tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
     const proofResponse = await generateTransferProof(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
     const rsp = await populateProvedTransfer(
-      NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_MEMO,
-      MOCK_TOKEN_AMOUNTS_DIFFERENT,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       undefined, // gasDetailsSerialized
     );
-    expect(rsp.error).to.equal('Transaction has not been proven.');
+    expect(rsp.error).to.equal(
+      'Invalid proof for this transaction. Mismatch: tokenAmountRecipients.',
+    );
   });
 });

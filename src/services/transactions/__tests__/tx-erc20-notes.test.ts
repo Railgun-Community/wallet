@@ -1,9 +1,19 @@
-import { OutputType , Memo , ByteLength, padToLength , RailgunEngine } from '@railgun-community/engine';
+import {
+  OutputType,
+  Memo,
+  ByteLength,
+  padToLength,
+  RailgunEngine,
+} from '@railgun-community/engine';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { RailgunWalletTokenAmount } from '@railgun-community/shared-models';
+import {
+  RailgunWalletTokenAmount,
+  RailgunWalletTokenAmountRecipient,
+} from '@railgun-community/shared-models';
 import {
   MOCK_DB_ENCRYPTION_KEY,
+  MOCK_ETH_WALLET_ADDRESS,
   MOCK_MEMO,
   MOCK_MNEMONIC,
   MOCK_RAILGUN_WALLET_ADDRESS,
@@ -16,7 +26,7 @@ import {
 import { fullWalletForID } from '../../railgun/core/engine';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import {
-  compareTokenAmountArrays,
+  compareTokenAmountRecipientArrays,
   erc20NoteFromTokenAmount,
 } from '../tx-erc20-notes';
 
@@ -52,24 +62,25 @@ describe('tx-erc20-notes', () => {
   });
 
   it('Should test erc20 note creation', () => {
-    const tokenAmount: RailgunWalletTokenAmount = {
+    const tokenAmountRecipient: RailgunWalletTokenAmountRecipient = {
       tokenAddress: MOCK_TOKEN,
       amountString: '0x100',
+      recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
     };
-    const addressData = RailgunEngine.decodeAddress(
-      MOCK_RAILGUN_WALLET_ADDRESS,
-    );
     const railgunWallet = fullWalletForID(railgunWalletID);
     const note = erc20NoteFromTokenAmount(
-      tokenAmount,
-      addressData,
+      tokenAmountRecipient,
       railgunWallet,
       OutputType.Transfer,
       MOCK_MEMO,
     );
     const viewingPrivateKey = railgunWallet.getViewingKeyPair().privateKey;
 
-    expect(note.value).to.equal(formatAmountString(tokenAmount));
+    const addressData = RailgunEngine.decodeAddress(
+      MOCK_RAILGUN_WALLET_ADDRESS,
+    );
+
+    expect(note.value).to.equal(formatAmountString(tokenAmountRecipient));
     expect(note.masterPublicKey).to.equal(addressData.masterPublicKey);
     expect(note.token).to.equal(padTo32BytesUnHex(MOCK_TOKEN));
 
@@ -84,71 +95,123 @@ describe('tx-erc20-notes', () => {
   });
 
   it('Should test token array comparisons', () => {
-    const tokenAmounts1: RailgunWalletTokenAmount[] = [
+    const tokenAmountRecipients1: RailgunWalletTokenAmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '2',
         amountString: '200',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '3',
         amountString: '300',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
     ];
 
     // Same same
-    const tokenAmounts2: RailgunWalletTokenAmount[] = [
+    const tokenAmountRecipients2: RailgunWalletTokenAmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '2',
         amountString: '200',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '3',
         amountString: '300',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
     ];
 
     // Different addresses
-    const tokenAmounts3: RailgunWalletTokenAmount[] = [
+    const tokenAmountRecipients3: RailgunWalletTokenAmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '3',
         amountString: '200',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '5',
         amountString: '300',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
     ];
 
     // Different amounts
-    const tokenAmounts4: RailgunWalletTokenAmount[] = [
+    const tokenAmountRecipients4: RailgunWalletTokenAmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '2',
         amountString: '300',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '3',
         amountString: '200',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
     ];
 
-    expect(compareTokenAmountArrays(tokenAmounts1, tokenAmounts2)).to.be.true;
-    expect(compareTokenAmountArrays(tokenAmounts1, tokenAmounts3)).to.be.false;
-    expect(compareTokenAmountArrays(tokenAmounts1, tokenAmounts4)).to.be.false;
+    // Different recipients
+    const tokenAmountRecipients5: RailgunWalletTokenAmountRecipient[] = [
+      {
+        tokenAddress: '1',
+        amountString: '100',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
+      },
+      {
+        tokenAddress: '2',
+        amountString: '200',
+        recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
+      },
+      {
+        tokenAddress: '3',
+        amountString: '300',
+        recipientAddress: MOCK_ETH_WALLET_ADDRESS,
+      },
+    ];
+
+    expect(
+      compareTokenAmountRecipientArrays(
+        tokenAmountRecipients1,
+        tokenAmountRecipients2,
+      ),
+    ).to.be.true;
+    expect(
+      compareTokenAmountRecipientArrays(
+        tokenAmountRecipients1,
+        tokenAmountRecipients3,
+      ),
+    ).to.be.false;
+    expect(
+      compareTokenAmountRecipientArrays(
+        tokenAmountRecipients1,
+        tokenAmountRecipients4,
+      ),
+    ).to.be.false;
+    expect(
+      compareTokenAmountRecipientArrays(
+        tokenAmountRecipients1,
+        tokenAmountRecipients5,
+      ),
+    ).to.be.false;
   });
 });
