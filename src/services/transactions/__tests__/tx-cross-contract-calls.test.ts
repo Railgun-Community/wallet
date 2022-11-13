@@ -18,6 +18,8 @@ import {
   NETWORK_CONFIG,
   deserializeTransaction,
   serializeUnsignedTransaction,
+  RailgunWalletTokenAmountRecipient,
+  createFallbackProviderFromJsonConfig,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
@@ -28,6 +30,7 @@ import {
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
   MOCK_FEE_TOKEN_DETAILS,
   MOCK_MNEMONIC,
   MOCK_TOKEN_ADDRESS,
@@ -56,10 +59,9 @@ let setWithdrawSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let railgunWalletAddress: string;
-let relayerRailgunAddress: string;
+let relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient;
 
-const ropstenRelayAdaptContract =
+const polygonRelayAdaptContract =
   NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
 
 chai.use(chaiAsPromised);
@@ -123,7 +125,6 @@ describe('tx-cross-contract-calls', () => {
       throw new Error('Expected railgunWalletInfo');
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
-    railgunWalletAddress = railgunWallet.getAddress(undefined);
 
     const { railgunWalletInfo: relayerWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
@@ -133,7 +134,12 @@ describe('tx-cross-contract-calls', () => {
     if (!relayerWalletInfo) {
       throw new Error('Expected relayerWalletInfo');
     }
-    relayerRailgunAddress = relayerWalletInfo.railgunAddress;
+    const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
+
+    relayerFeeTokenAmountRecipient = {
+      ...MOCK_TOKEN_FEE,
+      recipientAddress: relayerRailgunAddress,
+    };
 
     railProveStub = Sinon.stub(
       TransactionBatch.prototype,
@@ -171,7 +177,6 @@ describe('tx-cross-contract-calls', () => {
     spyOnSetWithdraw();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
@@ -184,10 +189,10 @@ describe('tx-cross-contract-calls', () => {
     expect(rsp.error).to.be.undefined;
     expect(setWithdrawSpy.called).to.be.true;
     expect(setWithdrawSpy.args).to.deep.equal([
-      [ropstenRelayAdaptContract, '0x0100', false], // run 1 - token 1
-      [ropstenRelayAdaptContract, '0x0200', false], // run 1 - token 2
-      [ropstenRelayAdaptContract, '0x0100', false], // run 2 - token 1
-      [ropstenRelayAdaptContract, '0x0200', false], // run 2 - token 2
+      [polygonRelayAdaptContract, '0x0100', false], // run 1 - token 1
+      [polygonRelayAdaptContract, '0x0200', false], // run 1 - token 2
+      [polygonRelayAdaptContract, '0x0100', false], // run 2 - token 1
+      [polygonRelayAdaptContract, '0x0200', false], // run 2 - token 2
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(280));
   });
@@ -197,7 +202,6 @@ describe('tx-cross-contract-calls', () => {
     spyOnSetWithdraw();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
@@ -210,8 +214,8 @@ describe('tx-cross-contract-calls', () => {
     expect(rsp.error).to.be.undefined;
     expect(setWithdrawSpy.called).to.be.true;
     expect(setWithdrawSpy.args).to.deep.equal([
-      [ropstenRelayAdaptContract, '0x0100', false],
-      [ropstenRelayAdaptContract, '0x0200', false],
+      [polygonRelayAdaptContract, '0x0100', false],
+      [polygonRelayAdaptContract, '0x0200', false],
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(280));
   });
@@ -220,24 +224,22 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       NetworkName.Polygon,
-      MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
-      mockCrossContractCallsSerialized,
+      ['abc'], // Invalid
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
     );
-    expect(rsp.error).to.equal('Invalid RAILGUN address.');
+    expect(rsp.error).to.equal('Invalid serialized cross contract calls.');
   });
 
   it('Should error on cross contract calls gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
@@ -258,34 +260,30 @@ describe('tx-cross-contract-calls', () => {
     spyOnSetWithdraw();
     const proofResponse = await generateCrossContractCallsProof(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicAddress
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
     expect(setWithdrawSpy.called).to.be.true;
     expect(setWithdrawSpy.args).to.deep.equal([
-      [ropstenRelayAdaptContract, '0x0100', false], // dummy proof #1
-      [ropstenRelayAdaptContract, '0x0200', false], // dummy proof #2
-      [ropstenRelayAdaptContract, '0x0100', false], // actual proof #1
-      [ropstenRelayAdaptContract, '0x0200', false], // actual proof #2
+      [polygonRelayAdaptContract, '0x0100', false], // dummy proof #1
+      [polygonRelayAdaptContract, '0x0200', false], // dummy proof #2
+      [polygonRelayAdaptContract, '0x0100', false], // actual proof #1
+      [polygonRelayAdaptContract, '0x0200', false], // actual proof #2
     ]);
     const populateResponse = await populateProvedCrossContractCalls(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicAddress
       undefined, // gasDetailsSerialized
     );
@@ -315,17 +313,17 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     const rsp = await populateProvedCrossContractCalls(
       NetworkName.Polygon,
-      MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
-      MOCK_TOKEN_AMOUNTS,
+      MOCK_TOKEN_AMOUNTS_DIFFERENT,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
-      mockCrossContractCallsSerialized,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      ['123'], // Invalid
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicAddress
       undefined, // gasDetailsSerialized
     );
-    expect(rsp.error).to.equal('Invalid RAILGUN address.');
+    expect(rsp.error).to.equal(
+      'Invalid proof for this transaction. Mismatch: relayAdaptWithdrawTokenAmountRecipients.',
+    );
   });
 
   it('Should error on populate cross contract calls tx for unproved transaction', async () => {
@@ -333,54 +331,58 @@ describe('tx-cross-contract-calls', () => {
     setCachedProvedTransaction(undefined);
     const rsp = await populateProvedCrossContractCalls(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicAddress
       undefined, // gasDetailsSerialized
     );
-    expect(rsp.error).to.equal('Transaction has not been proven.');
+    expect(rsp.error).to.equal(
+      'Invalid proof for this transaction. No proof found.',
+    );
   });
 
   it('Should error on populate cross contract calls tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
     const proofResponse = await generateCrossContractCallsProof(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicAddress
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
     const rsp = await populateProvedCrossContractCalls(
       NetworkName.Polygon,
-      railgunWalletAddress,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS_DIFFERENT,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerRailgunAddress,
-      MOCK_TOKEN_FEE,
+      relayerFeeTokenAmountRecipient,
       false, // sendWithPublicAddress
       undefined, // gasDetailsSerialized
     );
-    expect(rsp.error).to.equal('Transaction has not been proven.');
+    expect(rsp.error).to.equal(
+      'Invalid proof for this transaction. Mismatch: relayAdaptWithdrawTokenAmountRecipients.',
+    );
   });
 
   it('Should invalidate cross contract call as unsuccessful', async () => {
-    const provider = new JsonRpcProvider(TEST_POLYGON_RPC);
+    const provider = createFallbackProviderFromJsonConfig(
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
+    );
     const txReceipt: TransactionReceipt = await provider.getTransactionReceipt(
       '0x56c3b9bfb573e6f49f21b8e09282edd01a93bbb965b1f4debbf7316ea3d878dd',
+    );
+    expect(txReceipt).to.not.equal(
+      null,
+      'Could not get live transaction receipt (RPC error)',
     );
     expect(getRelayAdaptTransactionError(txReceipt.logs)).to.equal(
       'Unknown Relay Adapt error.',
@@ -388,6 +390,10 @@ describe('tx-cross-contract-calls', () => {
 
     const txReceipt2: TransactionReceipt = await provider.getTransactionReceipt(
       '0xeeaf0c55b4c34516402ce1c0d1eb4e3d2664b11204f2fc9988ec57ae7a1220ff',
+    );
+    expect(txReceipt).to.not.equal(
+      null,
+      'Could not get live transaction receipt (RPC error)',
     );
     expect(getRelayAdaptTransactionError(txReceipt2.logs)).to.equal(
       'ERC20: transfer amount exceeds allowance',

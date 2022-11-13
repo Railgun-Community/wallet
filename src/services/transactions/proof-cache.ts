@@ -1,6 +1,7 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { ProofType ,
-  RailgunWalletTokenAmount,
+import {
+  ProofType,
+  RailgunWalletTokenAmountRecipient,
   TransactionGasDetailsSerialized,
   ValidateCachedProvedTransactionResponse,
 } from '@railgun-community/shared-models';
@@ -8,21 +9,22 @@ import { sendErrorMessage } from '../../utils/logger';
 import { compareStringArrays } from '../../utils/utils';
 import { setGasDetailsForPopulatedTransaction } from './tx-gas-details';
 import {
-  compareTokenAmounts,
-  compareTokenAmountArrays,
+  compareTokenAmountRecipients,
+  compareTokenAmountRecipientArrays,
 } from './tx-erc20-notes';
 
 export type ProvedTransaction = {
   proofType: ProofType;
   populatedTransaction: PopulatedTransaction;
   railgunWalletID: string;
-  toWalletAddress: string;
   memoText: Optional<string>;
-  tokenAmounts: RailgunWalletTokenAmount[];
-  relayAdaptDepositTokenAddresses?: string[];
-  crossContractCallsSerialized?: string[];
-  relayerRailgunAddress?: string;
-  relayerFeeTokenAmount?: RailgunWalletTokenAmount;
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[];
+  relayAdaptWithdrawTokenAmountRecipients: Optional<
+    RailgunWalletTokenAmountRecipient[]
+  >;
+  relayAdaptDepositTokenAddresses: Optional<string[]>;
+  crossContractCallsSerialized: Optional<string[]>;
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>;
   sendWithPublicWallet: boolean;
 };
 
@@ -30,32 +32,31 @@ let cachedProvedTransaction: Optional<ProvedTransaction>;
 
 export const populateProvedTransaction = async (
   proofType: ProofType,
-  toWalletAddress: string,
   railgunWalletID: string,
   memoText: Optional<string>,
-  tokenAmounts: RailgunWalletTokenAmount[],
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  relayAdaptWithdrawTokenAmountRecipients: Optional<
+    RailgunWalletTokenAmountRecipient[]
+  >,
   relayAdaptDepositTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
 ): Promise<PopulatedTransaction> => {
-  if (
-    !validateCachedProvedTransaction(
-      proofType,
-      toWalletAddress,
-      railgunWalletID,
-      memoText,
-      tokenAmounts,
-      relayAdaptDepositTokenAddresses,
-      crossContractCallsSerialized,
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
-      sendWithPublicWallet,
-    ).isValid
-  ) {
-    throw new Error('Transaction has not been proven.');
+  const validation = validateCachedProvedTransaction(
+    proofType,
+    railgunWalletID,
+    memoText,
+    tokenAmountRecipients,
+    relayAdaptWithdrawTokenAmountRecipients,
+    relayAdaptDepositTokenAddresses,
+    crossContractCallsSerialized,
+    relayerFeeTokenAmountRecipient,
+    sendWithPublicWallet,
+  );
+  if (!validation.isValid) {
+    throw new Error(`Invalid proof for this transaction. ${validation.error}`);
   }
 
   const { populatedTransaction } = getCachedProvedTransaction();
@@ -70,7 +71,7 @@ export const populateProvedTransaction = async (
 
 export const setCachedProvedTransaction = (tx?: ProvedTransaction) => {
   if (tx?.populatedTransaction?.from) {
-    throw new Error(`We cannot cache a transaction with 'from' address.`);
+    throw new Error(`Cannot cache a transaction with a 'from' address.`);
   }
   cachedProvedTransaction = tx;
 };
@@ -81,65 +82,65 @@ export const getCachedProvedTransaction = (): ProvedTransaction => {
 
 export const validateCachedProvedTransaction = (
   proofType: ProofType,
-  toWalletAddress: string,
   railgunWalletID: string,
   memoText: Optional<string>,
-  tokenAmounts: RailgunWalletTokenAmount[],
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  relayAdaptWithdrawTokenAmountRecipients: Optional<
+    RailgunWalletTokenAmountRecipient[]
+  >,
   relayAdaptDepositTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
 ): ValidateCachedProvedTransactionResponse => {
   let error: Optional<string>;
   if (!cachedProvedTransaction) {
-    error = 'no cachedProvedTransaction';
+    error = 'No proof found.';
   } else if (cachedProvedTransaction.proofType !== proofType) {
-    error = 'mismatch: proofType';
-  } else if (cachedProvedTransaction.toWalletAddress !== toWalletAddress) {
-    error = 'mismatch: toWalletAddress';
+    error = 'Mismatch: proofType.';
   } else if (cachedProvedTransaction.railgunWalletID !== railgunWalletID) {
-    error = 'mismatch: railgunWalletID';
+    error = 'Mismatch: railgunWalletID.';
   } else if (cachedProvedTransaction.memoText !== memoText) {
-    error = 'mismatch: memoText';
+    error = 'Mismatch: memoText.';
   } else if (
-    cachedProvedTransaction.relayerRailgunAddress !== relayerRailgunAddress
-  ) {
-    error = 'mismatch: relayerRailgunAddress';
-  } else if (
-    !compareTokenAmounts(
-      cachedProvedTransaction.relayerFeeTokenAmount,
-      relayerFeeTokenAmount,
+    !compareTokenAmountRecipients(
+      cachedProvedTransaction.relayerFeeTokenAmountRecipient,
+      relayerFeeTokenAmountRecipient,
     )
   ) {
-    error = 'mismatch: relayerFeeTokenAmount';
+    error = 'Mismatch: relayerFeeTokenAmountRecipient.';
   } else if (
-    !compareTokenAmountArrays(
-      tokenAmounts,
-      cachedProvedTransaction.tokenAmounts,
+    !compareTokenAmountRecipientArrays(
+      tokenAmountRecipients,
+      cachedProvedTransaction.tokenAmountRecipients,
     )
   ) {
-    error = 'mismatch: tokenAmounts';
+    error = 'Mismatch: tokenAmountRecipients.';
   } else if (
-    relayAdaptDepositTokenAddresses &&
+    !compareTokenAmountRecipientArrays(
+      relayAdaptWithdrawTokenAmountRecipients,
+      cachedProvedTransaction.relayAdaptWithdrawTokenAmountRecipients,
+    )
+  ) {
+    error = 'Mismatch: relayAdaptWithdrawTokenAmountRecipients.';
+  } else if (
     !compareStringArrays(
       relayAdaptDepositTokenAddresses,
       cachedProvedTransaction.relayAdaptDepositTokenAddresses,
     )
   ) {
-    error = 'mismatch: relayAdaptDepositTokenAddresses';
+    error = 'Mismatch: relayAdaptDepositTokenAddresses.';
   } else if (
-    crossContractCallsSerialized &&
     !compareStringArrays(
       crossContractCallsSerialized,
       cachedProvedTransaction.crossContractCallsSerialized,
     )
   ) {
-    error = 'mismatch: crossContractCallsSerialized';
+    error = 'Mismatch: crossContractCallsSerialized.';
   } else if (
     sendWithPublicWallet !== cachedProvedTransaction.sendWithPublicWallet
   ) {
-    error = 'mismatch: sendWithPublicWallet';
+    error = 'Mismatch: sendWithPublicWallet.';
   }
 
   if (error) {

@@ -82,12 +82,12 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG: FallbackProviderJsonConfig = {
   providers: [
     {
       provider: 'https://rpc.ankr.com/polygon',
-      priority: 3,
+      priority: 1,
       weight: 1,
     },
     {
       provider: 'https://polygon-rpc.com',
-      priority: 3,
+      priority: 2,
       weight: 1,
     },
     {

@@ -1,47 +1,36 @@
 import {
   RailgunProveTransactionResponse,
-  RailgunWalletTokenAmount,
   NetworkName,
   ProofType,
   sanitizeError,
+  RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
 import { generateProofTransactions, generateTransact } from './tx-generator';
 import { sendErrorMessage } from '../../utils/logger';
-import { assertValidRailgunAddress } from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
 import { ProverProgressCallback } from '@railgun-community/engine';
 
 export const generateTransferProof = async (
   networkName: NetworkName,
-  toWalletAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
   memoText: Optional<string>,
-  tokenAmounts: RailgunWalletTokenAmount[],
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   progressCallback: ProverProgressCallback,
 ): Promise<RailgunProveTransactionResponse> => {
   try {
-    assertValidRailgunAddress(toWalletAddress, networkName);
-    if (relayerRailgunAddress) {
-      assertValidRailgunAddress(relayerRailgunAddress, networkName);
-    }
-    const railgunAddress = toWalletAddress;
-
     setCachedProvedTransaction(undefined);
 
     const txs = await generateProofTransactions(
       ProofType.Transfer,
       networkName,
       railgunWalletID,
-      railgunAddress,
       encryptionKey,
       memoText,
-      tokenAmounts,
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
+      tokenAmountRecipients,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       progressCallback,
     );
@@ -49,12 +38,13 @@ export const generateTransferProof = async (
 
     setCachedProvedTransaction({
       proofType: ProofType.Transfer,
-      toWalletAddress: railgunAddress,
       railgunWalletID,
       memoText,
-      tokenAmounts,
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
+      tokenAmountRecipients,
+      relayAdaptWithdrawTokenAmountRecipients: undefined,
+      relayAdaptDepositTokenAddresses: undefined,
+      crossContractCallsSerialized: undefined,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       populatedTransaction,
     });

@@ -2,7 +2,6 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 import {
   RailgunWallet,
-  RailgunEngine,
   TransactionBatch,
   AdaptID,
   OutputType,
@@ -13,6 +12,7 @@ import {
 } from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
+  RailgunWalletTokenAmountRecipient,
   NetworkName,
   NETWORK_CONFIG,
   ProofType,
@@ -24,6 +24,8 @@ import {
 } from '../railgun/core/providers';
 import { erc20NoteFromTokenAmount } from './tx-erc20-notes';
 import { getProver } from '../railgun/core/prover';
+import { assertValidEthAddress, assertValidRailgunAddress } from '../railgun';
+import { assertNotBlockedAddress } from '../../utils/blocked-address';
 
 const DUMMY_AMOUNT = '0x00';
 export const DUMMY_FROM_ADDRESS = '0x000000000000000000000000000000000000dEaD';
@@ -32,12 +34,10 @@ export const generateProofTransactions = async (
   proofType: ProofType,
   networkName: NetworkName,
   railgunWalletID: string,
-  toWalletAddress: string,
   encryptionKey: string,
   memoText: Optional<string>,
-  tokenAmounts: RailgunWalletTokenAmount[],
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   progressCallback: ProverProgressCallback,
   relayAdaptID: Optional<AdaptID> = undefined,
@@ -47,14 +47,12 @@ export const generateProofTransactions = async (
 
   const txs: SerializedTransaction[] = await erc20TransactionsFromTokenAmounts(
     proofType,
-    tokenAmounts,
+    tokenAmountRecipients,
     railgunWallet,
-    toWalletAddress,
     encryptionKey,
     memoText,
     networkName,
-    relayerRailgunAddress,
-    relayerFeeTokenAmount,
+    relayerFeeTokenAmountRecipient,
     sendWithPublicWallet,
     progressCallback,
     relayAdaptID,
@@ -75,10 +73,9 @@ export const generateDummyProofTransactions = async (
   proofType: ProofType,
   networkName: NetworkName,
   railgunWalletID: string,
-  toWalletAddress: string,
   encryptionKey: string,
   memoText: Optional<string>,
-  tokenAmounts: RailgunWalletTokenAmount[],
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
   relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
   sendWithPublicWallet: boolean,
 ): Promise<SerializedTransaction[]> => {
@@ -91,16 +88,22 @@ export const generateDummyProofTransactions = async (
   // Use self-wallet as dummy relayer address.
   const relayerRailgunAddress = railgunWallet.getAddress(undefined);
 
+  const relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient> =
+    relayerFeeTokenAmount
+      ? {
+          ...relayerFeeTokenAmount,
+          recipientAddress: relayerRailgunAddress,
+        }
+      : undefined;
+
   return generateProofTransactions(
     proofType,
     networkName,
     railgunWalletID,
-    toWalletAddress,
     encryptionKey,
     memoText,
-    tokenAmounts,
-    relayerRailgunAddress,
-    relayerFeeTokenAmount,
+    tokenAmountRecipients,
+    relayerFeeTokenAmountRecipient,
     sendWithPublicWallet,
     () => {}, // progressCallback (not necessary for dummy txs)
     undefined, // relayAdaptID
@@ -131,6 +134,9 @@ export const generateWithdrawBaseToken = async (
   relayAdaptParamsRandom: string,
   useDummyProof = false,
 ): Promise<PopulatedTransaction> => {
+  assertValidEthAddress(toWalletAddress);
+  assertNotBlockedAddress(toWalletAddress);
+
   const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
   const populatedTransaction =
@@ -150,14 +156,12 @@ export const generateWithdrawBaseToken = async (
 
 const erc20TransactionsFromTokenAmounts = async (
   proofType: ProofType,
-  tokenAmounts: RailgunWalletTokenAmount[],
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
   railgunWallet: RailgunWallet,
-  toWalletAddress: string,
   encryptionKey: string,
   memoText: Optional<string>,
   networkName: NetworkName,
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   progressCallback: ProverProgressCallback,
   relayAdaptID: Optional<AdaptID>,
@@ -182,41 +186,42 @@ const erc20TransactionsFromTokenAmounts = async (
 
   const txBatchPromises: Promise<SerializedTransaction[]>[] = [];
 
-  if (relayerRailgunAddress && relayerFeeTokenAmount && !sendWithPublicWallet) {
+  if (relayerFeeTokenAmountRecipient && !sendWithPublicWallet) {
+    assertValidRailgunAddress(relayerFeeTokenAmountRecipient.recipientAddress);
+
     const transactionBatchRelayerFee = new TransactionBatch(
-      relayerFeeTokenAmount.tokenAddress,
+      relayerFeeTokenAmountRecipient.tokenAddress,
       TokenType.ERC20,
       chain,
     );
     if (relayAdaptID) {
       transactionBatchRelayerFee.setAdaptID(relayAdaptID);
     }
-    const addressData = RailgunEngine.decodeAddress(relayerRailgunAddress);
     transactionBatchRelayerFee.addOutput(
       erc20NoteFromTokenAmount(
-        relayerFeeTokenAmount,
-        addressData,
+        relayerFeeTokenAmountRecipient,
         railgunWallet,
         OutputType.RelayerFee,
         undefined, // memoText
       ),
     );
 
-    // If paying Relayer fee in the same token that is any output/withdraw in transaction.
+    // TODO: If paying Relayer fee in the same token that is any output/withdraw in transaction.
+    // Disabled for now until we have more circuits to support this.
     // Combine into same Transaction to save gas.
-    const matchingOutputTokenAmounts = tokenAmounts.filter(
-      ta => ta.tokenAddress === relayerFeeTokenAmount.tokenAddress,
-    );
-    matchingOutputTokenAmounts.forEach(tokenAmount =>
-      setTransactionOutputs(
-        proofType,
-        transactionBatchRelayerFee,
-        toWalletAddress,
-        tokenAmount,
-        railgunWallet,
-        memoText,
-      ),
-    );
+    // const matchingOutputTokenAmounts = tokenAmounts.filter(
+    //   ta => ta.tokenAddress === relayerFeeTokenAmount.tokenAddress,
+    // );
+    // matchingOutputTokenAmounts.forEach(tokenAmount =>
+    //   setTransactionOutputs(
+    //     proofType,
+    //     transactionBatchRelayerFee,
+    //     toWalletAddress,
+    //     tokenAmount,
+    //     railgunWallet,
+    //     memoText,
+    //   ),
+    // );
 
     individualProgressAmounts.push(0);
     txBatchPromises.push(
@@ -230,46 +235,48 @@ const erc20TransactionsFromTokenAmounts = async (
     );
   }
 
-  tokenAmounts.forEach((tokenAmount: RailgunWalletTokenAmount) => {
-    if (
-      !sendWithPublicWallet &&
-      tokenAmount.tokenAddress === relayerFeeTokenAmount?.tokenAddress
-    ) {
-      // Token already added.
-      return;
-    }
+  tokenAmountRecipients.forEach(
+    (tokenAmountRecipient: RailgunWalletTokenAmountRecipient) => {
+      // if (
+      //   !sendWithPublicWallet &&
+      //   tokenAmountRecipient.tokenAddress ===
+      //     relayerFeeTokenAmountRecipient?.tokenAddress
+      // ) {
+      //   // Token already added.
+      //   return;
+      // }
 
-    const transactionBatch = new TransactionBatch(
-      tokenAmount.tokenAddress,
-      TokenType.ERC20,
-      chain,
-    );
-    if (relayAdaptID) {
-      transactionBatch.setAdaptID(relayAdaptID);
-    }
+      const transactionBatch = new TransactionBatch(
+        tokenAmountRecipient.tokenAddress,
+        TokenType.ERC20,
+        chain,
+      );
+      if (relayAdaptID) {
+        transactionBatch.setAdaptID(relayAdaptID);
+      }
 
-    setTransactionOutputs(
-      proofType,
-      transactionBatch,
-      toWalletAddress,
-      tokenAmount,
-      railgunWallet,
-      memoText,
-    );
-
-    const progressIndex = individualProgressAmounts.length;
-    individualProgressAmounts.push(0);
-    txBatchPromises.push(
-      generateAllProofs(
+      setTransactionOutputs(
+        proofType,
         transactionBatch,
+        tokenAmountRecipient,
         railgunWallet,
-        encryptionKey,
-        useDummyProof,
-        (progress: number) =>
-          individualProgressCallback(progressIndex, progress),
-      ),
-    );
-  });
+        memoText,
+      );
+
+      const progressIndex = individualProgressAmounts.length;
+      individualProgressAmounts.push(0);
+      txBatchPromises.push(
+        generateAllProofs(
+          transactionBatch,
+          railgunWallet,
+          encryptionKey,
+          useDummyProof,
+          (progress: number) =>
+            individualProgressCallback(progressIndex, progress),
+        ),
+      );
+    },
+  );
 
   const txBatches = await Promise.all(txBatchPromises);
   return txBatches.flat();
@@ -278,8 +285,7 @@ const erc20TransactionsFromTokenAmounts = async (
 const setTransactionOutputs = (
   proofType: ProofType,
   transactionBatch: TransactionBatch,
-  toWalletAddress: string,
-  tokenAmount: RailgunWalletTokenAmount,
+  tokenAmountRecipient: RailgunWalletTokenAmountRecipient,
   railgunWallet: RailgunWallet,
   memoText: Optional<string>,
 ) => {
@@ -287,8 +293,7 @@ const setTransactionOutputs = (
     case ProofType.Transfer: {
       setTransactionOutputsTransfer(
         transactionBatch,
-        toWalletAddress,
-        tokenAmount,
+        tokenAmountRecipient,
         railgunWallet,
         memoText,
       );
@@ -299,8 +304,7 @@ const setTransactionOutputs = (
     case ProofType.Withdraw: {
       setTransactionOutputsWithdraw(
         transactionBatch,
-        toWalletAddress,
-        tokenAmount,
+        tokenAmountRecipient,
         false, // allowOverride
       );
       break;
@@ -312,16 +316,15 @@ const setTransactionOutputs = (
 
 const setTransactionOutputsTransfer = (
   transactionBatch: TransactionBatch,
-  toWalletAddress: string,
-  tokenAmount: RailgunWalletTokenAmount,
+  tokenAmountRecipient: RailgunWalletTokenAmountRecipient,
   railgunWallet: RailgunWallet,
   memoText: Optional<string>,
 ) => {
-  const addressData = RailgunEngine.decodeAddress(toWalletAddress);
+  assertValidRailgunAddress(tokenAmountRecipient.recipientAddress);
+
   transactionBatch.addOutput(
     erc20NoteFromTokenAmount(
-      tokenAmount,
-      addressData,
+      tokenAmountRecipient,
       railgunWallet,
       OutputType.Transfer,
       memoText,
@@ -331,14 +334,20 @@ const setTransactionOutputsTransfer = (
 
 const setTransactionOutputsWithdraw = (
   transactionBatch: TransactionBatch,
-  toWalletAddress: string,
-  tokenAmount: RailgunWalletTokenAmount,
+  tokenAmountRecipient: RailgunWalletTokenAmountRecipient,
   allowOverride?: boolean,
 ) => {
-  const withdrawAmount = BigNumber.from(tokenAmount.amountString);
+  const withdrawAmount = BigNumber.from(tokenAmountRecipient.amountString);
   const value = withdrawAmount.toHexString();
 
-  transactionBatch.setWithdraw(toWalletAddress, value, allowOverride);
+  assertValidEthAddress(tokenAmountRecipient.recipientAddress);
+  assertNotBlockedAddress(tokenAmountRecipient.recipientAddress);
+
+  transactionBatch.setWithdraw(
+    tokenAmountRecipient.recipientAddress,
+    value,
+    allowOverride,
+  );
 };
 
 const generateAllProofs = (

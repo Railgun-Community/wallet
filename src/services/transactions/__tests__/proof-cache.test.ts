@@ -1,8 +1,12 @@
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { ProofType } from '@railgun-community/shared-models';
 import {
+  ProofType,
+  RailgunWalletTokenAmountRecipient,
+} from '@railgun-community/shared-models';
+import {
+  MOCK_ETH_WALLET_ADDRESS,
   MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_AMOUNTS,
   MOCK_TOKEN_FEE,
@@ -16,12 +20,27 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const proofType = ProofType.Transfer;
-const toWalletAddress = '0x12345';
 const railgunWalletID = '123';
 const memoText = 'Some memo';
-const tokenAmounts = MOCK_TOKEN_AMOUNTS;
-const relayerRailgunAddress = MOCK_RAILGUN_WALLET_ADDRESS;
-const relayerFeeTokenAmount = MOCK_TOKEN_FEE;
+const recipientAddress = '0x12345';
+const tokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+  MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
+    ...tokenAmount,
+    recipientAddress,
+  }));
+const relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient = {
+  ...MOCK_TOKEN_FEE,
+  recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
+};
+const crossContractCallsSerialized = ['0x4567'];
+const relayAdaptDepositTokenAddresses = ['0x123'];
+const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+  [
+    {
+      ...MOCK_TOKEN_FEE,
+      recipientAddress: MOCK_ETH_WALLET_ADDRESS,
+    },
+  ];
 
 describe('proof-cache', () => {
   it('Should validate cached transaction correctly', () => {
@@ -29,14 +48,13 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         proofType,
-        toWalletAddress,
         railgunWalletID,
         memoText,
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        relayerFeeTokenAmount,
+        tokenAmountRecipients,
+        relayAdaptWithdrawTokenAmountRecipients,
+        relayAdaptDepositTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
         false, // sendWithPublicAddress
       ).isValid,
     ).to.be.false;
@@ -44,13 +62,13 @@ describe('proof-cache', () => {
     setCachedProvedTransaction({
       populatedTransaction: {} as PopulatedTransaction,
       proofType,
-      toWalletAddress,
       memoText,
       railgunWalletID,
-      tokenAmounts,
-      relayAdaptDepositTokenAddresses: undefined,
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
+      tokenAmountRecipients,
+      relayAdaptWithdrawTokenAmountRecipients,
+      relayAdaptDepositTokenAddresses,
+      relayerFeeTokenAmountRecipient,
+      crossContractCallsSerialized,
       sendWithPublicWallet: false,
     });
 
@@ -58,14 +76,13 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         proofType,
-        toWalletAddress,
         railgunWalletID,
         memoText,
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        relayerFeeTokenAmount,
+        tokenAmountRecipients,
+        relayAdaptWithdrawTokenAmountRecipients,
+        relayAdaptDepositTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
         false, // sendWithPublicAddress
       ).isValid,
     ).to.be.true;
@@ -73,14 +90,13 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         ProofType.Withdraw,
-        toWalletAddress,
         railgunWalletID,
         memoText,
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        relayerFeeTokenAmount,
+        tokenAmountRecipients,
+        relayAdaptWithdrawTokenAmountRecipients,
+        relayAdaptDepositTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
         false, // sendWithPublicAddress
       ).isValid,
     ).to.be.false;
@@ -88,29 +104,13 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         proofType,
-        '0x0987654',
-        railgunWalletID,
-        memoText,
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        relayerFeeTokenAmount,
-        false, // sendWithPublicAddress
-      ).isValid,
-    ).to.be.false;
-
-    expect(
-      validateCachedProvedTransaction(
-        proofType,
-        toWalletAddress,
         '987',
         memoText,
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        relayerFeeTokenAmount,
+        tokenAmountRecipients,
+        relayAdaptWithdrawTokenAmountRecipients,
+        relayAdaptDepositTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
         false, // sendWithPublicAddress
       ).isValid,
     ).to.be.false;
@@ -118,14 +118,13 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         proofType,
-        toWalletAddress,
         railgunWalletID,
         'different memo',
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        relayerFeeTokenAmount,
+        tokenAmountRecipients,
+        relayAdaptWithdrawTokenAmountRecipients,
+        relayAdaptDepositTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
         false, // sendWithPublicAddress
       ).isValid,
     ).to.be.false;
@@ -133,14 +132,19 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         proofType,
-        toWalletAddress,
         railgunWalletID,
         memoText,
-        [{ tokenAddress: '0x765', amountString: '100' }],
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        relayerFeeTokenAmount,
+        [
+          {
+            tokenAddress: '0x765',
+            amountString: '100',
+            recipientAddress: '0x345',
+          },
+        ],
+        relayAdaptWithdrawTokenAmountRecipients,
+        relayAdaptDepositTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
         false, // sendWithPublicAddress
       ).isValid,
     ).to.be.false;
@@ -148,14 +152,27 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         proofType,
-        toWalletAddress,
         railgunWalletID,
         memoText,
-        tokenAmounts,
+        tokenAmountRecipients,
+        [], // relayAdaptWithdrawTokenAmountRecipients
+        relayAdaptDepositTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
+        false, // sendWithPublicAddress
+      ).isValid,
+    ).to.be.false;
+
+    expect(
+      validateCachedProvedTransaction(
+        proofType,
+        railgunWalletID,
+        memoText,
+        tokenAmountRecipients,
+        relayAdaptWithdrawTokenAmountRecipients,
         ['test'],
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        relayerFeeTokenAmount,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
         false, // sendWithPublicAddress
       ).isValid,
     ).to.be.false;
@@ -163,14 +180,13 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         proofType,
-        toWalletAddress,
         railgunWalletID,
         memoText,
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
+        tokenAmountRecipients,
+        relayAdaptWithdrawTokenAmountRecipients,
+        relayAdaptDepositTokenAddresses,
         ['test'],
-        relayerRailgunAddress,
-        relayerFeeTokenAmount,
+        relayerFeeTokenAmountRecipient,
         false, // sendWithPublicAddress
       ).isValid,
     ).to.be.false;
@@ -178,14 +194,17 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         proofType,
-        toWalletAddress,
         railgunWalletID,
         memoText,
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        '87654',
-        relayerFeeTokenAmount,
+        tokenAmountRecipients,
+        relayAdaptWithdrawTokenAmountRecipients,
+        relayAdaptDepositTokenAddresses,
+        crossContractCallsSerialized,
+        {
+          tokenAddress: '0x765',
+          amountString: '100',
+          recipientAddress: '0x123',
+        },
         false, // sendWithPublicAddress
       ).isValid,
     ).to.be.false;
@@ -193,29 +212,13 @@ describe('proof-cache', () => {
     expect(
       validateCachedProvedTransaction(
         proofType,
-        toWalletAddress,
         railgunWalletID,
         memoText,
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        { tokenAddress: '0x765', amountString: '100' },
-        false, // sendWithPublicAddress
-      ).isValid,
-    ).to.be.false;
-
-    expect(
-      validateCachedProvedTransaction(
-        proofType,
-        toWalletAddress,
-        railgunWalletID,
-        memoText,
-        tokenAmounts,
-        undefined, // relayAdaptDepositTokenAddresses
-        undefined, // crossContractCallsSerialized
-        relayerRailgunAddress,
-        { tokenAddress: '0x765', amountString: '100' },
+        tokenAmountRecipients,
+        relayAdaptWithdrawTokenAmountRecipients,
+        relayAdaptDepositTokenAddresses,
+        crossContractCallsSerialized,
+        relayerFeeTokenAmountRecipient,
         true, // sendWithPublicAddress
       ).isValid,
     ).to.be.false;

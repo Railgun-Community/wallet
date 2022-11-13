@@ -12,13 +12,13 @@ import {
   sanitizeError,
   deserializeTransaction,
   serializeUnsignedTransaction,
+  RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
   generateDummyProofTransactions,
   generateProofTransactions,
 } from './tx-generator';
-import { assertValidRailgunAddress } from '../railgun/wallets/wallets';
 import {
   populateProvedTransaction,
   setCachedProvedTransaction,
@@ -43,57 +43,73 @@ const createPopulatedCrossContractCalls = (
   crossContractCallsSerialized: string[],
   networkName: NetworkName,
 ): PopulatedTransaction[] => {
-  return crossContractCallsSerialized
-    .map(serialized =>
-      deserializeTransaction(
-        serialized,
-        undefined, // nonce
-        NETWORK_CONFIG[networkName].chain.id,
-      ),
-    )
-    .map(transactionRequest => {
-      const populatedTransaction: PopulatedTransaction = {
-        to: transactionRequest.to,
-        value: transactionRequest.value
-          ? BigNumber.from(transactionRequest.value)
-          : undefined,
-        data: transactionRequest.data
-          ? hexlify(transactionRequest.data, true)
-          : undefined,
-      };
-      assertNotBlockedAddress(populatedTransaction.to);
-      return populatedTransaction;
-    });
+  try {
+    return crossContractCallsSerialized
+      .map(serialized =>
+        deserializeTransaction(
+          serialized,
+          undefined, // nonce
+          NETWORK_CONFIG[networkName].chain.id,
+        ),
+      )
+      .map(transactionRequest => {
+        const populatedTransaction: PopulatedTransaction = {
+          to: transactionRequest.to,
+          value: transactionRequest.value
+            ? BigNumber.from(transactionRequest.value)
+            : undefined,
+          data: transactionRequest.data
+            ? hexlify(transactionRequest.data, true)
+            : undefined,
+        };
+        assertNotBlockedAddress(populatedTransaction.to);
+        return populatedTransaction;
+      });
+  } catch (err) {
+    sendErrorMessage(err);
+    throw new Error('Invalid serialized cross contract calls.');
+  }
+};
+
+export const createRelayAdaptWithdrawTokenAmountRecipients = (
+  networkName: NetworkName,
+  withdrawTokenAmounts: RailgunWalletTokenAmount[],
+): RailgunWalletTokenAmountRecipient[] => {
+  const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
+  const withdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+    withdrawTokenAmounts.map(withdrawTokenAmount => ({
+      ...withdrawTokenAmount,
+      recipientAddress: relayAdaptContract.address,
+    }));
+  return withdrawTokenAmountRecipients;
 };
 
 export const populateProvedCrossContractCalls = async (
   networkName: NetworkName,
-  fromWalletAddress: string,
   railgunWalletID: string,
-  withdrawTokenAmounts: RailgunWalletTokenAmount[],
-  depositTokenAddresses: string[],
+  relayAdaptWithdrawTokenAmounts: RailgunWalletTokenAmount[],
+  relayAdaptDepositTokenAddresses: string[],
   crossContractCallsSerialized: string[],
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   gasDetailsSerialized: Optional<TransactionGasDetailsSerialized>,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    assertValidRailgunAddress(fromWalletAddress, networkName);
-    if (relayerRailgunAddress) {
-      assertValidRailgunAddress(relayerRailgunAddress, networkName);
-    }
+    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+      createRelayAdaptWithdrawTokenAmountRecipients(
+        networkName,
+        relayAdaptWithdrawTokenAmounts,
+      );
 
     const populatedTransaction = await populateProvedTransaction(
       ProofType.CrossContractCalls,
-      fromWalletAddress,
       railgunWalletID,
       undefined, // memoText
-      withdrawTokenAmounts,
-      depositTokenAddresses,
+      [], // tokenAmountRecipients
+      relayAdaptWithdrawTokenAmountRecipients,
+      relayAdaptDepositTokenAddresses,
       crossContractCallsSerialized,
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       gasDetailsSerialized,
     );
@@ -114,18 +130,16 @@ export const populateProvedCrossContractCalls = async (
 
 export const gasEstimateForUnprovenCrossContractCalls = async (
   networkName: NetworkName,
-  fromWalletAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
-  withdrawTokenAmounts: RailgunWalletTokenAmount[],
-  depositTokenAddresses: string[],
+  relayAdaptWithdrawTokenAmounts: RailgunWalletTokenAmount[],
+  relayAdaptDepositTokenAddresses: string[],
   crossContractCallsSerialized: string[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
-    assertValidRailgunAddress(fromWalletAddress, networkName);
     const wallet = fullWalletForID(railgunWalletID);
 
     setCachedProvedTransaction(undefined);
@@ -137,11 +151,17 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
+    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+      createRelayAdaptWithdrawTokenAmountRecipients(
+        networkName,
+        relayAdaptWithdrawTokenAmounts,
+      );
+
     const depositRandom = randomHex(16);
     const relayDepositInputs = RelayAdaptHelper.generateRelayDepositInputs(
       wallet,
       depositRandom,
-      depositTokenAddresses,
+      relayAdaptDepositTokenAddresses,
     );
 
     // Add 40% to the gas fee to ensure that it's successful.
@@ -155,10 +175,9 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           ProofType.CrossContractCalls,
           networkName,
           railgunWalletID,
-          relayAdaptContract.address,
           encryptionKey,
           undefined, // memoText
-          withdrawTokenAmounts,
+          relayAdaptWithdrawTokenAmountRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
         ),
@@ -173,7 +192,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
       },
       networkName,
       railgunWalletID,
-      withdrawTokenAmounts,
+      relayAdaptWithdrawTokenAmountRecipients,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
@@ -192,23 +211,16 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
 export const generateCrossContractCallsProof = async (
   networkName: NetworkName,
-  fromWalletAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
-  withdrawTokenAmounts: RailgunWalletTokenAmount[],
-  depositTokenAddresses: string[],
+  relayAdaptWithdrawTokenAmounts: RailgunWalletTokenAmount[],
+  relayAdaptDepositTokenAddresses: string[],
   crossContractCallsSerialized: string[],
-  relayerRailgunAddress: Optional<string>,
-  relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   progressCallback: ProverProgressCallback,
 ): Promise<RailgunProveTransactionResponse> => {
   try {
-    assertValidRailgunAddress(fromWalletAddress, networkName);
-    if (relayerRailgunAddress) {
-      assertValidRailgunAddress(relayerRailgunAddress, networkName);
-    }
-    const railgunWalletAddress = fromWalletAddress;
     const wallet = fullWalletForID(railgunWalletID);
 
     setCachedProvedTransaction(undefined);
@@ -220,16 +232,21 @@ export const generateCrossContractCallsProof = async (
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
+    const relayAdaptWithdrawTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+      createRelayAdaptWithdrawTokenAmountRecipients(
+        networkName,
+        relayAdaptWithdrawTokenAmounts,
+      );
+
     // Generate dummy txs for relay adapt params.
     const dummyWithdrawTxs = await generateDummyProofTransactions(
       ProofType.CrossContractCalls,
       networkName,
       railgunWalletID,
-      relayAdaptContract.address,
       encryptionKey,
       undefined, // memoText
-      withdrawTokenAmounts,
-      relayerFeeTokenAmount,
+      relayAdaptWithdrawTokenAmountRecipients,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
     );
 
@@ -238,7 +255,7 @@ export const generateCrossContractCallsProof = async (
     const relayDepositInputs = RelayAdaptHelper.generateRelayDepositInputs(
       wallet,
       depositRandom,
-      depositTokenAddresses,
+      relayAdaptDepositTokenAddresses,
     );
 
     const relayAdaptParamsRandom = randomHex(16);
@@ -259,12 +276,10 @@ export const generateCrossContractCallsProof = async (
       ProofType.CrossContractCalls,
       networkName,
       railgunWalletID,
-      relayAdaptContract.address, // Withdraw to relay contract.
       encryptionKey,
       undefined, // memoText
-      withdrawTokenAmounts,
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
+      relayAdaptWithdrawTokenAmountRecipients,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       progressCallback,
       relayAdaptID,
@@ -282,14 +297,13 @@ export const generateCrossContractCallsProof = async (
 
     setCachedProvedTransaction({
       proofType: ProofType.CrossContractCalls,
-      toWalletAddress: railgunWalletAddress,
       railgunWalletID,
       memoText: undefined,
-      tokenAmounts: withdrawTokenAmounts,
-      relayAdaptDepositTokenAddresses: depositTokenAddresses,
+      tokenAmountRecipients: [],
+      relayAdaptWithdrawTokenAmountRecipients,
+      relayAdaptDepositTokenAddresses,
       crossContractCallsSerialized,
-      relayerRailgunAddress,
-      relayerFeeTokenAmount,
+      relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       populatedTransaction,
     });

@@ -1,4 +1,10 @@
-export const compareStringArrays = (a?: string[], b?: string[]): boolean => {
+export const compareStringArrays = (
+  a: Optional<string[]>,
+  b: Optional<string[]>,
+): boolean => {
+  if (!a && !b) {
+    return true;
+  }
   if (!a || !b || a.length !== b.length) {
     return false;
   }

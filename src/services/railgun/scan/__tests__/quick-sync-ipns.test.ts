@@ -70,7 +70,7 @@ describe('quick-sync-ipns', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should make sure IPNS Event Log has no data gaps in commitments - Polygon', async () => {
     const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 0);
@@ -85,7 +85,7 @@ describe('quick-sync-ipns', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should make sure IPNS Event Log has no data gaps in commitments - BNB Chain', async () => {
     const eventLog = await quickSyncIPNS(BNB_CHAIN, 0);
@@ -100,7 +100,7 @@ describe('quick-sync-ipns', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should run Railgun Event Log fetch on Polygon for corrupted block', async () => {
     const eventLog = await quickSyncIPNS(
@@ -135,7 +135,7 @@ describe('quick-sync-ipns', () => {
         'f17d5b705d928de4a2fec6e9f3aa14ad',
       ],
     });
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - Small', async () => {
     const eventLog = await quickSyncIPNS(
@@ -152,7 +152,7 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - Medium', async () => {
     const eventLog = await quickSyncIPNS(
@@ -169,7 +169,7 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - Large', async () => {
     const eventLog = await quickSyncIPNS(
@@ -186,7 +186,7 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - XLarge', async () => {
     const eventLog = await quickSyncIPNS(
@@ -203,7 +203,7 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon with starting block', async () => {
     const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 30000000);
@@ -212,7 +212,7 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(1300);
     expect(eventLog.nullifierEvents.length).to.be.at.least(1400);
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon with high starting block', async () => {
     const eventLog = await quickSyncIPNS(POLYGON_CHAIN, 100000000);
@@ -221,7 +221,7 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.equal(0);
     expect(eventLog.nullifierEvents.length).to.equal(0);
-  }).timeout(90000);
+  }).timeout(20000);
 
   it('Should retry Railgun Event Log API fetch on error', async () => {
     const stubAxiosGet = sinon.stub(axios, 'get').throws();

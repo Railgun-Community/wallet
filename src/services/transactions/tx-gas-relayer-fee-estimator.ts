@@ -11,6 +11,7 @@ import {
   FeeTokenDetails,
   calculateMaximumGas,
   NETWORK_CONFIG,
+  RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
 import { getProviderForNetwork } from '../railgun/core/providers';
 import {
@@ -77,7 +78,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   ) => Promise<PopulatedTransaction>,
   networkName: NetworkName,
   railgunWalletID: string,
-  tokenAmounts: RailgunWalletTokenAmount[],
+  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
@@ -121,9 +122,9 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   }
 
   // Find tokenAmount that matches token of relayer fee, if exists.
-  const relayerFeeMatchingSendingTokenAmount = tokenAmounts.find(
-    tokenAmount =>
-      tokenAmount.tokenAddress.toLowerCase() ===
+  const relayerFeeMatchingSendingTokenAmount = tokenAmountRecipients.find(
+    tokenAmountRecipient =>
+      tokenAmountRecipient.tokenAddress.toLowerCase() ===
       feeTokenDetails.tokenAddress.toLowerCase(),
   );
 
