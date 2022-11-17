@@ -88,6 +88,19 @@ export const getCachedProvedTransaction = (): ProvedTransaction => {
   return cachedProvedTransaction as ProvedTransaction;
 };
 
+const shouldValidateTokenAmountRecipients = (proofType: ProofType) => {
+  switch (proofType) {
+    case ProofType.CrossContractCalls:
+      // Skip validation for tokenAmountRecipients, which is not used
+      // in this transaction type.
+      return false;
+    case ProofType.Transfer:
+    case ProofType.Unshield:
+    case ProofType.UnshieldBaseToken:
+      return true;
+  }
+};
+
 export const validateCachedProvedTransaction = (
   proofType: ProofType,
   railgunWalletID: string,
@@ -120,6 +133,7 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'Mismatch: memoText.';
   } else if (
+    shouldValidateTokenAmountRecipients(proofType) &&
     !compareTokenAmountRecipientArrays(
       tokenAmountRecipients,
       cachedProvedTransaction.tokenAmountRecipients,
