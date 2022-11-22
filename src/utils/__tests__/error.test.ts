@@ -18,7 +18,7 @@ describe('error', () => {
   });
 
   it('Should sanitize bad token errors', () => {
-    const expectedErrorMessage = 'Possible bad token address.';
+    const expectedErrorMessage = 'Failed to connect to RPC.';
 
     expect(
       sanitizeError(new Error('call revert exception 12345')).message,
@@ -26,7 +26,7 @@ describe('error', () => {
   });
 
   it('Should sanitize bad address errors', () => {
-    const expectedErrorMessage = 'Possible bad address.';
+    const expectedErrorMessage = 'RPC connection error.';
 
     expect(sanitizeError(new Error('missing revert data')).message).to.equal(
       expectedErrorMessage,
@@ -35,7 +35,7 @@ describe('error', () => {
 
   it('Should sanitize gas estimate errors', () => {
     const expectedErrorMessage =
-      'Something went wrong. Please make sure you have a valid balance for this transaction.';
+      'Something went wrong. Please make sure you have a valid gas balance for this transaction.';
 
     expect(
       sanitizeError(
@@ -46,7 +46,7 @@ describe('error', () => {
 
   it('Should sanitize bad address errors', () => {
     const expectedErrorMessage =
-      'Cancellation fee too low. Please increase your network fee to replace the current pending transaction.';
+      'Nonce is used in a pending transaction, and replacement fee is too low. Please increase your network fee to replace the pending transaction.';
 
     expect(
       sanitizeError(new Error('replacement fee too low')).message,

@@ -193,15 +193,12 @@ export const getRailgunEventLogIPNS = async (
     startingBlock,
   );
 
-  // TODO: Add this when quicksync updated.
-  const numPagesUnshields = 0;
-  const startPageUnshields = 0;
-  // const numPagesUnshields = chainPageMetadata.unshield.num_pages;
-  // const startPageUnshields = getStartingPageIndex(
-  //   numPagesUnshields,
-  //   chainPageMetadata.unshield.pages_metadata,
-  //   startingBlock,
-  // );
+  const numPagesUnshields = chainPageMetadata.unshield.num_pages;
+  const startPageUnshields = getStartingPageIndex(
+    numPagesUnshields,
+    chainPageMetadata.unshield.pages_metadata,
+    startingBlock,
+  );
 
   const numPagesNullifiers = chainPageMetadata.nullifier.num_pages;
   const startPageNullifiers = getStartingPageIndex(
