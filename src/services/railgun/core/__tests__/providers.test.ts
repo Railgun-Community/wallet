@@ -81,7 +81,7 @@ describe('providers', () => {
     expect(wallet.erc20Merkletrees[0][3]).to.be.undefined;
   }).timeout(20000);
 
-  it.only('Should fail with invalid json', async () => {
+  it('Should fail with invalid json', async () => {
     const shouldDebug = true;
     const response = await loadProvider(
       {} as FallbackProviderJsonConfig,
@@ -89,7 +89,7 @@ describe('providers', () => {
       shouldDebug,
     );
     expect(response.error).to.equal(
-      'Proxy contract not yet loaded for network BNB Chain',
+      'Cannot load provider: invalid fallback provider config.',
     );
   });
 });
