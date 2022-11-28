@@ -81,7 +81,7 @@ describe('providers', () => {
     expect(wallet.erc20Merkletrees[0][3]).to.be.undefined;
   }).timeout(20000);
 
-  it('Should fail with invalid json', async () => {
+  it.only('Should fail with invalid json', async () => {
     const shouldDebug = true;
     const response = await loadProvider(
       {} as FallbackProviderJsonConfig,

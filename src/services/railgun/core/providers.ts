@@ -99,17 +99,23 @@ const loadProviderForNetwork = async (
     );
   }
 
-  // NOTE: This is an async call, but we need not await.
-  // Let Engine load network and scan events in the background.
-  // The synchronous start of this function will set `engine.contracts` for this chain.
-  getEngine().loadNetwork(
+  const engine = getEngine();
+
+  // This function will set up the contracts for this chain.
+  // Throws if provider does not respond.
+  await engine.loadNetwork(
     chain,
     proxyContract,
     relayAdaptContract,
     provider,
     deploymentBlock ?? 0,
   );
-  providerMap[networkName] = provider;
+
+  setProviderForNetwork(networkName, provider);
+
+  // NOTE: This is an async call, but we need not await.
+  // Let Engine scan events in the background.
+  engine.scanHistory(chain);
 };
 
 export const loadProvider = async (
@@ -122,7 +128,7 @@ export const loadProvider = async (
       // NOTE: This is an async call, but we need not await.
       // Let the Engine load in the background.
       const { chain } = NETWORK_CONFIG[networkName];
-      loadProviderForNetwork(
+      await loadProviderForNetwork(
         chain,
         networkName,
         fallbackProviderJsonConfig,

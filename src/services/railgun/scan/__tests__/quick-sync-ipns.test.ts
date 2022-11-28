@@ -56,7 +56,7 @@ const assertContiguousCommitmentEvents = (
   }
 };
 
-describe.only('quick-sync-ipns', () => {
+describe('quick-sync-ipns', () => {
   it('Should make sure IPNS Event Log has no data gaps in commitments - Ethereum', async () => {
     const eventLog = await quickSyncIPNS(ETH_CHAIN, 0);
     expect(eventLog).to.be.an('object');
