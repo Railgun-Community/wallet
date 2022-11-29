@@ -127,7 +127,7 @@ export const setGasDetailsForPopulatedTransaction = (
       // eslint-disable-next-line no-param-reassign
       populatedTransaction.gasPrice = gasPrice;
       // eslint-disable-next-line no-param-reassign
-      populatedTransaction.accessList = undefined;
+      delete populatedTransaction.accessList;
       break;
     }
     case EVMGasType.Type1: {
