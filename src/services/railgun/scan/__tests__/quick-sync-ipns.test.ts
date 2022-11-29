@@ -239,6 +239,7 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(1300);
     expect(eventLog.nullifierEvents.length).to.be.at.least(1400);
+    expect(eventLog.unshieldEvents.length).to.be.at.least(1);
   }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon with high starting block', async () => {
@@ -248,6 +249,7 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.equal(0);
     expect(eventLog.nullifierEvents.length).to.equal(0);
+    expect(eventLog.unshieldEvents.length).to.equal(0);
   }).timeout(20000);
 
   it('Should retry Railgun Event Log API fetch on error', async () => {
