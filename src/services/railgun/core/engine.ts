@@ -119,26 +119,12 @@ export const setOnMerkletreeScanCallback = (
   );
 };
 
-export const formatTempEngineV3StartBlockNumbersEVM =
-  (tempEngineV3StartBlockNumbersEVM: {
-    [chainID: string]: number;
-  }): number[][] => {
-    const engineV3StartBlockNumbersEVM: number[] = [];
-    const chainIDs = Object.keys(tempEngineV3StartBlockNumbersEVM);
-    chainIDs.forEach(chainID => {
-      engineV3StartBlockNumbersEVM[Number(chainID)] =
-        tempEngineV3StartBlockNumbersEVM[chainID];
-    });
-    return [engineV3StartBlockNumbersEVM]; // index 0 is EVM.
-  };
-
 export const startRailgunEngine = (
   walletSource: string,
   db: AbstractLevelDOWN,
   shouldDebug: boolean,
   artifactStore: ArtifactStore,
   useNativeArtifacts: boolean,
-  tempEngineV3StartBlockNumbersEVM: { [chainID: string]: number },
 ): StartRailgunEngineResponse => {
   if (engine) {
     const response: StartRailgunEngineResponse = {};
@@ -151,7 +137,6 @@ export const startRailgunEngine = (
       artifactsGetter,
       quickSyncIPNS,
       shouldDebug ? createEngineDebugger() : undefined,
-      formatTempEngineV3StartBlockNumbersEVM(tempEngineV3StartBlockNumbersEVM),
     );
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(useNativeArtifacts);

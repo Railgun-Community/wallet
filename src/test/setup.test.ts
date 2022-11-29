@@ -72,7 +72,6 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     shouldDebug,
     testArtifactStore,
     useNativeArtifacts,
-    {},
   );
   if (response.error) {
     throw new Error(response.error);

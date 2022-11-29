@@ -13,14 +13,17 @@ const { expect } = chai;
 const ETH_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Ethereum].chain;
 const EXPECTED_COMMITMENT_EVENTS_ETH = 1611;
 const EXPECTED_NULLIFIER_EVENTS_ETH = 1425;
+const EXPECTED_UNSHIELD_EVENTS_ETH = 1;
 
 const POLYGON_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Polygon].chain;
 const EXPECTED_COMMITMENT_EVENTS_POLYGON = 2500;
 const EXPECTED_NULLIFIER_EVENTS_POLYGON = 2600;
+const EXPECTED_UNSHIELD_EVENTS_POLYGON = 1;
 
 const BNB_CHAIN: Chain = NETWORK_CONFIG[NetworkName.BNBChain].chain;
 const EXPECTED_COMMITMENT_EVENTS_BNB = 614;
 const EXPECTED_NULLIFIER_EVENTS_BNB = 515;
+const EXPECTED_UNSHIELD_EVENTS_BNB = 1;
 
 const assertContiguousCommitmentEvents = (
   commitmentEvents: CommitmentEvent[],
@@ -67,6 +70,9 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_ETH,
     );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_ETH,
+    );
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
@@ -82,6 +88,12 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_POLYGON,
+    );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_POLYGON,
+    );
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
@@ -96,6 +108,9 @@ describe('quick-sync-ipns', () => {
     );
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_BNB,
+    );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_BNB,
     );
 
     const shouldThrow = true;
@@ -152,6 +167,9 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_POLYGON,
+    );
   }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - Medium', async () => {
@@ -168,6 +186,9 @@ describe('quick-sync-ipns', () => {
     );
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_POLYGON,
+    );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_POLYGON,
     );
   }).timeout(20000);
 
@@ -186,6 +207,9 @@ describe('quick-sync-ipns', () => {
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_POLYGON,
     );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_POLYGON,
+    );
   }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon from block 0 - XLarge', async () => {
@@ -202,6 +226,9 @@ describe('quick-sync-ipns', () => {
     );
     expect(eventLog.nullifierEvents.length).to.be.at.least(
       EXPECTED_NULLIFIER_EVENTS_POLYGON,
+    );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_POLYGON,
     );
   }).timeout(20000);
 
