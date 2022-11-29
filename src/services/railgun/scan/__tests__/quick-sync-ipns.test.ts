@@ -99,23 +99,26 @@ describe('quick-sync-ipns', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(20000);
 
-  it('Should make sure IPNS Event Log has no data gaps in commitments - BNB Chain', async () => {
-    const eventLog = await quickSyncIPNS(BNB_CHAIN, 0);
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_EVENTS_BNB,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_BNB,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_BNB,
-    );
+  it.skip(
+    'Should make sure IPNS Event Log has no data gaps in commitments - BNB Chain',
+    async () => {
+      const eventLog = await quickSyncIPNS(BNB_CHAIN, 0);
+      expect(eventLog).to.be.an('object');
+      expect(eventLog.commitmentEvents).to.be.an('array');
+      expect(eventLog.commitmentEvents.length).to.be.at.least(
+        EXPECTED_COMMITMENT_EVENTS_BNB,
+      );
+      expect(eventLog.nullifierEvents.length).to.be.at.least(
+        EXPECTED_NULLIFIER_EVENTS_BNB,
+      );
+      expect(eventLog.unshieldEvents.length).to.be.at.least(
+        EXPECTED_UNSHIELD_EVENTS_BNB,
+      );
 
-    const shouldThrow = true;
-    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(20000);
+      const shouldThrow = true;
+      assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+    },
+  ).timeout(20000);
 
   it('Should run Railgun Event Log fetch on Polygon for corrupted block', async () => {
     const eventLog = await quickSyncIPNS(
