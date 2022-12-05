@@ -2,7 +2,9 @@ import { Chain } from '@railgun-community/engine';
 import {
   RailgunBalanceRefreshTrigger,
   RailgunBalanceResponse,
+  sanitizeError,
 } from '@railgun-community/shared-models';
+import { sendErrorMessage } from '../../../utils/logger';
 import { getEngine, walletForID } from '../core/engine';
 
 export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
@@ -62,7 +64,10 @@ export const rescanFullMerkletreesAndWallets = async (
     // which calls `onBalancesUpdate` (balance-update.ts).
     return {};
   } catch (err: any) {
-    const response: RailgunBalanceResponse = { error: err.message };
+    sendErrorMessage(err.stack);
+    const sanitizedError = sanitizeError(err);
+
+    const response: RailgunBalanceResponse = { error: sanitizedError.message };
     return response;
   }
 };
