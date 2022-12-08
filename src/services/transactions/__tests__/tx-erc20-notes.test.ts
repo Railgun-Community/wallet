@@ -82,8 +82,10 @@ describe('tx-erc20-notes', () => {
     );
 
     expect(note.value).to.equal(formatAmountString(tokenAmountRecipient));
-    expect(note.receiverAddressData.masterPublicKey).to.equal(addressData.masterPublicKey);
-    expect(note.token).to.equal(padTo32BytesUnHex(MOCK_TOKEN));
+    expect(note.receiverAddressData.masterPublicKey).to.equal(
+      addressData.masterPublicKey,
+    );
+    expect(note.tokenHash).to.equal(padTo32BytesUnHex(MOCK_TOKEN));
 
     const decrypted = Memo.decryptNoteAnnotationData(
       note.annotationData,

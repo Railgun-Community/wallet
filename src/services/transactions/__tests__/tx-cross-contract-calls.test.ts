@@ -7,6 +7,8 @@ import {
   TransactionStruct,
   TransactionBatch,
   RelayAdaptContract,
+  getTokenDataERC20,
+  getTokenDataHash,
 } from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
@@ -52,7 +54,7 @@ let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
 let relayAdaptPopulateCrossContractCalls: SinonStub;
-let setUnshieldSpy: SinonSpy;
+let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
@@ -63,6 +65,11 @@ const polygonRelayAdaptContract =
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+
+const mockTokenData0 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[0].tokenAddress);
+const mockTokenHash0 = getTokenDataHash(mockTokenData0);
+const mockTokenData1 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[1].tokenAddress);
+const mockTokenHash1 = getTokenDataHash(mockTokenData1);
 
 const mockCrossContractCalls: PopulatedTransaction[] = [
   {
@@ -114,7 +121,7 @@ const stubGasEstimateFailure = () => {
 };
 
 const spyOnSetUnshield = () => {
-  setUnshieldSpy = Sinon.spy(TransactionBatch.prototype, 'setUnshield');
+  addUnshieldDataSpy = Sinon.spy(TransactionBatch.prototype, 'addUnshieldData');
 };
 
 describe('tx-cross-contract-calls', () => {
@@ -171,7 +178,7 @@ describe('tx-cross-contract-calls', () => {
   });
   afterEach(() => {
     gasEstimateStub?.restore();
-    setUnshieldSpy?.restore();
+    addUnshieldDataSpy?.restore();
     erc20NoteSpy?.restore();
   });
   after(() => {
@@ -197,12 +204,44 @@ describe('tx-cross-contract-calls', () => {
       false, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setUnshieldSpy.called).to.be.true;
-    expect(setUnshieldSpy.args).to.deep.equal([
-      [polygonRelayAdaptContract, '0x0100', false], // run 1 - token 1
-      [polygonRelayAdaptContract, '0x0200', false], // run 1 - token 2
-      [polygonRelayAdaptContract, '0x0100', false], // run 2 - token 1
-      [polygonRelayAdaptContract, '0x0200', false], // run 2 - token 2
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // run 1 - token 1
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData1,
+          tokenHash: mockTokenHash1,
+          value: BigInt('0x0200'),
+          allowOverride: false,
+        },
+      ], // run 1 - token 2
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // run 2 - token 1
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData1,
+          tokenHash: mockTokenHash1,
+          value: BigInt('0x0200'),
+          allowOverride: false,
+        },
+      ], // run 2 - token 2
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(280));
   });
@@ -221,11 +260,28 @@ describe('tx-cross-contract-calls', () => {
       MOCK_FEE_TOKEN_DETAILS,
       true, // sendWithPublicWallet
     );
+
     expect(rsp.error).to.be.undefined;
-    expect(setUnshieldSpy.called).to.be.true;
-    expect(setUnshieldSpy.args).to.deep.equal([
-      [polygonRelayAdaptContract, '0x0100', false],
-      [polygonRelayAdaptContract, '0x0200', false],
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // run 1 - token 1
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData1,
+          tokenHash: mockTokenHash1,
+          value: BigInt('0x0200'),
+          allowOverride: false,
+        },
+      ], // run 1 - token 2
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(280));
   });
@@ -281,12 +337,44 @@ describe('tx-cross-contract-calls', () => {
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
-    expect(setUnshieldSpy.called).to.be.true;
-    expect(setUnshieldSpy.args).to.deep.equal([
-      [polygonRelayAdaptContract, '0x0100', false], // dummy proof #1
-      [polygonRelayAdaptContract, '0x0200', false], // dummy proof #2
-      [polygonRelayAdaptContract, '0x0100', false], // actual proof #1
-      [polygonRelayAdaptContract, '0x0200', false], // actual proof #2
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // dummy proof #1
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData1,
+          tokenHash: mockTokenHash1,
+          value: BigInt('0x0200'),
+          allowOverride: false,
+        },
+      ], // dummy proof #2
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // actual proof #1
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData1,
+          tokenHash: mockTokenHash1,
+          value: BigInt('0x0200'),
+          allowOverride: false,
+        },
+      ], // actual proof #2
     ]);
     const populateResponse = await populateProvedCrossContractCalls(
       NetworkName.Polygon,

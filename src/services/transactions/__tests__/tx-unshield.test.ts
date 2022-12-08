@@ -8,6 +8,8 @@ import {
   TransactionBatch,
   RailgunProxyContract,
   RelayAdaptContract,
+  getTokenDataERC20,
+  getTokenDataHash,
 } from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
@@ -56,7 +58,7 @@ let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
 let railTransactStub: SinonStub;
 let relayAdaptPopulateUnshieldBaseToken: SinonStub;
-let setUnshieldSpy: SinonSpy;
+let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
@@ -67,6 +69,11 @@ const polygonRelayAdaptContract =
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+
+const mockTokenData0 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[0].tokenAddress);
+const mockTokenHash0 = getTokenDataHash(mockTokenData0);
+const mockTokenData1 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[1].tokenAddress);
+const mockTokenHash1 = getTokenDataHash(mockTokenData1);
 
 const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunWalletTokenAmount[] = [
   {
@@ -120,7 +127,7 @@ const stubGasEstimateFailure = () => {
 };
 
 const spyOnSetUnshield = () => {
-  setUnshieldSpy = Sinon.spy(TransactionBatch.prototype, 'setUnshield');
+  addUnshieldDataSpy = Sinon.spy(TransactionBatch.prototype, 'addUnshieldData');
 };
 
 describe('tx-unshield', () => {
@@ -181,7 +188,7 @@ describe('tx-unshield', () => {
   });
   afterEach(() => {
     gasEstimateStub?.restore();
-    setUnshieldSpy?.restore();
+    addUnshieldDataSpy?.restore();
     erc20NoteSpy?.restore();
   });
   after(() => {
@@ -206,12 +213,44 @@ describe('tx-unshield', () => {
       false, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setUnshieldSpy.called).to.be.true;
-    expect(setUnshieldSpy.args).to.deep.equal([
-      [MOCK_ETH_WALLET_ADDRESS, '0x0100', false], // 1st iteration - token1
-      [MOCK_ETH_WALLET_ADDRESS, '0x0200', false], // 1st iteration - token2
-      [MOCK_ETH_WALLET_ADDRESS, '0x0100', false], // 2nd iteration - token1
-      [MOCK_ETH_WALLET_ADDRESS, '0x0200', false], // 2nd iteration - token2
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: MOCK_ETH_WALLET_ADDRESS,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // run 1 - token 1
+      [
+        {
+          toAddress: MOCK_ETH_WALLET_ADDRESS,
+          tokenData: mockTokenData1,
+          tokenHash: mockTokenHash1,
+          value: BigInt('0x0200'),
+          allowOverride: false,
+        },
+      ], // run 1 - token 2
+      [
+        {
+          toAddress: MOCK_ETH_WALLET_ADDRESS,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // run 2 - token 1
+      [
+        {
+          toAddress: MOCK_ETH_WALLET_ADDRESS,
+          tokenData: mockTokenData1,
+          tokenHash: mockTokenHash1,
+          value: BigInt('0x0200'),
+          allowOverride: false,
+        },
+      ], // run 2 - token 2
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
@@ -260,10 +299,26 @@ describe('tx-unshield', () => {
       false, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setUnshieldSpy.called).to.be.true;
-    expect(setUnshieldSpy.args).to.deep.equal([
-      [polygonRelayAdaptContract, '0x0100', false],
-      [polygonRelayAdaptContract, '0x0100', false],
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ],
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ],
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
@@ -282,9 +337,17 @@ describe('tx-unshield', () => {
       true, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
-    expect(setUnshieldSpy.called).to.be.true;
-    expect(setUnshieldSpy.args).to.deep.equal([
-      [polygonRelayAdaptContract, '0x0100', false],
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ],
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
@@ -336,10 +399,26 @@ describe('tx-unshield', () => {
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
-    expect(setUnshieldSpy.called).to.be.true;
-    expect(setUnshieldSpy.args).to.deep.equal([
-      [MOCK_ETH_WALLET_ADDRESS, '0x0100', false], // 1st iteration - token1
-      [MOCK_ETH_WALLET_ADDRESS, '0x0200', false], // 1st iteration - token2
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: MOCK_ETH_WALLET_ADDRESS,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // run 1 - token 1
+      [
+        {
+          toAddress: MOCK_ETH_WALLET_ADDRESS,
+          tokenData: mockTokenData1,
+          tokenHash: mockTokenHash1,
+          value: BigInt('0x0200'),
+          allowOverride: false,
+        },
+      ], // run 1 - token 2
     ]);
     const populateResponse = await populateProvedUnshield(
       NetworkName.Polygon,
@@ -450,10 +529,26 @@ describe('tx-unshield', () => {
       () => {}, // progressCallback
     );
     expect(proofResponse.error).to.be.undefined;
-    expect(setUnshieldSpy.called).to.be.true;
-    expect(setUnshieldSpy.args).to.deep.equal([
-      [polygonRelayAdaptContract, '0x0100', false], // Dummy prove.
-      [polygonRelayAdaptContract, '0x0100', false], // Actual prove.
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // Dummy prove.
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockTokenData0,
+          tokenHash: mockTokenHash0,
+          value: BigInt('0x0100'),
+          allowOverride: false,
+        },
+      ], // Actual prove
     ]);
     const populateResponse = await populateProvedUnshieldBaseToken(
       NetworkName.Polygon,

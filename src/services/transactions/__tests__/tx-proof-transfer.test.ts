@@ -98,7 +98,7 @@ describe.skip('tx-proofs', () => {
       ByteLength.UINT_128,
     );
 
-    const shieldNote = TransactNote.create(
+    const shieldNote = TransactNote.createTransfer(
       receiverAddressData,
       railgunWallet.addressKeys,
       random,

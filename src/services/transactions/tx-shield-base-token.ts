@@ -18,7 +18,7 @@ import { sendErrorMessage } from '../../utils/logger';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import {
   randomHex,
-  ShieldNote,
+  ShieldNoteERC20,
   RailgunEngine,
   hexToBytes,
 } from '@railgun-community/engine';
@@ -39,7 +39,7 @@ const generateShieldBaseTokenTransaction = async (
     const amount = BigInt(wrappedTokenAmount.amountString);
     const wrappedAddress = wrappedTokenAmount.tokenAddress;
 
-    const shield = new ShieldNote(
+    const shield = new ShieldNoteERC20(
       masterPublicKey,
       random,
       amount,

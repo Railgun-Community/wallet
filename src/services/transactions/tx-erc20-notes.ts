@@ -5,6 +5,8 @@ import {
   TransactNote,
   RailgunWallet,
   RailgunEngine,
+  getTokenDataERC20,
+  getTokenDataHash,
 } from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
@@ -25,12 +27,15 @@ export const erc20NoteFromTokenAmount = (
     tokenAmountRecipient.recipientAddress,
   );
 
-  return TransactNote.create(
+  const tokenData = getTokenDataERC20(tokenAmountRecipient.tokenAddress);
+  const tokenHash = getTokenDataHash(tokenData);
+
+  return TransactNote.createTransfer(
     receiverAddressData,
     railgunWallet.addressKeys,
     random,
     value,
-    tokenAmountRecipient.tokenAddress.replace('0x', ''),
+    tokenHash,
     railgunWallet.getViewingKeyPair(),
     showSenderAddressToRecipient,
     outputType,

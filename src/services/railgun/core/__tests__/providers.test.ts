@@ -76,9 +76,9 @@ describe('providers', () => {
       throw new Error('Expected railgunWalletInfo.');
     }
     const wallet = walletForID(railgunWalletInfo.id);
-    expect(wallet.erc20Merkletrees[0][80001]).to.not.be.undefined;
-    expect(wallet.erc20Merkletrees[0][1]).to.be.undefined;
-    expect(wallet.erc20Merkletrees[0][3]).to.be.undefined;
+    expect(wallet.merkletrees[0][80001]).to.not.be.undefined;
+    expect(wallet.merkletrees[0][1]).to.be.undefined;
+    expect(wallet.merkletrees[0][3]).to.be.undefined;
   }).timeout(20000);
 
   it('Should fail with invalid json', async () => {

@@ -5,9 +5,10 @@ import {
   AdaptID,
   OutputType,
   TransactionStruct,
-  TokenType,
   ProverProgressCallback,
   averageNumber,
+  getTokenDataERC20,
+  getTokenDataHash,
 } from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
@@ -200,8 +201,6 @@ const erc20TransactionsFromTokenAmounts = async (
     assertValidRailgunAddress(relayerFeeTokenAmountRecipient.recipientAddress);
 
     const transactionBatchRelayerFee = new TransactionBatch(
-      relayerFeeTokenAmountRecipient.tokenAddress,
-      TokenType.ERC20,
       chain,
       BigInt(overallBatchMinGasPrice ?? 0),
     );
@@ -257,11 +256,8 @@ const erc20TransactionsFromTokenAmounts = async (
         return;
       }
 
-      const transactionBatch = new TransactionBatch(
-        tokenAmountRecipient.tokenAddress,
-        TokenType.ERC20,
-        chain,
-      );
+      const transactionBatch = new TransactionBatch(chain);
+
       if (relayAdaptID) {
         transactionBatch.setAdaptID(relayAdaptID);
       }
@@ -304,7 +300,7 @@ const setTransactionOutputs = (
 ) => {
   switch (proofType) {
     case ProofType.Transfer: {
-      setTransactionOutputsTransfer(
+      setTransactionOutputsTransferERC20(
         transactionBatch,
         tokenAmountRecipient,
         railgunWallet,
@@ -316,7 +312,7 @@ const setTransactionOutputs = (
     case ProofType.CrossContractCalls:
     case ProofType.UnshieldBaseToken:
     case ProofType.Unshield: {
-      setTransactionOutputsUnshield(
+      setTransactionOutputsUnshieldERC20(
         transactionBatch,
         tokenAmountRecipient,
         false, // allowOverride
@@ -328,7 +324,7 @@ const setTransactionOutputs = (
   }
 };
 
-const setTransactionOutputsTransfer = (
+const setTransactionOutputsTransferERC20 = (
   transactionBatch: TransactionBatch,
   tokenAmountRecipient: RailgunWalletTokenAmountRecipient,
   railgunWallet: RailgunWallet,
@@ -348,7 +344,7 @@ const setTransactionOutputsTransfer = (
   );
 };
 
-const setTransactionOutputsUnshield = (
+const setTransactionOutputsUnshieldERC20 = (
   transactionBatch: TransactionBatch,
   tokenAmountRecipient: RailgunWalletTokenAmountRecipient,
   allowOverride?: boolean,
@@ -359,13 +355,17 @@ const setTransactionOutputsUnshield = (
   assertNotBlockedAddress(recipientAddress);
 
   const withdrawAmount = BigNumber.from(amountString);
-  const value = withdrawAmount.toHexString();
 
-  transactionBatch.setUnshield(
-    tokenAmountRecipient.recipientAddress,
-    value,
+  const tokenData = getTokenDataERC20(tokenAmountRecipient.tokenAddress);
+  const tokenHash = getTokenDataHash(tokenData);
+
+  transactionBatch.addUnshieldData({
+    toAddress: tokenAmountRecipient.recipientAddress,
+    value: withdrawAmount.toBigInt(),
+    tokenData,
+    tokenHash,
     allowOverride,
-  );
+  });
 };
 
 const generateAllProofs = (

@@ -14,6 +14,7 @@ import {
   ShieldRequestStruct,
   randomHex,
   hexToBytes,
+  ShieldNoteERC20,
 } from '@railgun-community/engine';
 import { getProxyContractForNetwork } from '../railgun/core/providers';
 import {
@@ -29,7 +30,7 @@ export const getShieldPrivateKeySignatureMessage = () => {
   return ShieldNote.getShieldPrivateKeySignatureMessage();
 };
 
-const generateShieldTransaction = async (
+const generateShieldERC20Transaction = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
@@ -47,7 +48,7 @@ const generateShieldTransaction = async (
         const { masterPublicKey, viewingPublicKey } =
           RailgunEngine.decodeAddress(railgunAddress);
 
-        const shield = new ShieldNote(
+        const shield = new ShieldNoteERC20(
           masterPublicKey,
           random,
           BigInt(tokenAmountRecipient.amountString),
@@ -75,7 +76,7 @@ export const populateShield = async (
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const populatedTransaction = await generateShieldTransaction(
+    const populatedTransaction = await generateShieldERC20Transaction(
       networkName,
       shieldPrivateKey,
       tokenAmountRecipients,
@@ -112,7 +113,7 @@ export const gasEstimateForShield = async (
   try {
     assertNotBlockedAddress(fromWalletAddress);
 
-    const populatedTransaction = await generateShieldTransaction(
+    const populatedTransaction = await generateShieldERC20Transaction(
       networkName,
       shieldPrivateKey,
       tokenAmountRecipients,
