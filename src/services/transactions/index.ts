@@ -2,7 +2,7 @@ export * from './proof-cache';
 export * from './tx-cross-contract-calls';
 export * from './tx-shield-base-token';
 export * from './tx-shield-erc20';
-export * from './tx-erc20-notes';
+export * from './tx-notes';
 export * from './tx-gas-details';
 export * from './tx-gas-relayer-fee-estimator';
 export * from './tx-generator';

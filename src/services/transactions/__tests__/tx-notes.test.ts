@@ -27,8 +27,8 @@ import { fullWalletForID } from '../../railgun/core/engine';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import {
   compareTokenAmountRecipientArrays,
-  erc20NoteFromTokenAmount,
-} from '../tx-erc20-notes';
+  erc20NoteFromTokenAmountRecipient,
+} from '../tx-notes';
 
 const MOCK_TOKEN = '0x236c614a38362644deb15c9789779faf508bc6fe';
 
@@ -45,7 +45,7 @@ const formatAmountString = (tokenAmount: RailgunWalletTokenAmount) => {
 
 let railgunWalletID: string;
 
-describe('tx-erc20-notes', () => {
+describe('tx-notes', () => {
   before(async function run() {
     this.timeout(10000);
     initTestEngine();
@@ -68,7 +68,43 @@ describe('tx-erc20-notes', () => {
       recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
     };
     const railgunWallet = fullWalletForID(railgunWalletID);
-    const note = erc20NoteFromTokenAmount(
+    const note = erc20NoteFromTokenAmountRecipient(
+      tokenAmountRecipient,
+      railgunWallet,
+      OutputType.Transfer,
+      true, // showSenderAddressToRecipient
+      MOCK_MEMO,
+    );
+    const viewingPrivateKey = railgunWallet.getViewingKeyPair().privateKey;
+
+    const addressData = RailgunEngine.decodeAddress(
+      MOCK_RAILGUN_WALLET_ADDRESS,
+    );
+
+    expect(note.value).to.equal(formatAmountString(tokenAmountRecipient));
+    expect(note.receiverAddressData.masterPublicKey).to.equal(
+      addressData.masterPublicKey,
+    );
+    expect(note.tokenHash).to.equal(padTo32BytesUnHex(MOCK_TOKEN));
+
+    const decrypted = Memo.decryptNoteAnnotationData(
+      note.annotationData,
+      viewingPrivateKey,
+    );
+
+    expect(decrypted?.outputType).to.equal(OutputType.Transfer);
+    expect(decrypted?.senderRandom).to.be.a('string');
+    expect(decrypted?.walletSource).to.equal(TEST_WALLET_SOURCE);
+  });
+
+  it('Should test NFT note creation', () => {
+    const tokenAmountRecipient: RailgunWalletTokenAmountRecipient = {
+      tokenAddress: MOCK_TOKEN,
+      amountString: '0x100',
+      recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
+    };
+    const railgunWallet = fullWalletForID(railgunWalletID);
+    const note = erc20NoteFromTokenAmountRecipient(
       tokenAmountRecipient,
       railgunWallet,
       OutputType.Transfer,

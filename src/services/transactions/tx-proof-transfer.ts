@@ -4,6 +4,7 @@ import {
   ProofType,
   sanitizeError,
   RailgunWalletTokenAmountRecipient,
+  RailgunNFTRecipient,
 } from '@railgun-community/shared-models';
 import { generateProofTransactions, generateTransact } from './tx-generator';
 import { sendErrorMessage } from '../../utils/logger';
@@ -17,6 +18,7 @@ export const generateTransferProof = async (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  nftRecipients: RailgunNFTRecipient[],
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
@@ -33,6 +35,7 @@ export const generateTransferProof = async (
       showSenderAddressToRecipient,
       memoText,
       tokenAmountRecipients,
+      nftRecipients,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       undefined, // relayAdaptID
@@ -48,6 +51,7 @@ export const generateTransferProof = async (
       showSenderAddressToRecipient,
       memoText,
       tokenAmountRecipients,
+      nftRecipients,
       relayAdaptUnshieldTokenAmounts: undefined,
       relayAdaptShieldTokenAddresses: undefined,
       crossContractCallsSerialized: undefined,

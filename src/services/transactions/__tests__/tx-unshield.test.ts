@@ -208,6 +208,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      [], // nftRecipients
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -262,6 +263,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
+      [], // nftRecipients
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -276,6 +278,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      [], // nftRecipients
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -393,6 +396,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      [], // nftRecipients
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -424,6 +428,7 @@ describe('tx-unshield', () => {
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      [], // nftRecipients
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -457,6 +462,7 @@ describe('tx-unshield', () => {
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
+      [], // nftRecipients
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -474,6 +480,7 @@ describe('tx-unshield', () => {
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      [], // nftRecipients
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -491,6 +498,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      [], // nftRecipients
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -501,6 +509,7 @@ describe('tx-unshield', () => {
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
+      [], // nftRecipients
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,

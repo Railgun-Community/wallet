@@ -7,13 +7,15 @@ import {
   RailgunEngine,
   getTokenDataERC20,
   getTokenDataHash,
+  getTokenDataNFT,
 } from '@railgun-community/engine';
 import {
+  RailgunNFTRecipient,
   RailgunWalletTokenAmount,
   RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
 
-export const erc20NoteFromTokenAmount = (
+export const erc20NoteFromTokenAmountRecipient = (
   tokenAmountRecipient: RailgunWalletTokenAmountRecipient,
   railgunWallet: RailgunWallet,
   outputType: OutputType,
@@ -39,6 +41,36 @@ export const erc20NoteFromTokenAmount = (
     railgunWallet.getViewingKeyPair(),
     showSenderAddressToRecipient,
     outputType,
+    memoText,
+  );
+};
+
+export const nftNoteFromNFTRecipient = (
+  nftRecipient: RailgunNFTRecipient,
+  railgunWallet: RailgunWallet,
+  showSenderAddressToRecipient: boolean,
+  memoText: Optional<string>,
+): TransactNote => {
+  const { recipientAddress, nftAddress, nftTokenType, tokenSubID } =
+    nftRecipient;
+
+  const random = randomHex(16);
+
+  const receiverAddressData = RailgunEngine.decodeAddress(recipientAddress);
+
+  const tokenData = getTokenDataNFT(
+    nftAddress,
+    nftTokenType as 1 | 2,
+    tokenSubID,
+  );
+
+  return TransactNote.createNFTTransfer(
+    receiverAddressData,
+    railgunWallet.addressKeys,
+    random,
+    tokenData,
+    railgunWallet.getViewingKeyPair(),
+    showSenderAddressToRecipient,
     memoText,
   );
 };
@@ -108,6 +140,38 @@ export const compareTokenAmountRecipientArrays = (
       return false;
     }
     if (found.recipientAddress !== tokenAmount.recipientAddress) {
+      return false;
+    }
+  }
+  return true;
+};
+
+export const compareNFTRecipientArrays = (
+  a: Optional<RailgunNFTRecipient[]>,
+  b: Optional<RailgunNFTRecipient[]>,
+) => {
+  if (!a && !b) {
+    return true;
+  }
+  if (!a || !b) {
+    return false;
+  }
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (const nftRecipient of a) {
+    const found = b.find(
+      ta =>
+        ta.nftAddress === nftRecipient.nftAddress &&
+        ta.tokenSubID === nftRecipient.tokenSubID,
+    );
+    if (!found) {
+      return false;
+    }
+    if (found.nftTokenType !== nftRecipient.nftTokenType) {
+      return false;
+    }
+    if (found.recipientAddress !== nftRecipient.recipientAddress) {
       return false;
     }
   }

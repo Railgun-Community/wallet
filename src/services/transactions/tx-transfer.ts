@@ -9,6 +9,7 @@ import {
   sanitizeError,
   serializeUnsignedTransaction,
   RailgunWalletTokenAmountRecipient,
+  RailgunNFTRecipient,
 } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
@@ -26,6 +27,7 @@ export const populateProvedTransfer = async (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  nftRecipients: RailgunNFTRecipient[],
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
@@ -39,6 +41,7 @@ export const populateProvedTransfer = async (
       showSenderAddressToRecipient,
       memoText,
       tokenAmountRecipients,
+      nftRecipients,
       undefined, // relayAdaptUnshieldTokenAmountRecipients
       undefined, // relayAdaptShieldTokenAddresses
       undefined, // crossContractCallsSerialized
@@ -66,6 +69,7 @@ export const gasEstimateForUnprovenTransfer = async (
   encryptionKey: string,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  nftRecipients: RailgunNFTRecipient[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
@@ -83,6 +87,7 @@ export const gasEstimateForUnprovenTransfer = async (
           false, // showSenderAddressToRecipient - doesn't matter for gas estimate.
           memoText,
           tokenAmountRecipients,
+          nftRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,

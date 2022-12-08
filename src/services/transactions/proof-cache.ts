@@ -2,6 +2,7 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   NetworkName,
   ProofType,
+  RailgunNFTRecipient,
   RailgunWalletTokenAmount,
   RailgunWalletTokenAmountRecipient,
   TransactionGasDetailsSerialized,
@@ -14,7 +15,8 @@ import {
   compareTokenAmountRecipients,
   compareTokenAmountRecipientArrays,
   compareTokenAmountArrays,
-} from './tx-erc20-notes';
+  compareNFTRecipientArrays,
+} from './tx-notes';
 
 export type ProvedTransaction = {
   proofType: ProofType;
@@ -23,6 +25,7 @@ export type ProvedTransaction = {
   showSenderAddressToRecipient: boolean;
   memoText: Optional<string>;
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[];
+  nftRecipients: RailgunNFTRecipient[];
   relayAdaptUnshieldTokenAmounts: Optional<RailgunWalletTokenAmount[]>;
   relayAdaptShieldTokenAddresses: Optional<string[]>;
   crossContractCallsSerialized: Optional<string[]>;
@@ -40,6 +43,7 @@ export const populateProvedTransaction = async (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  nftRecipients: RailgunNFTRecipient[],
   relayAdaptUnshieldTokenAmounts: Optional<RailgunWalletTokenAmount[]>,
   relayAdaptShieldTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
@@ -54,6 +58,7 @@ export const populateProvedTransaction = async (
     showSenderAddressToRecipient,
     memoText,
     tokenAmountRecipients,
+    nftRecipients,
     relayAdaptUnshieldTokenAmounts,
     relayAdaptShieldTokenAddresses,
     crossContractCallsSerialized,
@@ -107,6 +112,7 @@ export const validateCachedProvedTransaction = (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  nftRecipients: RailgunNFTRecipient[],
   relayAdaptUnshieldTokenAmounts: Optional<RailgunWalletTokenAmount[]>,
   relayAdaptShieldTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
@@ -140,6 +146,13 @@ export const validateCachedProvedTransaction = (
     )
   ) {
     error = 'Mismatch: tokenAmountRecipients.';
+  } else if (
+    !compareNFTRecipientArrays(
+      nftRecipients,
+      cachedProvedTransaction.nftRecipients,
+    )
+  ) {
+    error = 'Mismatch: nftRecipients.';
   } else if (
     !compareTokenAmountArrays(
       relayAdaptUnshieldTokenAmounts,
