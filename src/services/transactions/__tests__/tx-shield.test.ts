@@ -18,6 +18,7 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_MNEMONIC,
+  MOCK_NFT_RECIPIENTS,
   MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_ADDRESS,
   MOCK_TOKEN_ADDRESS_2,
@@ -26,7 +27,7 @@ import {
   populateShield,
   gasEstimateForShield,
   getShieldPrivateKeySignatureMessage,
-} from '../tx-shield-erc20';
+} from '../tx-shield';
 import { decimalToHexString } from '../../../utils/format';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { getRandomBytes } from '../../railgun';
@@ -87,7 +88,7 @@ const stubFailure = () => {
   ).rejects(new Error('test rejection - gas estimate'));
 };
 
-describe('tx-shield-erc20', () => {
+describe('tx-shield', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
@@ -115,6 +116,7 @@ describe('tx-shield-erc20', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      MOCK_NFT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.be.undefined;
@@ -127,6 +129,7 @@ describe('tx-shield-erc20', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
+      MOCK_NFT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.equal('Invalid RAILGUN address.');
@@ -138,6 +141,7 @@ describe('tx-shield-erc20', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      MOCK_NFT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.equal('test rejection - gas estimate');
@@ -149,6 +153,7 @@ describe('tx-shield-erc20', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      MOCK_NFT_RECIPIENTS,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.be.undefined;
@@ -168,6 +173,7 @@ describe('tx-shield-erc20', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
+      MOCK_NFT_RECIPIENTS,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.equal('Invalid RAILGUN address.');

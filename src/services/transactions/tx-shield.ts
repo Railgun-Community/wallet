@@ -7,6 +7,7 @@ import {
   sanitizeError,
   serializeUnsignedTransaction,
   RailgunWalletTokenAmountRecipient,
+  RailgunNFTRecipient,
 } from '@railgun-community/shared-models';
 import {
   ShieldNote,
@@ -15,6 +16,7 @@ import {
   randomHex,
   hexToBytes,
   ShieldNoteERC20,
+  ShieldNoteNFT,
 } from '@railgun-community/engine';
 import { getProxyContractForNetwork } from '../railgun/core/providers';
 import {
@@ -30,33 +32,67 @@ export const getShieldPrivateKeySignatureMessage = () => {
   return ShieldNote.getShieldPrivateKeySignatureMessage();
 };
 
-const generateShieldERC20Transaction = async (
+const generateERC20Shield = async (
+  tokenAmountRecipient: RailgunWalletTokenAmountRecipient,
+  random: string,
+  shieldPrivateKey: string,
+) => {
+  const railgunAddress = tokenAmountRecipient.recipientAddress;
+
+  assertValidRailgunAddress(railgunAddress);
+
+  const { masterPublicKey, viewingPublicKey } =
+    RailgunEngine.decodeAddress(railgunAddress);
+
+  const shield = new ShieldNoteERC20(
+    masterPublicKey,
+    random,
+    BigInt(tokenAmountRecipient.amountString),
+    tokenAmountRecipient.tokenAddress,
+  );
+  return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
+};
+
+const generateNFTShield = async (
+  nftRecipient: RailgunNFTRecipient,
+  random: string,
+  shieldPrivateKey: string,
+) => {
+  const railgunAddress = nftRecipient.recipientAddress;
+
+  assertValidRailgunAddress(railgunAddress);
+
+  const { masterPublicKey, viewingPublicKey } =
+    RailgunEngine.decodeAddress(railgunAddress);
+
+  const shield = new ShieldNoteNFT(
+    masterPublicKey,
+    random,
+    nftRecipient.nftAddress,
+    nftRecipient.nftTokenType as 1 | 2,
+    nftRecipient.tokenSubID,
+  );
+  return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
+};
+
+const generateShieldTransactions = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  nftRecipients: RailgunNFTRecipient[],
 ): Promise<PopulatedTransaction> => {
   try {
     const railContract = getProxyContractForNetwork(networkName);
     const random = randomHex(16);
 
-    const shieldInputs: ShieldRequestStruct[] = await Promise.all(
-      tokenAmountRecipients.map(tokenAmountRecipient => {
-        const railgunAddress = tokenAmountRecipient.recipientAddress;
-
-        assertValidRailgunAddress(railgunAddress);
-
-        const { masterPublicKey, viewingPublicKey } =
-          RailgunEngine.decodeAddress(railgunAddress);
-
-        const shield = new ShieldNoteERC20(
-          masterPublicKey,
-          random,
-          BigInt(tokenAmountRecipient.amountString),
-          tokenAmountRecipient.tokenAddress,
-        );
-        return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
-      }),
-    );
+    const shieldInputs: ShieldRequestStruct[] = await Promise.all([
+      ...tokenAmountRecipients.map(tokenAmountRecipient =>
+        generateERC20Shield(tokenAmountRecipient, random, shieldPrivateKey),
+      ),
+      ...nftRecipients.map(nftRecipient =>
+        generateNFTShield(nftRecipient, random, shieldPrivateKey),
+      ),
+    ]);
 
     const populatedTransaction = await railContract.generateShield(
       shieldInputs,
@@ -73,13 +109,15 @@ export const populateShield = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  nftRecipients: RailgunNFTRecipient[],
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const populatedTransaction = await generateShieldERC20Transaction(
+    const populatedTransaction = await generateShieldTransactions(
       networkName,
       shieldPrivateKey,
       tokenAmountRecipients,
+      nftRecipients,
     );
 
     const sendWithPublicWallet = true;
@@ -108,15 +146,17 @@ export const gasEstimateForShield = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  nftRecipients: RailgunNFTRecipient[],
   fromWalletAddress: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     assertNotBlockedAddress(fromWalletAddress);
 
-    const populatedTransaction = await generateShieldERC20Transaction(
+    const populatedTransaction = await generateShieldTransactions(
       networkName,
       shieldPrivateKey,
       tokenAmountRecipients,
+      nftRecipients,
     );
 
     const sendWithPublicWallet = true;
