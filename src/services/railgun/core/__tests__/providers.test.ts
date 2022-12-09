@@ -11,11 +11,11 @@ import {
 import { initTestEngine } from '../../../../test/setup.test';
 import { walletForID } from '../engine';
 import {
-  getProxyContractForNetwork,
   getMerkleTreeForNetwork,
   getProviderForNetwork,
   loadProvider,
   getRelayAdaptContractForNetwork,
+  getRailgunSmartWalletContractForNetwork,
 } from '../providers';
 import { createRailgunWallet } from '../../wallets/wallets';
 
@@ -54,10 +54,12 @@ describe('providers', () => {
       getMerkleTreeForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
     ).to.throw;
 
-    expect(getProxyContractForNetwork(NetworkName.PolygonMumbai)).to.not.be
-      .undefined;
+    expect(getRailgunSmartWalletContractForNetwork(NetworkName.PolygonMumbai))
+      .to.not.be.undefined;
     expect(() =>
-      getProxyContractForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
+      getRailgunSmartWalletContractForNetwork(
+        NetworkName.EthereumRopsten_DEPRECATED,
+      ),
     ).to.throw;
 
     expect(getRelayAdaptContractForNetwork(NetworkName.PolygonMumbai)).to.not.be

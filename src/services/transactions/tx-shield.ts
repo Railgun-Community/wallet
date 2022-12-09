@@ -18,7 +18,6 @@ import {
   ShieldNoteERC20,
   ShieldNoteNFT,
 } from '@railgun-community/engine';
-import { getProxyContractForNetwork } from '../railgun/core/providers';
 import {
   gasEstimateResponse,
   getGasEstimate,
@@ -26,7 +25,10 @@ import {
 } from './tx-gas-details';
 import { sendErrorMessage } from '../../utils/logger';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { assertValidRailgunAddress } from '../railgun';
+import {
+  assertValidRailgunAddress,
+  getRailgunSmartWalletContractForNetwork,
+} from '../railgun';
 
 export const getShieldPrivateKeySignatureMessage = () => {
   return ShieldNote.getShieldPrivateKeySignatureMessage();
@@ -82,7 +84,8 @@ const generateShieldTransactions = async (
   nftRecipients: RailgunNFTRecipient[],
 ): Promise<PopulatedTransaction> => {
   try {
-    const railContract = getProxyContractForNetwork(networkName);
+    const railgunSmartWalletContract =
+      getRailgunSmartWalletContractForNetwork(networkName);
     const random = randomHex(16);
 
     const shieldInputs: ShieldRequestStruct[] = await Promise.all([
@@ -94,9 +97,8 @@ const generateShieldTransactions = async (
       ),
     ]);
 
-    const populatedTransaction = await railContract.generateShield(
-      shieldInputs,
-    );
+    const populatedTransaction =
+      await railgunSmartWalletContract.generateShield(shieldInputs);
     return populatedTransaction;
   } catch (err) {
     sendErrorMessage(err.message);

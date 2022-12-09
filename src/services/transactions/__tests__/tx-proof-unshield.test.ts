@@ -10,6 +10,7 @@ import {
   OutputType,
   TransactNote,
   RailgunEngine,
+  getTokenDataERC20,
 } from '@railgun-community/engine';
 import {
   NetworkName,
@@ -93,11 +94,7 @@ describe.skip('tx-proof-unshield', () => {
     };
 
     const mockShieldAmount = BigInt('12500000000');
-    const tokenAddress = formatToByteLength(
-      MOCK_TOKEN_ADDRESS,
-      ByteLength.UINT_256,
-      false,
-    );
+    const tokenData = getTokenDataERC20(MOCK_TOKEN_ADDRESS);
     const random = nToHex(
       BigInt('147663908922529969478643753345904959450'),
       ByteLength.UINT_128,
@@ -108,7 +105,7 @@ describe.skip('tx-proof-unshield', () => {
       railgunWallet.addressKeys,
       random,
       mockShieldAmount,
-      MOCK_TOKEN_ADDRESS,
+      tokenData,
       railgunWallet.getViewingKeyPair(),
       true, // showSenderAddressToRecipient
       OutputType.Transfer,

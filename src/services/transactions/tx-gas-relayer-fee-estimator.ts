@@ -21,7 +21,7 @@ import {
   deserializeTransactionGasDetails,
   gasEstimateResponse,
 } from './tx-gas-details';
-import { balanceForToken } from '../railgun/wallets/balance-update';
+import { balanceForERC20Token } from '../railgun/wallets/balance-update';
 import { walletForID } from '../railgun';
 
 const MAX_ITERATIONS_RELAYER_FEE_REESTIMATION = 5;
@@ -130,7 +130,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
 
   // Get private balance of matching token.
   const matchingSendingTokenBalance: Optional<BigNumber> =
-    await balanceForToken(
+    await balanceForERC20Token(
       wallet,
       NETWORK_CONFIG[networkName].chain,
       feeTokenDetails.tokenAddress,

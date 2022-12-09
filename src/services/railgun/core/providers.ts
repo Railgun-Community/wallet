@@ -12,7 +12,7 @@ import { sendMessage, sendErrorMessage } from '../../../utils/logger';
 import { getEngine } from './engine';
 import {
   Chain,
-  RailgunProxyContract,
+  RailgunSmartWalletContract,
   RelayAdaptContract,
 } from '@railgun-community/engine';
 
@@ -46,18 +46,19 @@ export const getMerkleTreeForNetwork = (networkName: NetworkName) => {
   return merkleTree;
 };
 
-export const getProxyContractForNetwork = (
+export const getRailgunSmartWalletContractForNetwork = (
   networkName: NetworkName,
-): RailgunProxyContract => {
+): RailgunSmartWalletContract => {
   const network = NETWORK_CONFIG[networkName];
   const { chain } = network;
-  const proxyContract = getEngine().proxyContracts[chain.type][chain.id];
-  if (!proxyContract) {
+  const railgunSmartWalletContract =
+    getEngine().railgunSmartWalletContracts[chain.type][chain.id];
+  if (!railgunSmartWalletContract) {
     throw new Error(
       `Proxy contract not yet loaded for network ${network.publicName}`,
     );
   }
-  return proxyContract;
+  return railgunSmartWalletContract;
 };
 
 export const getRelayAdaptContractForNetwork = (
@@ -136,10 +137,11 @@ export const loadProvider = async (
       );
     }
 
-    const contract = getProxyContractForNetwork(networkName);
+    const railgunSmartWalletContract =
+      getRailgunSmartWalletContractForNetwork(networkName);
 
     // Returned as Hex strings.
-    const { shield, unshield, nft } = await contract.fees();
+    const { shield, unshield, nft } = await railgunSmartWalletContract.fees();
 
     // Note: Shield and Unshield fees are in basis points.
     //  NFT fee is in wei.

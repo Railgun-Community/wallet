@@ -68,6 +68,12 @@ export const MOCK_NFT_RECIPIENTS: RailgunNFTRecipient[] = [
   },
 ];
 
+export const MOCK_NFT_RECIPIENTS_UNSHIELD: RailgunNFTRecipient[] =
+  MOCK_NFT_RECIPIENTS.map(nftRecipient => ({
+    ...nftRecipient,
+    recipientAddress: MOCK_ETH_WALLET_ADDRESS,
+  }));
+
 export const MOCK_TOKEN_FEE: RailgunWalletTokenAmount = {
   tokenAddress: MOCK_TOKEN_ADDRESS,
   amountString: '0x0300',

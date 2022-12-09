@@ -1,6 +1,14 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { RailgunWallet , ByteLength, nToHex , Balances , Chain, ChainType } from '@railgun-community/engine';
+import {
+  RailgunWallet,
+  ByteLength,
+  nToHex,
+  Balances,
+  Chain,
+  ChainType,
+  getTokenDataERC20,
+} from '@railgun-community/engine';
 import Sinon, { SinonStub } from 'sinon';
 import { RailgunBalancesEvent } from '@railgun-community/shared-models';
 import {
@@ -37,10 +45,12 @@ describe('balance-update', () => {
     }
     wallet = fullWalletForID(railgunWalletInfo.id);
     const tokenAddress = MOCK_TOKEN_ADDRESS.replace('0x', '');
+    const tokenData = getTokenDataERC20(tokenAddress);
     const balances: Balances = {
       [tokenAddress]: {
         balance: BigInt(10),
         utxos: [],
+        tokenData,
       },
     };
     walletBalanceStub = Sinon.stub(
@@ -72,9 +82,9 @@ describe('balance-update', () => {
     await expect(onBalancesUpdate(wallet, chain)).to.be.fulfilled;
     expect(walletBalanceStub.calledOnce).to.be.true;
     expect(formattedBalances.chain).to.deep.equal(chain);
-    expect(formattedBalances.tokenBalancesSerialized.length).to.equal(1);
-    expect(formattedBalances.tokenBalancesSerialized[0]).to.deep.equal({
-      tokenAddress: MOCK_TOKEN_ADDRESS,
+    expect(formattedBalances.tokenBalances.length).to.equal(1);
+    expect(formattedBalances.tokenBalances[0]).to.deep.equal({
+      tokenAddress: '0x0000000000000000000000000000000000012536',
       balanceString: nToHex(BigInt(10), ByteLength.UINT_256, true),
     });
   });

@@ -6,7 +6,6 @@ import {
   RailgunWallet,
   RailgunEngine,
   getTokenDataERC20,
-  getTokenDataHash,
   getTokenDataNFT,
 } from '@railgun-community/engine';
 import {
@@ -30,14 +29,13 @@ export const erc20NoteFromTokenAmountRecipient = (
   );
 
   const tokenData = getTokenDataERC20(tokenAmountRecipient.tokenAddress);
-  const tokenHash = getTokenDataHash(tokenData);
 
   return TransactNote.createTransfer(
     receiverAddressData,
     railgunWallet.addressKeys,
     random,
     value,
-    tokenHash,
+    tokenData,
     railgunWallet.getViewingKeyPair(),
     showSenderAddressToRecipient,
     outputType,

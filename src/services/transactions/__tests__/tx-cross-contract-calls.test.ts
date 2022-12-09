@@ -8,7 +8,6 @@ import {
   TransactionBatch,
   RelayAdaptContract,
   getTokenDataERC20,
-  getTokenDataHash,
 } from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
@@ -67,9 +66,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const mockTokenData0 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[0].tokenAddress);
-const mockTokenHash0 = getTokenDataHash(mockTokenData0);
 const mockTokenData1 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[1].tokenAddress);
-const mockTokenHash1 = getTokenDataHash(mockTokenData1);
 
 const mockCrossContractCalls: PopulatedTransaction[] = [
   {
@@ -210,7 +207,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData0,
-          tokenHash: mockTokenHash0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -219,7 +215,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData1,
-          tokenHash: mockTokenHash1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
@@ -228,7 +223,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData0,
-          tokenHash: mockTokenHash0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -237,7 +231,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData1,
-          tokenHash: mockTokenHash1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
@@ -268,7 +261,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData0,
-          tokenHash: mockTokenHash0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -277,7 +269,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData1,
-          tokenHash: mockTokenHash1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
@@ -343,7 +334,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData0,
-          tokenHash: mockTokenHash0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -352,7 +342,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData1,
-          tokenHash: mockTokenHash1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
@@ -361,7 +350,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData0,
-          tokenHash: mockTokenHash0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -370,7 +358,6 @@ describe('tx-cross-contract-calls', () => {
         {
           toAddress: polygonRelayAdaptContract,
           tokenData: mockTokenData1,
-          tokenHash: mockTokenHash1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },

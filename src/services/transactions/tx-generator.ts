@@ -7,7 +7,6 @@ import {
   TransactionStruct,
   ProverProgressCallback,
   getTokenDataERC20,
-  getTokenDataHash,
   TokenData,
   getTokenDataNFT,
   NFT_NOTE_VALUE,
@@ -22,7 +21,7 @@ import {
 } from '@railgun-community/shared-models';
 import { fullWalletForID, walletForID } from '../railgun/core/engine';
 import {
-  getProxyContractForNetwork,
+  getRailgunSmartWalletContractForNetwork,
   getRelayAdaptContractForNetwork,
 } from '../railgun/core/providers';
 import {
@@ -135,8 +134,9 @@ export const generateTransact = async (
   networkName: NetworkName,
   useDummyProof = false,
 ): Promise<PopulatedTransaction> => {
-  const railContract = getProxyContractForNetwork(networkName);
-  const populatedTransaction = await railContract.transact(txs);
+  const railgunSmartWalletContract =
+    getRailgunSmartWalletContractForNetwork(networkName);
+  const populatedTransaction = await railgunSmartWalletContract.transact(txs);
   if (useDummyProof) {
     return {
       ...populatedTransaction,
@@ -346,13 +346,11 @@ const addTransactionOutputsUnshieldERC20 = (
   const unshieldAmount = BigNumber.from(amountString);
 
   const tokenData = getTokenDataERC20(tokenAmountRecipient.tokenAddress);
-  const tokenHash = getTokenDataHash(tokenData);
 
   transactionBatch.addUnshieldData({
     toAddress: tokenAmountRecipient.recipientAddress,
     value: unshieldAmount.toBigInt(),
     tokenData,
-    tokenHash,
     allowOverride,
   });
 };
@@ -392,13 +390,11 @@ const addTransactionOutputsUnshieldNFT = (
     nftTokenType as 1 | 2,
     tokenSubID,
   );
-  const tokenHash = getTokenDataHash(tokenData);
 
   transactionBatch.addUnshieldData({
     toAddress: recipientAddress,
     value: NFT_NOTE_VALUE,
     tokenData,
-    tokenHash,
     allowOverride,
   });
 };

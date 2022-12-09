@@ -1,7 +1,11 @@
-import { trim, randomHex } from '@railgun-community/engine';
+import {
+  randomHex,
+  formatToByteLength,
+  ByteLength,
+} from '@railgun-community/engine';
 
 export const parseRailgunBalanceAddress = (tokenAddress: string): string => {
-  return `0x${trim(tokenAddress, 20)}`;
+  return formatToByteLength(tokenAddress, ByteLength.Address, true);
 };
 
 export const getRandomBytes = (length: number): string => {

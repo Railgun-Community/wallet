@@ -7,7 +7,9 @@ const { expect } = chai;
 
 describe('bytes-util', () => {
   it('Should parse rail balance addresses', () => {
-    expect(parseRailgunBalanceAddress('00')).to.equal('0x00');
+    expect(parseRailgunBalanceAddress('00')).to.equal(
+      '0x0000000000000000000000000000000000000000',
+    );
     expect(
       parseRailgunBalanceAddress('123456789012345678901234567890'),
     ).to.equal('0x1234567890');

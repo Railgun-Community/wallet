@@ -6,7 +6,7 @@ import {
   RailgunWallet,
   TransactionStruct,
   TransactionBatch,
-  RailgunProxyContract,
+  RailgunSmartWalletContract,
   RelayAdaptContract,
 } from '@railgun-community/engine';
 import {
@@ -178,7 +178,7 @@ describe('tx-transfer', () => {
       },
     ] as unknown as TransactionStruct[]);
     railTransactStub = Sinon.stub(
-      RailgunProxyContract.prototype,
+      RailgunSmartWalletContract.prototype,
       'transact',
     ).resolves({ data: '0x0123' } as PopulatedTransaction);
     relayAdaptPopulateUnshieldBaseToken = Sinon.stub(
