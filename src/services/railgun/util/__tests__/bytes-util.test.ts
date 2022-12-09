@@ -12,7 +12,7 @@ describe('bytes-util', () => {
     );
     expect(
       parseRailgunBalanceAddress('123456789012345678901234567890'),
-    ).to.equal('0x1234567890');
+    ).to.equal('0x0000000000123456789012345678901234567890');
   });
 
   it('Should return random bytes of length', () => {
