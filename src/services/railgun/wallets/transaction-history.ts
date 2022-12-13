@@ -5,6 +5,8 @@ import {
   Chain,
   TransactionHistoryReceiveTokenAmount,
   TokenType,
+  formatToByteLength,
+  ByteLength,
 } from '@railgun-community/engine';
 import {
   LoadRailgunWalletResponse,
@@ -114,7 +116,7 @@ const serializeTransactionHistory = (
   transactionHistory: TransactionHistoryEntry[],
 ): TransactionHistoryItem[] => {
   return transactionHistory.map(historyItem => ({
-    txid: historyItem.txid,
+    txid: formatToByteLength(historyItem.txid, ByteLength.UINT_256, true),
     transferTokenAmounts: historyItem.transferTokenAmounts
       .filter(filterERC20)
       .map(transactionHistoryTransferTokenAmountToRailgunTokenAmount),
