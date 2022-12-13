@@ -114,7 +114,7 @@ const serializeTransactionHistory = (
   transactionHistory: TransactionHistoryEntry[],
 ): TransactionHistoryItem[] => {
   return transactionHistory.map(historyItem => ({
-    txid: `0x${historyItem.txid}`,
+    txid: historyItem.txid,
     transferTokenAmounts: historyItem.transferTokenAmounts
       .filter(filterERC20)
       .map(transactionHistoryTransferTokenAmountToRailgunTokenAmount),

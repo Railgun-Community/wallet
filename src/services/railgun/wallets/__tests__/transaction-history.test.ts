@@ -41,6 +41,12 @@ describe('transaction-history', () => {
 
   it('Should get wallet transaction history', async () => {
     const resp = await getWalletTransactionHistory(POLYGON_CHAIN, wallet.id);
-    expect(resp.items?.length).to.be.greaterThanOrEqual(6);
+    if (resp.items == null) {
+      throw new Error('items is null');
+    }
+    expect(resp.items.length).to.be.greaterThanOrEqual(6);
+    resp.items.forEach(item => {
+      expect(item.txid.length === 66); // '0x' + 32 bytes
+    });
   });
 });
