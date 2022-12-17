@@ -59,7 +59,7 @@ let erc20NoteSpy: SinonSpy;
 let nftNoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient;
+let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -84,8 +84,8 @@ const gasDetailsSerialized: TransactionGasDetailsSerialized = {
 };
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunERC20AmountRecipient[] =
-  MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
-    ...tokenAmount,
+  MOCK_TOKEN_AMOUNTS.map(erc20Amount => ({
+    ...erc20Amount,
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
   }));
 
@@ -96,14 +96,14 @@ const MOCK_NFT_AMOUNT_RECIPIENTS_INVALID: RailgunNFTAmountRecipient[] =
   }));
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunERC20AmountRecipient[] =
-  MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
-    ...tokenAmount,
+  MOCK_TOKEN_AMOUNTS.map(erc20Amount => ({
+    ...erc20Amount,
     recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
   }));
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT: RailgunERC20AmountRecipient[] =
-  MOCK_TOKEN_AMOUNTS_DIFFERENT.map(tokenAmount => ({
-    ...tokenAmount,
+  MOCK_TOKEN_AMOUNTS_DIFFERENT.map(erc20Amount => ({
+    ...erc20Amount,
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
   }));
 
@@ -122,7 +122,7 @@ const stubGasEstimateFailure = () => {
 };
 
 const spyOnERC20Note = () => {
-  erc20NoteSpy = Sinon.spy(txNotes, 'erc20NoteFromTokenAmountRecipient');
+  erc20NoteSpy = Sinon.spy(txNotes, 'erc20NoteFromERC20AmountRecipient');
 };
 
 const spyOnNFTNote = () => {
@@ -154,7 +154,7 @@ describe('tx-transfer', () => {
 
     const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
 
-    relayerFeeTokenAmountRecipient = {
+    relayerFeeERC20AmountRecipient = {
       ...MOCK_TOKEN_FEE,
       recipientAddress: relayerRailgunAddress,
     };
@@ -291,7 +291,7 @@ describe('tx-transfer', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
-      [], // tokenAmountRecipients
+      [], // erc20AmountRecipients
       MOCK_NFT_AMOUNT_RECIPIENTS, // nftAmountRecipients
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
@@ -315,7 +315,7 @@ describe('tx-transfer', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
-      [], // tokenAmountRecipients
+      [], // erc20AmountRecipients
       MOCK_NFT_AMOUNT_RECIPIENTS,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
@@ -336,7 +336,7 @@ describe('tx-transfer', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
-      [], // tokenAmountRecipients
+      [], // erc20AmountRecipients
       MOCK_NFT_AMOUNT_RECIPIENTS_INVALID,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
@@ -360,7 +360,7 @@ describe('tx-transfer', () => {
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -381,7 +381,7 @@ describe('tx-transfer', () => {
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
@@ -417,7 +417,7 @@ describe('tx-transfer', () => {
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
@@ -437,7 +437,7 @@ describe('tx-transfer', () => {
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -450,13 +450,13 @@ describe('tx-transfer', () => {
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. Mismatch: tokenAmountRecipients.',
+      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });
 });

@@ -63,7 +63,7 @@ let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient;
+let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
 
 const polygonRelayAdaptContract =
   NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
@@ -104,20 +104,20 @@ const gasDetailsSerialized: TransactionGasDetailsSerialized = {
 };
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunERC20AmountRecipient[] =
-  MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
-    ...tokenAmount,
+  MOCK_TOKEN_AMOUNTS.map(erc20Amount => ({
+    ...erc20Amount,
     recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
   }));
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunERC20AmountRecipient[] =
-  MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
-    ...tokenAmount,
+  MOCK_TOKEN_AMOUNTS.map(erc20Amount => ({
+    ...erc20Amount,
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
   }));
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT: RailgunERC20AmountRecipient[] =
-  MOCK_TOKEN_AMOUNTS_DIFFERENT.map(tokenAmount => ({
-    ...tokenAmount,
+  MOCK_TOKEN_AMOUNTS_DIFFERENT.map(erc20Amount => ({
+    ...erc20Amount,
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
   }));
 
@@ -163,7 +163,7 @@ describe('tx-unshield', () => {
     }
     const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
 
-    relayerFeeTokenAmountRecipient = {
+    relayerFeeERC20AmountRecipient = {
       ...MOCK_TOKEN_FEE,
       recipientAddress: relayerRailgunAddress,
     };
@@ -399,7 +399,7 @@ describe('tx-unshield', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -445,7 +445,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
@@ -479,13 +479,13 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
       MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. Mismatch: tokenAmountRecipients.',
+      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });
 
@@ -497,7 +497,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       [], // nftAmountRecipients
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
@@ -515,7 +515,7 @@ describe('tx-unshield', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       [], // nftAmountRecipients
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -526,13 +526,13 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
       [], // nftAmountRecipients
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. Mismatch: tokenAmountRecipients.',
+      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });
 
@@ -548,7 +548,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS[0],
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -578,7 +578,7 @@ describe('tx-unshield', () => {
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS[0],
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
@@ -612,13 +612,13 @@ describe('tx-unshield', () => {
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS_DIFFERENT[0],
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. Mismatch: tokenAmountRecipients.',
+      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });
 
@@ -630,7 +630,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_ETH_WALLET_ADDRESS,
       MOCK_TOKEN_AMOUNTS[0],
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
@@ -648,7 +648,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS[0],
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -659,13 +659,13 @@ describe('tx-unshield', () => {
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS_DIFFERENT[0],
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. Mismatch: tokenAmountRecipients.',
+      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });
 });

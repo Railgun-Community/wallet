@@ -26,9 +26,9 @@ export const populateProvedTransfer = async (
   railgunWalletID: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
@@ -40,12 +40,12 @@ export const populateProvedTransfer = async (
       railgunWalletID,
       showSenderAddressToRecipient,
       memoText,
-      tokenAmountRecipients,
+      erc20AmountRecipients,
       nftAmountRecipients,
-      undefined, // relayAdaptUnshieldTokenAmountRecipients
-      undefined, // relayAdaptShieldTokenAddresses
+      undefined, // relayAdaptUnshieldERC20AmountRecipients
+      undefined, // relayAdaptShieldERC20Addresses
       undefined, // crossContractCallsSerialized
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
       gasDetailsSerialized,
@@ -68,7 +68,7 @@ export const gasEstimateForUnprovenTransfer = async (
   railgunWalletID: string,
   encryptionKey: string,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
@@ -78,7 +78,7 @@ export const gasEstimateForUnprovenTransfer = async (
     const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: Optional<RailgunERC20Amount>) =>
+      (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.Transfer,
           networkName,
@@ -86,9 +86,9 @@ export const gasEstimateForUnprovenTransfer = async (
           encryptionKey,
           false, // showSenderAddressToRecipient - doesn't matter for gas estimate.
           memoText,
-          tokenAmountRecipients,
+          erc20AmountRecipients,
           nftAmountRecipients,
-          relayerFeeTokenAmount,
+          relayerFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
@@ -100,7 +100,7 @@ export const gasEstimateForUnprovenTransfer = async (
         ),
       networkName,
       railgunWalletID,
-      tokenAmountRecipients,
+      erc20AmountRecipients,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,

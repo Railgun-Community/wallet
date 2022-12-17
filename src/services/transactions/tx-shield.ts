@@ -35,11 +35,11 @@ export const getShieldPrivateKeySignatureMessage = () => {
 };
 
 const generateERC20Shield = async (
-  tokenAmountRecipient: RailgunERC20AmountRecipient,
+  erc20AmountRecipient: RailgunERC20AmountRecipient,
   random: string,
   shieldPrivateKey: string,
 ) => {
-  const railgunAddress = tokenAmountRecipient.recipientAddress;
+  const railgunAddress = erc20AmountRecipient.recipientAddress;
 
   assertValidRailgunAddress(railgunAddress);
 
@@ -49,8 +49,8 @@ const generateERC20Shield = async (
   const shield = new ShieldNoteERC20(
     masterPublicKey,
     random,
-    BigInt(tokenAmountRecipient.amountString),
-    tokenAmountRecipient.tokenAddress,
+    BigInt(erc20AmountRecipient.amountString),
+    erc20AmountRecipient.tokenAddress,
   );
   return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
 };
@@ -80,7 +80,7 @@ const generateNFTShield = async (
 const generateShieldTransactions = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
 ): Promise<PopulatedTransaction> => {
   try {
@@ -89,8 +89,8 @@ const generateShieldTransactions = async (
     const random = randomHex(16);
 
     const shieldInputs: ShieldRequestStruct[] = await Promise.all([
-      ...tokenAmountRecipients.map(tokenAmountRecipient =>
-        generateERC20Shield(tokenAmountRecipient, random, shieldPrivateKey),
+      ...erc20AmountRecipients.map(erc20AmountRecipient =>
+        generateERC20Shield(erc20AmountRecipient, random, shieldPrivateKey),
       ),
       ...nftAmountRecipients.map(nftAmountRecipient =>
         generateNFTShield(nftAmountRecipient, random, shieldPrivateKey),
@@ -110,7 +110,7 @@ const generateShieldTransactions = async (
 export const populateShield = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
@@ -118,7 +118,7 @@ export const populateShield = async (
     const populatedTransaction = await generateShieldTransactions(
       networkName,
       shieldPrivateKey,
-      tokenAmountRecipients,
+      erc20AmountRecipients,
       nftAmountRecipients,
     );
 
@@ -147,7 +147,7 @@ export const populateShield = async (
 export const gasEstimateForShield = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   fromWalletAddress: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
@@ -157,7 +157,7 @@ export const gasEstimateForShield = async (
     const populatedTransaction = await generateShieldTransactions(
       networkName,
       shieldPrivateKey,
-      tokenAmountRecipients,
+      erc20AmountRecipients,
       nftAmountRecipients,
     );
 

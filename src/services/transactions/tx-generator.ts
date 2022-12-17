@@ -26,7 +26,7 @@ import {
   getRelayAdaptContractForNetwork,
 } from '../railgun/core/providers';
 import {
-  erc20NoteFromTokenAmountRecipient,
+  erc20NoteFromERC20AmountRecipient,
   nftNoteFromNFTAmountRecipient,
 } from './tx-notes';
 import { getProver } from '../railgun/core/prover';
@@ -44,9 +44,9 @@ export const generateProofTransactions = async (
   encryptionKey: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   relayAdaptID: Optional<AdaptID>,
   useDummyProof: boolean,
@@ -55,16 +55,16 @@ export const generateProofTransactions = async (
 ): Promise<TransactionStruct[]> => {
   const railgunWallet = fullWalletForID(railgunWalletID);
 
-  const txs: TransactionStruct[] = await transactionsFromTokenAmounts(
+  const txs: TransactionStruct[] = await transactionsFromERC20Amounts(
     proofType,
-    tokenAmountRecipients,
+    erc20AmountRecipients,
     nftAmountRecipients,
     railgunWallet,
     encryptionKey,
     showSenderAddressToRecipient,
     memoText,
     networkName,
-    relayerFeeTokenAmountRecipient,
+    relayerFeeERC20AmountRecipient,
     sendWithPublicWallet,
     relayAdaptID,
     useDummyProof,
@@ -74,12 +74,12 @@ export const generateProofTransactions = async (
   return txs;
 };
 
-export const createDummyRelayerFeeTokenAmount = (feeTokenAddress: string) => {
-  const relayerFeeTokenAmount: RailgunERC20Amount = {
+export const createDummyRelayerFeeERC20Amount = (feeTokenAddress: string) => {
+  const relayerFeeERC20Amount: RailgunERC20Amount = {
     tokenAddress: feeTokenAddress,
     amountString: DUMMY_AMOUNT,
   };
-  return relayerFeeTokenAmount;
+  return relayerFeeERC20Amount;
 };
 
 export const generateDummyProofTransactions = async (
@@ -89,13 +89,13 @@ export const generateDummyProofTransactions = async (
   encryptionKey: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeTokenAmount: Optional<RailgunERC20Amount>,
+  relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
 ): Promise<TransactionStruct[]> => {
-  if (!relayerFeeTokenAmount && !sendWithPublicWallet) {
+  if (!relayerFeeERC20Amount && !sendWithPublicWallet) {
     throw new Error('Must send with relayer or public wallet.');
   }
 
@@ -104,10 +104,10 @@ export const generateDummyProofTransactions = async (
   // Use self-wallet as dummy relayer address.
   const relayerRailgunAddress = railgunWallet.getAddress(undefined);
 
-  const relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient> =
-    relayerFeeTokenAmount
+  const relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient> =
+    relayerFeeERC20Amount
       ? {
-          ...relayerFeeTokenAmount,
+          ...relayerFeeERC20Amount,
           recipientAddress: relayerRailgunAddress,
         }
       : undefined;
@@ -119,9 +119,9 @@ export const generateDummyProofTransactions = async (
     encryptionKey,
     showSenderAddressToRecipient,
     memoText,
-    tokenAmountRecipients,
+    erc20AmountRecipients,
     nftAmountRecipients,
-    relayerFeeTokenAmountRecipient,
+    relayerFeeERC20AmountRecipient,
     sendWithPublicWallet,
     undefined, // relayAdaptID
     true, // useDummyProof
@@ -174,16 +174,16 @@ export const generateUnshieldBaseToken = async (
   return populatedTransaction;
 };
 
-const transactionsFromTokenAmounts = async (
+const transactionsFromERC20Amounts = async (
   proofType: ProofType,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   railgunWallet: RailgunWallet,
   encryptionKey: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   networkName: NetworkName,
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   relayAdaptID: Optional<AdaptID>,
   useDummyProof: boolean,
@@ -201,13 +201,13 @@ const transactionsFromTokenAmounts = async (
     transactionBatch.setAdaptID(relayAdaptID);
   }
 
-  if (relayerFeeTokenAmountRecipient && !sendWithPublicWallet) {
-    assertValidRailgunAddress(relayerFeeTokenAmountRecipient.recipientAddress);
+  if (relayerFeeERC20AmountRecipient && !sendWithPublicWallet) {
+    assertValidRailgunAddress(relayerFeeERC20AmountRecipient.recipientAddress);
 
     // Add Relayer Fee
     transactionBatch.addOutput(
-      erc20NoteFromTokenAmountRecipient(
-        relayerFeeTokenAmountRecipient,
+      erc20NoteFromERC20AmountRecipient(
+        relayerFeeERC20AmountRecipient,
         railgunWallet,
         OutputType.RelayerFee,
         false, // showSenderAddressToRecipient - never show sender for Relayer fees
@@ -216,12 +216,12 @@ const transactionsFromTokenAmounts = async (
     );
   }
 
-  tokenAmountRecipients.forEach(
-    (tokenAmountRecipient: RailgunERC20AmountRecipient) => {
+  erc20AmountRecipients.forEach(
+    (erc20AmountRecipient: RailgunERC20AmountRecipient) => {
       addTransactionOutputsERC20(
         proofType,
         transactionBatch,
-        tokenAmountRecipient,
+        erc20AmountRecipient,
         railgunWallet,
         showSenderAddressToRecipient,
         memoText,
@@ -255,7 +255,7 @@ const transactionsFromTokenAmounts = async (
 const addTransactionOutputsERC20 = (
   proofType: ProofType,
   transactionBatch: TransactionBatch,
-  tokenAmountRecipient: RailgunERC20AmountRecipient,
+  erc20AmountRecipient: RailgunERC20AmountRecipient,
   railgunWallet: RailgunWallet,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
@@ -264,7 +264,7 @@ const addTransactionOutputsERC20 = (
     case ProofType.Transfer: {
       addTransactionOutputsTransferERC20(
         transactionBatch,
-        tokenAmountRecipient,
+        erc20AmountRecipient,
         railgunWallet,
         showSenderAddressToRecipient,
         memoText,
@@ -276,7 +276,7 @@ const addTransactionOutputsERC20 = (
     case ProofType.Unshield: {
       addTransactionOutputsUnshieldERC20(
         transactionBatch,
-        tokenAmountRecipient,
+        erc20AmountRecipient,
         false, // allowOverride
       );
       break;
@@ -318,16 +318,16 @@ const addTransactionOutputsNFT = (
 
 const addTransactionOutputsTransferERC20 = (
   transactionBatch: TransactionBatch,
-  tokenAmountRecipient: RailgunERC20AmountRecipient,
+  erc20AmountRecipient: RailgunERC20AmountRecipient,
   railgunWallet: RailgunWallet,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
 ) => {
-  assertValidRailgunAddress(tokenAmountRecipient.recipientAddress);
+  assertValidRailgunAddress(erc20AmountRecipient.recipientAddress);
 
   transactionBatch.addOutput(
-    erc20NoteFromTokenAmountRecipient(
-      tokenAmountRecipient,
+    erc20NoteFromERC20AmountRecipient(
+      erc20AmountRecipient,
       railgunWallet,
       OutputType.Transfer,
       showSenderAddressToRecipient,
@@ -338,20 +338,20 @@ const addTransactionOutputsTransferERC20 = (
 
 const addTransactionOutputsUnshieldERC20 = (
   transactionBatch: TransactionBatch,
-  tokenAmountRecipient: RailgunERC20AmountRecipient,
+  erc20AmountRecipient: RailgunERC20AmountRecipient,
   allowOverride?: boolean,
 ) => {
-  const { recipientAddress, amountString } = tokenAmountRecipient;
+  const { recipientAddress, amountString } = erc20AmountRecipient;
 
   assertValidEthAddress(recipientAddress);
   assertNotBlockedAddress(recipientAddress);
 
   const unshieldAmount = BigNumber.from(amountString);
 
-  const tokenData = getTokenDataERC20(tokenAmountRecipient.tokenAddress);
+  const tokenData = getTokenDataERC20(erc20AmountRecipient.tokenAddress);
 
   transactionBatch.addUnshieldData({
-    toAddress: tokenAmountRecipient.recipientAddress,
+    toAddress: erc20AmountRecipient.recipientAddress,
     value: unshieldAmount.toBigInt(),
     tokenData,
     allowOverride,

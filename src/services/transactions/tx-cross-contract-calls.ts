@@ -72,26 +72,26 @@ const createPopulatedCrossContractCalls = (
   }
 };
 
-export const createRelayAdaptUnshieldTokenAmountRecipients = (
+export const createRelayAdaptUnshieldERC20AmountRecipients = (
   networkName: NetworkName,
-  unshieldTokenAmounts: RailgunERC20Amount[],
+  unshieldERC20Amounts: RailgunERC20Amount[],
 ): RailgunERC20AmountRecipient[] => {
   const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
-  const unshieldTokenAmountRecipients: RailgunERC20AmountRecipient[] =
-    unshieldTokenAmounts.map(unshieldTokenAmount => ({
-      ...unshieldTokenAmount,
+  const unshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
+    unshieldERC20Amounts.map(unshieldERC20Amount => ({
+      ...unshieldERC20Amount,
       recipientAddress: relayAdaptContract.address,
     }));
-  return unshieldTokenAmountRecipients;
+  return unshieldERC20AmountRecipients;
 };
 
 export const populateProvedCrossContractCalls = async (
   networkName: NetworkName,
   railgunWalletID: string,
-  relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[],
-  relayAdaptShieldTokenAddresses: string[],
+  relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[],
+  relayAdaptShieldERC20Addresses: string[],
   crossContractCallsSerialized: string[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
@@ -103,12 +103,12 @@ export const populateProvedCrossContractCalls = async (
       railgunWalletID,
       false, // showSenderAddressToRecipient
       undefined, // memoText
-      [], // tokenAmountRecipients
+      [], // erc20AmountRecipients
       [], // nftAmountRecipients
-      relayAdaptUnshieldTokenAmounts,
-      relayAdaptShieldTokenAddresses,
+      relayAdaptUnshieldERC20Amounts,
+      relayAdaptShieldERC20Addresses,
       crossContractCallsSerialized,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
       gasDetailsSerialized,
@@ -132,8 +132,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
-  relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[],
-  relayAdaptShieldTokenAddresses: string[],
+  relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[],
+  relayAdaptShieldERC20Addresses: string[],
   crossContractCallsSerialized: string[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
@@ -153,10 +153,10 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
-    const relayAdaptUnshieldTokenAmountRecipients: RailgunERC20AmountRecipient[] =
-      createRelayAdaptUnshieldTokenAmountRecipients(
+    const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
+      createRelayAdaptUnshieldERC20AmountRecipients(
         networkName,
-        relayAdaptUnshieldTokenAmounts,
+        relayAdaptUnshieldERC20Amounts,
       );
 
     // Empty unshield NFT recipients.
@@ -168,7 +168,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
       await RelayAdaptHelper.generateRelayShieldRequests(
         wallet,
         shieldRandom,
-        relayAdaptShieldTokenAddresses,
+        relayAdaptShieldERC20Addresses,
       );
 
     // Add 40% to the gas fee to ensure that it's successful.
@@ -177,7 +177,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
     const multiplierBasisPoints = 14000;
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: Optional<RailgunERC20Amount>) =>
+      (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.CrossContractCalls,
           networkName,
@@ -185,9 +185,9 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           encryptionKey,
           false, // showSenderAddressToRecipient
           undefined, // memoText
-          relayAdaptUnshieldTokenAmountRecipients,
+          relayAdaptUnshieldERC20AmountRecipients,
           relayAdaptUnshieldNFTAmountRecipients,
-          relayerFeeTokenAmount,
+          relayerFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
@@ -202,7 +202,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
       },
       networkName,
       railgunWalletID,
-      relayAdaptUnshieldTokenAmountRecipients,
+      relayAdaptUnshieldERC20AmountRecipients,
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
@@ -223,10 +223,10 @@ export const generateCrossContractCallsProof = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
-  relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[],
-  relayAdaptShieldTokenAddresses: string[],
+  relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[],
+  relayAdaptShieldERC20Addresses: string[],
   crossContractCallsSerialized: string[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
@@ -243,10 +243,10 @@ export const generateCrossContractCallsProof = async (
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
-    const relayAdaptUnshieldTokenAmountRecipients: RailgunERC20AmountRecipient[] =
-      createRelayAdaptUnshieldTokenAmountRecipients(
+    const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
+      createRelayAdaptUnshieldERC20AmountRecipients(
         networkName,
-        relayAdaptUnshieldTokenAmounts,
+        relayAdaptUnshieldERC20Amounts,
       );
 
     // Empty unshield NFT recipients.
@@ -261,9 +261,9 @@ export const generateCrossContractCallsProof = async (
       encryptionKey,
       false, // showSenderAddressToRecipient
       undefined, // memoText
-      relayAdaptUnshieldTokenAmountRecipients,
+      relayAdaptUnshieldERC20AmountRecipients,
       relayAdaptUnshieldNFTAmountRecipients,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
     );
@@ -274,7 +274,7 @@ export const generateCrossContractCallsProof = async (
       await RelayAdaptHelper.generateRelayShieldRequests(
         wallet,
         shieldRandom,
-        relayAdaptShieldTokenAddresses,
+        relayAdaptShieldERC20Addresses,
       );
 
     const relayAdaptParamsRandom = randomHex(31);
@@ -298,9 +298,9 @@ export const generateCrossContractCallsProof = async (
       encryptionKey,
       false, // showSenderAddressToRecipient
       undefined, // memoText
-      relayAdaptUnshieldTokenAmountRecipients,
+      relayAdaptUnshieldERC20AmountRecipients,
       relayAdaptUnshieldNFTAmountRecipients,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       relayAdaptID,
       false, // useDummyProof
@@ -322,12 +322,12 @@ export const generateCrossContractCallsProof = async (
       railgunWalletID,
       showSenderAddressToRecipient: false,
       memoText: undefined,
-      tokenAmountRecipients: [],
+      erc20AmountRecipients: [],
       nftAmountRecipients: [],
-      relayAdaptUnshieldTokenAmounts,
-      relayAdaptShieldTokenAddresses,
+      relayAdaptUnshieldERC20Amounts,
+      relayAdaptShieldERC20Addresses,
       crossContractCallsSerialized,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       populatedTransaction,
       overallBatchMinGasPrice,

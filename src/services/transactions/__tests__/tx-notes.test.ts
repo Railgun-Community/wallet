@@ -26,8 +26,8 @@ import {
 import { fullWalletForID } from '../../railgun/core/engine';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import {
-  compareTokenAmountRecipientArrays,
-  erc20NoteFromTokenAmountRecipient,
+  compareERC20AmountRecipientArrays,
+  erc20NoteFromERC20AmountRecipient,
 } from '../tx-notes';
 
 const MOCK_TOKEN = '0x236c614a38362644deb15c9789779faf508bc6fe';
@@ -39,8 +39,8 @@ const padTo32BytesUnHex = (str: string) => {
   return padToLength(str.replace('0x', ''), ByteLength.UINT_256);
 };
 
-const formatAmountString = (tokenAmount: RailgunERC20Amount) => {
-  return BigInt(tokenAmount.amountString);
+const formatAmountString = (erc20Amount: RailgunERC20Amount) => {
+  return BigInt(erc20Amount.amountString);
 };
 
 let railgunWalletID: string;
@@ -62,14 +62,14 @@ describe('tx-notes', () => {
   });
 
   it('Should test erc20 note creation', () => {
-    const tokenAmountRecipient: RailgunERC20AmountRecipient = {
+    const erc20AmountRecipient: RailgunERC20AmountRecipient = {
       tokenAddress: MOCK_TOKEN,
       amountString: '0x100',
       recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
     };
     const railgunWallet = fullWalletForID(railgunWalletID);
-    const note = erc20NoteFromTokenAmountRecipient(
-      tokenAmountRecipient,
+    const note = erc20NoteFromERC20AmountRecipient(
+      erc20AmountRecipient,
       railgunWallet,
       OutputType.Transfer,
       true, // showSenderAddressToRecipient
@@ -81,7 +81,7 @@ describe('tx-notes', () => {
       MOCK_RAILGUN_WALLET_ADDRESS,
     );
 
-    expect(note.value).to.equal(formatAmountString(tokenAmountRecipient));
+    expect(note.value).to.equal(formatAmountString(erc20AmountRecipient));
     expect(note.receiverAddressData.masterPublicKey).to.equal(
       addressData.masterPublicKey,
     );
@@ -98,14 +98,14 @@ describe('tx-notes', () => {
   });
 
   it('Should test NFT note creation', () => {
-    const tokenAmountRecipient: RailgunERC20AmountRecipient = {
+    const erc20AmountRecipient: RailgunERC20AmountRecipient = {
       tokenAddress: MOCK_TOKEN,
       amountString: '0x100',
       recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
     };
     const railgunWallet = fullWalletForID(railgunWalletID);
-    const note = erc20NoteFromTokenAmountRecipient(
-      tokenAmountRecipient,
+    const note = erc20NoteFromERC20AmountRecipient(
+      erc20AmountRecipient,
       railgunWallet,
       OutputType.Transfer,
       true, // showSenderAddressToRecipient
@@ -117,7 +117,7 @@ describe('tx-notes', () => {
       MOCK_RAILGUN_WALLET_ADDRESS,
     );
 
-    expect(note.value).to.equal(formatAmountString(tokenAmountRecipient));
+    expect(note.value).to.equal(formatAmountString(erc20AmountRecipient));
     expect(note.receiverAddressData.masterPublicKey).to.equal(
       addressData.masterPublicKey,
     );
@@ -134,7 +134,7 @@ describe('tx-notes', () => {
   });
 
   it('Should test token array comparisons', () => {
-    const tokenAmountRecipients1: RailgunERC20AmountRecipient[] = [
+    const erc20AmountRecipients1: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
@@ -153,7 +153,7 @@ describe('tx-notes', () => {
     ];
 
     // Same same
-    const tokenAmountRecipients2: RailgunERC20AmountRecipient[] = [
+    const erc20AmountRecipients2: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
@@ -172,7 +172,7 @@ describe('tx-notes', () => {
     ];
 
     // Different addresses
-    const tokenAmountRecipients3: RailgunERC20AmountRecipient[] = [
+    const erc20AmountRecipients3: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
@@ -191,7 +191,7 @@ describe('tx-notes', () => {
     ];
 
     // Different amounts
-    const tokenAmountRecipients4: RailgunERC20AmountRecipient[] = [
+    const erc20AmountRecipients4: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
@@ -210,7 +210,7 @@ describe('tx-notes', () => {
     ];
 
     // Different recipients
-    const tokenAmountRecipients5: RailgunERC20AmountRecipient[] = [
+    const erc20AmountRecipients5: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
@@ -229,27 +229,27 @@ describe('tx-notes', () => {
     ];
 
     expect(
-      compareTokenAmountRecipientArrays(
-        tokenAmountRecipients1,
-        tokenAmountRecipients2,
+      compareERC20AmountRecipientArrays(
+        erc20AmountRecipients1,
+        erc20AmountRecipients2,
       ),
     ).to.be.true;
     expect(
-      compareTokenAmountRecipientArrays(
-        tokenAmountRecipients1,
-        tokenAmountRecipients3,
+      compareERC20AmountRecipientArrays(
+        erc20AmountRecipients1,
+        erc20AmountRecipients3,
       ),
     ).to.be.false;
     expect(
-      compareTokenAmountRecipientArrays(
-        tokenAmountRecipients1,
-        tokenAmountRecipients4,
+      compareERC20AmountRecipientArrays(
+        erc20AmountRecipients1,
+        erc20AmountRecipients4,
       ),
     ).to.be.false;
     expect(
-      compareTokenAmountRecipientArrays(
-        tokenAmountRecipients1,
-        tokenAmountRecipients5,
+      compareERC20AmountRecipientArrays(
+        erc20AmountRecipients1,
+        erc20AmountRecipients5,
       ),
     ).to.be.false;
   });

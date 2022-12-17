@@ -28,7 +28,7 @@ const generateShieldBaseTokenTransaction = async (
   networkName: NetworkName,
   railgunAddress: string,
   shieldPrivateKey: string,
-  wrappedTokenAmount: RailgunERC20Amount,
+  wrappedERC20Amount: RailgunERC20Amount,
 ): Promise<PopulatedTransaction> => {
   try {
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
@@ -36,8 +36,8 @@ const generateShieldBaseTokenTransaction = async (
       RailgunEngine.decodeAddress(railgunAddress);
     const random = randomHex(16);
 
-    const amount = BigInt(wrappedTokenAmount.amountString);
-    const wrappedAddress = wrappedTokenAmount.tokenAddress;
+    const amount = BigInt(wrappedERC20Amount.amountString);
+    const wrappedAddress = wrappedERC20Amount.tokenAddress;
 
     const shield = new ShieldNoteERC20(
       masterPublicKey,
@@ -66,7 +66,7 @@ export const populateShieldBaseToken = async (
   networkName: NetworkName,
   railgunAddress: string,
   shieldPrivateKey: string,
-  wrappedTokenAmount: RailgunERC20Amount,
+  wrappedERC20Amount: RailgunERC20Amount,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
@@ -76,7 +76,7 @@ export const populateShieldBaseToken = async (
       networkName,
       railgunAddress,
       shieldPrivateKey,
-      wrappedTokenAmount,
+      wrappedERC20Amount,
     );
 
     const sendWithPublicWallet = true;
@@ -105,7 +105,7 @@ export const gasEstimateForShieldBaseToken = async (
   networkName: NetworkName,
   railgunAddress: string,
   shieldPrivateKey: string,
-  wrappedTokenAmount: RailgunERC20Amount,
+  wrappedERC20Amount: RailgunERC20Amount,
   fromWalletAddress: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
@@ -116,7 +116,7 @@ export const gasEstimateForShieldBaseToken = async (
       networkName,
       railgunAddress,
       shieldPrivateKey,
-      wrappedTokenAmount,
+      wrappedERC20Amount,
     );
 
     const sendWithPublicWallet = true;

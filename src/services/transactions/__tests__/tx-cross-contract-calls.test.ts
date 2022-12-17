@@ -57,7 +57,7 @@ let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient;
+let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
 
 const polygonRelayAdaptContract =
   NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
@@ -145,7 +145,7 @@ describe('tx-cross-contract-calls', () => {
     }
     const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
 
-    relayerFeeTokenAmountRecipient = {
+    relayerFeeERC20AmountRecipient = {
       ...MOCK_TOKEN_FEE,
       recipientAddress: relayerRailgunAddress,
     };
@@ -322,7 +322,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -369,7 +369,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized, // gasDetailsSerialized
@@ -404,13 +404,13 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS_DIFFERENT,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       ['123'], // Invalid
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldTokenAmounts.',
+      'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldERC20Amounts.',
     );
   });
 
@@ -423,7 +423,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
@@ -442,7 +442,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -454,13 +454,13 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TOKEN_AMOUNTS_DIFFERENT,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       mockCrossContractCallsSerialized,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldTokenAmounts.',
+      'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldERC20Amounts.',
     );
   });
 

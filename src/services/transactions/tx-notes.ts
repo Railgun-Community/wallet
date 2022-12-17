@@ -15,21 +15,21 @@ import {
   RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 
-export const erc20NoteFromTokenAmountRecipient = (
-  tokenAmountRecipient: RailgunERC20AmountRecipient,
+export const erc20NoteFromERC20AmountRecipient = (
+  erc20AmountRecipient: RailgunERC20AmountRecipient,
   railgunWallet: RailgunWallet,
   outputType: OutputType,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
 ): TransactNote => {
   const random = randomHex(16);
-  const value = hexToBigInt(tokenAmountRecipient.amountString);
+  const value = hexToBigInt(erc20AmountRecipient.amountString);
 
   const receiverAddressData = RailgunEngine.decodeAddress(
-    tokenAmountRecipient.recipientAddress,
+    erc20AmountRecipient.recipientAddress,
   );
 
-  const tokenData = getTokenDataERC20(tokenAmountRecipient.tokenAddress);
+  const tokenData = getTokenDataERC20(erc20AmountRecipient.tokenAddress);
 
   return TransactNote.createTransfer(
     receiverAddressData,
@@ -93,7 +93,7 @@ export const nftNoteFromNFTAmountRecipient = (
   }
 };
 
-const compareTokenAmounts = (
+const compareERC20Amounts = (
   a: Optional<RailgunERC20Amount>,
   b: Optional<RailgunERC20Amount>,
 ) => {
@@ -102,16 +102,16 @@ const compareTokenAmounts = (
   );
 };
 
-export const compareTokenAmountRecipients = (
+export const compareERC20AmountRecipients = (
   a: Optional<RailgunERC20AmountRecipient>,
   b: Optional<RailgunERC20AmountRecipient>,
 ) => {
   return (
-    compareTokenAmounts(a, b) && a?.recipientAddress === b?.recipientAddress
+    compareERC20Amounts(a, b) && a?.recipientAddress === b?.recipientAddress
   );
 };
 
-export const compareTokenAmountArrays = (
+export const compareERC20AmountArrays = (
   a: Optional<RailgunERC20Amount[]>,
   b: Optional<RailgunERC20Amount[]>,
 ) => {
@@ -124,19 +124,19 @@ export const compareTokenAmountArrays = (
   if (a.length !== b.length) {
     return false;
   }
-  for (const tokenAmount of a) {
-    const found = b.find(ta => ta.tokenAddress === tokenAmount.tokenAddress);
+  for (const erc20Amount of a) {
+    const found = b.find(ta => ta.tokenAddress === erc20Amount.tokenAddress);
     if (!found) {
       return false;
     }
-    if (found.amountString !== tokenAmount.amountString) {
+    if (found.amountString !== erc20Amount.amountString) {
       return false;
     }
   }
   return true;
 };
 
-export const compareTokenAmountRecipientArrays = (
+export const compareERC20AmountRecipientArrays = (
   a: Optional<RailgunERC20AmountRecipient[]>,
   b: Optional<RailgunERC20AmountRecipient[]>,
 ) => {
@@ -149,15 +149,15 @@ export const compareTokenAmountRecipientArrays = (
   if (a.length !== b.length) {
     return false;
   }
-  for (const tokenAmount of a) {
-    const found = b.find(ta => ta.tokenAddress === tokenAmount.tokenAddress);
+  for (const erc20Amount of a) {
+    const found = b.find(ta => ta.tokenAddress === erc20Amount.tokenAddress);
     if (!found) {
       return false;
     }
-    if (found.amountString !== tokenAmount.amountString) {
+    if (found.amountString !== erc20Amount.amountString) {
       return false;
     }
-    if (found.recipientAddress !== tokenAmount.recipientAddress) {
+    if (found.recipientAddress !== erc20Amount.recipientAddress) {
       return false;
     }
   }

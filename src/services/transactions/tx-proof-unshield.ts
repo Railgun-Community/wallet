@@ -23,15 +23,15 @@ import {
   randomHex,
 } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { createRelayAdaptUnshieldTokenAmountRecipients } from './tx-cross-contract-calls';
+import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 
 export const generateUnshieldProof = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
@@ -46,9 +46,9 @@ export const generateUnshieldProof = async (
       encryptionKey,
       false, // showSenderAddressToRecipient
       undefined, // memoText
-      tokenAmountRecipients,
+      erc20AmountRecipients,
       nftAmountRecipients,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       undefined, // relayAdaptID
       false, // useDummyProof
@@ -62,12 +62,12 @@ export const generateUnshieldProof = async (
       railgunWalletID,
       showSenderAddressToRecipient: false,
       memoText: undefined,
-      tokenAmountRecipients,
+      erc20AmountRecipients,
       nftAmountRecipients,
-      relayAdaptUnshieldTokenAmounts: undefined,
-      relayAdaptShieldTokenAddresses: undefined,
+      relayAdaptUnshieldERC20Amounts: undefined,
+      relayAdaptShieldERC20Addresses: undefined,
       crossContractCallsSerialized: undefined,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       populatedTransaction,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
@@ -87,8 +87,8 @@ export const generateUnshieldBaseTokenProof = async (
   publicWalletAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
-  wrappedTokenAmount: RailgunERC20Amount,
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  wrappedERC20Amount: RailgunERC20Amount,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
@@ -99,20 +99,20 @@ export const generateUnshieldBaseTokenProof = async (
 
     setCachedProvedTransaction(undefined);
 
-    const tokenAmountRecipients: RailgunERC20AmountRecipient[] = [
+    const erc20AmountRecipients: RailgunERC20AmountRecipient[] = [
       {
-        ...wrappedTokenAmount,
+        ...wrappedERC20Amount,
         recipientAddress: publicWalletAddress,
       },
     ];
 
-    const relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[] = [
-      wrappedTokenAmount,
+    const relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[] = [
+      wrappedERC20Amount,
     ];
 
-    const relayAdaptUnshieldTokenAmountRecipients: RailgunERC20AmountRecipient[] =
-      createRelayAdaptUnshieldTokenAmountRecipients(networkName, [
-        wrappedTokenAmount,
+    const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
+      createRelayAdaptUnshieldERC20AmountRecipients(networkName, [
+        wrappedERC20Amount,
       ]);
 
     // Empty NFT recipients.
@@ -130,9 +130,9 @@ export const generateUnshieldBaseTokenProof = async (
       encryptionKey,
       false, // showSenderAddressToRecipient
       undefined, // memoText
-      relayAdaptUnshieldTokenAmountRecipients,
+      relayAdaptUnshieldERC20AmountRecipients,
       relayAdaptUnshieldNFTAmountRecipients,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
     );
@@ -160,9 +160,9 @@ export const generateUnshieldBaseTokenProof = async (
       encryptionKey,
       showSenderAddressToRecipient,
       memoText,
-      relayAdaptUnshieldTokenAmountRecipients,
+      relayAdaptUnshieldERC20AmountRecipients,
       relayAdaptUnshieldNFTAmountRecipients,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       relayAdaptID,
       false, // useDummyProof
@@ -183,12 +183,12 @@ export const generateUnshieldBaseTokenProof = async (
       railgunWalletID,
       showSenderAddressToRecipient,
       memoText,
-      tokenAmountRecipients,
+      erc20AmountRecipients,
       nftAmountRecipients,
-      relayAdaptUnshieldTokenAmounts,
-      relayAdaptShieldTokenAddresses: undefined,
+      relayAdaptUnshieldERC20Amounts,
+      relayAdaptShieldERC20Addresses: undefined,
       crossContractCallsSerialized: undefined,
-      relayerFeeTokenAmountRecipient,
+      relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       populatedTransaction,
       overallBatchMinGasPrice,

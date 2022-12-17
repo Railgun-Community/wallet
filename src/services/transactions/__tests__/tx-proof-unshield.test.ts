@@ -42,8 +42,8 @@ import { generateUnshieldProof } from '../tx-proof-unshield';
 
 let railgunWallet: RailgunWallet;
 let railgunWalletAddress: string;
-let relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient;
-let tokenAmountRecipients: RailgunERC20AmountRecipient[];
+let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
+let erc20AmountRecipients: RailgunERC20AmountRecipient[];
 let nftAmountRecipients: RailgunNFTAmountRecipient[];
 
 chai.use(chaiAsPromised);
@@ -71,9 +71,9 @@ describe.skip('tx-proof-unshield', () => {
     const receiverAddressData =
       RailgunEngine.decodeAddress(railgunWalletAddress);
 
-    tokenAmountRecipients = MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY.map(
-      tokenAmount => ({
-        ...tokenAmount,
+    erc20AmountRecipients = MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY.map(
+      erc20Amount => ({
+        ...erc20Amount,
         recipientAddress: MOCK_ETH_WALLET_ADDRESS,
       }),
     );
@@ -88,7 +88,7 @@ describe.skip('tx-proof-unshield', () => {
       throw new Error('Expected relayerWalletInfo');
     }
     const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
-    relayerFeeTokenAmountRecipient = {
+    relayerFeeERC20AmountRecipient = {
       ...MOCK_TOKEN_FEE,
       recipientAddress: relayerRailgunAddress,
     };
@@ -181,9 +181,9 @@ describe.skip('tx-proof-unshield', () => {
         NetworkName.Hardhat,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,
-        tokenAmountRecipients,
+        erc20AmountRecipients,
         nftAmountRecipients,
-        relayerFeeTokenAmountRecipient,
+        relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
         () => {}, // progressCallback
@@ -195,8 +195,8 @@ describe.skip('tx-proof-unshield', () => {
       railgunWalletID: railgunWallet.id,
       memoText: undefined,
       toWalletAddress: MOCK_ETH_WALLET_ADDRESS,
-      tokenAmountRecipients,
-      relayerFeeTokenAmountRecipient,
+      erc20AmountRecipients,
+      relayerFeeERC20AmountRecipient,
     });
   }).timeout(30000);
 });

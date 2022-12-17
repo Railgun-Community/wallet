@@ -41,8 +41,8 @@ import { generateTransferProof } from '../tx-proof-transfer';
 
 let railgunWallet: RailgunWallet;
 let railgunWalletAddress: string;
-let relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient;
-let tokenAmountRecipients: RailgunERC20AmountRecipient[];
+let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
+let erc20AmountRecipients: RailgunERC20AmountRecipient[];
 let nftAmountRecipients: RailgunNFTAmountRecipient[];
 
 chai.use(chaiAsPromised);
@@ -70,9 +70,9 @@ describe.skip('tx-proofs', () => {
     const receiverAddressData =
       RailgunEngine.decodeAddress(railgunWalletAddress);
 
-    tokenAmountRecipients = MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY.map(
-      tokenAmount => ({
-        ...tokenAmount,
+    erc20AmountRecipients = MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY.map(
+      erc20Amount => ({
+        ...erc20Amount,
         recipientAddress: railgunWalletAddress,
       }),
     );
@@ -87,7 +87,7 @@ describe.skip('tx-proofs', () => {
       throw new Error('Expected relayerWalletInfo');
     }
     const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
-    relayerFeeTokenAmountRecipient = {
+    relayerFeeERC20AmountRecipient = {
       ...MOCK_TOKEN_FEE,
       recipientAddress: relayerRailgunAddress,
     };
@@ -182,9 +182,9 @@ describe.skip('tx-proofs', () => {
         MOCK_DB_ENCRYPTION_KEY,
         false, // showSenderAddressToRecipient
         MOCK_MEMO,
-        tokenAmountRecipients,
+        erc20AmountRecipients,
         nftAmountRecipients,
-        relayerFeeTokenAmountRecipient,
+        relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
         () => {}, // progressCallback
@@ -195,9 +195,9 @@ describe.skip('tx-proofs', () => {
       populatedTransaction: MOCK_POPULATED_TX,
       railgunWalletID: railgunWallet.id,
       toWalletAddress: railgunWalletAddress,
-      tokenAmountRecipients,
-      relayerFeeTokenAmountRecipient,
-      relayerFeeTokenAmount: MOCK_TOKEN_FEE,
+      erc20AmountRecipients,
+      relayerFeeERC20AmountRecipient,
+      relayerFeeERC20Amount: MOCK_TOKEN_FEE,
     });
   }).timeout(30000);
 });

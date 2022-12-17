@@ -12,9 +12,9 @@ import { sendErrorMessage } from '../../utils/logger';
 import { compareStringArrays } from '../../utils/utils';
 import { setGasDetailsForPopulatedTransaction } from './tx-gas-details';
 import {
-  compareTokenAmountRecipients,
-  compareTokenAmountRecipientArrays,
-  compareTokenAmountArrays,
+  compareERC20AmountRecipients,
+  compareERC20AmountRecipientArrays,
+  compareERC20AmountArrays,
   compareNFTAmountRecipientArrays,
 } from './tx-notes';
 
@@ -24,12 +24,12 @@ export type ProvedTransaction = {
   railgunWalletID: string;
   showSenderAddressToRecipient: boolean;
   memoText: Optional<string>;
-  tokenAmountRecipients: RailgunERC20AmountRecipient[];
+  erc20AmountRecipients: RailgunERC20AmountRecipient[];
   nftAmountRecipients: RailgunNFTAmountRecipient[];
-  relayAdaptUnshieldTokenAmounts: Optional<RailgunERC20Amount[]>;
-  relayAdaptShieldTokenAddresses: Optional<string[]>;
+  relayAdaptUnshieldERC20Amounts: Optional<RailgunERC20Amount[]>;
+  relayAdaptShieldERC20Addresses: Optional<string[]>;
   crossContractCallsSerialized: Optional<string[]>;
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>;
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>;
   sendWithPublicWallet: boolean;
   overallBatchMinGasPrice: Optional<string>;
 };
@@ -42,12 +42,12 @@ export const populateProvedTransaction = async (
   railgunWalletID: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayAdaptUnshieldTokenAmounts: Optional<RailgunERC20Amount[]>,
-  relayAdaptShieldTokenAddresses: Optional<string[]>,
+  relayAdaptUnshieldERC20Amounts: Optional<RailgunERC20Amount[]>,
+  relayAdaptShieldERC20Addresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
@@ -57,12 +57,12 @@ export const populateProvedTransaction = async (
     railgunWalletID,
     showSenderAddressToRecipient,
     memoText,
-    tokenAmountRecipients,
+    erc20AmountRecipients,
     nftAmountRecipients,
-    relayAdaptUnshieldTokenAmounts,
-    relayAdaptShieldTokenAddresses,
+    relayAdaptUnshieldERC20Amounts,
+    relayAdaptShieldERC20Addresses,
     crossContractCallsSerialized,
-    relayerFeeTokenAmountRecipient,
+    relayerFeeERC20AmountRecipient,
     sendWithPublicWallet,
     overallBatchMinGasPrice,
   );
@@ -93,10 +93,10 @@ export const getCachedProvedTransaction = (): ProvedTransaction => {
   return cachedProvedTransaction as ProvedTransaction;
 };
 
-const shouldValidateTokenAmountRecipients = (proofType: ProofType) => {
+const shouldValidateERC20AmountRecipients = (proofType: ProofType) => {
   switch (proofType) {
     case ProofType.CrossContractCalls:
-      // Skip validation for tokenAmountRecipients, which is not used
+      // Skip validation for erc20AmountRecipients, which is not used
       // in this transaction type.
       return false;
     case ProofType.Transfer:
@@ -111,12 +111,12 @@ export const validateCachedProvedTransaction = (
   railgunWalletID: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayAdaptUnshieldTokenAmounts: Optional<RailgunERC20Amount[]>,
-  relayAdaptShieldTokenAddresses: Optional<string[]>,
+  relayAdaptUnshieldERC20Amounts: Optional<RailgunERC20Amount[]>,
+  relayAdaptShieldERC20Addresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
-  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
 ): ValidateCachedProvedTransactionResponse => {
@@ -139,13 +139,13 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'Mismatch: memoText.';
   } else if (
-    shouldValidateTokenAmountRecipients(proofType) &&
-    !compareTokenAmountRecipientArrays(
-      tokenAmountRecipients,
-      cachedProvedTransaction.tokenAmountRecipients,
+    shouldValidateERC20AmountRecipients(proofType) &&
+    !compareERC20AmountRecipientArrays(
+      erc20AmountRecipients,
+      cachedProvedTransaction.erc20AmountRecipients,
     )
   ) {
-    error = 'Mismatch: tokenAmountRecipients.';
+    error = 'Mismatch: erc20AmountRecipients.';
   } else if (
     !compareNFTAmountRecipientArrays(
       nftAmountRecipients,
@@ -154,19 +154,19 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'Mismatch: nftAmountRecipients.';
   } else if (
-    !compareTokenAmountArrays(
-      relayAdaptUnshieldTokenAmounts,
-      cachedProvedTransaction.relayAdaptUnshieldTokenAmounts,
+    !compareERC20AmountArrays(
+      relayAdaptUnshieldERC20Amounts,
+      cachedProvedTransaction.relayAdaptUnshieldERC20Amounts,
     )
   ) {
-    error = 'Mismatch: relayAdaptUnshieldTokenAmounts.';
+    error = 'Mismatch: relayAdaptUnshieldERC20Amounts.';
   } else if (
     !compareStringArrays(
-      relayAdaptShieldTokenAddresses,
-      cachedProvedTransaction.relayAdaptShieldTokenAddresses,
+      relayAdaptShieldERC20Addresses,
+      cachedProvedTransaction.relayAdaptShieldERC20Addresses,
     )
   ) {
-    error = 'Mismatch: relayAdaptShieldTokenAddresses.';
+    error = 'Mismatch: relayAdaptShieldERC20Addresses.';
   } else if (
     !compareStringArrays(
       crossContractCallsSerialized,
@@ -175,12 +175,12 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'Mismatch: crossContractCallsSerialized.';
   } else if (
-    !compareTokenAmountRecipients(
-      cachedProvedTransaction.relayerFeeTokenAmountRecipient,
-      relayerFeeTokenAmountRecipient,
+    !compareERC20AmountRecipients(
+      cachedProvedTransaction.relayerFeeERC20AmountRecipient,
+      relayerFeeERC20AmountRecipient,
     )
   ) {
-    error = 'Mismatch: relayerFeeTokenAmountRecipient.';
+    error = 'Mismatch: relayerFeeERC20AmountRecipient.';
   } else if (
     sendWithPublicWallet !== cachedProvedTransaction.sendWithPublicWallet
   ) {

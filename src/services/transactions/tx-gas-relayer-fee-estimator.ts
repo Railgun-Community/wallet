@@ -14,7 +14,7 @@ import {
 } from '@railgun-community/shared-models';
 import {
   DUMMY_FROM_ADDRESS,
-  createDummyRelayerFeeTokenAmount,
+  createDummyRelayerFeeERC20Amount,
 } from './tx-generator';
 import {
   getGasEstimate,
@@ -26,7 +26,7 @@ import { walletForID } from '../railgun';
 
 const MAX_ITERATIONS_RELAYER_FEE_REESTIMATION = 5;
 
-export const calculateRelayerFeeTokenAmount = (
+export const calculateRelayerFeeERC20Amount = (
   feeTokenDetails: FeeTokenDetails,
   gasDetails: TransactionGasDetails,
 ): RailgunERC20Amount => {
@@ -63,22 +63,22 @@ const getUpdatedRelayerFeeForGasEstimation = async (
     gasEstimate,
   };
 
-  const relayerFeeTokenAmount: RailgunERC20Amount =
-    calculateRelayerFeeTokenAmount(feeTokenDetails, updatedGasDetails);
+  const relayerFeeERC20Amount: RailgunERC20Amount =
+    calculateRelayerFeeERC20Amount(feeTokenDetails, updatedGasDetails);
 
-  return relayerFeeTokenAmount;
+  return relayerFeeERC20Amount;
 };
 
 export const gasEstimateResponseIterativeRelayerFee = async (
   generateTransactionStructs: (
-    relayerFeeTokenAmount: Optional<RailgunERC20Amount>,
+    relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
   ) => Promise<TransactionStruct[]>,
   generatePopulatedTransaction: (
     serializedTransactions: TransactionStruct[],
   ) => Promise<PopulatedTransaction>,
   networkName: NetworkName,
   railgunWalletID: string,
-  tokenAmountRecipients: RailgunERC20AmountRecipient[],
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
@@ -93,7 +93,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   const fromWalletAddress = DUMMY_FROM_ADDRESS;
 
   const dummyRelayerFee = feeTokenDetails
-    ? createDummyRelayerFeeTokenAmount(feeTokenDetails.tokenAddress)
+    ? createDummyRelayerFeeERC20Amount(feeTokenDetails.tokenAddress)
     : undefined;
 
   let serializedTransactions = await generateTransactionStructs(
@@ -121,10 +121,10 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     );
   }
 
-  // Find tokenAmount that matches token of relayer fee, if exists.
-  const relayerFeeMatchingSendingTokenAmount = tokenAmountRecipients.find(
-    tokenAmountRecipient =>
-      tokenAmountRecipient.tokenAddress.toLowerCase() ===
+  // Find erc20Amount that matches token of relayer fee, if exists.
+  const relayerFeeMatchingSendingERC20Amount = erc20AmountRecipients.find(
+    erc20AmountRecipient =>
+      erc20AmountRecipient.tokenAddress.toLowerCase() ===
       feeTokenDetails.tokenAddress.toLowerCase(),
   );
 
@@ -153,17 +153,17 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     // If Relayer fee causes overflow with the token balance,
     // then use the MAX amount for Relayer Fee, which is BALANCE - SENDING AMOUNT.
     if (
-      relayerFeeMatchingSendingTokenAmount &&
+      relayerFeeMatchingSendingERC20Amount &&
       matchingSendingTokenBalance &&
       // eslint-disable-next-line no-await-in-loop
       (await relayerFeeWillOverflowBalance(
         matchingSendingTokenBalance,
-        relayerFeeMatchingSendingTokenAmount,
+        relayerFeeMatchingSendingERC20Amount,
         updatedRelayerFee,
       ))
     ) {
       updatedRelayerFee.amountString = matchingSendingTokenBalance
-        .sub(relayerFeeMatchingSendingTokenAmount.amountString)
+        .sub(relayerFeeMatchingSendingERC20Amount.amountString)
         .toHexString();
     }
 
@@ -229,11 +229,11 @@ const compareCircuitSizesTransactionStructs = (
 
 const relayerFeeWillOverflowBalance = async (
   tokenBalance: BigNumber,
-  sendingTokenAmount: RailgunERC20Amount,
-  relayerFeeTokenAmount: RailgunERC20Amount,
+  sendingERC20Amount: RailgunERC20Amount,
+  relayerFeeERC20Amount: RailgunERC20Amount,
 ) => {
-  const sendingAmount = BigNumber.from(sendingTokenAmount.amountString);
-  const relayerFeeAmount = BigNumber.from(relayerFeeTokenAmount.amountString);
+  const sendingAmount = BigNumber.from(sendingERC20Amount.amountString);
+  const relayerFeeAmount = BigNumber.from(relayerFeeERC20Amount.amountString);
 
   return sendingAmount.add(relayerFeeAmount).gt(tokenBalance);
 };
