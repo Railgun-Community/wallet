@@ -17,7 +17,7 @@ import {
   ProofType,
   RailgunNFTAmountRecipient,
   RailgunProveTransactionResponse,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
@@ -42,8 +42,8 @@ import { generateUnshieldProof } from '../tx-proof-unshield';
 
 let railgunWallet: RailgunWallet;
 let railgunWalletAddress: string;
-let relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient;
-let tokenAmountRecipients: RailgunWalletTokenAmountRecipient[];
+let relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient;
+let tokenAmountRecipients: RailgunERC20AmountRecipient[];
 let nftAmountRecipients: RailgunNFTAmountRecipient[];
 
 chai.use(chaiAsPromised);

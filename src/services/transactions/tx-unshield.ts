@@ -1,14 +1,14 @@
 import {
   RailgunPopulateTransactionResponse,
   RailgunTransactionGasEstimateResponse,
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   TransactionGasDetailsSerialized,
   NetworkName,
   ProofType,
   FeeTokenDetails,
   sanitizeError,
   serializeUnsignedTransaction,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
 import {
@@ -26,9 +26,9 @@ import { BigNumber } from '@ethersproject/bignumber';
 export const populateProvedUnshield = async (
   networkName: NetworkName,
   railgunWalletID: string,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
@@ -67,20 +67,20 @@ export const populateProvedUnshieldBaseToken = async (
   networkName: NetworkName,
   publicWalletAddress: string,
   railgunWalletID: string,
-  wrappedTokenAmount: RailgunWalletTokenAmount,
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
+  wrappedTokenAmount: RailgunERC20Amount,
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const tokenAmountRecipients: RailgunWalletTokenAmountRecipient[] = [
+    const tokenAmountRecipients: RailgunERC20AmountRecipient[] = [
       {
         ...wrappedTokenAmount,
         recipientAddress: publicWalletAddress,
       },
     ];
-    const relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[] = [
+    const relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[] = [
       wrappedTokenAmount,
     ];
 
@@ -120,7 +120,7 @@ export const gasEstimateForUnprovenUnshield = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
@@ -130,7 +130,7 @@ export const gasEstimateForUnprovenUnshield = async (
     const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
+      (relayerFeeTokenAmount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.Unshield,
           networkName,
@@ -174,13 +174,13 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
   publicWalletAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
-  wrappedTokenAmount: RailgunWalletTokenAmount,
+  wrappedTokenAmount: RailgunERC20Amount,
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
-    const relayAdaptUnshieldTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+    const relayAdaptUnshieldTokenAmountRecipients: RailgunERC20AmountRecipient[] =
       createRelayAdaptUnshieldTokenAmountRecipients(networkName, [
         wrappedTokenAmount,
       ]);
@@ -191,7 +191,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
     const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
+      (relayerFeeTokenAmount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.UnshieldBaseToken,
           networkName,

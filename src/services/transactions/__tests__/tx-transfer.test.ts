@@ -10,12 +10,12 @@ import {
   RelayAdaptContract,
 } from '@railgun-community/engine';
 import {
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   NetworkName,
   deserializeTransaction,
   EVMGasType,
   TransactionGasDetailsSerialized,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -59,12 +59,12 @@ let erc20NoteSpy: SinonSpy;
 let nftNoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient;
+let relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient;
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunWalletTokenAmount[] = [
+const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
     amountString: '100',
@@ -83,7 +83,7 @@ const gasDetailsSerialized: TransactionGasDetailsSerialized = {
   gasPriceString: overallBatchMinGasPrice,
 };
 
-const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunWalletTokenAmountRecipient[] =
+const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunERC20AmountRecipient[] =
   MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
     ...tokenAmount,
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
@@ -95,13 +95,13 @@ const MOCK_NFT_AMOUNT_RECIPIENTS_INVALID: RailgunNFTAmountRecipient[] =
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
   }));
 
-const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunWalletTokenAmountRecipient[] =
+const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunERC20AmountRecipient[] =
   MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
     ...tokenAmount,
     recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
   }));
 
-const MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT: RailgunWalletTokenAmountRecipient[] =
+const MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT: RailgunERC20AmountRecipient[] =
   MOCK_TOKEN_AMOUNTS_DIFFERENT.map(tokenAmount => ({
     ...tokenAmount,
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,

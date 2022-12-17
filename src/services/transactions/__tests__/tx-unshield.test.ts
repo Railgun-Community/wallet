@@ -12,13 +12,13 @@ import {
   getTokenDataNFT,
 } from '@railgun-community/engine';
 import {
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   NetworkName,
   NETWORK_CONFIG,
   deserializeTransaction,
   EVMGasType,
   TransactionGasDetailsSerialized,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
@@ -63,7 +63,7 @@ let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient;
+let relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient;
 
 const polygonRelayAdaptContract =
   NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
@@ -84,7 +84,7 @@ const mockNFTTokenData1 = getTokenDataNFT(
   MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD[1].tokenSubID,
 );
 
-const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunWalletTokenAmount[] = [
+const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
     amountString: '0x0100',
@@ -103,19 +103,19 @@ const gasDetailsSerialized: TransactionGasDetailsSerialized = {
   gasPriceString: overallBatchMinGasPrice,
 };
 
-const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunWalletTokenAmountRecipient[] =
+const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunERC20AmountRecipient[] =
   MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
     ...tokenAmount,
     recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
   }));
 
-const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunWalletTokenAmountRecipient[] =
+const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunERC20AmountRecipient[] =
   MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
     ...tokenAmount,
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
   }));
 
-const MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT: RailgunWalletTokenAmountRecipient[] =
+const MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT: RailgunERC20AmountRecipient[] =
   MOCK_TOKEN_AMOUNTS_DIFFERENT.map(tokenAmount => ({
     ...tokenAmount,
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,

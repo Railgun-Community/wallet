@@ -4,8 +4,8 @@ import chaiAsPromised from 'chai-as-promised';
 import {
   ProofType,
   RailgunNFTAmountRecipient,
-  RailgunWalletTokenAmount,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20Amount,
+  RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 import {
   MOCK_NFT_AMOUNT_RECIPIENTS,
@@ -26,22 +26,20 @@ const railgunWalletID = '123';
 const showSenderAddressToRecipient = true;
 const memoText = 'Some memo';
 const recipientAddress = '0x12345';
-const tokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+const tokenAmountRecipients: RailgunERC20AmountRecipient[] =
   MOCK_TOKEN_AMOUNTS.map(tokenAmount => ({
     ...tokenAmount,
     recipientAddress,
   }));
 const nftAmountRecipients: RailgunNFTAmountRecipient[] =
   MOCK_NFT_AMOUNT_RECIPIENTS;
-const relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient = {
+const relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient = {
   ...MOCK_TOKEN_FEE,
   recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
 };
 const crossContractCallsSerialized = ['0x4567'];
 const relayAdaptShieldTokenAddresses = ['0x123'];
-const relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[] = [
-  MOCK_TOKEN_FEE,
-];
+const relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[] = [MOCK_TOKEN_FEE];
 
 const sendWithPublicWallet = false;
 const overallBatchMinGasPrice = '0x1000';

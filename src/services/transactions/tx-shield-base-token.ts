@@ -2,7 +2,7 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   RailgunPopulateTransactionResponse,
   RailgunTransactionGasEstimateResponse,
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   TransactionGasDetailsSerialized,
   NetworkName,
   sanitizeError,
@@ -28,7 +28,7 @@ const generateShieldBaseTokenTransaction = async (
   networkName: NetworkName,
   railgunAddress: string,
   shieldPrivateKey: string,
-  wrappedTokenAmount: RailgunWalletTokenAmount,
+  wrappedTokenAmount: RailgunERC20Amount,
 ): Promise<PopulatedTransaction> => {
   try {
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
@@ -66,7 +66,7 @@ export const populateShieldBaseToken = async (
   networkName: NetworkName,
   railgunAddress: string,
   shieldPrivateKey: string,
-  wrappedTokenAmount: RailgunWalletTokenAmount,
+  wrappedTokenAmount: RailgunERC20Amount,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
@@ -105,7 +105,7 @@ export const gasEstimateForShieldBaseToken = async (
   networkName: NetworkName,
   railgunAddress: string,
   shieldPrivateKey: string,
-  wrappedTokenAmount: RailgunWalletTokenAmount,
+  wrappedTokenAmount: RailgunERC20Amount,
   fromWalletAddress: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {

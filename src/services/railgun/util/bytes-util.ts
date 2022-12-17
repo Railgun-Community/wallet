@@ -4,7 +4,7 @@ import {
   ByteLength,
 } from '@railgun-community/engine';
 
-export const parseRailgunBalanceAddress = (tokenAddress: string): string => {
+export const parseRailgunTokenAddress = (tokenAddress: string): string => {
   return formatToByteLength(tokenAddress, ByteLength.Address, true);
 };
 

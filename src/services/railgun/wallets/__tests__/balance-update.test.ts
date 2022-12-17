@@ -82,10 +82,10 @@ describe('balance-update', () => {
     await expect(onBalancesUpdate(wallet, chain)).to.be.fulfilled;
     expect(walletBalanceStub.calledOnce).to.be.true;
     expect(formattedBalances.chain).to.deep.equal(chain);
-    expect(formattedBalances.tokenBalances.length).to.equal(1);
-    expect(formattedBalances.tokenBalances[0]).to.deep.equal({
+    expect(formattedBalances.erc20Amounts.length).to.equal(1);
+    expect(formattedBalances.erc20Amounts[0]).to.deep.equal({
       tokenAddress: '0x0000000000000000000000000000000000012536',
-      balanceString: nToHex(BigInt(10), ByteLength.UINT_256, true),
+      amountString: nToHex(BigInt(10), ByteLength.UINT_256, true),
     });
   });
 });

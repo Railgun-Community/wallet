@@ -10,14 +10,14 @@ import {
   getTokenDataERC20,
 } from '@railgun-community/engine';
 import {
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   NetworkName,
   NETWORK_CONFIG,
   deserializeTransaction,
   serializeUnsignedTransaction,
   EVMGasType,
   TransactionGasDetailsSerialized,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
   createFallbackProviderFromJsonConfig,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -57,7 +57,7 @@ let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient;
+let relayerFeeTokenAmountRecipient: RailgunERC20AmountRecipient;
 
 const polygonRelayAdaptContract =
   NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
@@ -84,7 +84,7 @@ const mockCrossContractCallsSerialized: string[] = mockCrossContractCalls.map(
   serializeUnsignedTransaction,
 );
 
-const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunWalletTokenAmount[] = [
+const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
     amountString: '100',

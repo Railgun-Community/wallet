@@ -1,14 +1,14 @@
 import {
   RailgunPopulateTransactionResponse,
   RailgunTransactionGasEstimateResponse,
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   TransactionGasDetailsSerialized,
   NetworkName,
   ProofType,
   FeeTokenDetails,
   sanitizeError,
   serializeUnsignedTransaction,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
 import {
@@ -26,9 +26,9 @@ export const populateProvedTransfer = async (
   railgunWalletID: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
@@ -68,7 +68,7 @@ export const gasEstimateForUnprovenTransfer = async (
   railgunWalletID: string,
   encryptionKey: string,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
@@ -78,7 +78,7 @@ export const gasEstimateForUnprovenTransfer = async (
     const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
+      (relayerFeeTokenAmount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.Transfer,
           networkName,

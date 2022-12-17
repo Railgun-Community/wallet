@@ -8,8 +8,8 @@ import {
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
-  RailgunWalletTokenAmount,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20Amount,
+  RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -39,7 +39,7 @@ const padTo32BytesUnHex = (str: string) => {
   return padToLength(str.replace('0x', ''), ByteLength.UINT_256);
 };
 
-const formatAmountString = (tokenAmount: RailgunWalletTokenAmount) => {
+const formatAmountString = (tokenAmount: RailgunERC20Amount) => {
   return BigInt(tokenAmount.amountString);
 };
 
@@ -62,7 +62,7 @@ describe('tx-notes', () => {
   });
 
   it('Should test erc20 note creation', () => {
-    const tokenAmountRecipient: RailgunWalletTokenAmountRecipient = {
+    const tokenAmountRecipient: RailgunERC20AmountRecipient = {
       tokenAddress: MOCK_TOKEN,
       amountString: '0x100',
       recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
@@ -98,7 +98,7 @@ describe('tx-notes', () => {
   });
 
   it('Should test NFT note creation', () => {
-    const tokenAmountRecipient: RailgunWalletTokenAmountRecipient = {
+    const tokenAmountRecipient: RailgunERC20AmountRecipient = {
       tokenAddress: MOCK_TOKEN,
       amountString: '0x100',
       recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
@@ -134,7 +134,7 @@ describe('tx-notes', () => {
   });
 
   it('Should test token array comparisons', () => {
-    const tokenAmountRecipients1: RailgunWalletTokenAmountRecipient[] = [
+    const tokenAmountRecipients1: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
@@ -153,7 +153,7 @@ describe('tx-notes', () => {
     ];
 
     // Same same
-    const tokenAmountRecipients2: RailgunWalletTokenAmountRecipient[] = [
+    const tokenAmountRecipients2: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
@@ -172,7 +172,7 @@ describe('tx-notes', () => {
     ];
 
     // Different addresses
-    const tokenAmountRecipients3: RailgunWalletTokenAmountRecipient[] = [
+    const tokenAmountRecipients3: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
@@ -191,7 +191,7 @@ describe('tx-notes', () => {
     ];
 
     // Different amounts
-    const tokenAmountRecipients4: RailgunWalletTokenAmountRecipient[] = [
+    const tokenAmountRecipients4: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',
@@ -210,7 +210,7 @@ describe('tx-notes', () => {
     ];
 
     // Different recipients
-    const tokenAmountRecipients5: RailgunWalletTokenAmountRecipient[] = [
+    const tokenAmountRecipients5: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
         amountString: '100',

@@ -8,7 +8,7 @@ import {
   deserializeTransaction,
   EVMGasType,
   TransactionGasDetailsSerialized,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 import {
   initTestEngine,
@@ -47,7 +47,7 @@ const gasDetailsSerialized: TransactionGasDetailsSerialized = {
   maxPriorityFeePerGasString: '0x100',
 };
 
-const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunWalletTokenAmountRecipient[] = [
+const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunERC20AmountRecipient[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
     amountString: '0x100',
@@ -60,19 +60,18 @@ const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunWalletTokenAmountRecipient[] = [
   },
 ];
 
-const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunWalletTokenAmountRecipient[] =
-  [
-    {
-      tokenAddress: MOCK_TOKEN_ADDRESS,
-      amountString: '0x100',
-      recipientAddress: '0x1234',
-    },
-    {
-      tokenAddress: MOCK_TOKEN_ADDRESS_2,
-      amountString: '0x200',
-      recipientAddress: '0x1234',
-    },
-  ];
+const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunERC20AmountRecipient[] = [
+  {
+    tokenAddress: MOCK_TOKEN_ADDRESS,
+    amountString: '0x100',
+    recipientAddress: '0x1234',
+  },
+  {
+    tokenAddress: MOCK_TOKEN_ADDRESS_2,
+    amountString: '0x200',
+    recipientAddress: '0x1234',
+  },
+];
 
 const stubSuccess = () => {
   gasEstimateStub = Sinon.stub(

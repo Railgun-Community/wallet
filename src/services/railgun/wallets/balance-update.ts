@@ -9,11 +9,11 @@ import {
 } from '@railgun-community/engine';
 import {
   RailgunBalancesEvent,
-  RailgunNFT,
-  RailgunShieldedTokenBalanceSerialized,
+  RailgunNFTAmount,
+  RailgunERC20Amount,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
-import { parseRailgunBalanceAddress } from '../util/bytes-util';
+import { parseRailgunTokenAddress } from '../util/bytes-util';
 
 export type BalancesUpdatedCallback = (
   balancesEvent: RailgunBalancesEvent,
@@ -27,9 +27,9 @@ export const setOnBalanceUpdateCallback = (
   onBalanceUpdateCallback = callback;
 };
 
-const getSerializedTokenBalances = (
+const getSerializedERC20Balances = (
   balances: Balances,
-): RailgunShieldedTokenBalanceSerialized[] => {
+): RailgunERC20Amount[] => {
   const tokenHashes = Object.keys(balances);
 
   return tokenHashes
@@ -37,11 +37,11 @@ const getSerializedTokenBalances = (
       return balances[tokenHash].tokenData.tokenType === TokenType.ERC20;
     })
     .map(railgunBalanceAddress => {
-      const erc20Balance: RailgunShieldedTokenBalanceSerialized = {
-        tokenAddress: parseRailgunBalanceAddress(
+      const erc20Balance: RailgunERC20Amount = {
+        tokenAddress: parseRailgunTokenAddress(
           balances[railgunBalanceAddress].tokenData.tokenAddress,
         ).toLowerCase(),
-        balanceString: nToHex(
+        amountString: nToHex(
           balances[railgunBalanceAddress].balance,
           ByteLength.UINT_256,
           true,
@@ -51,7 +51,7 @@ const getSerializedTokenBalances = (
     });
 };
 
-const getNFTs = (balances: Balances): RailgunNFT[] => {
+const getNFTBalances = (balances: Balances): RailgunNFTAmount[] => {
   const tokenHashes = Object.keys(balances);
 
   return tokenHashes
@@ -65,12 +65,17 @@ const getNFTs = (balances: Balances): RailgunNFT[] => {
     .map(tokenHash => {
       const tokenData = balances[tokenHash].tokenData;
 
-      const nftBalance: RailgunNFT = {
-        nftAddress: parseRailgunBalanceAddress(
+      const nftBalance: RailgunNFTAmount = {
+        nftAddress: parseRailgunTokenAddress(
           tokenData.tokenAddress,
         ).toLowerCase(),
         nftTokenType: tokenData.tokenType as 1 | 2,
         tokenSubID: tokenData.tokenSubID,
+        amountString: nToHex(
+          balances[tokenHash].balance,
+          ByteLength.UINT_256,
+          true,
+        ),
       };
       return nftBalance;
     });
@@ -88,13 +93,13 @@ export const onBalancesUpdate = async (
   }
 
   const balances = await wallet.balances(chain);
-  const tokenBalances = getSerializedTokenBalances(balances);
-  const nfts = getNFTs(balances);
+  const erc20Amounts = getSerializedERC20Balances(balances);
+  const nftAmounts = getNFTBalances(balances);
 
   const balancesEvent: RailgunBalancesEvent = {
     chain,
-    tokenBalances,
-    nfts,
+    erc20Amounts,
+    nftAmounts,
     railgunWalletID: wallet.id,
   };
 
@@ -107,16 +112,15 @@ export const balanceForERC20Token = async (
   tokenAddress: string,
 ): Promise<Optional<BigNumber>> => {
   const balances = await wallet.balances(chain);
-  const tokenBalances = getSerializedTokenBalances(balances);
+  const tokenBalances = getSerializedERC20Balances(balances);
 
-  const matchingTokenBalance: Optional<RailgunShieldedTokenBalanceSerialized> =
-    tokenBalances.find(
-      tokenBalance => tokenBalance.tokenAddress === tokenAddress,
-    );
+  const matchingTokenBalance: Optional<RailgunERC20Amount> = tokenBalances.find(
+    tokenBalance => tokenBalance.tokenAddress === tokenAddress,
+  );
 
   if (!matchingTokenBalance) {
     return undefined;
   }
 
-  return BigNumber.from(matchingTokenBalance.balanceString);
+  return BigNumber.from(matchingTokenBalance.amountString);
 };

@@ -3,8 +3,8 @@ import {
   NetworkName,
   ProofType,
   RailgunNFTAmountRecipient,
-  RailgunWalletTokenAmount,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20Amount,
+  RailgunERC20AmountRecipient,
   TransactionGasDetailsSerialized,
   ValidateCachedProvedTransactionResponse,
 } from '@railgun-community/shared-models';
@@ -24,12 +24,12 @@ export type ProvedTransaction = {
   railgunWalletID: string;
   showSenderAddressToRecipient: boolean;
   memoText: Optional<string>;
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[];
+  tokenAmountRecipients: RailgunERC20AmountRecipient[];
   nftAmountRecipients: RailgunNFTAmountRecipient[];
-  relayAdaptUnshieldTokenAmounts: Optional<RailgunWalletTokenAmount[]>;
+  relayAdaptUnshieldTokenAmounts: Optional<RailgunERC20Amount[]>;
   relayAdaptShieldTokenAddresses: Optional<string[]>;
   crossContractCallsSerialized: Optional<string[]>;
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>;
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>;
   sendWithPublicWallet: boolean;
   overallBatchMinGasPrice: Optional<string>;
 };
@@ -42,12 +42,12 @@ export const populateProvedTransaction = async (
   railgunWalletID: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayAdaptUnshieldTokenAmounts: Optional<RailgunWalletTokenAmount[]>,
+  relayAdaptUnshieldTokenAmounts: Optional<RailgunERC20Amount[]>,
   relayAdaptShieldTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
@@ -111,12 +111,12 @@ export const validateCachedProvedTransaction = (
   railgunWalletID: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayAdaptUnshieldTokenAmounts: Optional<RailgunWalletTokenAmount[]>,
+  relayAdaptUnshieldTokenAmounts: Optional<RailgunERC20Amount[]>,
   relayAdaptShieldTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
 ): ValidateCachedProvedTransactionResponse => {

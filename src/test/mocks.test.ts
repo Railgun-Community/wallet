@@ -2,7 +2,7 @@ import {
   FallbackProviderJsonConfig,
   FeeTokenDetails,
   EVMGasType,
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   TransactionGasDetailsSerialized,
   RailgunNFTAmountRecipient,
   NFTTokenType,
@@ -35,14 +35,14 @@ export const TEST_POLYGON_RPC = 'https://polygon-rpc.com';
 
 export const TEST_WALLET_SOURCE = 'test engine';
 
-export const MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY: RailgunWalletTokenAmount[] = [
+export const MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
     amountString: '0x100',
   },
 ];
 
-export const MOCK_TOKEN_AMOUNTS: RailgunWalletTokenAmount[] = [
+export const MOCK_TOKEN_AMOUNTS: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
     amountString: '0x100',
@@ -76,7 +76,7 @@ export const MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD: RailgunNFTAmountRecipient[] =
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
   }));
 
-export const MOCK_TOKEN_FEE: RailgunWalletTokenAmount = {
+export const MOCK_TOKEN_FEE: RailgunERC20Amount = {
   tokenAddress: MOCK_TOKEN_ADDRESS,
   amountString: '0x0300',
 };

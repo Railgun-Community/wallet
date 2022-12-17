@@ -1,10 +1,10 @@
 import {
   RailgunProveTransactionResponse,
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   NetworkName,
   ProofType,
   sanitizeError,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
 import {
@@ -29,9 +29,9 @@ export const generateUnshieldProof = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
@@ -87,8 +87,8 @@ export const generateUnshieldBaseTokenProof = async (
   publicWalletAddress: string,
   railgunWalletID: string,
   encryptionKey: string,
-  wrappedTokenAmount: RailgunWalletTokenAmount,
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
+  wrappedTokenAmount: RailgunERC20Amount,
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
@@ -99,18 +99,18 @@ export const generateUnshieldBaseTokenProof = async (
 
     setCachedProvedTransaction(undefined);
 
-    const tokenAmountRecipients: RailgunWalletTokenAmountRecipient[] = [
+    const tokenAmountRecipients: RailgunERC20AmountRecipient[] = [
       {
         ...wrappedTokenAmount,
         recipientAddress: publicWalletAddress,
       },
     ];
 
-    const relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[] = [
+    const relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[] = [
       wrappedTokenAmount,
     ];
 
-    const relayAdaptUnshieldTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+    const relayAdaptUnshieldTokenAmountRecipients: RailgunERC20AmountRecipient[] =
       createRelayAdaptUnshieldTokenAmountRecipients(networkName, [
         wrappedTokenAmount,
       ]);

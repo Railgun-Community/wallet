@@ -11,12 +11,12 @@ import {
 import {
   NFTTokenType,
   RailgunNFTAmountRecipient,
-  RailgunWalletTokenAmount,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20Amount,
+  RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 
 export const erc20NoteFromTokenAmountRecipient = (
-  tokenAmountRecipient: RailgunWalletTokenAmountRecipient,
+  tokenAmountRecipient: RailgunERC20AmountRecipient,
   railgunWallet: RailgunWallet,
   outputType: OutputType,
   showSenderAddressToRecipient: boolean,
@@ -94,8 +94,8 @@ export const nftNoteFromNFTAmountRecipient = (
 };
 
 const compareTokenAmounts = (
-  a: Optional<RailgunWalletTokenAmount>,
-  b: Optional<RailgunWalletTokenAmount>,
+  a: Optional<RailgunERC20Amount>,
+  b: Optional<RailgunERC20Amount>,
 ) => {
   return (
     a?.tokenAddress === b?.tokenAddress && a?.amountString === b?.amountString
@@ -103,8 +103,8 @@ const compareTokenAmounts = (
 };
 
 export const compareTokenAmountRecipients = (
-  a: Optional<RailgunWalletTokenAmountRecipient>,
-  b: Optional<RailgunWalletTokenAmountRecipient>,
+  a: Optional<RailgunERC20AmountRecipient>,
+  b: Optional<RailgunERC20AmountRecipient>,
 ) => {
   return (
     compareTokenAmounts(a, b) && a?.recipientAddress === b?.recipientAddress
@@ -112,8 +112,8 @@ export const compareTokenAmountRecipients = (
 };
 
 export const compareTokenAmountArrays = (
-  a: Optional<RailgunWalletTokenAmount[]>,
-  b: Optional<RailgunWalletTokenAmount[]>,
+  a: Optional<RailgunERC20Amount[]>,
+  b: Optional<RailgunERC20Amount[]>,
 ) => {
   if (!a && !b) {
     return true;
@@ -137,8 +137,8 @@ export const compareTokenAmountArrays = (
 };
 
 export const compareTokenAmountRecipientArrays = (
-  a: Optional<RailgunWalletTokenAmountRecipient[]>,
-  b: Optional<RailgunWalletTokenAmountRecipient[]>,
+  a: Optional<RailgunERC20AmountRecipient[]>,
+  b: Optional<RailgunERC20AmountRecipient[]>,
 ) => {
   if (!a && !b) {
     return true;

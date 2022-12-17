@@ -6,7 +6,7 @@ import {
   NetworkName,
   sanitizeError,
   serializeUnsignedTransaction,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
 import {
@@ -35,7 +35,7 @@ export const getShieldPrivateKeySignatureMessage = () => {
 };
 
 const generateERC20Shield = async (
-  tokenAmountRecipient: RailgunWalletTokenAmountRecipient,
+  tokenAmountRecipient: RailgunERC20AmountRecipient,
   random: string,
   shieldPrivateKey: string,
 ) => {
@@ -80,7 +80,7 @@ const generateNFTShield = async (
 const generateShieldTransactions = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
 ): Promise<PopulatedTransaction> => {
   try {
@@ -110,7 +110,7 @@ const generateShieldTransactions = async (
 export const populateShield = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
@@ -147,7 +147,7 @@ export const populateShield = async (
 export const gasEstimateForShield = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   fromWalletAddress: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {

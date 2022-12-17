@@ -7,28 +7,29 @@ import {
   TokenType,
   formatToByteLength,
   ByteLength,
+  nToHex,
 } from '@railgun-community/engine';
 import {
   LoadRailgunWalletResponse,
   TransactionHistorySerializedResponse,
   TransactionHistoryItem,
-  RailgunWalletTokenAmount,
-  RailgunWalletSendTokenAmount,
-  RailgunWalletReceiveTokenAmount,
-  RailgunWalletSendNFT,
-  RailgunNFT,
-  RailgunWalletReceiveNFT,
+  RailgunERC20Amount,
+  RailgunSendERC20Amount,
+  RailgunReceiveERC20Amount,
+  RailgunSendNFTAmount,
+  RailgunNFTAmount,
+  RailgunReceiveNFTAmount,
 } from '@railgun-community/shared-models';
 import { walletForID } from '../core/engine';
 import { sendErrorMessage } from '../../../utils/logger';
 import { BigNumber } from '@ethersproject/bignumber';
-import { parseRailgunBalanceAddress } from '../util/bytes-util';
+import { parseRailgunTokenAddress } from '../util/bytes-util';
 
-const transactionHistoryReceiveTokenAmountToRailgunTokenAmount = (
+const transactionHistoryReceiveTokenAmountToRailgunERC20Amount = (
   transactionHistoryReceiveTokenAmount: TransactionHistoryReceiveTokenAmount,
-): RailgunWalletReceiveTokenAmount => {
+): RailgunReceiveERC20Amount => {
   return {
-    ...transactionHistoryTokenAmountToRailgunTokenAmount(
+    ...transactionHistoryTokenAmountToRailgunERC20Amount(
       transactionHistoryReceiveTokenAmount,
     ),
     memoText: transactionHistoryReceiveTokenAmount.memoText,
@@ -36,23 +37,25 @@ const transactionHistoryReceiveTokenAmountToRailgunTokenAmount = (
   };
 };
 
-const transactionHistoryReceiveNFTToRailgunNFT = (
+const transactionHistoryReceiveNFTToRailgunNFTAmount = (
   transactionHistoryReceiveTokenAmount: TransactionHistoryReceiveTokenAmount,
-): RailgunWalletReceiveNFT => {
+): RailgunReceiveNFTAmount => {
   return {
-    ...transactionHistoryNFTToRailgunNFT(transactionHistoryReceiveTokenAmount),
+    ...transactionHistoryNFTToRailgunNFTAmount(
+      transactionHistoryReceiveTokenAmount,
+    ),
     memoText: transactionHistoryReceiveTokenAmount.memoText,
     senderAddress: transactionHistoryReceiveTokenAmount.senderAddress,
   };
 };
 
-const transactionHistoryTransferTokenAmountToRailgunTokenAmount = (
+const transactionHistoryTransferTokenAmountToRailgunERC20Amount = (
   transactionHistoryTokenAmount: TransactionHistoryTransferTokenAmount,
-): RailgunWalletSendTokenAmount => {
+): RailgunSendERC20Amount => {
   const walletSource =
     transactionHistoryTokenAmount.noteAnnotationData?.walletSource;
   return {
-    ...transactionHistoryTokenAmountToRailgunTokenAmount(
+    ...transactionHistoryTokenAmountToRailgunERC20Amount(
       transactionHistoryTokenAmount,
     ),
     recipientAddress: transactionHistoryTokenAmount.recipientAddress,
@@ -61,23 +64,23 @@ const transactionHistoryTransferTokenAmountToRailgunTokenAmount = (
   };
 };
 
-const transactionHistoryTransferNFTToRailgunNFT = (
+const transactionHistoryTransferNFTToRailgunNFTAmount = (
   transactionHistoryNFT: TransactionHistoryTransferTokenAmount,
-): RailgunWalletSendNFT => {
+): RailgunSendNFTAmount => {
   const walletSource = transactionHistoryNFT.noteAnnotationData?.walletSource;
   return {
-    ...transactionHistoryNFTToRailgunNFT(transactionHistoryNFT),
+    ...transactionHistoryNFTToRailgunNFTAmount(transactionHistoryNFT),
 
     memoText: transactionHistoryNFT.memoText,
     walletSource,
   };
 };
 
-const transactionHistoryTokenAmountToRailgunTokenAmount = (
+const transactionHistoryTokenAmountToRailgunERC20Amount = (
   transactionHistoryTokenAmount: TransactionHistoryTokenAmount,
-): RailgunWalletTokenAmount => {
+): RailgunERC20Amount => {
   return {
-    tokenAddress: parseRailgunBalanceAddress(
+    tokenAddress: parseRailgunTokenAddress(
       transactionHistoryTokenAmount.tokenData.tokenAddress,
     ).toLowerCase(),
     amountString: BigNumber.from(
@@ -86,15 +89,20 @@ const transactionHistoryTokenAmountToRailgunTokenAmount = (
   };
 };
 
-const transactionHistoryNFTToRailgunNFT = (
+const transactionHistoryNFTToRailgunNFTAmount = (
   transactionHistoryNFT: TransactionHistoryTokenAmount,
-): RailgunNFT => {
+): RailgunNFTAmount => {
   return {
-    nftAddress: parseRailgunBalanceAddress(
+    nftAddress: parseRailgunTokenAddress(
       transactionHistoryNFT.tokenData.tokenAddress,
     ).toLowerCase(),
     nftTokenType: transactionHistoryNFT.tokenData.tokenType as 1 | 2,
     tokenSubID: transactionHistoryNFT.tokenData.tokenSubID,
+    amountString: nToHex(
+      transactionHistoryNFT.amount,
+      ByteLength.UINT_256,
+      true,
+    ),
   };
 };
 
@@ -117,32 +125,32 @@ const serializeTransactionHistory = (
 ): TransactionHistoryItem[] => {
   return transactionHistory.map(historyItem => ({
     txid: formatToByteLength(historyItem.txid, ByteLength.UINT_256, true),
-    transferTokenAmounts: historyItem.transferTokenAmounts
+    transferERC20Amounts: historyItem.transferTokenAmounts
       .filter(filterERC20)
-      .map(transactionHistoryTransferTokenAmountToRailgunTokenAmount),
-    relayerFeeTokenAmount: historyItem.relayerFeeTokenAmount
-      ? transactionHistoryTokenAmountToRailgunTokenAmount(
+      .map(transactionHistoryTransferTokenAmountToRailgunERC20Amount),
+    relayerFeeERC20Amount: historyItem.relayerFeeTokenAmount
+      ? transactionHistoryTokenAmountToRailgunERC20Amount(
           historyItem.relayerFeeTokenAmount,
         )
       : undefined,
-    changeTokenAmounts: historyItem.changeTokenAmounts
+    changeERC20Amounts: historyItem.changeTokenAmounts
       .filter(filterERC20)
-      .map(transactionHistoryTokenAmountToRailgunTokenAmount),
-    receiveTokenAmounts: historyItem.receiveTokenAmounts
+      .map(transactionHistoryTokenAmountToRailgunERC20Amount),
+    receiveERC20Amounts: historyItem.receiveTokenAmounts
       .filter(filterERC20)
-      .map(transactionHistoryReceiveTokenAmountToRailgunTokenAmount),
-    unshieldTokenAmounts: historyItem.unshieldTokenAmounts
+      .map(transactionHistoryReceiveTokenAmountToRailgunERC20Amount),
+    unshieldERC20Amounts: historyItem.unshieldTokenAmounts
       .filter(filterERC20)
-      .map(transactionHistoryTransferTokenAmountToRailgunTokenAmount),
-    receiveNFTs: historyItem.receiveTokenAmounts
+      .map(transactionHistoryTransferTokenAmountToRailgunERC20Amount),
+    receiveNFTAmounts: historyItem.receiveTokenAmounts
       .filter(filterNFT)
-      .map(transactionHistoryReceiveNFTToRailgunNFT),
-    transferNFTs: historyItem.transferTokenAmounts
+      .map(transactionHistoryReceiveNFTToRailgunNFTAmount),
+    transferNFTAmounts: historyItem.transferTokenAmounts
       .filter(filterNFT)
-      .map(transactionHistoryTransferNFTToRailgunNFT),
-    unshieldNFTs: historyItem.unshieldTokenAmounts
+      .map(transactionHistoryTransferNFTToRailgunNFTAmount),
+    unshieldNFTAmounts: historyItem.unshieldTokenAmounts
       .filter(filterNFT)
-      .map(transactionHistoryTransferNFTToRailgunNFT),
+      .map(transactionHistoryTransferNFTToRailgunNFTAmount),
     version: historyItem.version,
   }));
 };

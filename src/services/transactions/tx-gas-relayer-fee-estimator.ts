@@ -4,13 +4,13 @@ import { TransactionStruct } from '@railgun-community/engine';
 import {
   NetworkName,
   TransactionGasDetails,
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   TransactionGasDetailsSerialized,
   RailgunTransactionGasEstimateResponse,
   FeeTokenDetails,
   calculateMaximumGas,
   NETWORK_CONFIG,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 import {
   DUMMY_FROM_ADDRESS,
@@ -29,7 +29,7 @@ const MAX_ITERATIONS_RELAYER_FEE_REESTIMATION = 5;
 export const calculateRelayerFeeTokenAmount = (
   feeTokenDetails: FeeTokenDetails,
   gasDetails: TransactionGasDetails,
-): RailgunWalletTokenAmount => {
+): RailgunERC20Amount => {
   const tokenFeePerUnitGas = BigNumber.from(feeTokenDetails.feePerUnitGas);
   const oneUnitGas = BigNumber.from(10).pow(18);
   const maximumGas = calculateMaximumGas(gasDetails);
@@ -49,7 +49,7 @@ const getUpdatedRelayerFeeForGasEstimation = async (
   feeTokenDetails: FeeTokenDetails,
   sendWithPublicWallet: boolean,
   multiplierBasisPoints?: number,
-): Promise<RailgunWalletTokenAmount> => {
+): Promise<RailgunERC20Amount> => {
   const gasEstimate = await getGasEstimate(
     networkName,
     populatedTransaction,
@@ -63,7 +63,7 @@ const getUpdatedRelayerFeeForGasEstimation = async (
     gasEstimate,
   };
 
-  const relayerFeeTokenAmount: RailgunWalletTokenAmount =
+  const relayerFeeTokenAmount: RailgunERC20Amount =
     calculateRelayerFeeTokenAmount(feeTokenDetails, updatedGasDetails);
 
   return relayerFeeTokenAmount;
@@ -71,14 +71,14 @@ const getUpdatedRelayerFeeForGasEstimation = async (
 
 export const gasEstimateResponseIterativeRelayerFee = async (
   generateTransactionStructs: (
-    relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
+    relayerFeeTokenAmount: Optional<RailgunERC20Amount>,
   ) => Promise<TransactionStruct[]>,
   generatePopulatedTransaction: (
     serializedTransactions: TransactionStruct[],
   ) => Promise<PopulatedTransaction>,
   networkName: NetworkName,
   railgunWalletID: string,
-  tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
+  tokenAmountRecipients: RailgunERC20AmountRecipient[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
@@ -229,8 +229,8 @@ const compareCircuitSizesTransactionStructs = (
 
 const relayerFeeWillOverflowBalance = async (
   tokenBalance: BigNumber,
-  sendingTokenAmount: RailgunWalletTokenAmount,
-  relayerFeeTokenAmount: RailgunWalletTokenAmount,
+  sendingTokenAmount: RailgunERC20Amount,
+  relayerFeeTokenAmount: RailgunERC20Amount,
 ) => {
   const sendingAmount = BigNumber.from(sendingTokenAmount.amountString);
   const relayerFeeAmount = BigNumber.from(relayerFeeTokenAmount.amountString);

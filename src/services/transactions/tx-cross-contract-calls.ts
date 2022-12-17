@@ -2,7 +2,7 @@ import {
   RailgunPopulateTransactionResponse,
   RailgunProveTransactionResponse,
   RailgunTransactionGasEstimateResponse,
-  RailgunWalletTokenAmount,
+  RailgunERC20Amount,
   TransactionGasDetailsSerialized,
   NetworkName,
   NETWORK_CONFIG,
@@ -12,7 +12,7 @@ import {
   sanitizeError,
   deserializeTransaction,
   serializeUnsignedTransaction,
-  RailgunWalletTokenAmountRecipient,
+  RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
@@ -74,10 +74,10 @@ const createPopulatedCrossContractCalls = (
 
 export const createRelayAdaptUnshieldTokenAmountRecipients = (
   networkName: NetworkName,
-  unshieldTokenAmounts: RailgunWalletTokenAmount[],
-): RailgunWalletTokenAmountRecipient[] => {
+  unshieldTokenAmounts: RailgunERC20Amount[],
+): RailgunERC20AmountRecipient[] => {
   const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
-  const unshieldTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+  const unshieldTokenAmountRecipients: RailgunERC20AmountRecipient[] =
     unshieldTokenAmounts.map(unshieldTokenAmount => ({
       ...unshieldTokenAmount,
       recipientAddress: relayAdaptContract.address,
@@ -88,10 +88,10 @@ export const createRelayAdaptUnshieldTokenAmountRecipients = (
 export const populateProvedCrossContractCalls = async (
   networkName: NetworkName,
   railgunWalletID: string,
-  relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[],
+  relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[],
   relayAdaptShieldTokenAddresses: string[],
   crossContractCallsSerialized: string[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
@@ -132,7 +132,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
-  relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[],
+  relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[],
   relayAdaptShieldTokenAddresses: string[],
   crossContractCallsSerialized: string[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
@@ -153,7 +153,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
-    const relayAdaptUnshieldTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+    const relayAdaptUnshieldTokenAmountRecipients: RailgunERC20AmountRecipient[] =
       createRelayAdaptUnshieldTokenAmountRecipients(
         networkName,
         relayAdaptUnshieldTokenAmounts,
@@ -177,7 +177,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
     const multiplierBasisPoints = 14000;
 
     const response = await gasEstimateResponseIterativeRelayerFee(
-      (relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>) =>
+      (relayerFeeTokenAmount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.CrossContractCalls,
           networkName,
@@ -223,10 +223,10 @@ export const generateCrossContractCallsProof = async (
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
-  relayAdaptUnshieldTokenAmounts: RailgunWalletTokenAmount[],
+  relayAdaptUnshieldTokenAmounts: RailgunERC20Amount[],
   relayAdaptShieldTokenAddresses: string[],
   crossContractCallsSerialized: string[],
-  relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
+  relayerFeeTokenAmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
@@ -243,7 +243,7 @@ export const generateCrossContractCallsProof = async (
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
-    const relayAdaptUnshieldTokenAmountRecipients: RailgunWalletTokenAmountRecipient[] =
+    const relayAdaptUnshieldTokenAmountRecipients: RailgunERC20AmountRecipient[] =
       createRelayAdaptUnshieldTokenAmountRecipients(
         networkName,
         relayAdaptUnshieldTokenAmounts,
