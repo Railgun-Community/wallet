@@ -16,7 +16,7 @@ import {
   EVMGasType,
   TransactionGasDetailsSerialized,
   RailgunWalletTokenAmountRecipient,
-  RailgunNFTRecipient,
+  RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
@@ -30,7 +30,7 @@ import {
   MOCK_FEE_TOKEN_DETAILS,
   MOCK_MEMO,
   MOCK_MNEMONIC,
-  MOCK_NFT_RECIPIENTS,
+  MOCK_NFT_AMOUNT_RECIPIENTS,
   MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_ADDRESS,
   MOCK_TOKEN_ADDRESS_2,
@@ -89,9 +89,9 @@ const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunWalletTokenAmountRecipient[] 
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
   }));
 
-const MOCK_NFT_RECIPIENTS_INVALID: RailgunNFTRecipient[] =
-  MOCK_NFT_RECIPIENTS.map(nftRecipient => ({
-    ...nftRecipient,
+const MOCK_NFT_AMOUNT_RECIPIENTS_INVALID: RailgunNFTAmountRecipient[] =
+  MOCK_NFT_AMOUNT_RECIPIENTS.map(nftAmountRecipient => ({
+    ...nftAmountRecipient,
     recipientAddress: MOCK_ETH_WALLET_ADDRESS,
   }));
 
@@ -126,7 +126,7 @@ const spyOnERC20Note = () => {
 };
 
 const spyOnNFTNote = () => {
-  nftNoteSpy = Sinon.spy(txNotes, 'nftNoteFromNFTRecipient');
+  nftNoteSpy = Sinon.spy(txNotes, 'nftNoteFromNFTAmountRecipient');
 };
 
 describe('tx-transfer', () => {
@@ -210,7 +210,7 @@ describe('tx-transfer', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      [], // nftRecipients
+      [], // nftAmountRecipients
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -236,7 +236,7 @@ describe('tx-transfer', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      [], // nftRecipients
+      [], // nftAmountRecipients
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       true, // sendWithPublicWallet
@@ -257,7 +257,7 @@ describe('tx-transfer', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
-      [], // nftRecipients
+      [], // nftAmountRecipients
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -273,7 +273,7 @@ describe('tx-transfer', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      [], // nftRecipients
+      [], // nftAmountRecipients
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -292,7 +292,7 @@ describe('tx-transfer', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
       [], // tokenAmountRecipients
-      MOCK_NFT_RECIPIENTS, // nftRecipients
+      MOCK_NFT_AMOUNT_RECIPIENTS, // nftAmountRecipients
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -316,7 +316,7 @@ describe('tx-transfer', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
       [], // tokenAmountRecipients
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       true, // sendWithPublicWallet
@@ -337,7 +337,7 @@ describe('tx-transfer', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MEMO,
       [], // tokenAmountRecipients
-      MOCK_NFT_RECIPIENTS_INVALID,
+      MOCK_NFT_AMOUNT_RECIPIENTS_INVALID,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -359,7 +359,7 @@ describe('tx-transfer', () => {
       true, // showSenderAddressToRecipient
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -371,7 +371,7 @@ describe('tx-transfer', () => {
     );
     expect(nftNoteSpy.called).to.be.true;
     expect(nftNoteSpy.args[0][0].nftAddress).to.equal(
-      MOCK_NFT_RECIPIENTS[0].nftAddress,
+      MOCK_NFT_AMOUNT_RECIPIENTS[0].nftAddress,
     );
     expect(proofResponse.error).to.be.undefined;
     const populateResponse = await populateProvedTransfer(
@@ -380,7 +380,7 @@ describe('tx-transfer', () => {
       true, // showSenderAddressToRecipient
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -416,7 +416,7 @@ describe('tx-transfer', () => {
       false, // showSenderAddressToRecipient
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -436,7 +436,7 @@ describe('tx-transfer', () => {
       true, // showSenderAddressToRecipient
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -449,7 +449,7 @@ describe('tx-transfer', () => {
       true, // showSenderAddressToRecipient
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       relayerFeeTokenAmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,

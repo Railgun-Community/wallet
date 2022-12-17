@@ -15,7 +15,7 @@ import {
 import {
   NetworkName,
   ProofType,
-  RailgunNFTRecipient,
+  RailgunNFTAmountRecipient,
   RailgunProveTransactionResponse,
   RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
@@ -30,7 +30,7 @@ import {
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_MEMO,
   MOCK_MNEMONIC,
-  MOCK_NFT_RECIPIENTS,
+  MOCK_NFT_AMOUNT_RECIPIENTS,
   MOCK_TOKEN_ADDRESS,
   MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY,
   MOCK_TOKEN_FEE,
@@ -44,7 +44,7 @@ let railgunWallet: RailgunWallet;
 let railgunWalletAddress: string;
 let relayerFeeTokenAmountRecipient: RailgunWalletTokenAmountRecipient;
 let tokenAmountRecipients: RailgunWalletTokenAmountRecipient[];
-let nftRecipients: RailgunNFTRecipient[];
+let nftAmountRecipients: RailgunNFTAmountRecipient[];
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -77,7 +77,7 @@ describe.skip('tx-proof-unshield', () => {
         recipientAddress: MOCK_ETH_WALLET_ADDRESS,
       }),
     );
-    nftRecipients = MOCK_NFT_RECIPIENTS;
+    nftAmountRecipients = MOCK_NFT_AMOUNT_RECIPIENTS;
 
     const { railgunWalletInfo: relayerWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
@@ -182,7 +182,7 @@ describe.skip('tx-proof-unshield', () => {
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,
         tokenAmountRecipients,
-        nftRecipients,
+        nftAmountRecipients,
         relayerFeeTokenAmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,

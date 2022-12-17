@@ -2,7 +2,7 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   NetworkName,
   ProofType,
-  RailgunNFTRecipient,
+  RailgunNFTAmountRecipient,
   RailgunWalletTokenAmount,
   RailgunWalletTokenAmountRecipient,
   TransactionGasDetailsSerialized,
@@ -15,7 +15,7 @@ import {
   compareTokenAmountRecipients,
   compareTokenAmountRecipientArrays,
   compareTokenAmountArrays,
-  compareNFTRecipientArrays,
+  compareNFTAmountRecipientArrays,
 } from './tx-notes';
 
 export type ProvedTransaction = {
@@ -25,7 +25,7 @@ export type ProvedTransaction = {
   showSenderAddressToRecipient: boolean;
   memoText: Optional<string>;
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[];
-  nftRecipients: RailgunNFTRecipient[];
+  nftAmountRecipients: RailgunNFTAmountRecipient[];
   relayAdaptUnshieldTokenAmounts: Optional<RailgunWalletTokenAmount[]>;
   relayAdaptShieldTokenAddresses: Optional<string[]>;
   crossContractCallsSerialized: Optional<string[]>;
@@ -43,7 +43,7 @@ export const populateProvedTransaction = async (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
-  nftRecipients: RailgunNFTRecipient[],
+  nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayAdaptUnshieldTokenAmounts: Optional<RailgunWalletTokenAmount[]>,
   relayAdaptShieldTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
@@ -58,7 +58,7 @@ export const populateProvedTransaction = async (
     showSenderAddressToRecipient,
     memoText,
     tokenAmountRecipients,
-    nftRecipients,
+    nftAmountRecipients,
     relayAdaptUnshieldTokenAmounts,
     relayAdaptShieldTokenAddresses,
     crossContractCallsSerialized,
@@ -112,7 +112,7 @@ export const validateCachedProvedTransaction = (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
-  nftRecipients: RailgunNFTRecipient[],
+  nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayAdaptUnshieldTokenAmounts: Optional<RailgunWalletTokenAmount[]>,
   relayAdaptShieldTokenAddresses: Optional<string[]>,
   crossContractCallsSerialized: Optional<string[]>,
@@ -147,12 +147,12 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'Mismatch: tokenAmountRecipients.';
   } else if (
-    !compareNFTRecipientArrays(
-      nftRecipients,
-      cachedProvedTransaction.nftRecipients,
+    !compareNFTAmountRecipientArrays(
+      nftAmountRecipients,
+      cachedProvedTransaction.nftAmountRecipients,
     )
   ) {
-    error = 'Mismatch: nftRecipients.';
+    error = 'Mismatch: nftAmountRecipients.';
   } else if (
     !compareTokenAmountArrays(
       relayAdaptUnshieldTokenAmounts,

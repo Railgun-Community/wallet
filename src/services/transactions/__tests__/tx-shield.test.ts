@@ -18,7 +18,7 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_MNEMONIC,
-  MOCK_NFT_RECIPIENTS,
+  MOCK_NFT_AMOUNT_RECIPIENTS,
   MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_ADDRESS,
   MOCK_TOKEN_ADDRESS_2,
@@ -116,7 +116,7 @@ describe('tx-shield', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.be.undefined;
@@ -129,7 +129,7 @@ describe('tx-shield', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.equal('Invalid RAILGUN address.');
@@ -141,7 +141,7 @@ describe('tx-shield', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
     expect(rsp.error).to.equal('test rejection - gas estimate');
@@ -153,7 +153,7 @@ describe('tx-shield', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.be.undefined;
@@ -173,7 +173,7 @@ describe('tx-shield', () => {
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
-      MOCK_NFT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
       gasDetailsSerialized,
     );
     expect(rsp.error).to.equal('Invalid RAILGUN address.');

@@ -9,7 +9,8 @@ import {
   getTokenDataNFT,
 } from '@railgun-community/engine';
 import {
-  RailgunNFTRecipient,
+  NFTTokenType,
+  RailgunNFTAmountRecipient,
   RailgunWalletTokenAmount,
   RailgunWalletTokenAmountRecipient,
 } from '@railgun-community/shared-models';
@@ -43,14 +44,19 @@ export const erc20NoteFromTokenAmountRecipient = (
   );
 };
 
-export const nftNoteFromNFTRecipient = (
-  nftRecipient: RailgunNFTRecipient,
+export const nftNoteFromNFTAmountRecipient = (
+  nftAmountRecipient: RailgunNFTAmountRecipient,
   railgunWallet: RailgunWallet,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
 ): TransactNote => {
-  const { recipientAddress, nftAddress, nftTokenType, tokenSubID } =
-    nftRecipient;
+  const {
+    recipientAddress,
+    nftAddress,
+    nftTokenType,
+    tokenSubID,
+    amountString,
+  } = nftAmountRecipient;
 
   const random = randomHex(16);
 
@@ -62,15 +68,29 @@ export const nftNoteFromNFTRecipient = (
     tokenSubID,
   );
 
-  return TransactNote.createNFTTransfer(
-    receiverAddressData,
-    railgunWallet.addressKeys,
-    random,
-    tokenData,
-    railgunWallet.getViewingKeyPair(),
-    showSenderAddressToRecipient,
-    memoText,
-  );
+  switch (nftTokenType) {
+    case NFTTokenType.ERC721:
+      return TransactNote.createERC721Transfer(
+        receiverAddressData,
+        railgunWallet.addressKeys,
+        random,
+        tokenData,
+        railgunWallet.getViewingKeyPair(),
+        showSenderAddressToRecipient,
+        memoText,
+      );
+    case NFTTokenType.ERC1155:
+      return TransactNote.createERC1155Transfer(
+        receiverAddressData,
+        railgunWallet.addressKeys,
+        random,
+        tokenData,
+        BigInt(amountString),
+        railgunWallet.getViewingKeyPair(),
+        showSenderAddressToRecipient,
+        memoText,
+      );
+  }
 };
 
 const compareTokenAmounts = (
@@ -144,9 +164,9 @@ export const compareTokenAmountRecipientArrays = (
   return true;
 };
 
-export const compareNFTRecipientArrays = (
-  a: Optional<RailgunNFTRecipient[]>,
-  b: Optional<RailgunNFTRecipient[]>,
+export const compareNFTAmountRecipientArrays = (
+  a: Optional<RailgunNFTAmountRecipient[]>,
+  b: Optional<RailgunNFTAmountRecipient[]>,
 ) => {
   if (!a && !b) {
     return true;
@@ -157,19 +177,22 @@ export const compareNFTRecipientArrays = (
   if (a.length !== b.length) {
     return false;
   }
-  for (const nftRecipient of a) {
+  for (const nftAmountRecipient of a) {
     const found = b.find(
       ta =>
-        ta.nftAddress === nftRecipient.nftAddress &&
-        ta.tokenSubID === nftRecipient.tokenSubID,
+        ta.nftAddress === nftAmountRecipient.nftAddress &&
+        ta.tokenSubID === nftAmountRecipient.tokenSubID,
     );
     if (!found) {
       return false;
     }
-    if (found.nftTokenType !== nftRecipient.nftTokenType) {
+    if (found.nftTokenType !== nftAmountRecipient.nftTokenType) {
       return false;
     }
-    if (found.recipientAddress !== nftRecipient.recipientAddress) {
+    if (found.recipientAddress !== nftAmountRecipient.recipientAddress) {
+      return false;
+    }
+    if (found.amountString !== nftAmountRecipient.amountString) {
       return false;
     }
   }

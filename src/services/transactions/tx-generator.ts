@@ -9,7 +9,7 @@ import {
   getTokenDataERC20,
   TokenData,
   getTokenDataNFT,
-  NFT_NOTE_VALUE,
+  ERC721_NOTE_VALUE,
 } from '@railgun-community/engine';
 import {
   RailgunWalletTokenAmount,
@@ -17,7 +17,8 @@ import {
   NetworkName,
   NETWORK_CONFIG,
   ProofType,
-  RailgunNFTRecipient,
+  RailgunNFTAmountRecipient,
+  NFTTokenType,
 } from '@railgun-community/shared-models';
 import { fullWalletForID, walletForID } from '../railgun/core/engine';
 import {
@@ -26,7 +27,7 @@ import {
 } from '../railgun/core/providers';
 import {
   erc20NoteFromTokenAmountRecipient,
-  nftNoteFromNFTRecipient,
+  nftNoteFromNFTAmountRecipient,
 } from './tx-notes';
 import { getProver } from '../railgun/core/prover';
 import { assertValidEthAddress, assertValidRailgunAddress } from '../railgun';
@@ -44,7 +45,7 @@ export const generateProofTransactions = async (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
-  nftRecipients: RailgunNFTRecipient[],
+  nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayerFeeTokenAmountRecipient: Optional<RailgunWalletTokenAmountRecipient>,
   sendWithPublicWallet: boolean,
   relayAdaptID: Optional<AdaptID>,
@@ -57,7 +58,7 @@ export const generateProofTransactions = async (
   const txs: TransactionStruct[] = await transactionsFromTokenAmounts(
     proofType,
     tokenAmountRecipients,
-    nftRecipients,
+    nftAmountRecipients,
     railgunWallet,
     encryptionKey,
     showSenderAddressToRecipient,
@@ -89,7 +90,7 @@ export const generateDummyProofTransactions = async (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
-  nftRecipients: RailgunNFTRecipient[],
+  nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayerFeeTokenAmount: Optional<RailgunWalletTokenAmount>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
@@ -119,7 +120,7 @@ export const generateDummyProofTransactions = async (
     showSenderAddressToRecipient,
     memoText,
     tokenAmountRecipients,
-    nftRecipients,
+    nftAmountRecipients,
     relayerFeeTokenAmountRecipient,
     sendWithPublicWallet,
     undefined, // relayAdaptID
@@ -176,7 +177,7 @@ export const generateUnshieldBaseToken = async (
 const transactionsFromTokenAmounts = async (
   proofType: ProofType,
   tokenAmountRecipients: RailgunWalletTokenAmountRecipient[],
-  nftRecipients: RailgunNFTRecipient[],
+  nftAmountRecipients: RailgunNFTAmountRecipient[],
   railgunWallet: RailgunWallet,
   encryptionKey: string,
   showSenderAddressToRecipient: boolean,
@@ -228,16 +229,18 @@ const transactionsFromTokenAmounts = async (
     },
   );
 
-  nftRecipients.forEach((nftRecipient: RailgunNFTRecipient) => {
-    addTransactionOutputsNFT(
-      proofType,
-      transactionBatch,
-      nftRecipient,
-      railgunWallet,
-      showSenderAddressToRecipient,
-      memoText,
-    );
-  });
+  nftAmountRecipients.forEach(
+    (nftAmountRecipient: RailgunNFTAmountRecipient) => {
+      addTransactionOutputsNFT(
+        proofType,
+        transactionBatch,
+        nftAmountRecipient,
+        railgunWallet,
+        showSenderAddressToRecipient,
+        memoText,
+      );
+    },
+  );
 
   const txBatches = await generateAllProofs(
     transactionBatch,
@@ -284,7 +287,7 @@ const addTransactionOutputsERC20 = (
 const addTransactionOutputsNFT = (
   proofType: ProofType,
   transactionBatch: TransactionBatch,
-  nftRecipient: RailgunNFTRecipient,
+  nftAmountRecipient: RailgunNFTAmountRecipient,
   railgunWallet: RailgunWallet,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
@@ -293,7 +296,7 @@ const addTransactionOutputsNFT = (
     case ProofType.Transfer: {
       addTransactionOutputsTransferNFT(
         transactionBatch,
-        nftRecipient,
+        nftAmountRecipient,
         railgunWallet,
         showSenderAddressToRecipient,
         memoText,
@@ -305,7 +308,7 @@ const addTransactionOutputsNFT = (
     case ProofType.Unshield: {
       addTransactionOutputsUnshieldNFT(
         transactionBatch,
-        nftRecipient,
+        nftAmountRecipient,
         false, // allowOverride
       );
       break;
@@ -357,16 +360,16 @@ const addTransactionOutputsUnshieldERC20 = (
 
 const addTransactionOutputsTransferNFT = (
   transactionBatch: TransactionBatch,
-  nftRecipient: RailgunNFTRecipient,
+  nftAmountRecipient: RailgunNFTAmountRecipient,
   railgunWallet: RailgunWallet,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
 ) => {
-  assertValidRailgunAddress(nftRecipient.recipientAddress);
+  assertValidRailgunAddress(nftAmountRecipient.recipientAddress);
 
   transactionBatch.addOutput(
-    nftNoteFromNFTRecipient(
-      nftRecipient,
+    nftNoteFromNFTAmountRecipient(
+      nftAmountRecipient,
       railgunWallet,
       showSenderAddressToRecipient,
       memoText,
@@ -376,11 +379,16 @@ const addTransactionOutputsTransferNFT = (
 
 const addTransactionOutputsUnshieldNFT = (
   transactionBatch: TransactionBatch,
-  nftRecipient: RailgunNFTRecipient,
+  nftAmountRecipient: RailgunNFTAmountRecipient,
   allowOverride?: boolean,
 ) => {
-  const { recipientAddress, nftAddress, tokenSubID, nftTokenType } =
-    nftRecipient;
+  const {
+    recipientAddress,
+    nftAddress,
+    tokenSubID,
+    nftTokenType,
+    amountString,
+  } = nftAmountRecipient;
 
   assertValidEthAddress(recipientAddress);
   assertNotBlockedAddress(recipientAddress);
@@ -391,9 +399,14 @@ const addTransactionOutputsUnshieldNFT = (
     tokenSubID,
   );
 
+  const amount: bigint =
+    nftTokenType === NFTTokenType.ERC721
+      ? ERC721_NOTE_VALUE
+      : BigInt(amountString);
+
   transactionBatch.addUnshieldData({
     toAddress: recipientAddress,
-    value: NFT_NOTE_VALUE,
+    value: amount,
     tokenData,
     allowOverride,
   });

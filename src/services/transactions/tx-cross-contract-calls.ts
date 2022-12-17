@@ -13,7 +13,7 @@ import {
   deserializeTransaction,
   serializeUnsignedTransaction,
   RailgunWalletTokenAmountRecipient,
-  RailgunNFTRecipient,
+  RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
@@ -104,7 +104,7 @@ export const populateProvedCrossContractCalls = async (
       false, // showSenderAddressToRecipient
       undefined, // memoText
       [], // tokenAmountRecipients
-      [], // nftRecipients
+      [], // nftAmountRecipients
       relayAdaptUnshieldTokenAmounts,
       relayAdaptShieldTokenAddresses,
       crossContractCallsSerialized,
@@ -160,7 +160,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
       );
 
     // Empty unshield NFT recipients.
-    const relayAdaptUnshieldNFTRecipients: RailgunNFTRecipient[] = [];
+    const relayAdaptUnshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
+      [];
 
     const shieldRandom = randomHex(16);
     const relayShieldRequests =
@@ -185,7 +186,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           false, // showSenderAddressToRecipient
           undefined, // memoText
           relayAdaptUnshieldTokenAmountRecipients,
-          relayAdaptUnshieldNFTRecipients,
+          relayAdaptUnshieldNFTAmountRecipients,
           relayerFeeTokenAmount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
@@ -249,7 +250,8 @@ export const generateCrossContractCallsProof = async (
       );
 
     // Empty unshield NFT recipients.
-    const relayAdaptUnshieldNFTRecipients: RailgunNFTRecipient[] = [];
+    const relayAdaptUnshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
+      [];
 
     // Generate dummy txs for relay adapt params.
     const dummyUnshieldTxs = await generateDummyProofTransactions(
@@ -260,7 +262,7 @@ export const generateCrossContractCallsProof = async (
       false, // showSenderAddressToRecipient
       undefined, // memoText
       relayAdaptUnshieldTokenAmountRecipients,
-      relayAdaptUnshieldNFTRecipients,
+      relayAdaptUnshieldNFTAmountRecipients,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
@@ -297,7 +299,7 @@ export const generateCrossContractCallsProof = async (
       false, // showSenderAddressToRecipient
       undefined, // memoText
       relayAdaptUnshieldTokenAmountRecipients,
-      relayAdaptUnshieldNFTRecipients,
+      relayAdaptUnshieldNFTAmountRecipients,
       relayerFeeTokenAmountRecipient,
       sendWithPublicWallet,
       relayAdaptID,
@@ -321,7 +323,7 @@ export const generateCrossContractCallsProof = async (
       showSenderAddressToRecipient: false,
       memoText: undefined,
       tokenAmountRecipients: [],
-      nftRecipients: [],
+      nftAmountRecipients: [],
       relayAdaptUnshieldTokenAmounts,
       relayAdaptShieldTokenAddresses,
       crossContractCallsSerialized,
