@@ -8,6 +8,7 @@ import {
   TransactionGasDetailsSerialized,
   ValidateCachedProvedTransactionResponse,
 } from '@railgun-community/shared-models';
+import { shouldSetOverallBatchMinGasPriceForNetwork } from '../../utils/gas-price';
 import { sendErrorMessage } from '../../utils/logger';
 import { compareStringArrays } from '../../utils/utils';
 import { setGasDetailsForPopulatedTransaction } from './tx-gas-details';
@@ -53,6 +54,7 @@ export const populateProvedTransaction = async (
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<PopulatedTransaction> => {
   const validation = validateCachedProvedTransaction(
+    networkName,
     proofType,
     railgunWalletID,
     showSenderAddressToRecipient,
@@ -106,7 +108,32 @@ const shouldValidateERC20AmountRecipients = (proofType: ProofType) => {
   }
 };
 
+const shouldValidateRelayAdaptAmounts = (proofType: ProofType) => {
+  switch (proofType) {
+    case ProofType.CrossContractCalls:
+    case ProofType.UnshieldBaseToken:
+      // Only validate for Cross Contract and Unshield Base Token proofs.
+      return true;
+    case ProofType.Transfer:
+    case ProofType.Unshield:
+      return false;
+  }
+};
+
+const shouldValidateCrossContractCalls = (proofType: ProofType) => {
+  switch (proofType) {
+    case ProofType.CrossContractCalls:
+      // Only validate for Cross Contract proofs.
+      return true;
+    case ProofType.Transfer:
+    case ProofType.Unshield:
+    case ProofType.UnshieldBaseToken:
+      return false;
+  }
+};
+
 export const validateCachedProvedTransaction = (
+  networkName: NetworkName,
   proofType: ProofType,
   railgunWalletID: string,
   showSenderAddressToRecipient: boolean,
@@ -154,6 +181,7 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'Mismatch: nftAmountRecipients.';
   } else if (
+    shouldValidateRelayAdaptAmounts(proofType) &&
     !compareERC20AmountArrays(
       relayAdaptUnshieldERC20Amounts,
       cachedProvedTransaction.relayAdaptUnshieldERC20Amounts,
@@ -161,6 +189,7 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'Mismatch: relayAdaptUnshieldERC20Amounts.';
   } else if (
+    shouldValidateRelayAdaptAmounts(proofType) &&
     !compareStringArrays(
       relayAdaptShieldERC20Addresses,
       cachedProvedTransaction.relayAdaptShieldERC20Addresses,
@@ -168,6 +197,7 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'Mismatch: relayAdaptShieldERC20Addresses.';
   } else if (
+    shouldValidateCrossContractCalls(proofType) &&
     !compareStringArrays(
       crossContractCallsSerialized,
       cachedProvedTransaction.crossContractCallsSerialized,
@@ -186,6 +216,7 @@ export const validateCachedProvedTransaction = (
   ) {
     error = 'Mismatch: sendWithPublicWallet.';
   } else if (
+    shouldSetOverallBatchMinGasPriceForNetwork(networkName) &&
     overallBatchMinGasPrice !== cachedProvedTransaction.overallBatchMinGasPrice
   ) {
     error = 'Mismatch: overallBatchMinGasPrice.';

@@ -6,6 +6,7 @@ import {
   RailgunNFTAmountRecipient,
   RailgunERC20Amount,
   RailgunERC20AmountRecipient,
+  NetworkName,
 } from '@railgun-community/shared-models';
 import {
   MOCK_NFT_AMOUNT_RECIPIENTS,
@@ -21,6 +22,7 @@ import {
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
+const networkName = NetworkName.BNBChain;
 const proofType = ProofType.Transfer;
 const railgunWalletID = '123';
 const showSenderAddressToRecipient = true;
@@ -49,6 +51,7 @@ describe('proof-cache', () => {
     setCachedProvedTransaction(undefined);
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -83,6 +86,7 @@ describe('proof-cache', () => {
     // Same same
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -100,6 +104,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         ProofType.Unshield,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -117,6 +122,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -134,6 +140,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         '987',
         showSenderAddressToRecipient,
@@ -151,6 +158,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         railgunWalletID,
         false,
@@ -168,6 +176,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -185,6 +194,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -208,6 +218,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -225,7 +236,9 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
-        proofType,
+        networkName,
+        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
+        ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
         memoText,
@@ -247,7 +260,9 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
-        proofType,
+        networkName,
+        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
+        ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
         memoText,
@@ -264,7 +279,9 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
-        proofType,
+        networkName,
+        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
+        ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
         memoText,
@@ -281,6 +298,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -302,6 +320,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -319,6 +338,7 @@ describe('proof-cache', () => {
 
     expect(
       validateCachedProvedTransaction(
+        networkName,
         proofType,
         railgunWalletID,
         showSenderAddressToRecipient,

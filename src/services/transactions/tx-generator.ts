@@ -33,6 +33,7 @@ import { getProver } from '../railgun/core/prover';
 import { assertValidEthAddress, assertValidRailgunAddress } from '../railgun';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { BigNumber } from '@ethersproject/bignumber';
+import { shouldSetOverallBatchMinGasPriceForNetwork } from '../../utils/gas-price';
 
 const DUMMY_AMOUNT = '0x00';
 export const DUMMY_FROM_ADDRESS = '0x000000000000000000000000000000000000dEaD';
@@ -193,9 +194,15 @@ const transactionsFromERC20Amounts = async (
   const network = NETWORK_CONFIG[networkName];
   const { chain } = network;
 
+  // Removes overallBatchMinGasPrice for L2 networks.
+  const validatedOverallBatchMinGasPrice =
+    shouldSetOverallBatchMinGasPriceForNetwork(networkName)
+      ? BigInt(overallBatchMinGasPrice ?? 0)
+      : BigInt(0);
+
   const transactionBatch = new TransactionBatch(
     chain,
-    BigInt(overallBatchMinGasPrice ?? 0),
+    validatedOverallBatchMinGasPrice,
   );
   if (relayAdaptID) {
     transactionBatch.setAdaptID(relayAdaptID);
