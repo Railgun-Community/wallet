@@ -34,8 +34,7 @@ describe('error', () => {
   });
 
   it('Should sanitize gas estimate errors', () => {
-    const expectedErrorMessage =
-      'Something went wrong. Please make sure you have a valid gas balance for this transaction.';
+    const expectedErrorMessage = 'Unknown error. Transaction failed.';
 
     expect(
       sanitizeError(

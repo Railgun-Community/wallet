@@ -175,7 +175,7 @@ export const loadWalletByID = async (
   } catch (err) {
     sendErrorMessage(err.stack);
     const response: LoadRailgunWalletResponse = {
-      error: 'Could not load RAILGUN wallet.',
+      error: `Could not load RAILGUN wallet: ${err.message}`,
     };
     return response;
   }

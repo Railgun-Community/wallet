@@ -128,7 +128,9 @@ describe('wallets', () => {
       'unknown',
       false, // isViewOnlyWallet
     );
-    expect(loadWalletResponse.error).to.equal('Could not load RAILGUN wallet.');
+    expect(loadWalletResponse.error).to.include(
+      'Could not load RAILGUN wallet',
+    );
   });
 
   it('Should validate RAILGUN addresses', async () => {
