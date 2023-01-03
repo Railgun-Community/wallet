@@ -116,6 +116,7 @@ const loadProviderForNetwork = async (
 
   // NOTE: This is an async call, but we need not await.
   // Let Engine scan events in the background.
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   engine.scanHistory(chain);
 };
 

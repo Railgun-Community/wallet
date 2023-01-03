@@ -47,5 +47,6 @@ module.exports = {
     'lines-between-class-members': 0,
     '@typescript-eslint/no-empty-function': 0,
     'no-promise-executor-return': 0,
+    '@typescript-eslint/no-floating-promises': 2,
   },
 };
