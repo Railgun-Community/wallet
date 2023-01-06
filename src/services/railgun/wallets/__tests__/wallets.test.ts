@@ -20,11 +20,11 @@ import {
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MNEMONIC_2,
-} from '../../../../test/mocks.test';
+} from '../../../../tests/mocks.test';
 import {
   initTestEngine,
   initTestEngineNetwork,
-} from '../../../../test/setup.test';
+} from '../../../../tests/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
 import { NetworkName } from '@railgun-community/shared-models';
 

@@ -2,9 +2,8 @@ import { Chain } from '@railgun-community/engine';
 import {
   RailgunBalanceRefreshTrigger,
   RailgunBalanceResponse,
-  sanitizeError,
 } from '@railgun-community/shared-models';
-import { sendErrorMessage } from '../../../utils/logger';
+import { reportAndSanitizeError } from '../../../utils/error';
 import { getEngine, walletForID } from '../core/engine';
 
 export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
@@ -31,8 +30,9 @@ export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
     await engine.scanHistory(chain);
 
     return {};
-  } catch (err: any) {
-    const response: RailgunBalanceResponse = { error: err.message };
+  } catch (err) {
+    const sanitizedError = reportAndSanitizeError(err);
+    const response: RailgunBalanceResponse = { error: sanitizedError.message };
     return response;
   }
 };
@@ -47,8 +47,9 @@ export const scanUpdatesForMerkletreeAndWallets = async (
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
     // which calls `onBalancesUpdate` (balance-update.ts).
     return {};
-  } catch (err: any) {
-    const response: RailgunBalanceResponse = { error: err.message };
+  } catch (err) {
+    const sanitizedError = reportAndSanitizeError(err);
+    const response: RailgunBalanceResponse = { error: sanitizedError.message };
     return response;
   }
 };
@@ -63,10 +64,8 @@ export const rescanFullMerkletreesAndWallets = async (
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
     // which calls `onBalancesUpdate` (balance-update.ts).
     return {};
-  } catch (err: any) {
-    sendErrorMessage(err.stack);
-    const sanitizedError = sanitizeError(err);
-
+  } catch (err) {
+    const sanitizedError = reportAndSanitizeError(err);
     const response: RailgunBalanceResponse = { error: sanitizedError.message };
     return response;
   }

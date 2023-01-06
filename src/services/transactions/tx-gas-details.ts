@@ -6,13 +6,12 @@ import {
   TransactionGasDetails,
   TransactionGasDetailsSerialized,
   EVMGasType,
-  sanitizeError,
   calculateGasLimit,
   NetworkName,
   getEVMGasTypeForTransaction,
 } from '@railgun-community/shared-models';
-import { sendErrorMessage } from '../../utils/logger';
 import { getProviderForNetwork } from '../railgun';
+import { reportAndSanitizeError } from '../../utils/error';
 
 export const getGasEstimate = async (
   networkName: NetworkName,
@@ -39,8 +38,7 @@ export const getGasEstimate = async (
     const gasEstimate = await provider.estimateGas(estimateGasTransaction);
     return gasEstimate.mul(multiplierBasisPoints).div(10000);
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    reportAndSanitizeError(err);
     throw err;
   }
 };
@@ -63,10 +61,9 @@ export const gasEstimateResponseFromGasEstimate = (
     };
     return railResponse;
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }

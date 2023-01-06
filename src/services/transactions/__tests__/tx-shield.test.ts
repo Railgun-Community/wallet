@@ -13,7 +13,7 @@ import {
 import {
   initTestEngine,
   initTestEngineNetwork,
-} from '../../../test/setup.test';
+} from '../../../tests/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
@@ -22,7 +22,7 @@ import {
   MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_ADDRESS,
   MOCK_TOKEN_ADDRESS_2,
-} from '../../../test/mocks.test';
+} from '../../../tests/mocks.test';
 import {
   populateShield,
   gasEstimateForShield,

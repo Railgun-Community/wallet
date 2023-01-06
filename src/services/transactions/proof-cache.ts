@@ -7,6 +7,7 @@ import {
   RailgunERC20AmountRecipient,
   TransactionGasDetailsSerialized,
   ValidateCachedProvedTransactionResponse,
+  RailgunNFTAmount,
 } from '@railgun-community/shared-models';
 import { shouldSetOverallBatchMinGasPriceForNetwork } from '../../utils/gas-price';
 import { sendErrorMessage } from '../../utils/logger';
@@ -17,6 +18,7 @@ import {
   compareERC20AmountRecipientArrays,
   compareERC20AmountArrays,
   compareNFTAmountRecipientArrays,
+  compareNFTAmountArrays,
 } from './tx-notes';
 
 export type ProvedTransaction = {
@@ -28,7 +30,9 @@ export type ProvedTransaction = {
   erc20AmountRecipients: RailgunERC20AmountRecipient[];
   nftAmountRecipients: RailgunNFTAmountRecipient[];
   relayAdaptUnshieldERC20Amounts: Optional<RailgunERC20Amount[]>;
+  relayAdaptUnshieldNFTAmounts: Optional<RailgunNFTAmount[]>;
   relayAdaptShieldERC20Addresses: Optional<string[]>;
+  relayAdaptShieldNFTs: Optional<RailgunNFTAmount[]>;
   crossContractCallsSerialized: Optional<string[]>;
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>;
   sendWithPublicWallet: boolean;
@@ -46,7 +50,9 @@ export const populateProvedTransaction = async (
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayAdaptUnshieldERC20Amounts: Optional<RailgunERC20Amount[]>,
+  relayAdaptUnshieldNFTAmounts: Optional<RailgunNFTAmount[]>,
   relayAdaptShieldERC20Addresses: Optional<string[]>,
+  relayAdaptShieldNFTs: Optional<RailgunNFTAmount[]>,
   crossContractCallsSerialized: Optional<string[]>,
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
@@ -62,7 +68,9 @@ export const populateProvedTransaction = async (
     erc20AmountRecipients,
     nftAmountRecipients,
     relayAdaptUnshieldERC20Amounts,
+    relayAdaptUnshieldNFTAmounts,
     relayAdaptShieldERC20Addresses,
+    relayAdaptShieldNFTs,
     crossContractCallsSerialized,
     relayerFeeERC20AmountRecipient,
     sendWithPublicWallet,
@@ -141,7 +149,9 @@ export const validateCachedProvedTransaction = (
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayAdaptUnshieldERC20Amounts: Optional<RailgunERC20Amount[]>,
+  relayAdaptUnshieldNFTAmounts: Optional<RailgunNFTAmount[]>,
   relayAdaptShieldERC20Addresses: Optional<string[]>,
+  relayAdaptShieldNFTs: Optional<RailgunNFTAmount[]>,
   crossContractCallsSerialized: Optional<string[]>,
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
@@ -190,12 +200,28 @@ export const validateCachedProvedTransaction = (
     error = 'Mismatch: relayAdaptUnshieldERC20Amounts.';
   } else if (
     shouldValidateRelayAdaptAmounts(proofType) &&
+    !compareNFTAmountArrays(
+      relayAdaptUnshieldNFTAmounts,
+      cachedProvedTransaction.relayAdaptUnshieldNFTAmounts,
+    )
+  ) {
+    error = 'Mismatch: relayAdaptUnshieldNFTAmounts.';
+  } else if (
+    shouldValidateRelayAdaptAmounts(proofType) &&
     !compareStringArrays(
       relayAdaptShieldERC20Addresses,
       cachedProvedTransaction.relayAdaptShieldERC20Addresses,
     )
   ) {
     error = 'Mismatch: relayAdaptShieldERC20Addresses.';
+  } else if (
+    shouldValidateRelayAdaptAmounts(proofType) &&
+    !compareNFTAmountArrays(
+      relayAdaptShieldNFTs,
+      cachedProvedTransaction.relayAdaptShieldNFTs,
+    )
+  ) {
+    error = 'Mismatch: relayAdaptShieldNFTs.';
   } else if (
     shouldValidateCrossContractCalls(proofType) &&
     !compareStringArrays(

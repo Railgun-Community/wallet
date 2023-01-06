@@ -21,9 +21,9 @@ import {
   RailgunReceiveNFTAmount,
 } from '@railgun-community/shared-models';
 import { walletForID } from '../core/engine';
-import { sendErrorMessage } from '../../../utils/logger';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseRailgunTokenAddress } from '../util/bytes-util';
+import { reportAndSanitizeError } from '../../../utils/error';
 
 const transactionHistoryReceiveTokenAmountToRailgunERC20Amount = (
   transactionHistoryReceiveTokenAmount: TransactionHistoryReceiveTokenAmount,
@@ -166,7 +166,7 @@ export const getWalletTransactionHistory = async (
       items: serializeTransactionHistory(transactionHistory),
     };
   } catch (err) {
-    sendErrorMessage(err.stack);
+    reportAndSanitizeError(err);
     const response: LoadRailgunWalletResponse = {
       error: 'Could not load RAILGUN wallet transaction history.',
     };

@@ -23,7 +23,7 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   initTestEngine,
   initTestEngineNetwork,
-} from '../../../test/setup.test';
+} from '../../../tests/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
@@ -37,7 +37,7 @@ import {
   MOCK_TOKEN_AMOUNTS,
   MOCK_TOKEN_FEE,
   MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-} from '../../../test/mocks.test';
+} from '../../../tests/mocks.test';
 import {
   populateProvedTransfer,
   gasEstimateForUnprovenTransfer,

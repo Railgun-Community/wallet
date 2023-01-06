@@ -25,7 +25,7 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   initTestEngine,
   initTestEngineNetwork,
-} from '../../../test/setup.test';
+} from '../../../tests/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
@@ -38,7 +38,7 @@ import {
   MOCK_TOKEN_AMOUNTS,
   MOCK_TOKEN_FEE,
   MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-} from '../../../test/mocks.test';
+} from '../../../tests/mocks.test';
 import {
   populateProvedUnshield,
   gasEstimateForUnprovenUnshield,
@@ -71,8 +71,12 @@ const polygonRelayAdaptContract =
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const mockTokenData0 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[0].tokenAddress);
-const mockTokenData1 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[1].tokenAddress);
+const mockERC20TokenData0 = getTokenDataERC20(
+  MOCK_TOKEN_AMOUNTS[0].tokenAddress,
+);
+const mockERC20TokenData1 = getTokenDataERC20(
+  MOCK_TOKEN_AMOUNTS[1].tokenAddress,
+);
 const mockNFTTokenData0 = getTokenDataNFT(
   MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD[0].nftAddress,
   MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD[0].nftTokenType as 1 | 2,
@@ -228,7 +232,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: MOCK_ETH_WALLET_ADDRESS,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -236,7 +240,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: MOCK_ETH_WALLET_ADDRESS,
-          tokenData: mockTokenData1,
+          tokenData: mockERC20TokenData1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
@@ -244,7 +248,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: MOCK_ETH_WALLET_ADDRESS,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -252,7 +256,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: MOCK_ETH_WALLET_ADDRESS,
-          tokenData: mockTokenData1,
+          tokenData: mockERC20TokenData1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
@@ -312,7 +316,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -320,7 +324,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -348,7 +352,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -410,7 +414,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: MOCK_ETH_WALLET_ADDRESS,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -418,7 +422,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: MOCK_ETH_WALLET_ADDRESS,
-          tokenData: mockTokenData1,
+          tokenData: mockERC20TokenData1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
@@ -559,7 +563,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
@@ -567,7 +571,7 @@ describe('tx-unshield', () => {
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },

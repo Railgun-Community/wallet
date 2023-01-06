@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { initTestEngine } from '../../../../test/setup.test';
+import { initTestEngine } from '../../../../tests/setup.test';
 import { closeRailgunEngine, getEngine } from '../engine';
 import { getProver } from '../prover';
 

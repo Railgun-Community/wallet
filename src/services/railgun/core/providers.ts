@@ -6,15 +6,15 @@ import {
   NetworkName,
   NETWORK_CONFIG,
   LoadProviderResponse,
-  sanitizeError,
 } from '@railgun-community/shared-models';
-import { sendMessage, sendErrorMessage } from '../../../utils/logger';
+import { sendMessage } from '../../../utils/logger';
 import { getEngine } from './engine';
 import {
   Chain,
   RailgunSmartWalletContract,
   RelayAdaptContract,
 } from '@railgun-community/engine';
+import { reportAndSanitizeError } from '../../../utils/error';
 
 const providerMap: MapType<BaseProvider> = {};
 export const getProviderForNetwork = (
@@ -157,8 +157,7 @@ export const loadProvider = async (
     };
     return response;
   } catch (err) {
-    sendErrorMessage(err.stack);
-    const sanitizedError = sanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(err);
     const response: LoadProviderResponse = { error: sanitizedError.message };
     return response;
   }

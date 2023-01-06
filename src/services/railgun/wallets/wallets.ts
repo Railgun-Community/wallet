@@ -1,7 +1,7 @@
 import {
   RailgunWallet,
   EngineEvent,
-  ScannedEventData,
+  WalletScannedEventData,
   BytesData,
   AbstractWallet,
   WalletData,
@@ -21,12 +21,13 @@ import {
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import { getEngine, walletForID } from '../core/engine';
-import { sendErrorMessage } from '../../../utils/logger';
 import { onBalancesUpdate } from './balance-update';
+import { reportAndSanitizeError } from '../../../utils/error';
 
 const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
-  wallet.on(EngineEvent.WalletScanComplete, ({ chain }: ScannedEventData) =>
-    onBalancesUpdate(wallet, chain),
+  wallet.on(
+    EngineEvent.WalletScanComplete,
+    ({ chain }: WalletScannedEventData) => onBalancesUpdate(wallet, chain),
   );
 };
 
@@ -129,9 +130,9 @@ export const createRailgunWallet = async (
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
   } catch (err) {
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const response: LoadRailgunWalletResponse = {
-      error: err.message,
+      error: sanitizedError.message,
     };
     return response;
   }
@@ -151,9 +152,9 @@ export const createViewOnlyRailgunWallet = async (
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
   } catch (err) {
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const response: LoadRailgunWalletResponse = {
-      error: err.message,
+      error: sanitizedError.message,
     };
     return response;
   }
@@ -173,9 +174,9 @@ export const loadWalletByID = async (
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
   } catch (err) {
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const response: LoadRailgunWalletResponse = {
-      error: `Could not load RAILGUN wallet: ${err.message}`,
+      error: `Could not load RAILGUN wallet: ${sanitizedError.message}`,
     };
     return response;
   }
@@ -190,7 +191,7 @@ export const unloadWalletByID = (
     const response: UnloadRailgunWalletResponse = {};
     return response;
   } catch (err) {
-    sendErrorMessage(err.stack);
+    reportAndSanitizeError(err);
     const response: UnloadRailgunWalletResponse = {
       error: 'Could not unload RAILGUN wallet.',
     };
@@ -272,7 +273,7 @@ export const getRailgunAddress = (
     const wallet = walletForID(railgunWalletID);
     return wallet.getAddress();
   } catch (err) {
-    sendErrorMessage(err.stack);
+    reportAndSanitizeError(err);
     return undefined;
   }
 };
@@ -284,7 +285,7 @@ export const getWalletShareableViewingKey = async (
     const wallet = walletForID(railgunWalletID);
     return wallet.generateShareableViewingKey();
   } catch (err) {
-    sendErrorMessage(err.stack);
+    reportAndSanitizeError(err);
     return undefined;
   }
 };

@@ -9,11 +9,11 @@ import {
   ProofType,
   TransactionReceiptLog,
   FeeTokenDetails,
-  sanitizeError,
   deserializeTransaction,
   serializeUnsignedTransaction,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
+  RailgunNFTAmount,
 } from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
@@ -35,10 +35,14 @@ import {
   randomHex,
   RelayAdaptContract,
   ProverProgressCallback,
+  NFTTokenData,
+  formatToByteLength,
+  ByteLength,
 } from '@railgun-community/engine';
 import { fullWalletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
+import { reportAndSanitizeError } from '../../utils/error';
 
 const createPopulatedCrossContractCalls = (
   crossContractCallsSerialized: string[],
@@ -67,7 +71,7 @@ const createPopulatedCrossContractCalls = (
         return populatedTransaction;
       });
   } catch (err) {
-    sendErrorMessage(err);
+    reportAndSanitizeError(err);
     throw new Error('Invalid serialized cross contract calls.');
   }
 };
@@ -85,11 +89,50 @@ export const createRelayAdaptUnshieldERC20AmountRecipients = (
   return unshieldERC20AmountRecipients;
 };
 
+export const createRelayAdaptUnshieldNFTAmountRecipients = (
+  networkName: NetworkName,
+  unshieldNFTAmounts: RailgunNFTAmount[],
+): RailgunNFTAmountRecipient[] => {
+  const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
+  const unshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
+    unshieldNFTAmounts.map(unshieldNFTAmount => ({
+      ...unshieldNFTAmount,
+      recipientAddress: relayAdaptContract.address,
+    }));
+  return unshieldNFTAmountRecipients;
+};
+
+export const createNFTTokenDataFromRailgunNFTAmount = (
+  nftAmount: RailgunNFTAmount,
+): NFTTokenData => {
+  return {
+    tokenAddress: formatToByteLength(
+      nftAmount.nftAddress,
+      ByteLength.Address,
+      true,
+    ),
+    tokenType: nftAmount.nftTokenType as 1 | 2,
+    tokenSubID: formatToByteLength(
+      nftAmount.tokenSubID,
+      ByteLength.UINT_256,
+      true,
+    ),
+  };
+};
+
+const createRelayAdaptShieldNFTsTokenData = (
+  relayAdaptShieldNFTs: RailgunNFTAmount[],
+): NFTTokenData[] => {
+  return relayAdaptShieldNFTs.map(createNFTTokenDataFromRailgunNFTAmount);
+};
+
 export const populateProvedCrossContractCalls = async (
   networkName: NetworkName,
   railgunWalletID: string,
   relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[],
+  relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[],
   relayAdaptShieldERC20Addresses: string[],
+  relayAdaptShieldNFTs: RailgunNFTAmount[],
   crossContractCallsSerialized: string[],
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
@@ -106,7 +149,9 @@ export const populateProvedCrossContractCalls = async (
       [], // erc20AmountRecipients
       [], // nftAmountRecipients
       relayAdaptUnshieldERC20Amounts,
+      relayAdaptUnshieldNFTAmounts,
       relayAdaptShieldERC20Addresses,
+      relayAdaptShieldNFTs,
       crossContractCallsSerialized,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
@@ -119,10 +164,9 @@ export const populateProvedCrossContractCalls = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -133,7 +177,9 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
   railgunWalletID: string,
   encryptionKey: string,
   relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[],
+  relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[],
   relayAdaptShieldERC20Addresses: string[],
+  relayAdaptShieldNFTs: RailgunNFTAmount[],
   crossContractCallsSerialized: string[],
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
@@ -158,10 +204,14 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
         networkName,
         relayAdaptUnshieldERC20Amounts,
       );
-
-    // Empty unshield NFT recipients.
     const relayAdaptUnshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
-      [];
+      createRelayAdaptUnshieldNFTAmountRecipients(
+        networkName,
+        relayAdaptUnshieldNFTAmounts,
+      );
+
+    const relayAdaptShieldNFTsTokenData: NFTTokenData[] =
+      createRelayAdaptShieldNFTsTokenData(relayAdaptShieldNFTs);
 
     const shieldRandom = randomHex(16);
     const relayShieldRequests =
@@ -169,6 +219,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
         wallet,
         shieldRandom,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTsTokenData,
       );
 
     // Add 40% to the gas fee to ensure that it's successful.
@@ -210,10 +261,9 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
     );
     return response;
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -224,7 +274,9 @@ export const generateCrossContractCallsProof = async (
   railgunWalletID: string,
   encryptionKey: string,
   relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[],
+  relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[],
   relayAdaptShieldERC20Addresses: string[],
+  relayAdaptShieldNFTs: RailgunNFTAmount[],
   crossContractCallsSerialized: string[],
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
@@ -248,10 +300,11 @@ export const generateCrossContractCallsProof = async (
         networkName,
         relayAdaptUnshieldERC20Amounts,
       );
-
-    // Empty unshield NFT recipients.
     const relayAdaptUnshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
-      [];
+      createRelayAdaptUnshieldNFTAmountRecipients(
+        networkName,
+        relayAdaptUnshieldNFTAmounts,
+      );
 
     // Generate dummy txs for relay adapt params.
     const dummyUnshieldTxs = await generateDummyProofTransactions(
@@ -270,11 +323,16 @@ export const generateCrossContractCallsProof = async (
 
     // Generate relay adapt params from dummy transactions.
     const shieldRandom = randomHex(16);
+
+    const relayAdaptShieldNFTsTokenData: NFTTokenData[] =
+      createRelayAdaptShieldNFTsTokenData(relayAdaptShieldNFTs);
+
     const relayShieldRequests =
       await RelayAdaptHelper.generateRelayShieldRequests(
         wallet,
         shieldRandom,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTsTokenData,
       );
 
     const relayAdaptParamsRandom = randomHex(31);
@@ -325,7 +383,9 @@ export const generateCrossContractCallsProof = async (
       erc20AmountRecipients: [],
       nftAmountRecipients: [],
       relayAdaptUnshieldERC20Amounts,
+      relayAdaptUnshieldNFTAmounts,
       relayAdaptShieldERC20Addresses,
+      relayAdaptShieldNFTs,
       crossContractCallsSerialized,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
@@ -334,9 +394,9 @@ export const generateCrossContractCallsProof = async (
     });
     return {};
   } catch (err) {
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunProveTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -354,7 +414,7 @@ export const getRelayAdaptTransactionError = (
     }
     return undefined;
   } catch (err) {
-    sendErrorMessage(err.stack);
+    reportAndSanitizeError(err);
     throw err;
   }
 };

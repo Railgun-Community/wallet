@@ -12,13 +12,13 @@ import {
 import {
   initTestEngine,
   initTestEngineNetwork,
-} from '../../../test/setup.test';
+} from '../../../tests/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_MNEMONIC,
   MOCK_TOKEN_AMOUNTS,
-} from '../../../test/mocks.test';
+} from '../../../tests/mocks.test';
 import {
   populateShieldBaseToken,
   gasEstimateForShieldBaseToken,

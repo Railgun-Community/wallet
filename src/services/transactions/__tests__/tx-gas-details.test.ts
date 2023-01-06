@@ -13,7 +13,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import {
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
-} from '../../../test/mocks.test';
+} from '../../../tests/mocks.test';
 import { decimalToHexString } from '../../../utils/format';
 import {
   gasEstimateResponse,

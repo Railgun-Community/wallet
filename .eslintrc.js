@@ -39,8 +39,13 @@ module.exports = {
     'no-console': 1,
     'default-case': 0,
     '@typescript-eslint/switch-exhaustiveness-check': 2,
-    '@typescript-eslint/no-explicit-any': 0,
+    '@typescript-eslint/no-explicit-any': 1,
     '@typescript-eslint/ban-ts-comment': 0,
+    '@typescript-eslint/no-unused-vars': 1,
+    '@typescript-eslint/no-unsafe-call': 1,
+    '@typescript-eslint/no-unsafe-member-access': 1,
+    '@typescript-eslint/no-unsafe-assignment': 1,
+    '@typescript-eslint/no-unsafe-argument': 1,
     'import/order': 0,
     'consistent-return': 0,
     'prefer-destructuring': 0,
@@ -49,4 +54,13 @@ module.exports = {
     'no-promise-executor-return': 0,
     '@typescript-eslint/no-floating-promises': 2,
   },
+  overrides: [
+    {
+      files: ['**/__tests__/**', './src/tests/**'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 0,
+        '@typescript-eslint/no-unsafe-member-access': 0,
+      },
+    },
+  ],
 };

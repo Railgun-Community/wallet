@@ -25,24 +25,26 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   initTestEngine,
   initTestEngineNetwork,
-} from '../../../test/setup.test';
+} from '../../../tests/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
   MOCK_FEE_TOKEN_DETAILS,
   MOCK_MNEMONIC,
+  MOCK_NFT_AMOUNTS,
   MOCK_TOKEN_ADDRESS,
   MOCK_TOKEN_ADDRESS_2,
   MOCK_TOKEN_AMOUNTS,
   MOCK_TOKEN_FEE,
   MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-} from '../../../test/mocks.test';
+} from '../../../tests/mocks.test';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { setCachedProvedTransaction } from '../proof-cache';
 import { decimalToHexString } from '../../../utils/format';
 import {
+  createNFTTokenDataFromRailgunNFTAmount,
   gasEstimateForUnprovenCrossContractCalls,
   generateCrossContractCallsProof,
   getRelayAdaptTransactionError,
@@ -65,8 +67,18 @@ const polygonRelayAdaptContract =
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const mockTokenData0 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[0].tokenAddress);
-const mockTokenData1 = getTokenDataERC20(MOCK_TOKEN_AMOUNTS[1].tokenAddress);
+const mockERC20TokenData0 = getTokenDataERC20(
+  MOCK_TOKEN_AMOUNTS[0].tokenAddress,
+);
+const mockERC20TokenData1 = getTokenDataERC20(
+  MOCK_TOKEN_AMOUNTS[1].tokenAddress,
+);
+const mockNFTTokenData0 = createNFTTokenDataFromRailgunNFTAmount(
+  MOCK_NFT_AMOUNTS[0],
+);
+const mockNFTTokenData1 = createNFTTokenDataFromRailgunNFTAmount(
+  MOCK_NFT_AMOUNTS[1],
+);
 
 const mockCrossContractCalls: PopulatedTransaction[] = [
   {
@@ -194,7 +206,9 @@ describe('tx-cross-contract-calls', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       mockCrossContractCallsSerialized,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
@@ -206,40 +220,72 @@ describe('tx-cross-contract-calls', () => {
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
-      ], // run 1 - token 1
+      ], // run 1 - erc20 1
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData1,
+          tokenData: mockERC20TokenData1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
-      ], // run 1 - token 2
+      ], // run 1 - erc20 2
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockNFTTokenData0,
+          value: BigInt('1'),
+          allowOverride: false,
+        },
+      ], // run 1 - nft 0
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockNFTTokenData1,
+          value: BigInt('2'),
+          allowOverride: false,
+        },
+      ], // run 1 - nft 1
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
-      ], // run 2 - token 1
+      ], // run 2 - erc20 1
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData1,
+          tokenData: mockERC20TokenData1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
-      ], // run 2 - token 2
+      ], // run 2 - erc20 2
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockNFTTokenData0,
+          value: BigInt('1'),
+          allowOverride: false,
+        },
+      ], // run 2 - nft 0
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockNFTTokenData1,
+          value: BigInt('2'),
+          allowOverride: false,
+        },
+      ], // run 2 - nft 1
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(280));
   });
 
-  it('Should get gas estimates for valid cross contract calls: public wallet', async () => {
+  it('Should get gas estimates for valid cross contract calls, public wallet', async () => {
     stubGasEstimateSuccess();
     spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
@@ -247,7 +293,9 @@ describe('tx-cross-contract-calls', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       mockCrossContractCallsSerialized,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
@@ -260,19 +308,35 @@ describe('tx-cross-contract-calls', () => {
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
-      ], // run 1 - token 1
+      ], // run 1 - erc20 1
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData1,
+          tokenData: mockERC20TokenData1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
-      ], // run 1 - token 2
+      ], // run 1 - erc20 2
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockNFTTokenData0,
+          value: BigInt('1'),
+          allowOverride: false,
+        },
+      ], // run 1 - nft 0
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockNFTTokenData1,
+          value: BigInt('2'),
+          allowOverride: false,
+        },
+      ], // run 1 - nft 1
     ]);
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(280));
   });
@@ -284,7 +348,9 @@ describe('tx-cross-contract-calls', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       ['abc'], // Invalid
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
@@ -300,7 +366,9 @@ describe('tx-cross-contract-calls', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       mockCrossContractCallsSerialized,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
@@ -320,7 +388,9 @@ describe('tx-cross-contract-calls', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       mockCrossContractCallsSerialized,
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
@@ -333,41 +403,75 @@ describe('tx-cross-contract-calls', () => {
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
-      ], // dummy proof #1
+      ], // dummy proof - erc20 token 0
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData1,
+          tokenData: mockERC20TokenData1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
-      ], // dummy proof #2
+      ], // dummy proof - erc20 token 1
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData0,
+          tokenData: mockNFTTokenData0,
+          value: BigInt('1'),
+          allowOverride: false,
+        },
+      ], // dummy proof - nft 0
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockNFTTokenData1,
+          value: BigInt('2'),
+          allowOverride: false,
+        },
+      ], // actual proof - nft 1
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockERC20TokenData0,
           value: BigInt('0x0100'),
           allowOverride: false,
         },
-      ], // actual proof #1
+      ], // actual proof - erc20 token 0
       [
         {
           toAddress: polygonRelayAdaptContract,
-          tokenData: mockTokenData1,
+          tokenData: mockERC20TokenData1,
           value: BigInt('0x0200'),
           allowOverride: false,
         },
-      ], // actual proof #2
+      ], // actual proof - erc20 token 1
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockNFTTokenData0,
+          value: BigInt('1'),
+          allowOverride: false,
+        },
+      ], // actual proof - nft 0
+      [
+        {
+          toAddress: polygonRelayAdaptContract,
+          tokenData: mockNFTTokenData1,
+          value: BigInt('2'),
+          allowOverride: false,
+        },
+      ], // actual proof - nft 1
     ]);
     const populateResponse = await populateProvedCrossContractCalls(
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       mockCrossContractCallsSerialized,
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
@@ -402,7 +506,9 @@ describe('tx-cross-contract-calls', () => {
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS_DIFFERENT,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       ['123'], // Invalid
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
@@ -421,7 +527,9 @@ describe('tx-cross-contract-calls', () => {
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       mockCrossContractCallsSerialized,
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
@@ -440,7 +548,9 @@ describe('tx-cross-contract-calls', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       mockCrossContractCallsSerialized,
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
@@ -452,7 +562,9 @@ describe('tx-cross-contract-calls', () => {
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS_DIFFERENT,
+      MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+      MOCK_NFT_AMOUNTS,
       mockCrossContractCallsSerialized,
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet

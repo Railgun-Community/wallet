@@ -6,6 +6,7 @@ import {
   TransactionGasDetailsSerialized,
   RailgunNFTAmountRecipient,
   NFTTokenType,
+  RailgunNFTAmount,
 } from '@railgun-community/shared-models';
 import { BalancesUpdatedCallback } from '../services/railgun/wallets/balance-update';
 
@@ -31,6 +32,8 @@ export const MOCK_TOKEN_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 export const MOCK_TOKEN_ADDRESS_2 =
   '0xe76C6c83af64e4C60245D8C7dE953DF673a7A33D';
 
+export const MOCK_NFT_ADDRESS = '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d';
+
 export const TEST_POLYGON_RPC = 'https://polygon-rpc.com';
 
 export const TEST_WALLET_SOURCE = 'test engine';
@@ -53,22 +56,26 @@ export const MOCK_TOKEN_AMOUNTS: RailgunERC20Amount[] = [
   },
 ];
 
-export const MOCK_NFT_AMOUNT_RECIPIENTS: RailgunNFTAmountRecipient[] = [
+export const MOCK_NFT_AMOUNTS: RailgunNFTAmount[] = [
   {
-    recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
-    nftAddress: MOCK_TOKEN_ADDRESS,
+    nftAddress: MOCK_NFT_ADDRESS,
     nftTokenType: NFTTokenType.ERC721,
     tokenSubID: '0x01',
     amountString: '0x01',
   },
   {
-    recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
-    nftAddress: MOCK_TOKEN_ADDRESS,
+    nftAddress: MOCK_NFT_ADDRESS,
     nftTokenType: NFTTokenType.ERC1155,
     tokenSubID: '0x02',
     amountString: '0x02',
   },
 ];
+
+export const MOCK_NFT_AMOUNT_RECIPIENTS: RailgunNFTAmountRecipient[] =
+  MOCK_NFT_AMOUNTS.map(nftAmount => ({
+    ...nftAmount,
+    recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
+  }));
 
 export const MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD: RailgunNFTAmountRecipient[] =
   MOCK_NFT_AMOUNT_RECIPIENTS.map(nftAmountRecipient => ({

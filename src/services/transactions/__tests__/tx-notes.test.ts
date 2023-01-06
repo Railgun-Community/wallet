@@ -18,11 +18,11 @@ import {
   MOCK_MNEMONIC,
   MOCK_RAILGUN_WALLET_ADDRESS,
   TEST_WALLET_SOURCE,
-} from '../../../test/mocks.test';
+} from '../../../tests/mocks.test';
 import {
   initTestEngine,
   initTestEngineNetwork,
-} from '../../../test/setup.test';
+} from '../../../tests/setup.test';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import {

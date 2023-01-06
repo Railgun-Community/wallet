@@ -2,14 +2,13 @@ import {
   RailgunProveTransactionResponse,
   NetworkName,
   ProofType,
-  sanitizeError,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
 import { generateProofTransactions, generateTransact } from './tx-generator';
-import { sendErrorMessage } from '../../utils/logger';
 import { setCachedProvedTransaction } from './proof-cache';
 import { ProverProgressCallback } from '@railgun-community/engine';
+import { reportAndSanitizeError } from '../../utils/error';
 
 export const generateTransferProof = async (
   networkName: NetworkName,
@@ -53,7 +52,9 @@ export const generateTransferProof = async (
       erc20AmountRecipients,
       nftAmountRecipients,
       relayAdaptUnshieldERC20Amounts: undefined,
+      relayAdaptUnshieldNFTAmounts: undefined,
       relayAdaptShieldERC20Addresses: undefined,
+      relayAdaptShieldNFTs: undefined,
       crossContractCallsSerialized: undefined,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
@@ -62,9 +63,9 @@ export const generateTransferProof = async (
     });
     return {};
   } catch (err) {
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunProveTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }

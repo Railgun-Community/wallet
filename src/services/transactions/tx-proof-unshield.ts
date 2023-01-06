@@ -3,7 +3,6 @@ import {
   RailgunERC20Amount,
   NetworkName,
   ProofType,
-  sanitizeError,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
@@ -13,7 +12,6 @@ import {
   generateTransact,
   generateUnshieldBaseToken,
 } from './tx-generator';
-import { sendErrorMessage } from '../../utils/logger';
 import { assertValidEthAddress } from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
@@ -24,6 +22,7 @@ import {
 } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
+import { reportAndSanitizeError } from '../../utils/error';
 
 export const generateUnshieldProof = async (
   networkName: NetworkName,
@@ -65,7 +64,9 @@ export const generateUnshieldProof = async (
       erc20AmountRecipients,
       nftAmountRecipients,
       relayAdaptUnshieldERC20Amounts: undefined,
+      relayAdaptUnshieldNFTAmounts: undefined,
       relayAdaptShieldERC20Addresses: undefined,
+      relayAdaptShieldNFTs: undefined,
       crossContractCallsSerialized: undefined,
       relayerFeeERC20AmountRecipient,
       populatedTransaction,
@@ -74,9 +75,9 @@ export const generateUnshieldProof = async (
     });
     return {};
   } catch (err) {
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunProveTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -186,7 +187,9 @@ export const generateUnshieldBaseTokenProof = async (
       erc20AmountRecipients,
       nftAmountRecipients,
       relayAdaptUnshieldERC20Amounts,
+      relayAdaptUnshieldNFTAmounts: undefined,
       relayAdaptShieldERC20Addresses: undefined,
+      relayAdaptShieldNFTs: undefined,
       crossContractCallsSerialized: undefined,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
@@ -195,9 +198,9 @@ export const generateUnshieldBaseTokenProof = async (
     });
     return {};
   } catch (err) {
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunProveTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }

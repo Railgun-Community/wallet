@@ -4,9 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {
   RailgunWallet,
   ByteLength,
-  formatToByteLength,
   nToHex,
-  randomHex,
   OutputType,
   TransactNote,
   RailgunEngine,
@@ -24,7 +22,7 @@ import {
   initTestEngine,
   initTestEngineNetwork,
   setTestArtifacts,
-} from '../../../test/setup.test';
+} from '../../../tests/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MEMO,
@@ -33,7 +31,7 @@ import {
   MOCK_TOKEN_ADDRESS,
   MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY,
   MOCK_TOKEN_FEE,
-} from '../../../test/mocks.test';
+} from '../../../tests/mocks.test';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { getCachedProvedTransaction } from '../proof-cache';

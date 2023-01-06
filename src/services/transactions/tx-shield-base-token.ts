@@ -5,7 +5,6 @@ import {
   RailgunERC20Amount,
   TransactionGasDetailsSerialized,
   NetworkName,
-  sanitizeError,
   serializeUnsignedTransaction,
 } from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
@@ -14,7 +13,6 @@ import {
   getGasEstimate,
   setGasDetailsForPopulatedTransaction,
 } from './tx-gas-details';
-import { sendErrorMessage } from '../../utils/logger';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import {
   randomHex,
@@ -23,6 +21,7 @@ import {
   hexToBytes,
 } from '@railgun-community/engine';
 import { assertValidRailgunAddress } from '../railgun';
+import { reportAndSanitizeError } from '../../utils/error';
 
 const generateShieldBaseTokenTransaction = async (
   networkName: NetworkName,
@@ -56,9 +55,8 @@ const generateShieldBaseTokenTransaction = async (
 
     return populatedTransaction;
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
-    throw sanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(err);
+    throw sanitizedError;
   }
 };
 
@@ -92,10 +90,9 @@ export const populateShieldBaseToken = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -129,10 +126,9 @@ export const gasEstimateForShieldBaseToken = async (
       ),
     );
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }

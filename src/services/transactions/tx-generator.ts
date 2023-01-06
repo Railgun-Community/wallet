@@ -7,9 +7,9 @@ import {
   TransactionStruct,
   ProverProgressCallback,
   getTokenDataERC20,
-  TokenData,
   getTokenDataNFT,
   ERC721_NOTE_VALUE,
+  NFTTokenData,
 } from '@railgun-community/engine';
 import {
   RailgunERC20Amount,
@@ -400,7 +400,7 @@ const addTransactionOutputsUnshieldNFT = (
   assertValidEthAddress(recipientAddress);
   assertNotBlockedAddress(recipientAddress);
 
-  const tokenData: TokenData = getTokenDataNFT(
+  const tokenData: NFTTokenData = getTokenDataNFT(
     nftAddress,
     nftTokenType as 1 | 2,
     tokenSubID,

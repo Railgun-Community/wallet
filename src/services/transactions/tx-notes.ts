@@ -13,6 +13,7 @@ import {
   RailgunNFTAmountRecipient,
   RailgunERC20Amount,
   RailgunERC20AmountRecipient,
+  RailgunNFTAmount,
 } from '@railgun-community/shared-models';
 
 export const erc20NoteFromERC20AmountRecipient = (
@@ -158,6 +159,38 @@ export const compareERC20AmountRecipientArrays = (
       return false;
     }
     if (found.recipientAddress !== erc20Amount.recipientAddress) {
+      return false;
+    }
+  }
+  return true;
+};
+
+export const compareNFTAmountArrays = (
+  a: Optional<RailgunNFTAmount[]>,
+  b: Optional<RailgunNFTAmount[]>,
+) => {
+  if (!a && !b) {
+    return true;
+  }
+  if (!a || !b) {
+    return false;
+  }
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (const nftAmountRecipient of a) {
+    const found = b.find(
+      ta =>
+        ta.nftAddress === nftAmountRecipient.nftAddress &&
+        ta.tokenSubID === nftAmountRecipient.tokenSubID,
+    );
+    if (!found) {
+      return false;
+    }
+    if (found.nftTokenType !== nftAmountRecipient.nftTokenType) {
+      return false;
+    }
+    if (found.amountString !== nftAmountRecipient.amountString) {
       return false;
     }
   }

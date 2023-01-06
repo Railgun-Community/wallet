@@ -5,7 +5,7 @@ import {
   ArtifactName,
   ArtifactVariant,
 } from '@railgun-community/shared-models';
-import { initTestEngine } from '../../../test/setup.test';
+import { initTestEngine } from '../../../tests/setup.test';
 import { setLoggers } from '../../../utils/logger';
 import {
   clearArtifactCache,

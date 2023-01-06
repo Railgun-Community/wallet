@@ -4,7 +4,6 @@ import {
   ArtifactVariant,
 } from '@railgun-community/shared-models';
 import axios, { ResponseType } from 'axios';
-import { sendErrorMessage } from '../../utils/logger';
 import {
   artifactDir,
   artifactPath,
@@ -14,6 +13,7 @@ import {
   validateArtifactDownload,
 } from './artifact-util';
 import { ArtifactStore } from './artifact-store';
+import { reportAndSanitizeError } from '../../utils/error';
 
 export class ArtifactDownloader {
   private artifactStore: ArtifactStore;
@@ -92,7 +92,7 @@ export class ArtifactDownloader {
 
       return path;
     } catch (err) {
-      sendErrorMessage(err.message);
+      reportAndSanitizeError(err);
       return undefined;
     }
   };
@@ -134,7 +134,7 @@ export class ArtifactDownloader {
         | null;
       return storedItem;
     } catch (err) {
-      sendErrorMessage(err);
+      reportAndSanitizeError(err);
       return null;
     }
   };

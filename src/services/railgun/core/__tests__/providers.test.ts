@@ -7,8 +7,8 @@ import {
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
-} from '../../../../test/mocks.test';
-import { initTestEngine } from '../../../../test/setup.test';
+} from '../../../../tests/mocks.test';
+import { initTestEngine } from '../../../../tests/setup.test';
 import { walletForID } from '../engine';
 import {
   getMerkleTreeForNetwork,

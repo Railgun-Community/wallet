@@ -22,6 +22,7 @@ import {
 } from './artifacts';
 import { ArtifactStore } from '../../artifacts/artifact-store';
 import { quickSyncIPNS } from '../scan/quick-sync-ipns';
+import { reportAndSanitizeError } from '../../../utils/error';
 
 let engine: Optional<RailgunEngine>;
 
@@ -144,8 +145,10 @@ export const startRailgunEngine = (
     const response: StartRailgunEngineResponse = {};
     return response;
   } catch (err) {
-    sendErrorMessage(err.stack);
-    const response: StartRailgunEngineResponse = { error: err.message };
+    const sanitizedError = reportAndSanitizeError(err);
+    const response: StartRailgunEngineResponse = {
+      error: sanitizedError.message,
+    };
     return response;
   }
 };

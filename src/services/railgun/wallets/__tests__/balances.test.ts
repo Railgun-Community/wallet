@@ -5,8 +5,8 @@ import Sinon, { SinonStub } from 'sinon';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MNEMONIC,
-} from '../../../../test/mocks.test';
-import { initTestEngine } from '../../../../test/setup.test';
+} from '../../../../tests/mocks.test';
+import { initTestEngine } from '../../../../tests/setup.test';
 import { createRailgunWallet } from '../wallets';
 import {
   refreshRailgunBalances,

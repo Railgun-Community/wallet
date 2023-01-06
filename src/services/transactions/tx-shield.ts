@@ -4,10 +4,10 @@ import {
   RailgunTransactionGasEstimateResponse,
   TransactionGasDetailsSerialized,
   NetworkName,
-  sanitizeError,
   serializeUnsignedTransaction,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
+  NFTTokenType,
 } from '@railgun-community/shared-models';
 import {
   ShieldNote,
@@ -17,18 +17,20 @@ import {
   hexToBytes,
   ShieldNoteERC20,
   ShieldNoteNFT,
+  ERC721_NOTE_VALUE,
 } from '@railgun-community/engine';
 import {
   gasEstimateResponse,
   getGasEstimate,
   setGasDetailsForPopulatedTransaction,
 } from './tx-gas-details';
-import { sendErrorMessage } from '../../utils/logger';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import {
   assertValidRailgunAddress,
   getRailgunSmartWalletContractForNetwork,
 } from '../railgun';
+import { createNFTTokenDataFromRailgunNFTAmount } from './tx-cross-contract-calls';
+import { reportAndSanitizeError } from '../../utils/error';
 
 export const getShieldPrivateKeySignatureMessage = () => {
   return ShieldNote.getShieldPrivateKeySignatureMessage();
@@ -67,12 +69,19 @@ const generateNFTShield = async (
   const { masterPublicKey, viewingPublicKey } =
     RailgunEngine.decodeAddress(railgunAddress);
 
+  const value =
+    nftAmountRecipient.nftTokenType === NFTTokenType.ERC721
+      ? ERC721_NOTE_VALUE
+      : BigInt(nftAmountRecipient.amountString);
+
+  const nftTokenData =
+    createNFTTokenDataFromRailgunNFTAmount(nftAmountRecipient);
+
   const shield = new ShieldNoteNFT(
     masterPublicKey,
     random,
-    nftAmountRecipient.nftAddress,
-    nftAmountRecipient.nftTokenType as 1 | 2,
-    nftAmountRecipient.tokenSubID,
+    value,
+    nftTokenData,
   );
   return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
 };
@@ -101,9 +110,8 @@ const generateShieldTransactions = async (
       await railgunSmartWalletContract.generateShield(shieldInputs);
     return populatedTransaction;
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
-    throw sanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(err);
+    throw sanitizedError;
   }
 };
 
@@ -135,10 +143,9 @@ export const populateShield = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -171,10 +178,9 @@ export const gasEstimateForShield = async (
       ),
     );
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }

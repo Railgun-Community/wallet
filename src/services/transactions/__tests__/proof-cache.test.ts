@@ -7,13 +7,15 @@ import {
   RailgunERC20Amount,
   RailgunERC20AmountRecipient,
   NetworkName,
+  RailgunNFTAmount,
 } from '@railgun-community/shared-models';
 import {
+  MOCK_NFT_AMOUNTS,
   MOCK_NFT_AMOUNT_RECIPIENTS,
   MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_AMOUNTS,
   MOCK_TOKEN_FEE,
-} from '../../../test/mocks.test';
+} from '../../../tests/mocks.test';
 import {
   setCachedProvedTransaction,
   validateCachedProvedTransaction,
@@ -42,6 +44,8 @@ const relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient = {
 const crossContractCallsSerialized = ['0x4567'];
 const relayAdaptShieldERC20Addresses = ['0x123'];
 const relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[] = [MOCK_TOKEN_FEE];
+const relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[] = MOCK_NFT_AMOUNTS;
+const relayAdaptShieldNFTs: RailgunNFTAmount[] = MOCK_NFT_AMOUNTS;
 
 const sendWithPublicWallet = false;
 const overallBatchMinGasPrice = '0x1000';
@@ -59,7 +63,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -76,7 +82,9 @@ describe('proof-cache', () => {
       erc20AmountRecipients,
       nftAmountRecipients,
       relayAdaptUnshieldERC20Amounts,
+      relayAdaptUnshieldNFTAmounts,
       relayAdaptShieldERC20Addresses,
+      relayAdaptShieldNFTs,
       crossContractCallsSerialized,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet: false,
@@ -94,7 +102,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -112,7 +122,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -130,7 +142,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -148,7 +162,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -166,7 +182,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -184,7 +202,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -208,7 +228,9 @@ describe('proof-cache', () => {
         ],
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -226,7 +248,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         [MOCK_NFT_AMOUNT_RECIPIENTS[0]],
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -250,45 +274,93 @@ describe('proof-cache', () => {
             amountString: '100',
           },
         ],
-        ['test'],
-        crossContractCallsSerialized,
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
-
-    expect(
-      validateCachedProvedTransaction(
-        networkName,
-        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
-        ProofType.CrossContractCalls,
-        railgunWalletID,
-        showSenderAddressToRecipient,
-        memoText,
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        relayAdaptUnshieldERC20Amounts,
-        ['test'],
-        crossContractCallsSerialized,
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
-
-    expect(
-      validateCachedProvedTransaction(
-        networkName,
-        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
-        ProofType.CrossContractCalls,
-        railgunWalletID,
-        showSenderAddressToRecipient,
-        memoText,
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
+        crossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ).isValid,
+    ).to.be.false;
+
+    expect(
+      validateCachedProvedTransaction(
+        networkName,
+        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        [MOCK_NFT_AMOUNTS[0]],
+        relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
+        crossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ).isValid,
+    ).to.be.false;
+
+    expect(
+      validateCachedProvedTransaction(
+        networkName,
+        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        ['test'],
+        relayAdaptShieldNFTs,
+        crossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ).isValid,
+    ).to.be.false;
+
+    expect(
+      validateCachedProvedTransaction(
+        networkName,
+        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        relayAdaptShieldERC20Addresses,
+        [MOCK_NFT_AMOUNTS[0]],
+        crossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ).isValid,
+    ).to.be.false;
+
+    expect(
+      validateCachedProvedTransaction(
+        networkName,
+        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         ['test'],
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -306,7 +378,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         {
           tokenAddress: '0x765',
@@ -328,7 +402,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         true, // sendWithPublicWallet
@@ -346,7 +422,9 @@ describe('proof-cache', () => {
         erc20AmountRecipients,
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
         crossContractCallsSerialized,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,

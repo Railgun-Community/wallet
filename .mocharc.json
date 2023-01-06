@@ -1,5 +1,5 @@
 {
-  "file": ["./src/test/setup.test.ts"],
+  "file": ["./src/tests/setup.test.ts"],
   "require": "ts-node/register",
   "exit": true
 }

@@ -7,7 +7,7 @@ import {
   AccumulatedEvents,
   promiseTimeout,
 } from '@railgun-community/engine';
-import { sendErrorMessage } from '../../../utils/logger';
+import { reportAndSanitizeError } from '../../../utils/error';
 
 const MAX_NUM_RETRIES = 3;
 
@@ -300,7 +300,7 @@ const fetchJsonData = async <ReturnType>(
     if (retryCount < MAX_NUM_RETRIES) {
       return fetchJsonData(url, retryCount + 1);
     }
-    sendErrorMessage(err);
+    reportAndSanitizeError(err);
     throw new Error(
       'Could not pull historical transactions. Please try again.',
     );

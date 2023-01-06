@@ -6,7 +6,6 @@ import {
   NetworkName,
   ProofType,
   FeeTokenDetails,
-  sanitizeError,
   serializeUnsignedTransaction,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
@@ -15,11 +14,11 @@ import {
   generateDummyProofTransactions,
   generateTransact,
 } from './tx-generator';
-import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
 import { TransactionStruct } from '@railgun-community/engine';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { BigNumber } from '@ethersproject/bignumber';
+import { reportAndSanitizeError } from '../../utils/error';
 
 export const populateProvedTransfer = async (
   networkName: NetworkName,
@@ -43,7 +42,9 @@ export const populateProvedTransfer = async (
       erc20AmountRecipients,
       nftAmountRecipients,
       undefined, // relayAdaptUnshieldERC20AmountRecipients
+      undefined, // relayAdaptUnshieldNFTAmounts
       undefined, // relayAdaptShieldERC20Addresses
+      undefined, // relayAdaptShieldNFTs
       undefined, // crossContractCallsSerialized
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
@@ -54,10 +55,9 @@ export const populateProvedTransfer = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -108,10 +108,9 @@ export const gasEstimateForUnprovenTransfer = async (
     );
     return response;
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }

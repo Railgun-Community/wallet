@@ -6,7 +6,6 @@ import {
   NetworkName,
   ProofType,
   FeeTokenDetails,
-  sanitizeError,
   serializeUnsignedTransaction,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
@@ -16,12 +15,12 @@ import {
   generateTransact,
   generateUnshieldBaseToken,
 } from './tx-generator';
-import { sendErrorMessage } from '../../utils/logger';
 import { populateProvedTransaction } from './proof-cache';
 import { randomHex, TransactionStruct } from '@railgun-community/engine';
 import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { BigNumber } from '@ethersproject/bignumber';
+import { reportAndSanitizeError } from '../../utils/error';
 
 export const populateProvedUnshield = async (
   networkName: NetworkName,
@@ -43,7 +42,9 @@ export const populateProvedUnshield = async (
       erc20AmountRecipients,
       nftAmountRecipients,
       undefined, // relayAdaptUnshieldERC20AmountRecipients
+      undefined, // relayAdaptUnshieldNFTAmounts
       undefined, // relayAdaptShieldERC20Addresses
+      undefined, // relayAdaptShieldNFTs
       undefined, // crossContractCallsSerialized
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
@@ -54,10 +55,9 @@ export const populateProvedUnshield = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -96,7 +96,9 @@ export const populateProvedUnshieldBaseToken = async (
       erc20AmountRecipients,
       nftAmountRecipients,
       relayAdaptUnshieldERC20Amounts,
+      undefined, // relayAdaptUnshieldNFTAmounts
       undefined, // relayAdaptShieldERC20Addresses
+      undefined, // relayAdaptShieldNFTs
       undefined, // crossContractCallsSerialized
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
@@ -107,10 +109,9 @@ export const populateProvedUnshieldBaseToken = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -160,10 +161,9 @@ export const gasEstimateForUnprovenUnshield = async (
     );
     return response;
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
@@ -225,10 +225,9 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
     );
     return response;
   } catch (err) {
-    sendErrorMessage(err.message);
-    sendErrorMessage(err.stack);
+    const sanitizedError = reportAndSanitizeError(err);
     const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizeError(err).message,
+      error: sanitizedError.message,
     };
     return railResponse;
   }
