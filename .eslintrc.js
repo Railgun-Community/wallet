@@ -15,7 +15,6 @@ module.exports = {
   globals: {
     Optional: 'readonly',
     MapType: 'readonly',
-    NumMapType: 'readonly',
     BigInt: 'readonly',
   },
   parser: '@typescript-eslint/parser',
