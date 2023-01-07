@@ -14,10 +14,10 @@ const MAX_NUM_RETRIES = 3;
 // 2 sec to look up chain page metadata.
 const CHAIN_PAGE_METADATA_TIMEOUT = 2000;
 
-const GATEWAY_URLS = [
-  'https://railgun1.b-cdn.net',
-  'https://railgun2.b-cdn.net',
-  'https://railgun3.b-cdn.net',
+const GATEWAY_URLS: string[] = [
+  'https://mex.ipfs-lb.com',
+  'https://ams.ipfs-lb.com',
+  'https://sin.ipfs-lb.com',
 ];
 
 const IPNS_HASH =
