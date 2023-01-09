@@ -25,6 +25,18 @@ const EXPECTED_COMMITMENT_EVENTS_BNB = 614;
 const EXPECTED_NULLIFIER_EVENTS_BNB = 515;
 const EXPECTED_UNSHIELD_EVENTS_BNB = 1;
 
+const POLYGON_MUMBAI_CHAIN: Chain =
+  NETWORK_CONFIG[NetworkName.PolygonMumbai].chain;
+const EXPECTED_COMMITMENT_EVENTS_POLYGON_MUMBAI = 75;
+const EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI = 40;
+const EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI = 1;
+
+const ARBITRUM_GOERLI_CHAIN: Chain =
+  NETWORK_CONFIG[NetworkName.ArbitrumGoerli].chain;
+const EXPECTED_COMMITMENT_EVENTS_ARBITRUM_GOERLI = 30;
+const EXPECTED_NULLIFIER_EVENTS_ARBITRUM_GOERLI = 25;
+const EXPECTED_UNSHIELD_EVENTS_ARBITRUM_GOERLI = 1;
+
 const assertContiguousCommitmentEvents = (
   commitmentEvents: CommitmentEvent[],
   shouldThrow: boolean,
@@ -111,6 +123,42 @@ describe('quick-sync-ipns', () => {
     );
     expect(eventLog.unshieldEvents.length).to.be.at.least(
       EXPECTED_UNSHIELD_EVENTS_BNB,
+    );
+
+    const shouldThrow = true;
+    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+  }).timeout(20000);
+
+  it('Should make sure IPNS Event Log has no data gaps in commitments - Polygon Mumbai', async () => {
+    const eventLog = await quickSyncIPNS(POLYGON_MUMBAI_CHAIN, 0);
+    expect(eventLog).to.be.an('object');
+    expect(eventLog.commitmentEvents).to.be.an('array');
+    expect(eventLog.commitmentEvents.length).to.be.at.least(
+      EXPECTED_COMMITMENT_EVENTS_POLYGON_MUMBAI,
+    );
+    expect(eventLog.nullifierEvents.length).to.be.at.least(
+      EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI,
+    );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI,
+    );
+
+    const shouldThrow = true;
+    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+  }).timeout(20000);
+
+  it('Should make sure IPNS Event Log has no data gaps in commitments - Arbitrum Goerli', async () => {
+    const eventLog = await quickSyncIPNS(ARBITRUM_GOERLI_CHAIN, 0);
+    expect(eventLog).to.be.an('object');
+    expect(eventLog.commitmentEvents).to.be.an('array');
+    expect(eventLog.commitmentEvents.length).to.be.at.least(
+      EXPECTED_COMMITMENT_EVENTS_ARBITRUM_GOERLI,
+    );
+    expect(eventLog.nullifierEvents.length).to.be.at.least(
+      EXPECTED_NULLIFIER_EVENTS_ARBITRUM_GOERLI,
+    );
+    expect(eventLog.unshieldEvents.length).to.be.at.least(
+      EXPECTED_UNSHIELD_EVENTS_ARBITRUM_GOERLI,
     );
 
     const shouldThrow = true;

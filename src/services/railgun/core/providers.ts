@@ -55,7 +55,7 @@ export const getRailgunSmartWalletContractForNetwork = (
     getEngine().railgunSmartWalletContracts[chain.type][chain.id];
   if (!railgunSmartWalletContract) {
     throw new Error(
-      `Proxy contract not yet loaded for network ${network.publicName}`,
+      `RailgunSmartWallet contract not yet loaded for network ${network.publicName}`,
     );
   }
   return railgunSmartWalletContract;
