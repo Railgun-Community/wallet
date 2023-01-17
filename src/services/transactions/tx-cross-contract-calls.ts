@@ -48,6 +48,9 @@ const createPopulatedCrossContractCalls = (
   crossContractCallsSerialized: string[],
   networkName: NetworkName,
 ): PopulatedTransaction[] => {
+  if (!crossContractCallsSerialized.length) {
+    throw new Error('No cross contract calls in transaction.');
+  }
   try {
     return crossContractCallsSerialized
       .map(serialized =>
@@ -72,7 +75,7 @@ const createPopulatedCrossContractCalls = (
       });
   } catch (err) {
     reportAndSanitizeError(err);
-    throw new Error('Invalid serialized cross contract calls.');
+    throw new Error('Invalid cross contract calls.');
   }
 };
 

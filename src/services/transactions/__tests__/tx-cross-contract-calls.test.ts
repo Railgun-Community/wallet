@@ -356,7 +356,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
     );
-    expect(rsp.error).to.equal('Invalid serialized cross contract calls.');
+    expect(rsp.error).to.equal('Invalid cross contract calls.');
   });
 
   it('Should error on cross contract calls gas estimate for ethers rejections', async () => {
