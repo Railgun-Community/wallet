@@ -51,8 +51,9 @@ module.exports = {
     'lines-between-class-members': 0,
     '@typescript-eslint/no-empty-function': 0,
     'no-promise-executor-return': 0,
-    '@typescript-eslint/no-floating-promises': 2,
-    '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/no-floating-promises': 2,
+      '@typescript-eslint/no-non-null-assertion': 2,
+    'no-warning-comments': 1,
   },
   overrides: [
     {
