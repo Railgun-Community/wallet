@@ -65,7 +65,7 @@ export const populateShieldBaseToken = async (
   railgunAddress: string,
   shieldPrivateKey: string,
   wrappedERC20Amount: RailgunERC20Amount,
-  gasDetailsSerialized: TransactionGasDetailsSerialized,
+  gasDetailsSerialized?: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     assertValidRailgunAddress(railgunAddress);
@@ -77,14 +77,15 @@ export const populateShieldBaseToken = async (
       wrappedERC20Amount,
     );
 
-    const sendWithPublicWallet = true;
-
-    setGasDetailsForPopulatedTransaction(
-      networkName,
-      populatedTransaction,
-      gasDetailsSerialized,
-      sendWithPublicWallet,
-    );
+    if (gasDetailsSerialized) {
+      const sendWithPublicWallet = true;
+      setGasDetailsForPopulatedTransaction(
+        networkName,
+        populatedTransaction,
+        gasDetailsSerialized,
+        sendWithPublicWallet,
+      );
+    }
 
     return {
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),

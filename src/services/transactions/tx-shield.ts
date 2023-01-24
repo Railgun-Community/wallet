@@ -120,7 +120,7 @@ export const populateShield = async (
   shieldPrivateKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  gasDetailsSerialized: TransactionGasDetailsSerialized,
+  gasDetailsSerialized?: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     const populatedTransaction = await generateShieldTransactions(
@@ -130,14 +130,15 @@ export const populateShield = async (
       nftAmountRecipients,
     );
 
-    const sendWithPublicWallet = true;
-
-    setGasDetailsForPopulatedTransaction(
-      networkName,
-      populatedTransaction,
-      gasDetailsSerialized,
-      sendWithPublicWallet,
-    );
+    if (gasDetailsSerialized) {
+      const sendWithPublicWallet = true;
+      setGasDetailsForPopulatedTransaction(
+        networkName,
+        populatedTransaction,
+        gasDetailsSerialized,
+        sendWithPublicWallet,
+      );
+    }
 
     return {
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
