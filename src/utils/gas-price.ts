@@ -8,7 +8,9 @@ export const shouldSetOverallBatchMinGasPriceForNetwork = (
   networkName: NetworkName,
 ) => {
   switch (networkName) {
+    case NetworkName.Arbitrum:
     case NetworkName.ArbitrumGoerli:
+      // L2s should not set overallBatchMinGasPrice.
       return false;
     case NetworkName.Railgun:
       throw new Error('Invalid network for transaction');
