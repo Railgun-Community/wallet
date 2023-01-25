@@ -47,6 +47,8 @@ const relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[] = [MOCK_TOKEN_FEE];
 const relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[] = MOCK_NFT_AMOUNTS;
 const relayAdaptShieldNFTs: RailgunNFTAmount[] = MOCK_NFT_AMOUNTS;
 
+const nullifiers = ['0x1234'];
+
 const sendWithPublicWallet = false;
 const overallBatchMinGasPrice = '0x1000';
 
@@ -89,6 +91,7 @@ describe('proof-cache', () => {
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet: false,
       overallBatchMinGasPrice,
+      nullifiers,
     });
 
     // Same same

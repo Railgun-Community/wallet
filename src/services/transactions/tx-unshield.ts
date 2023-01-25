@@ -33,25 +33,27 @@ export const populateProvedUnshield = async (
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const populatedTransaction = await populateProvedTransaction(
-      networkName,
-      ProofType.Unshield,
-      railgunWalletID,
-      false, // showSenderAddressToRecipient
-      undefined, // memoText
-      erc20AmountRecipients,
-      nftAmountRecipients,
-      undefined, // relayAdaptUnshieldERC20AmountRecipients
-      undefined, // relayAdaptUnshieldNFTAmounts
-      undefined, // relayAdaptShieldERC20Addresses
-      undefined, // relayAdaptShieldNFTs
-      undefined, // crossContractCallsSerialized
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
+    const { populatedTransaction, nullifiers } =
+      await populateProvedTransaction(
+        networkName,
+        ProofType.Unshield,
+        railgunWalletID,
+        false, // showSenderAddressToRecipient
+        undefined, // memoText
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        undefined, // relayAdaptUnshieldERC20AmountRecipients
+        undefined, // relayAdaptUnshieldNFTAmounts
+        undefined, // relayAdaptShieldERC20Addresses
+        undefined, // relayAdaptShieldNFTs
+        undefined, // crossContractCallsSerialized
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      );
     return {
+      nullifiers,
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
@@ -87,25 +89,27 @@ export const populateProvedUnshieldBaseToken = async (
     // Empty NFT Recipients.
     const nftAmountRecipients: RailgunNFTAmountRecipient[] = [];
 
-    const populatedTransaction = await populateProvedTransaction(
-      networkName,
-      ProofType.UnshieldBaseToken,
-      railgunWalletID,
-      false, // showSenderAddressToRecipient
-      undefined, // memoText
-      erc20AmountRecipients,
-      nftAmountRecipients,
-      relayAdaptUnshieldERC20Amounts,
-      undefined, // relayAdaptUnshieldNFTAmounts
-      undefined, // relayAdaptShieldERC20Addresses
-      undefined, // relayAdaptShieldNFTs
-      undefined, // crossContractCallsSerialized
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
+    const { populatedTransaction, nullifiers } =
+      await populateProvedTransaction(
+        networkName,
+        ProofType.UnshieldBaseToken,
+        railgunWalletID,
+        false, // showSenderAddressToRecipient
+        undefined, // memoText
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        undefined, // relayAdaptUnshieldNFTAmounts
+        undefined, // relayAdaptShieldERC20Addresses
+        undefined, // relayAdaptShieldNFTs
+        undefined, // crossContractCallsSerialized
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      );
     return {
+      nullifiers,
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {

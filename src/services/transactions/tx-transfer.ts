@@ -33,25 +33,27 @@ export const populateProvedTransfer = async (
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const populatedTransaction = await populateProvedTransaction(
-      networkName,
-      ProofType.Transfer,
-      railgunWalletID,
-      showSenderAddressToRecipient,
-      memoText,
-      erc20AmountRecipients,
-      nftAmountRecipients,
-      undefined, // relayAdaptUnshieldERC20AmountRecipients
-      undefined, // relayAdaptUnshieldNFTAmounts
-      undefined, // relayAdaptShieldERC20Addresses
-      undefined, // relayAdaptShieldNFTs
-      undefined, // crossContractCallsSerialized
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
+    const { populatedTransaction, nullifiers } =
+      await populateProvedTransaction(
+        networkName,
+        ProofType.Transfer,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        undefined, // relayAdaptUnshieldERC20AmountRecipients
+        undefined, // relayAdaptUnshieldNFTAmounts
+        undefined, // relayAdaptShieldERC20Addresses
+        undefined, // relayAdaptShieldNFTs
+        undefined, // crossContractCallsSerialized
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      );
     return {
+      nullifiers,
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {

@@ -5,7 +5,11 @@ import {
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
 } from '@railgun-community/shared-models';
-import { generateProofTransactions, generateTransact } from './tx-generator';
+import {
+  generateProofTransactions,
+  generateTransact,
+  nullifiersForTransactions,
+} from './tx-generator';
 import { setCachedProvedTransaction } from './proof-cache';
 import { ProverProgressCallback } from '@railgun-community/engine';
 import { reportAndSanitizeError } from '../../utils/error';
@@ -26,7 +30,7 @@ export const generateTransferProof = async (
   try {
     setCachedProvedTransaction(undefined);
 
-    const txs = await generateProofTransactions(
+    const transactions = await generateProofTransactions(
       ProofType.Transfer,
       networkName,
       railgunWalletID,
@@ -42,7 +46,12 @@ export const generateTransferProof = async (
       overallBatchMinGasPrice,
       progressCallback,
     );
-    const populatedTransaction = await generateTransact(txs, networkName);
+    const populatedTransaction = await generateTransact(
+      transactions,
+      networkName,
+    );
+
+    const nullifiers = nullifiersForTransactions(transactions);
 
     setCachedProvedTransaction({
       proofType: ProofType.Transfer,
@@ -60,6 +69,7 @@ export const generateTransferProof = async (
       sendWithPublicWallet,
       populatedTransaction,
       overallBatchMinGasPrice,
+      nullifiers,
     });
     return {};
   } catch (err) {

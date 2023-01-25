@@ -75,6 +75,14 @@ export const generateProofTransactions = async (
   return txs;
 };
 
+export const nullifiersForTransactions = (
+  transactions: TransactionStruct[],
+): string[] => {
+  return transactions
+    .map(transaction => transaction.nullifiers)
+    .flat() as string[];
+};
+
 export const createDummyRelayerFeeERC20Amount = (feeTokenAddress: string) => {
   const relayerFeeERC20Amount: RailgunERC20Amount = {
     tokenAddress: feeTokenAddress,

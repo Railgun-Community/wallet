@@ -31,6 +31,7 @@ import {
   MOCK_MEMO,
   MOCK_MNEMONIC,
   MOCK_NFT_AMOUNT_RECIPIENTS,
+  MOCK_NULLIFIERS,
   MOCK_RAILGUN_WALLET_ADDRESS,
   MOCK_TOKEN_ADDRESS,
   MOCK_TOKEN_ADDRESS_2,
@@ -162,7 +163,11 @@ describe('tx-transfer', () => {
     railProveStub = Sinon.stub(
       TransactionBatch.prototype,
       'generateTransactions',
-    ).resolves([{}] as TransactionStruct[]);
+    ).resolves([
+      {
+        nullifiers: MOCK_NULLIFIERS,
+      },
+    ] as TransactionStruct[]);
     railDummyProveStub = Sinon.stub(
       TransactionBatch.prototype,
       'generateDummyTransactions',
@@ -171,10 +176,7 @@ describe('tx-transfer', () => {
         commitments: [
           '0x0000000000000000000000000000000000000000000000000000000000000003',
         ],
-        nullifiers: [
-          '0x0000000000000000000000000000000000000000000000000000000000000001',
-          '0x0000000000000000000000000000000000000000000000000000000000000002',
-        ],
+        nullifiers: MOCK_NULLIFIERS,
       },
     ] as unknown as TransactionStruct[]);
     railTransactStub = Sinon.stub(
@@ -390,6 +392,11 @@ describe('tx-transfer', () => {
     expect(populateResponse.serializedTransaction).to.equal(
       '0x01cc8080821000808080820123c0',
     );
+    expect(populateResponse.nullifiers).to.deep.equal([
+      '0x0000000000000000000000000000000000000000000000000000000000000001',
+      '0x0000000000000000000000000000000000000000000000000000000000000002',
+    ]);
+
     const deserialized = deserializeTransaction(
       populateResponse.serializedTransaction as string,
       2,

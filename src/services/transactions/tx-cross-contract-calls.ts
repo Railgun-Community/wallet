@@ -19,6 +19,7 @@ import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
   generateDummyProofTransactions,
   generateProofTransactions,
+  nullifiersForTransactions,
 } from './tx-generator';
 import {
   populateProvedTransaction,
@@ -143,27 +144,29 @@ export const populateProvedCrossContractCalls = async (
   gasDetailsSerialized: TransactionGasDetailsSerialized,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const populatedTransaction = await populateProvedTransaction(
-      networkName,
-      ProofType.CrossContractCalls,
-      railgunWalletID,
-      false, // showSenderAddressToRecipient
-      undefined, // memoText
-      [], // erc20AmountRecipients
-      [], // nftAmountRecipients
-      relayAdaptUnshieldERC20Amounts,
-      relayAdaptUnshieldNFTAmounts,
-      relayAdaptShieldERC20Addresses,
-      relayAdaptShieldNFTs,
-      crossContractCallsSerialized,
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
+    const { populatedTransaction, nullifiers } =
+      await populateProvedTransaction(
+        networkName,
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        false, // showSenderAddressToRecipient
+        undefined, // memoText
+        [], // erc20AmountRecipients
+        [], // nftAmountRecipients
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
+        crossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      );
     delete populatedTransaction.from;
 
     return {
+      nullifiers,
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
@@ -369,6 +372,8 @@ export const generateCrossContractCallsProof = async (
       progressCallback,
     );
 
+    const nullifiers = nullifiersForTransactions(transactions);
+
     const populatedTransaction =
       await relayAdaptContract.populateCrossContractCalls(
         transactions,
@@ -394,6 +399,7 @@ export const generateCrossContractCallsProof = async (
       sendWithPublicWallet,
       populatedTransaction,
       overallBatchMinGasPrice,
+      nullifiers,
     });
     return {};
   } catch (err) {

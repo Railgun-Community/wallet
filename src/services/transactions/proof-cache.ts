@@ -37,6 +37,7 @@ export type ProvedTransaction = {
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>;
   sendWithPublicWallet: boolean;
   overallBatchMinGasPrice: Optional<string>;
+  nullifiers: string[];
 };
 
 let cachedProvedTransaction: Optional<ProvedTransaction>;
@@ -58,7 +59,10 @@ export const populateProvedTransaction = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   gasDetailsSerialized: TransactionGasDetailsSerialized,
-): Promise<PopulatedTransaction> => {
+): Promise<{
+  populatedTransaction: PopulatedTransaction;
+  nullifiers: string[];
+}> => {
   const validation = validateCachedProvedTransaction(
     networkName,
     proofType,
@@ -80,7 +84,7 @@ export const populateProvedTransaction = async (
     throw new Error(`Invalid proof for this transaction. ${validation.error}`);
   }
 
-  const { populatedTransaction } = getCachedProvedTransaction();
+  const { populatedTransaction, nullifiers } = getCachedProvedTransaction();
 
   setGasDetailsForPopulatedTransaction(
     networkName,
@@ -89,7 +93,7 @@ export const populateProvedTransaction = async (
     sendWithPublicWallet,
   );
 
-  return populatedTransaction;
+  return { populatedTransaction, nullifiers };
 };
 
 export const setCachedProvedTransaction = (tx?: ProvedTransaction) => {

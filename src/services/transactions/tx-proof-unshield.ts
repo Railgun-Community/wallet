@@ -11,6 +11,7 @@ import {
   generateProofTransactions,
   generateTransact,
   generateUnshieldBaseToken,
+  nullifiersForTransactions,
 } from './tx-generator';
 import { assertValidEthAddress } from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
@@ -38,7 +39,7 @@ export const generateUnshieldProof = async (
   try {
     setCachedProvedTransaction(undefined);
 
-    const txs = await generateProofTransactions(
+    const transactions = await generateProofTransactions(
       ProofType.Unshield,
       networkName,
       railgunWalletID,
@@ -54,7 +55,12 @@ export const generateUnshieldProof = async (
       overallBatchMinGasPrice,
       progressCallback,
     );
-    const populatedTransaction = await generateTransact(txs, networkName);
+    const populatedTransaction = await generateTransact(
+      transactions,
+      networkName,
+    );
+
+    const nullifiers = nullifiersForTransactions(transactions);
 
     setCachedProvedTransaction({
       proofType: ProofType.Unshield,
@@ -72,6 +78,7 @@ export const generateUnshieldProof = async (
       populatedTransaction,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
+      nullifiers,
     });
     return {};
   } catch (err) {
@@ -154,7 +161,7 @@ export const generateUnshieldBaseTokenProof = async (
     const memoText: Optional<string> = undefined;
 
     // Generate final txs with relay adapt ID.
-    const txs = await generateProofTransactions(
+    const transactions = await generateProofTransactions(
       ProofType.UnshieldBaseToken,
       networkName,
       railgunWalletID,
@@ -172,12 +179,14 @@ export const generateUnshieldBaseTokenProof = async (
     );
 
     const populatedTransaction = await generateUnshieldBaseToken(
-      txs,
+      transactions,
       networkName,
       publicWalletAddress,
       relayAdaptParamsRandom,
       false, // useDummyProof
     );
+
+    const nullifiers = nullifiersForTransactions(transactions);
 
     setCachedProvedTransaction({
       proofType: ProofType.UnshieldBaseToken,
@@ -195,6 +204,7 @@ export const generateUnshieldBaseTokenProof = async (
       sendWithPublicWallet,
       populatedTransaction,
       overallBatchMinGasPrice,
+      nullifiers,
     });
     return {};
   } catch (err) {
