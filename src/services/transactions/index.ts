@@ -8,5 +8,6 @@ export * from './tx-gas-relayer-fee-estimator';
 export * from './tx-generator';
 export * from './tx-proof-transfer';
 export * from './tx-proof-unshield';
+export * from './tx-nullifiers';
 export * from './tx-transfer';
 export * from './tx-unshield';
