@@ -497,13 +497,13 @@ describe('tx-cross-contract-calls', () => {
 
     expect(deserialized.nonce).to.equal(2);
     expect(deserialized.gasPrice?.toString()).to.equal('4096');
-    expect(deserialized.gasLimit?.toString()).to.equal('0');
+    expect(deserialized.gasLimit).to.equal(undefined);
     expect(deserialized.value?.toString()).to.equal('0');
     expect(deserialized.data).to.equal('0x0123');
     expect(deserialized.to).to.equal(null);
     expect(deserialized.chainId).to.equal(1);
     expect(deserialized.type).to.equal(1);
-    expect(Object.keys(deserialized).length).to.equal(9);
+    expect(Object.keys(deserialized).length).to.equal(11);
   });
 
   it('Should error on populate tx for invalid cross contract calls', async () => {

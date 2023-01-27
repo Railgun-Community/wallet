@@ -42,7 +42,7 @@ const { expect } = chai;
 
 const gasDetailsSerialized: TransactionGasDetailsSerialized = {
   evmGasType: EVMGasType.Type2,
-  gasEstimateString: '0x00',
+  gasEstimateString: '0x10',
   maxFeePerGasString: '0x1000',
   maxPriorityFeePerGasString: '0x100',
 };
@@ -146,7 +146,31 @@ describe('tx-shield', () => {
     expect(rsp.error).to.equal('test rejection - gas estimate');
   });
 
-  it('Should send tx for valid shield', async () => {
+  it('Should send tx for valid shield - no gas details', async () => {
+    stubSuccess();
+    const rsp = await populateShield(
+      NetworkName.Polygon,
+      shieldPrivateKey,
+      MOCK_TOKEN_AMOUNT_RECIPIENTS,
+      MOCK_NFT_AMOUNT_RECIPIENTS,
+      undefined, // gasDetailsSerialized
+    );
+    expect(rsp.error).to.be.undefined;
+    const parsedTx = deserializeTransaction(
+      rsp.serializedTransaction ?? '',
+      2,
+      1,
+    );
+    expect(parsedTx).to.be.an('object');
+    expect(parsedTx.data).to.be.a('string');
+    expect(parsedTx.to).to.equal('0x19B620929f97b7b990801496c3b361CA5dEf8C71');
+    expect(parsedTx.gasPrice).to.be.undefined;
+    expect(parsedTx.gasLimit).to.be.undefined;
+    expect(parsedTx.maxFeePerGas).to.be.undefined;
+    expect(parsedTx.maxPriorityFeePerGas).to.be.undefined;
+  });
+
+  it('Should send tx for valid shield - gas details', async () => {
     stubSuccess();
     const rsp = await populateShield(
       NetworkName.Polygon,
@@ -163,7 +187,15 @@ describe('tx-shield', () => {
     );
     expect(parsedTx).to.be.an('object');
     expect(parsedTx.data).to.be.a('string');
-    expect(parsedTx.to).to.be.a('string');
+    expect(parsedTx.to).to.equal('0x19B620929f97b7b990801496c3b361CA5dEf8C71');
+    expect(parsedTx.gasPrice).to.be.null;
+    expect((parsedTx.gasLimit as BigNumber).toHexString()).to.equal('0x13');
+    expect((parsedTx.maxFeePerGas as BigNumber).toHexString()).to.equal(
+      '0x1000',
+    );
+    expect((parsedTx.maxPriorityFeePerGas as BigNumber).toHexString()).to.equal(
+      '0x0100',
+    );
   });
 
   it('Should error on send tx for invalid shield', async () => {
