@@ -8,6 +8,7 @@ import {
   deserializeTransaction,
   EVMGasType,
   TransactionGasDetailsSerialized,
+  decimalToHexString,
 } from '@railgun-community/shared-models';
 import {
   initTestEngine,
@@ -23,7 +24,6 @@ import {
   populateShieldBaseToken,
   gasEstimateForShieldBaseToken,
 } from '../tx-shield-base-token';
-import { decimalToHexString } from '../../../utils/format';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { PopulatedTransaction } from '@ethersproject/contracts';
 import { randomHex, RelayAdaptContract } from '@railgun-community/engine';

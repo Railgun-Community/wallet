@@ -17,6 +17,7 @@ import {
   TransactionGasDetailsSerialized,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
+  decimalToHexString,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
@@ -47,7 +48,6 @@ import { generateTransferProof } from '../tx-proof-transfer';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { setCachedProvedTransaction } from '../proof-cache';
-import { decimalToHexString } from '../../../utils/format';
 import * as txNotes from '../tx-notes';
 
 let gasEstimateStub: SinonStub;

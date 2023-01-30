@@ -19,6 +19,7 @@ import {
   TransactionGasDetailsSerialized,
   RailgunERC20AmountRecipient,
   createFallbackProviderFromJsonConfig,
+  decimalToHexString,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
@@ -43,7 +44,6 @@ import {
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { setCachedProvedTransaction } from '../proof-cache';
-import { decimalToHexString } from '../../../utils/format';
 import {
   createNFTTokenDataFromRailgunNFTAmount,
   gasEstimateForUnprovenCrossContractCalls,

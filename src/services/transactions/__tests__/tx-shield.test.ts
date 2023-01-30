@@ -9,6 +9,7 @@ import {
   EVMGasType,
   TransactionGasDetailsSerialized,
   RailgunERC20AmountRecipient,
+  decimalToHexString,
 } from '@railgun-community/shared-models';
 import {
   initTestEngine,
@@ -28,7 +29,6 @@ import {
   gasEstimateForShield,
   getShieldPrivateKeySignatureMessage,
 } from '../tx-shield';
-import { decimalToHexString } from '../../../utils/format';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { getRandomBytes } from '../../railgun';
 

@@ -4,6 +4,7 @@ import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub } from 'sinon';
 import {
   createFallbackProviderFromJsonConfig,
+  decimalToHexString,
   EVMGasType,
   NetworkName,
   TransactionGasDetailsSerialized,
@@ -14,7 +15,6 @@ import {
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
 } from '../../../tests/mocks.test';
-import { decimalToHexString } from '../../../utils/format';
 import {
   gasEstimateResponse,
   getGasEstimate,
