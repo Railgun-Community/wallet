@@ -124,7 +124,7 @@ export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
   shouldDebug: boolean,
-) => {
+): Promise<LoadProviderResponse> => {
   try {
     if (!providerMap[networkName]) {
       // NOTE: This is an async call, but we need not await.
