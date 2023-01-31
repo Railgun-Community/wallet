@@ -7,12 +7,12 @@ import {
   pbkdf2,
   verifyRelayerSignature,
 } from '../crypto-util';
-import { bytesToHex } from 'ethereum-cryptography/utils';
+import { bytesToHex } from '../bytes-util';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-describe.only('crypto-util', () => {
+describe('crypto-util', () => {
   it('Should verify signature', async () => {
     const privateKey = ed.utils.randomPrivateKey();
     const data = Uint8Array.from([0xab, 0xbc, 0xcd, 0xde]);
