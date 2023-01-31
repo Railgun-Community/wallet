@@ -7,18 +7,31 @@ import {
   pbkdf2,
   verifyRelayerSignature,
 } from '../crypto-util';
+import { bytesToHex } from 'ethereum-cryptography/utils';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-describe('crypto-util', () => {
+describe.only('crypto-util', () => {
   it('Should verify signature', async () => {
     const privateKey = ed.utils.randomPrivateKey();
     const data = Uint8Array.from([0xab, 0xbc, 0xcd, 0xde]);
     const publicKey = await ed.getPublicKey(privateKey);
     const signature = await ed.sign(data, privateKey);
-    const isValid = await verifyRelayerSignature(signature, data, publicKey);
-    expect(isValid).to.be.true;
+
+    const isValidBytes = await verifyRelayerSignature(
+      signature,
+      data,
+      publicKey,
+    );
+    expect(isValidBytes).to.be.true;
+
+    const isValidHex = await verifyRelayerSignature(
+      bytesToHex(signature),
+      bytesToHex(data),
+      publicKey,
+    );
+    expect(isValidHex).to.be.true;
   });
 
   it('Should encrypt and decrypt data with shareable random pubkey', async () => {

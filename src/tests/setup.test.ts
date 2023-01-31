@@ -29,9 +29,10 @@ const setupTests = () => {
   // setLoggers(console.log, console.error);
 
   // Remove artifacts.
-  const { warn } = console;
+  // const { warn } = console;
   fs.rm('v1', { recursive: true }, () => {
-    warn('Error removing test db.');
+    // Note: expect this error when we aren't running artifact download tests.
+    // warn('Error removing test artifacts.');
   });
 };
 

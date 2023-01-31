@@ -14,8 +14,8 @@ import { getRandomBytes } from './bytes-util';
 import crypto from 'crypto';
 
 export const verifyRelayerSignature = (
-  signature: Uint8Array,
-  data: Uint8Array,
+  signature: string | Uint8Array,
+  data: string | Uint8Array,
   signingKey: Uint8Array,
 ): Promise<boolean> => {
   return verifyED25519(data, signature, signingKey);
