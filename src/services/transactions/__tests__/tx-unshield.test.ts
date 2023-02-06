@@ -479,7 +479,7 @@ describe('tx-unshield', () => {
     expect(deserialized.to).to.equal(null);
     expect(deserialized.chainId).to.equal(1);
     expect(deserialized.type).to.equal(1);
-    expect(Object.keys(deserialized).length).to.equal(11);
+    expect(Object.keys(deserialized).length).to.equal(8);
   });
 
   it('Should error on populate tx for invalid Unshield', async () => {
@@ -612,7 +612,7 @@ describe('tx-unshield', () => {
     expect(deserialized.to).to.equal(null);
     expect(deserialized.chainId).to.equal(1);
     expect(deserialized.type).to.equal(1);
-    expect(Object.keys(deserialized).length).to.equal(11);
+    expect(Object.keys(deserialized).length).to.equal(8);
   }).timeout(60000);
 
   it('Should error on populate tx for invalid Unshield Base Token', async () => {

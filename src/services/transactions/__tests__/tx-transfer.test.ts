@@ -411,7 +411,7 @@ describe('tx-transfer', () => {
     expect(deserialized.to).to.equal(null);
     expect(deserialized.chainId).to.equal(1);
     expect(deserialized.type).to.equal(1);
-    expect(Object.keys(deserialized).length).to.equal(11);
+    expect(Object.keys(deserialized).length).to.equal(8);
   });
 
   it('Should error on populate transfer tx for unproved transaction', async () => {
