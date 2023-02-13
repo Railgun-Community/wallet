@@ -40,6 +40,13 @@ export const decryptAESGCM256 = (
   return tryDecryptJSONDataWithSharedKey(encryptedData, sharedKey);
 };
 
+export const encryptAESGCM256 = (
+  data: object,
+  sharedKey: Uint8Array,
+): Promise<EncryptDataWithSharedKeyResponse> => {
+  return encryptJSONDataWithSharedKey(data, sharedKey);
+};
+
 /**
  * Calculates PBKDF2 hash
  * @param secret - input
