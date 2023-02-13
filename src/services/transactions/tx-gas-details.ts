@@ -32,6 +32,9 @@ export const getGasEstimate = async (
     from: fromWalletAddress,
     type: evmGasType,
   };
+  if (shouldRemoveGasLimitForL2GasEstimate(networkName)) {
+    delete estimateGasTransaction.gasLimit;
+  }
 
   try {
     const provider = getProviderForNetwork(networkName);
@@ -40,6 +43,28 @@ export const getGasEstimate = async (
   } catch (err) {
     reportAndSanitizeError(err);
     throw err;
+  }
+};
+
+/**
+ * Gas estimates can fail for relay-adapt transactions on L2s like Arbitrum.
+ * This occurs on cross-contract calls (relay-adapt) which have a manual minimum gas limit set by Railgun Engine.
+ */
+const shouldRemoveGasLimitForL2GasEstimate = (networkName: NetworkName) => {
+  switch (networkName) {
+    case NetworkName.Arbitrum:
+    case NetworkName.ArbitrumGoerli:
+      return true;
+    case NetworkName.Railgun:
+      throw new Error('Invalid network for transaction');
+    case NetworkName.Ethereum:
+    case NetworkName.BNBChain:
+    case NetworkName.Polygon:
+    case NetworkName.EthereumRopsten_DEPRECATED:
+    case NetworkName.EthereumGoerli:
+    case NetworkName.PolygonMumbai:
+    case NetworkName.Hardhat:
+      return false;
   }
 };
 
