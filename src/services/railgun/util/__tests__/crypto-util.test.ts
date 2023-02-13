@@ -46,7 +46,7 @@ describe('crypto-util', () => {
     expect(randomPubKey.length).to.equal(64);
 
     const sharedKey = await ed.getSharedSecret(privateKey, randomPubKey);
-    const decrypted = await decryptAESGCM256(encryptedData, sharedKey);
+    const decrypted = decryptAESGCM256(encryptedData, sharedKey);
 
     expect(decrypted).to.deep.equal(data);
   });
