@@ -36,9 +36,14 @@ export const encryptDataWithSharedKey = async (
 export const decryptAESGCM256 = (
   encryptedData: EncryptedData,
   sharedKey: Uint8Array,
-): Promise<object | null> => {
-  return tryDecryptJSONDataWithSharedKey(encryptedData, sharedKey);
-};
+): Promise<object | null> =>
+  tryDecryptJSONDataWithSharedKey(encryptedData, sharedKey);
+
+export const encryptAESGCM256 = (
+  data: object,
+  sharedKey: Uint8Array,
+): Promise<EncryptDataWithSharedKeyResponse> =>
+  encryptJSONDataWithSharedKey(data, sharedKey);
 
 /**
  * Calculates PBKDF2 hash
