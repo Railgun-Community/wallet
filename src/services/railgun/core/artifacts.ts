@@ -2,10 +2,10 @@ import { ArtifactGetter, PublicInputs } from '@railgun-community/engine';
 import {
   Artifact,
   assertArtifactExists,
-  ipfsHashForArtifact,
 } from '@railgun-community/shared-models';
 import { ArtifactDownloader } from '../../artifacts/artifact-downloader';
 import { ArtifactStore } from '../../artifacts/artifact-store';
+import { getArtifactVariantString } from '../../artifacts/artifact-util';
 
 let artifactStore: ArtifactStore;
 let useNativeArtifacts: boolean;
@@ -15,8 +15,8 @@ export const artifactCache: MapType<Artifact> = {};
 export const setArtifactStore = (store: ArtifactStore) => {
   artifactStore = store;
 };
-export const setUseNativeArtifacts = (native: boolean) => {
-  useNativeArtifacts = native;
+export const setUseNativeArtifacts = (useNative: boolean) => {
+  useNativeArtifacts = useNative;
 };
 
 export const getArtifacts = async (inputs: PublicInputs): Promise<Artifact> => {
@@ -24,11 +24,14 @@ export const getArtifacts = async (inputs: PublicInputs): Promise<Artifact> => {
   const commitments = inputs.commitmentsOut.length;
   assertArtifactExists(nullifiers, commitments);
 
-  const artifactIPFSHash = ipfsHashForArtifact(nullifiers, commitments);
+  const artifactVariantString = getArtifactVariantString(
+    nullifiers,
+    commitments,
+  );
 
   // Use artifact in cache if available.
-  if (artifactCache[artifactIPFSHash]) {
-    return artifactCache[artifactIPFSHash];
+  if (artifactCache[artifactVariantString]) {
+    return artifactCache[artifactVariantString];
   }
 
   const downloader = new ArtifactDownloader(artifactStore, useNativeArtifacts);
@@ -36,20 +39,20 @@ export const getArtifacts = async (inputs: PublicInputs): Promise<Artifact> => {
   // Try to pull previously downloaded from storage.
   try {
     const downloadedArtifacts = await downloader.getDownloadedArtifacts(
-      artifactIPFSHash,
+      artifactVariantString,
     );
-    artifactCache[artifactIPFSHash] = downloadedArtifacts;
+    artifactCache[artifactVariantString] = downloadedArtifacts;
     return downloadedArtifacts;
   } catch (err) {
     // No op. Artifacts not yet downloaded.
   }
 
   // Download anew. Throws upon error.
-  await downloader.downloadArtifacts(artifactIPFSHash);
+  await downloader.downloadArtifacts(artifactVariantString);
   const downloadedArtifacts = await downloader.getDownloadedArtifacts(
-    artifactIPFSHash,
+    artifactVariantString,
   );
-  artifactCache[artifactIPFSHash] = downloadedArtifacts;
+  artifactCache[artifactVariantString] = downloadedArtifacts;
   return downloadedArtifacts;
 };
 
@@ -60,9 +63,9 @@ export const artifactGetterDownloadJustInTime: ArtifactGetter = {
 
 export const overrideArtifact = (
   artifactVariant: string,
-  artifactGroup: Artifact,
+  artifact: Artifact,
 ) => {
-  artifactCache[artifactVariant] = artifactGroup;
+  artifactCache[artifactVariant] = artifact;
 };
 
 export const clearArtifactCache = () => {

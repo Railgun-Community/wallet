@@ -19,13 +19,13 @@ export class ArtifactDownloader {
     this.useNativeArtifacts = useNativeArtifacts;
   }
 
-  downloadArtifacts = async (artifactIPFSHash: string): Promise<void> => {
+  downloadArtifacts = async (artifactVariantString: string): Promise<void> => {
     const [vkeyPath, zkeyPath, wasmOrDatPath] = await Promise.all([
-      this.downloadArtifact(ArtifactName.VKEY, artifactIPFSHash),
-      this.downloadArtifact(ArtifactName.ZKEY, artifactIPFSHash),
+      this.downloadArtifact(ArtifactName.VKEY, artifactVariantString),
+      this.downloadArtifact(ArtifactName.ZKEY, artifactVariantString),
       this.downloadArtifact(
         this.useNativeArtifacts ? ArtifactName.DAT : ArtifactName.WASM,
-        artifactIPFSHash,
+        artifactVariantString,
       ),
     ]);
 
@@ -36,20 +36,25 @@ export class ArtifactDownloader {
       throw new Error('Could not download zkey artifact.');
     }
     if (!wasmOrDatPath) {
-      throw new Error('Could not download wasm/dat artifact.');
+      throw new Error(
+        this.useNativeArtifacts
+          ? 'Could not download dat artifact.'
+          : 'Could not download wasm artifact.',
+      );
     }
   };
 
   private downloadArtifact = async (
     artifactName: ArtifactName,
-    artifactIPFSHash: string,
+    artifactVariantString: string,
   ): Promise<string | undefined> => {
-    const path = artifactDownloadsPath(artifactName, artifactIPFSHash);
+    const path = artifactDownloadsPath(artifactName, artifactVariantString);
     if (await this.artifactStore.exists(path)) {
       return path;
     }
     try {
-      const url = getArtifactUrl(artifactName, artifactIPFSHash);
+      const url = getArtifactUrl(artifactName, artifactVariantString);
+
       const result = await axios.get(url, {
         method: 'GET',
         responseType: ArtifactDownloader.artifactResponseType(artifactName),
@@ -69,7 +74,7 @@ export class ArtifactDownloader {
         artifactName,
       );
       await this.artifactStore.store(
-        artifactDownloadsDir(artifactIPFSHash),
+        artifactDownloadsDir(artifactVariantString),
         path,
         decompressedData,
       );
@@ -123,9 +128,11 @@ export class ArtifactDownloader {
   };
 
   getDownloadedArtifacts = async (
-    artifactIPFSHash: string,
+    artifactVariantString: string,
   ): Promise<Artifact> => {
-    const artifactDownloadsPaths = getArtifactDownloadsPaths(artifactIPFSHash);
+    const artifactDownloadsPaths = getArtifactDownloadsPaths(
+      artifactVariantString,
+    );
 
     const [vkeyString, zkeyBuffer, datBuffer, wasmBuffer] = await Promise.all([
       this.getDownloadedArtifact(artifactDownloadsPaths[ArtifactName.VKEY]),
@@ -143,8 +150,11 @@ export class ArtifactDownloader {
     if (zkeyBuffer == null) {
       throw new Error('Could not retrieve zkey artifact.');
     }
-    if (datBuffer == null && wasmBuffer == null) {
-      throw new Error('Could not retrieve dat/wasm artifact.');
+    if (this.useNativeArtifacts && datBuffer == null) {
+      throw new Error('Could not retrieve dat artifact.');
+    }
+    if (!this.useNativeArtifacts && wasmBuffer == null) {
+      throw new Error('Could not retrieve wasm artifact.');
     }
 
     return {
