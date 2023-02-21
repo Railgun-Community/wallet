@@ -19,7 +19,7 @@ describe('logger', () => {
     expect(messageSpy.notCalled).to.be.true;
     expect(errorSpy.notCalled).to.be.true;
 
-    sendMessage('sup');
+    sendMessage('msg');
     expect(messageSpy.calledOnce).to.be.true;
     sendErrorMessage('err');
     expect(errorSpy.calledOnce).to.be.true;

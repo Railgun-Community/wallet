@@ -1,16 +1,11 @@
-import {
-  ArtifactGroup,
-  ArtifactName,
-  ArtifactVariant,
-} from '@railgun-community/shared-models';
+import { Artifact, ArtifactName } from '@railgun-community/shared-models';
 import axios, { ResponseType } from 'axios';
 import {
-  artifactDir,
-  artifactPath,
+  artifactDownloadsDir,
+  artifactDownloadsPath,
   decompressArtifact,
-  getArtifactPaths,
+  getArtifactDownloadsPaths,
   getArtifactUrl,
-  validateArtifactDownload,
 } from './artifact-util';
 import { ArtifactStore } from './artifact-store';
 import { reportAndSanitizeError } from '../../utils/error';
@@ -24,15 +19,13 @@ export class ArtifactDownloader {
     this.useNativeArtifacts = useNativeArtifacts;
   }
 
-  downloadArtifactsForVariant = async (
-    artifactVariant: ArtifactVariant,
-  ): Promise<void> => {
+  downloadArtifacts = async (artifactIPFSHash: string): Promise<void> => {
     const [vkeyPath, zkeyPath, wasmOrDatPath] = await Promise.all([
-      this.downloadArtifact(ArtifactName.VKEY, artifactVariant),
-      this.downloadArtifact(ArtifactName.ZKEY, artifactVariant),
+      this.downloadArtifact(ArtifactName.VKEY, artifactIPFSHash),
+      this.downloadArtifact(ArtifactName.ZKEY, artifactIPFSHash),
       this.downloadArtifact(
         this.useNativeArtifacts ? ArtifactName.DAT : ArtifactName.WASM,
-        artifactVariant,
+        artifactIPFSHash,
       ),
     ]);
 
@@ -49,14 +42,14 @@ export class ArtifactDownloader {
 
   private downloadArtifact = async (
     artifactName: ArtifactName,
-    artifactVariant: ArtifactVariant,
+    artifactIPFSHash: string,
   ): Promise<string | undefined> => {
-    const path = artifactPath(artifactName, artifactVariant);
+    const path = artifactDownloadsPath(artifactName, artifactIPFSHash);
     if (await this.artifactStore.exists(path)) {
       return path;
     }
     try {
-      const url = getArtifactUrl(artifactName, artifactVariant);
+      const url = getArtifactUrl(artifactName, artifactIPFSHash);
       const result = await axios.get(url, {
         method: 'GET',
         responseType: ArtifactDownloader.artifactResponseType(artifactName),
@@ -71,24 +64,15 @@ export class ArtifactDownloader {
           ? (data as ArrayBuffer | Buffer)
           : JSON.stringify(data);
 
-      const isValid = await validateArtifactDownload(
+      const decompressedData = ArtifactDownloader.getArtifactData(
         dataFormatted,
         artifactName,
-        artifactVariant,
       );
-      if (isValid) {
-        const decompressedData = ArtifactDownloader.getArtifactData(
-          dataFormatted,
-          artifactName,
-        );
-        await this.artifactStore.store(
-          artifactDir(artifactVariant),
-          path,
-          decompressedData,
-        );
-      } else {
-        throw new Error(`Invalid artifact download: ${artifactName}`);
-      }
+      await this.artifactStore.store(
+        artifactDownloadsDir(artifactIPFSHash),
+        path,
+        decompressedData,
+      );
 
       return path;
     } catch (err) {
@@ -134,24 +118,23 @@ export class ArtifactDownloader {
         | null;
       return storedItem;
     } catch (err) {
-      reportAndSanitizeError(err);
       return null;
     }
   };
 
   getDownloadedArtifacts = async (
-    artifactVariant: ArtifactVariant,
-  ): Promise<ArtifactGroup> => {
-    const artifactPaths = getArtifactPaths(artifactVariant);
+    artifactIPFSHash: string,
+  ): Promise<Artifact> => {
+    const artifactDownloadsPaths = getArtifactDownloadsPaths(artifactIPFSHash);
 
     const [vkeyString, zkeyBuffer, datBuffer, wasmBuffer] = await Promise.all([
-      this.getDownloadedArtifact(artifactPaths[ArtifactName.VKEY]),
-      this.getDownloadedArtifact(artifactPaths[ArtifactName.ZKEY]),
+      this.getDownloadedArtifact(artifactDownloadsPaths[ArtifactName.VKEY]),
+      this.getDownloadedArtifact(artifactDownloadsPaths[ArtifactName.ZKEY]),
       this.useNativeArtifacts
-        ? this.getDownloadedArtifact(artifactPaths[ArtifactName.DAT])
+        ? this.getDownloadedArtifact(artifactDownloadsPaths[ArtifactName.DAT])
         : Promise.resolve(undefined),
       !this.useNativeArtifacts
-        ? this.getDownloadedArtifact(artifactPaths[ArtifactName.WASM])
+        ? this.getDownloadedArtifact(artifactDownloadsPaths[ArtifactName.WASM])
         : Promise.resolve(undefined),
     ]);
     if (vkeyString == null) {

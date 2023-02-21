@@ -21,7 +21,6 @@ import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   initTestEngine,
   initTestEngineNetwork,
-  setTestArtifacts,
 } from '../../../tests/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -55,7 +54,6 @@ describe.skip('tx-proof-unshield', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
-    setTestArtifacts();
     const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,

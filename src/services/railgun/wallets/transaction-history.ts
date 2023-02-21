@@ -8,6 +8,7 @@ import {
   formatToByteLength,
   ByteLength,
   nToHex,
+  TransactionHistoryUnshieldTokenAmount,
 } from '@railgun-community/engine';
 import {
   LoadRailgunWalletResponse,
@@ -19,6 +20,8 @@ import {
   RailgunSendNFTAmount,
   RailgunNFTAmount,
   RailgunReceiveNFTAmount,
+  RailgunUnshieldERC20Amount,
+  RailgunUnshieldNFTAmount,
 } from '@railgun-community/shared-models';
 import { walletForID } from '../core/engine';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -34,6 +37,7 @@ const transactionHistoryReceiveTokenAmountToRailgunERC20Amount = (
     ),
     memoText: transactionHistoryReceiveTokenAmount.memoText,
     senderAddress: transactionHistoryReceiveTokenAmount.senderAddress,
+    shieldFee: transactionHistoryReceiveTokenAmount.shieldFee,
   };
 };
 
@@ -46,6 +50,7 @@ const transactionHistoryReceiveNFTToRailgunNFTAmount = (
     ),
     memoText: transactionHistoryReceiveTokenAmount.memoText,
     senderAddress: transactionHistoryReceiveTokenAmount.senderAddress,
+    shieldFee: transactionHistoryReceiveTokenAmount.shieldFee,
   };
 };
 
@@ -64,15 +69,35 @@ const transactionHistoryTransferTokenAmountToRailgunERC20Amount = (
   };
 };
 
+const transactionHistoryUnshieldTokenAmountToRailgunERC20Amount = (
+  transactionHistoryUnshieldTokenAmount: TransactionHistoryUnshieldTokenAmount,
+): RailgunUnshieldERC20Amount => {
+  return {
+    ...transactionHistoryTransferTokenAmountToRailgunERC20Amount(
+      transactionHistoryUnshieldTokenAmount,
+    ),
+    unshieldFee: transactionHistoryUnshieldTokenAmount.unshieldFee,
+  };
+};
+
 const transactionHistoryTransferNFTToRailgunNFTAmount = (
   transactionHistoryNFT: TransactionHistoryTransferTokenAmount,
 ): RailgunSendNFTAmount => {
   const walletSource = transactionHistoryNFT.noteAnnotationData?.walletSource;
   return {
     ...transactionHistoryNFTToRailgunNFTAmount(transactionHistoryNFT),
-
     memoText: transactionHistoryNFT.memoText,
     walletSource,
+    recipientAddress: transactionHistoryNFT.recipientAddress,
+  };
+};
+
+const transactionHistoryUnshieldNFTToRailgunNFTAmount = (
+  transactionHistoryNFT: TransactionHistoryUnshieldTokenAmount,
+): RailgunUnshieldNFTAmount => {
+  return {
+    ...transactionHistoryTransferNFTToRailgunNFTAmount(transactionHistoryNFT),
+    unshieldFee: transactionHistoryNFT.unshieldFee,
   };
 };
 
@@ -141,7 +166,7 @@ const serializeTransactionHistory = (
       .map(transactionHistoryReceiveTokenAmountToRailgunERC20Amount),
     unshieldERC20Amounts: historyItem.unshieldTokenAmounts
       .filter(filterERC20)
-      .map(transactionHistoryTransferTokenAmountToRailgunERC20Amount),
+      .map(transactionHistoryUnshieldTokenAmountToRailgunERC20Amount),
     receiveNFTAmounts: historyItem.receiveTokenAmounts
       .filter(filterNFT)
       .map(transactionHistoryReceiveNFTToRailgunNFTAmount),
@@ -150,7 +175,7 @@ const serializeTransactionHistory = (
       .map(transactionHistoryTransferNFTToRailgunNFTAmount),
     unshieldNFTAmounts: historyItem.unshieldTokenAmounts
       .filter(filterNFT)
-      .map(transactionHistoryTransferNFTToRailgunNFTAmount),
+      .map(transactionHistoryUnshieldNFTToRailgunNFTAmount),
     version: historyItem.version,
   }));
 };

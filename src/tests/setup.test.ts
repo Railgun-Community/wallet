@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import LevelDOWN from 'leveldown';
 import fs from 'fs';
-import { NetworkName, ArtifactVariant } from '@railgun-community/shared-models';
+import { NetworkName } from '@railgun-community/shared-models';
 import {
   setOnMerkletreeScanCallback,
   startRailgunEngine,
@@ -15,25 +15,14 @@ import {
 } from './mocks.test';
 import { loadProvider } from '../services/railgun/core/providers';
 import { ArtifactStore } from '../services/artifacts/artifact-store';
-import { overrideArtifact } from '../services/railgun/core/artifacts';
 import { setOnBalanceUpdateCallback } from '../services/railgun/wallets/balance-update';
-import testArtifacts from '@railgun-community/test-artifacts';
 
 const LEPTON_TEST_DB = 'test.db';
 const db = new LevelDOWN(LEPTON_TEST_DB);
 
 const setupTests = () => {
-  setTestArtifacts();
-
   // Uncomment to enable logger during tests (Do not commit).
   // setLoggers(console.log, console.error);
-
-  // Remove artifacts.
-  // const { warn } = console;
-  fs.rm('v1', { recursive: true }, () => {
-    // Note: expect this error when we aren't running artifact download tests.
-    // warn('Error removing test artifacts.');
-  });
 };
 
 before(() => {
@@ -44,6 +33,10 @@ after(() => {
   const { warn } = console;
   fs.rm(LEPTON_TEST_DB, { recursive: true }, () => {
     warn('Error removing test db.');
+  });
+  fs.rm('artifacts-v2', { recursive: true }, () => {
+    // Note: expect this error when we aren't running artifact download tests.
+    warn('Error removing test artifacts.');
   });
 });
 
@@ -66,13 +59,15 @@ const testArtifactStore = new ArtifactStore(
 );
 
 export const initTestEngine = (useNativeArtifacts = false) => {
-  const shouldDebug = true;
+  const shouldDebug = false;
   const response = startRailgunEngine(
     TEST_WALLET_SOURCE,
     db,
     shouldDebug,
     testArtifactStore,
     useNativeArtifacts,
+    false, // skipMerkletreeScans
+    {}, // tempEngineV3NewShieldEventBlockNumbersEVM
   );
   if (response.error) {
     throw new Error(response.error);
@@ -81,14 +76,6 @@ export const initTestEngine = (useNativeArtifacts = false) => {
   // TODO: Clear listeners when test engine is reset.
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);
   setOnMerkletreeScanCallback(MOCK_HISTORY_SCAN_CALLBACK);
-};
-
-export const setTestArtifacts = () => {
-  overrideArtifact(ArtifactVariant.Variant_1_by_2, testArtifacts[1][2]);
-  overrideArtifact(ArtifactVariant.Variant_1_by_3, testArtifacts[1][3]);
-  overrideArtifact(ArtifactVariant.Variant_2_by_2, testArtifacts[2][2]);
-  overrideArtifact(ArtifactVariant.Variant_2_by_3, testArtifacts[2][3]);
-  overrideArtifact(ArtifactVariant.Variant_8_by_2, testArtifacts[8][2]);
 };
 
 export const initTestEngineNetwork = async () => {

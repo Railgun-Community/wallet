@@ -16,7 +16,7 @@ import {
 } from '@railgun-community/shared-models';
 import { sendErrorMessage, sendMessage } from '../../../utils/logger';
 import {
-  artifactsGetter,
+  artifactGetterDownloadJustInTime,
   setArtifactStore,
   setUseNativeArtifacts,
 } from './artifacts';
@@ -136,7 +136,10 @@ export const startRailgunEngine = (
   shouldDebug: boolean,
   artifactStore: ArtifactStore,
   useNativeArtifacts: boolean,
-  skipMerkletreeScans?: boolean,
+  skipMerkletreeScans: boolean,
+  tempEngineV3NewShieldEventBlockNumbersEVM: {
+    [chainID: number]: number;
+  },
 ): StartRailgunEngineResponse => {
   if (engine) {
     const response: StartRailgunEngineResponse = {};
@@ -146,10 +149,11 @@ export const startRailgunEngine = (
     engine = new RailgunEngine(
       walletSource,
       db,
-      artifactsGetter,
+      artifactGetterDownloadJustInTime,
       quickSyncIPNS,
       shouldDebug ? createEngineDebugger() : undefined,
       skipMerkletreeScans,
+      tempEngineV3NewShieldEventBlockNumbersEVM,
     );
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(useNativeArtifacts);

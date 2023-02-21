@@ -91,7 +91,7 @@ describe('providers', () => {
       shouldDebug,
     );
     expect(response.error).to.equal(
-      'Cannot load provider: invalid fallback provider config.',
+      'Invalid fallback provider config: Cannot read properties of undefined (reading map)',
     );
   });
 });
