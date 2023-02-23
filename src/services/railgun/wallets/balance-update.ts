@@ -11,6 +11,8 @@ import {
   RailgunBalancesEvent,
   RailgunNFTAmount,
   RailgunERC20Amount,
+  NetworkName,
+  NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
 import { parseRailgunTokenAddress } from '../util/bytes-util';
@@ -108,14 +110,16 @@ export const onBalancesUpdate = async (
 
 export const balanceForERC20Token = async (
   wallet: AbstractWallet,
-  chain: Chain,
+  networkName: NetworkName,
   tokenAddress: string,
 ): Promise<Optional<BigNumber>> => {
+  const { chain } = NETWORK_CONFIG[networkName];
   const balances = await wallet.balances(chain);
   const tokenBalances = getSerializedERC20Balances(balances);
 
   const matchingTokenBalance: Optional<RailgunERC20Amount> = tokenBalances.find(
-    tokenBalance => tokenBalance.tokenAddress === tokenAddress,
+    tokenBalance =>
+      tokenBalance.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
   );
 
   if (!matchingTokenBalance) {

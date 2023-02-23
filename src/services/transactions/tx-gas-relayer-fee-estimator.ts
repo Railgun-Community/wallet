@@ -129,10 +129,10 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   );
 
   // Get private balance of matching token.
-  const matchingSendingTokenBalance: Optional<BigNumber> =
+  const balanceForRelayerFeeERC20: Optional<BigNumber> =
     await balanceForERC20Token(
       wallet,
-      NETWORK_CONFIG[networkName].chain,
+      networkName,
       feeTokenDetails.tokenAddress,
     );
 
@@ -154,15 +154,15 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     // then use the MAX amount for Relayer Fee, which is BALANCE - SENDING AMOUNT.
     if (
       relayerFeeMatchingSendingERC20Amount &&
-      matchingSendingTokenBalance &&
+      balanceForRelayerFeeERC20 &&
       // eslint-disable-next-line no-await-in-loop
       (await relayerFeeWillOverflowBalance(
-        matchingSendingTokenBalance,
+        balanceForRelayerFeeERC20,
         relayerFeeMatchingSendingERC20Amount,
         updatedRelayerFee,
       ))
     ) {
-      updatedRelayerFee.amountString = matchingSendingTokenBalance
+      updatedRelayerFee.amountString = balanceForRelayerFeeERC20
         .sub(relayerFeeMatchingSendingERC20Amount.amountString)
         .toHexString();
     }
