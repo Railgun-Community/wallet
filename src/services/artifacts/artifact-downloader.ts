@@ -1,4 +1,8 @@
-import { Artifact, ArtifactName } from '@railgun-community/shared-models';
+import {
+  Artifact,
+  ArtifactName,
+  promiseTimeout,
+} from '@railgun-community/shared-models';
 import axios, { ResponseType } from 'axios';
 import {
   artifactDownloadsDir,
@@ -9,6 +13,7 @@ import {
 } from './artifact-util';
 import { ArtifactStore } from './artifact-store';
 import { reportAndSanitizeError } from '../../utils/error';
+import { sendMessage } from '../../utils/logger';
 
 export class ArtifactDownloader {
   private artifactStore: ArtifactStore;
@@ -20,14 +25,22 @@ export class ArtifactDownloader {
   }
 
   downloadArtifacts = async (artifactVariantString: string): Promise<void> => {
-    const [vkeyPath, zkeyPath, wasmOrDatPath] = await Promise.all([
-      this.downloadArtifact(ArtifactName.VKEY, artifactVariantString),
-      this.downloadArtifact(ArtifactName.ZKEY, artifactVariantString),
-      this.downloadArtifact(
-        this.useNativeArtifacts ? ArtifactName.DAT : ArtifactName.WASM,
-        artifactVariantString,
+    sendMessage(`Downloading artifacts: ${artifactVariantString}`);
+
+    const [vkeyPath, zkeyPath, wasmOrDatPath] = await promiseTimeout(
+      Promise.all([
+        this.downloadArtifact(ArtifactName.VKEY, artifactVariantString),
+        this.downloadArtifact(ArtifactName.ZKEY, artifactVariantString),
+        this.downloadArtifact(
+          this.useNativeArtifacts ? ArtifactName.DAT : ArtifactName.WASM,
+          artifactVariantString,
+        ),
+      ]),
+      45000,
+      new Error(
+        `Timed out downloading artifact files for ${artifactVariantString} circuit. Please try again.`,
       ),
-    ]);
+    );
 
     if (!vkeyPath) {
       throw new Error('Could not download vkey artifact.');
