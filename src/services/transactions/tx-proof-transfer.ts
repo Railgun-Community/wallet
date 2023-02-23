@@ -73,7 +73,10 @@ export const generateTransferProof = async (
     });
     return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      generateTransferProof.name,
+      err,
+    );
     const railResponse: RailgunProveTransactionResponse = {
       error: sanitizedError.message,
     };

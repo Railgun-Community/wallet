@@ -82,7 +82,10 @@ export const generateUnshieldProof = async (
     });
     return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      generateUnshieldProof.name,
+      err,
+    );
     const railResponse: RailgunProveTransactionResponse = {
       error: sanitizedError.message,
     };
@@ -208,7 +211,10 @@ export const generateUnshieldBaseTokenProof = async (
     });
     return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      generateUnshieldBaseTokenProof.name,
+      err,
+    );
     const railResponse: RailgunProveTransactionResponse = {
       error: sanitizedError.message,
     };

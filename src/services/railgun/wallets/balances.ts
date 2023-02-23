@@ -31,7 +31,10 @@ export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
 
     return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      refreshRailgunBalances.name,
+      err,
+    );
     const response: RailgunBalanceResponse = { error: sanitizedError.message };
     return response;
   }
@@ -48,7 +51,10 @@ export const scanUpdatesForMerkletreeAndWallets = async (
     // which calls `onBalancesUpdate` (balance-update.ts).
     return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      scanUpdatesForMerkletreeAndWallets.name,
+      err,
+    );
     const response: RailgunBalanceResponse = { error: sanitizedError.message };
     return response;
   }
@@ -65,7 +71,10 @@ export const rescanFullMerkletreesAndWallets = async (
     // which calls `onBalancesUpdate` (balance-update.ts).
     return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      rescanFullMerkletreesAndWallets.name,
+      err,
+    );
     const response: RailgunBalanceResponse = { error: sanitizedError.message };
     return response;
   }

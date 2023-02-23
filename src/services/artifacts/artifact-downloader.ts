@@ -94,7 +94,7 @@ export class ArtifactDownloader {
 
       return path;
     } catch (err) {
-      reportAndSanitizeError(err);
+      reportAndSanitizeError(this.downloadArtifact.name, err);
       return undefined;
     }
   };

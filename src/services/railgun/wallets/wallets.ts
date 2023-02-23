@@ -130,7 +130,10 @@ export const createRailgunWallet = async (
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      createRailgunWallet.name,
+      err,
+    );
     const response: LoadRailgunWalletResponse = {
       error: sanitizedError.message,
     };
@@ -152,7 +155,10 @@ export const createViewOnlyRailgunWallet = async (
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      createViewOnlyRailgunWallet.name,
+      err,
+    );
     const response: LoadRailgunWalletResponse = {
       error: sanitizedError.message,
     };
@@ -174,7 +180,7 @@ export const loadWalletByID = async (
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(loadWalletByID.name, err);
     const response: LoadRailgunWalletResponse = {
       error: `Could not load RAILGUN wallet: ${sanitizedError.message}`,
     };
@@ -191,7 +197,7 @@ export const unloadWalletByID = (
     const response: UnloadRailgunWalletResponse = {};
     return response;
   } catch (err) {
-    reportAndSanitizeError(err);
+    reportAndSanitizeError(unloadWalletByID.name, err);
     const response: UnloadRailgunWalletResponse = {
       error: 'Could not unload RAILGUN wallet.',
     };
@@ -273,7 +279,7 @@ export const getRailgunAddress = (
     const wallet = walletForID(railgunWalletID);
     return wallet.getAddress();
   } catch (err) {
-    reportAndSanitizeError(err);
+    reportAndSanitizeError(getRailgunAddress.name, err);
     return undefined;
   }
 };
@@ -285,7 +291,7 @@ export const getWalletShareableViewingKey = async (
     const wallet = walletForID(railgunWalletID);
     return wallet.generateShareableViewingKey();
   } catch (err) {
-    reportAndSanitizeError(err);
+    reportAndSanitizeError(getWalletShareableViewingKey.name, err);
     return undefined;
   }
 };

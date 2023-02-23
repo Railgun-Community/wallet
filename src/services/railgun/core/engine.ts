@@ -161,7 +161,7 @@ export const startRailgunEngine = (
     const response: StartRailgunEngineResponse = {};
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(startRailgunEngine.name, err);
     const response: StartRailgunEngineResponse = {
       error: sanitizedError.message,
     };

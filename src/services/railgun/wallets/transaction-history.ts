@@ -191,7 +191,7 @@ export const getWalletTransactionHistory = async (
       items: serializeTransactionHistory(transactionHistory),
     };
   } catch (err) {
-    reportAndSanitizeError(err);
+    reportAndSanitizeError(getWalletTransactionHistory.name, err);
     const response: LoadRailgunWalletResponse = {
       error: 'Could not load RAILGUN wallet transaction history.',
     };

@@ -110,7 +110,10 @@ const generateShieldTransactions = async (
       await railgunSmartWalletContract.generateShield(shieldInputs);
     return populatedTransaction;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      generateShieldTransactions.name,
+      err,
+    );
     throw sanitizedError;
   }
 };
@@ -144,7 +147,7 @@ export const populateShield = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(populateShield.name, err);
     const railResponse: RailgunPopulateTransactionResponse = {
       error: sanitizedError.message,
     };
@@ -179,7 +182,10 @@ export const gasEstimateForShield = async (
       ),
     );
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      gasEstimateForShield.name,
+      err,
+    );
     const railResponse: RailgunTransactionGasEstimateResponse = {
       error: sanitizedError.message,
     };

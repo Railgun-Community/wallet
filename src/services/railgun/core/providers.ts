@@ -157,7 +157,7 @@ export const loadProvider = async (
     };
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(loadProvider.name, err);
     const response: LoadProviderResponse = { error: sanitizedError.message };
     return response;
   }

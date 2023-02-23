@@ -75,7 +75,7 @@ const createPopulatedCrossContractCalls = (
         return populatedTransaction;
       });
   } catch (err) {
-    reportAndSanitizeError(err);
+    reportAndSanitizeError(createPopulatedCrossContractCalls.name, err);
     throw new Error('Invalid cross contract calls.');
   }
 };
@@ -170,7 +170,10 @@ export const populateProvedCrossContractCalls = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      populateProvedCrossContractCalls.name,
+      err,
+    );
     const railResponse: RailgunPopulateTransactionResponse = {
       error: sanitizedError.message,
     };
@@ -267,7 +270,10 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
     );
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      gasEstimateForUnprovenCrossContractCalls.name,
+      err,
+    );
     const railResponse: RailgunTransactionGasEstimateResponse = {
       error: sanitizedError.message,
     };
@@ -403,7 +409,10 @@ export const generateCrossContractCallsProof = async (
     });
     return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      generateCrossContractCallsProof.name,
+      err,
+    );
     const railResponse: RailgunProveTransactionResponse = {
       error: sanitizedError.message,
     };
@@ -423,7 +432,7 @@ export const getRelayAdaptTransactionError = (
     }
     return undefined;
   } catch (err) {
-    reportAndSanitizeError(err);
+    reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
     throw err;
   }
 };

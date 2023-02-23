@@ -17,7 +17,10 @@ export const getCompletedTxidFromNullifiers = async (
     );
     return { txid };
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      getCompletedTxidFromNullifiers.name,
+      err,
+    );
     const response: RailgunTxidFromNullifiersResponse = {
       error: sanitizedError.message,
     };

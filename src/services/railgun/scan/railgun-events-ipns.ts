@@ -300,7 +300,7 @@ const fetchJsonData = async <ReturnType>(
     if (retryCount < MAX_NUM_RETRIES) {
       return fetchJsonData(url, retryCount + 1);
     }
-    reportAndSanitizeError(err);
+    reportAndSanitizeError(fetchJsonData.name, err);
     throw new Error(
       'Could not pull historical transactions. Please try again.',
     );

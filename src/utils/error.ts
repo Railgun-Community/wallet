@@ -1,8 +1,13 @@
 import { sanitizeError } from '@railgun-community/shared-models';
 import { sendErrorMessage } from './logger';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const reportAndSanitizeError = (err: Error | any): Error => {
+export const reportAndSanitizeError = (
+  func: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  err: Error | any,
+): Error => {
+  sendErrorMessage(`Caught error in Quickstart: ${func}`);
+
   if (err instanceof Error) {
     const error = sanitizeError(err);
     sendErrorMessage(error);

@@ -41,7 +41,7 @@ export const getGasEstimate = async (
     const gasEstimate = await provider.estimateGas(estimateGasTransaction);
     return gasEstimate.mul(multiplierBasisPoints).div(10000);
   } catch (err) {
-    reportAndSanitizeError(err);
+    reportAndSanitizeError(getGasEstimate.name, err);
     throw err;
   }
 };
@@ -86,7 +86,10 @@ export const gasEstimateResponseFromGasEstimate = (
     };
     return railResponse;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(err);
+    const sanitizedError = reportAndSanitizeError(
+      gasEstimateResponseFromGasEstimate.name,
+      err,
+    );
     const railResponse: RailgunTransactionGasEstimateResponse = {
       error: sanitizedError.message,
     };
