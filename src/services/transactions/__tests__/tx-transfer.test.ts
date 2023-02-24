@@ -226,8 +226,8 @@ describe('tx-transfer', () => {
     expect(erc20NoteSpy.args[4][0].amountString).to.equal('0x100'); // token1
     expect(erc20NoteSpy.args[5][0].amountString).to.equal('0x200'); // token2
     expect(rsp.error).to.be.undefined;
-    // Add 10000 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(10000 + 200));
+    // Add 7500 for the dummy tx variance
+    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
   });
 
   it('Should get gas estimates for valid erc20 transfer: public wallet', async () => {
@@ -249,8 +249,8 @@ describe('tx-transfer', () => {
     expect(erc20NoteSpy.args[0][0].amountString).to.equal('0x100'); // token1
     expect(erc20NoteSpy.args[1][0].amountString).to.equal('0x200'); // token2
     expect(rsp.error).to.be.undefined;
-    // Add 10000 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(10000 + 200));
+    // Add 7500 for the dummy tx variance
+    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
   });
 
   it('Should error on gas estimates for invalid erc20 transfer', async () => {
@@ -308,8 +308,8 @@ describe('tx-transfer', () => {
     expect(nftNoteSpy.args[2][0].tokenSubID).to.equal('0x01'); // nft1
     expect(nftNoteSpy.args[3][0].tokenSubID).to.equal('0x02'); // nft2
     expect(rsp.error).to.be.undefined;
-    // Add 10000 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(10000 + 200));
+    // Add 7500 for the dummy tx variance
+    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
   });
 
   it('Should get gas estimates for valid NFT transfer: public wallet', async () => {
@@ -331,8 +331,8 @@ describe('tx-transfer', () => {
     expect(nftNoteSpy.args[0][0].tokenSubID).to.equal('0x01'); // nft1
     expect(nftNoteSpy.args[1][0].tokenSubID).to.equal('0x02'); // nft2
     expect(rsp.error).to.be.undefined;
-    // Add 10000 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(10000 + 200));
+    // Add 7500 for the dummy tx variance
+    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
   });
 
   it('Should error on gas estimates for invalid NFT transfer', async () => {
