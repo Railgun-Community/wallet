@@ -49,7 +49,9 @@ describe('tx-gas', () => {
       MOCK_ETH_WALLET_ADDRESS,
       true, // sendWithPublicWallet
     );
-    const rsp = gasEstimateResponse(gasEstimate);
+
+    const isGasEstimateWithDummyProof = false;
+    const rsp = gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
 
     expect(gasEstimateStub.callCount).to.equal(1);
 
@@ -73,7 +75,8 @@ describe('tx-gas', () => {
       MOCK_ETH_WALLET_ADDRESS,
       true, // sendWithPublicWallet
     );
-    const rsp = gasEstimateResponse(gasEstimate);
+    const isGasEstimateWithDummyProof = true;
+    const rsp = gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
     expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.not.be.undefined;
   }).timeout(5000);
@@ -94,7 +97,8 @@ describe('tx-gas', () => {
       MOCK_ETH_WALLET_ADDRESS,
       false, // sendWithPublicWallet
     );
-    const rsp = gasEstimateResponse(gasEstimate);
+    const isGasEstimateWithDummyProof = true;
+    const rsp = gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
     expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.not.be.undefined;
   }).timeout(5000);

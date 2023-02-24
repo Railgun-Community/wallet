@@ -16,7 +16,7 @@ import {
 } from './tx-generator';
 import { populateProvedTransaction } from './proof-cache';
 import { TransactionStruct } from '@railgun-community/engine';
-import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
+import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { BigNumber } from '@ethersproject/bignumber';
 import { reportAndSanitizeError } from '../../utils/error';
 
@@ -82,7 +82,7 @@ export const gasEstimateForUnprovenTransfer = async (
   try {
     const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
 
-    const response = await gasEstimateResponseIterativeRelayerFee(
+    const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.Transfer,

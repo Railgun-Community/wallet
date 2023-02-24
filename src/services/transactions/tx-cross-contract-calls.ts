@@ -42,7 +42,7 @@ import {
 } from '@railgun-community/engine';
 import { fullWalletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
+import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { reportAndSanitizeError } from '../../utils/error';
 
 const createPopulatedCrossContractCalls = (
@@ -236,7 +236,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
     // TODO: Replace this after Callback Upgrade made to Relay Adapt contract.
     const multiplierBasisPoints = 14000;
 
-    const response = await gasEstimateResponseIterativeRelayerFee(
+    const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.CrossContractCalls,

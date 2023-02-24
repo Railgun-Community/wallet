@@ -12,6 +12,7 @@ import {
 } from '@railgun-community/shared-models';
 import { getProviderForNetwork } from '../railgun';
 import { reportAndSanitizeError } from '../../utils/error';
+import { GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION } from '@railgun-community/engine';
 
 export const getGasEstimate = async (
   networkName: NetworkName,
@@ -70,9 +71,16 @@ const shouldRemoveGasLimitForL2GasEstimate = (networkName: NetworkName) => {
 
 export const gasEstimateResponse = (
   gasEstimate: BigNumber,
+  isGasEstimateWithDummyProof: boolean,
 ): RailgunTransactionGasEstimateResponse => {
+  // TODO: This variance will be different on L2s.
+  // However, it's small enough that it shouldn't matter very much.
+  const gasEstimateWithDummyProofVariance = isGasEstimateWithDummyProof
+    ? gasEstimate.add(GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION)
+    : gasEstimate;
+
   const railResponse: RailgunTransactionGasEstimateResponse = {
-    gasEstimateString: gasEstimate.toHexString(),
+    gasEstimateString: gasEstimateWithDummyProofVariance.toHexString(),
   };
   return railResponse;
 };

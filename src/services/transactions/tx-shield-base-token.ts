@@ -124,6 +124,7 @@ export const gasEstimateForShieldBaseToken = async (
     );
 
     const sendWithPublicWallet = true;
+    const isGasEstimateWithDummyProof = false;
     return gasEstimateResponse(
       await getGasEstimate(
         networkName,
@@ -131,6 +132,7 @@ export const gasEstimateForShieldBaseToken = async (
         fromWalletAddress,
         sendWithPublicWallet,
       ),
+      isGasEstimateWithDummyProof,
     );
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(

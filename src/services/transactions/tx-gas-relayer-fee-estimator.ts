@@ -9,7 +9,6 @@ import {
   RailgunTransactionGasEstimateResponse,
   FeeTokenDetails,
   calculateMaximumGas,
-  NETWORK_CONFIG,
   RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 import {
@@ -69,8 +68,8 @@ const getUpdatedRelayerFeeForGasEstimation = async (
   return relayerFeeERC20Amount;
 };
 
-export const gasEstimateResponseIterativeRelayerFee = async (
-  generateTransactionStructsWithRelayerFee: (
+export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
+  generateDummyTransactionStructsWithRelayerFee: (
     relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
   ) => Promise<TransactionStruct[]>,
   generatePopulatedTransaction: (
@@ -92,18 +91,14 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   // Use dead address for private transaction gas estimate
   const fromWalletAddress = DUMMY_FROM_ADDRESS;
 
+  const isGasEstimateWithDummyProof = true;
+
   const dummyRelayerFee = feeTokenDetails
     ? createDummyRelayerFeeERC20Amount(feeTokenDetails.tokenAddress)
     : undefined;
 
-  // TODO: Add null UTXO support for 0n dummy relayer fee. (actually output a 1x1 circuit)
-  // See todo in @engine: createSpendingSolutionsForValue
-  // Then remove isDummyRelayerFee.
-  // After that, the logic will commonly cut a full gasEstimate.
-  let isDummyRelayerFee = true;
-  let serializedTransactions = await generateTransactionStructsWithRelayerFee(
-    dummyRelayerFee,
-  );
+  let serializedTransactions =
+    await generateDummyTransactionStructsWithRelayerFee(dummyRelayerFee);
   let populatedTransaction = await generatePopulatedTransaction(
     serializedTransactions,
   );
@@ -117,7 +112,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
   );
 
   if (sendWithPublicWallet) {
-    return gasEstimateResponse(gasEstimate);
+    return gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
   }
 
   if (!feeTokenDetails) {
@@ -174,20 +169,17 @@ export const gasEstimateResponseIterativeRelayerFee = async (
 
     const newTransactionStructs =
       // eslint-disable-next-line no-await-in-loop
-      await generateTransactionStructsWithRelayerFee(updatedRelayerFee);
+      await generateDummyTransactionStructsWithRelayerFee(updatedRelayerFee);
 
     if (
-      !isDummyRelayerFee &&
       compareCircuitSizesTransactionStructs(
         newTransactionStructs,
         serializedTransactions,
       )
     ) {
       // Same circuit sizes, no need to run further gas estimates.
-      return gasEstimateResponse(gasEstimate);
+      return gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
     }
-
-    isDummyRelayerFee = false;
 
     serializedTransactions = newTransactionStructs;
 
@@ -206,12 +198,12 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     );
 
     if (newGasEstimate.toHexString() === gasEstimate.toHexString()) {
-      return gasEstimateResponse(newGasEstimate);
+      return gasEstimateResponse(newGasEstimate, isGasEstimateWithDummyProof);
     }
     gasEstimate = newGasEstimate;
   }
 
-  return gasEstimateResponse(gasEstimate);
+  return gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
 };
 
 const compareCircuitSizesTransactionStructs = (

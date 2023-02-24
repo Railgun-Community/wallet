@@ -17,7 +17,7 @@ import {
 } from './tx-generator';
 import { populateProvedTransaction } from './proof-cache';
 import { randomHex, TransactionStruct } from '@railgun-community/engine';
-import { gasEstimateResponseIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
+import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { BigNumber } from '@ethersproject/bignumber';
 import { reportAndSanitizeError } from '../../utils/error';
@@ -140,7 +140,7 @@ export const gasEstimateForUnprovenUnshield = async (
   try {
     const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
 
-    const response = await gasEstimateResponseIterativeRelayerFee(
+    const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.Unshield,
@@ -203,7 +203,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
 
     const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
 
-    const response = await gasEstimateResponseIterativeRelayerFee(
+    const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.UnshieldBaseToken,
