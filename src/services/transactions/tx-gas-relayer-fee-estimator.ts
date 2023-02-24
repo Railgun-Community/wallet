@@ -70,7 +70,7 @@ const getUpdatedRelayerFeeForGasEstimation = async (
 };
 
 export const gasEstimateResponseIterativeRelayerFee = async (
-  generateTransactionStructs: (
+  generateTransactionStructsWithRelayerFee: (
     relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
   ) => Promise<TransactionStruct[]>,
   generatePopulatedTransaction: (
@@ -96,7 +96,12 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     ? createDummyRelayerFeeERC20Amount(feeTokenDetails.tokenAddress)
     : undefined;
 
-  let serializedTransactions = await generateTransactionStructs(
+  // TODO: Add null UTXO support for 0n dummy relayer fee. (actually output a 1x1 circuit)
+  // See todo in @engine: createSpendingSolutionsForValue
+  // Then remove isDummyRelayerFee.
+  // After that, the logic will commonly cut a full gasEstimate.
+  let isDummyRelayerFee = true;
+  let serializedTransactions = await generateTransactionStructsWithRelayerFee(
     dummyRelayerFee,
   );
   let populatedTransaction = await generatePopulatedTransaction(
@@ -121,7 +126,7 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     );
   }
 
-  // Find erc20Amount that matches token of relayer fee, if exists.
+  // Find any erc20Amount in transfer that matches token of relayer fee, if exists.
   const relayerFeeMatchingSendingERC20Amount = erc20AmountRecipients.find(
     erc20AmountRecipient =>
       erc20AmountRecipient.tokenAddress.toLowerCase() ===
@@ -153,8 +158,8 @@ export const gasEstimateResponseIterativeRelayerFee = async (
     // If Relayer fee causes overflow with the token balance,
     // then use the MAX amount for Relayer Fee, which is BALANCE - SENDING AMOUNT.
     if (
-      relayerFeeMatchingSendingERC20Amount &&
       balanceForRelayerFeeERC20 &&
+      relayerFeeMatchingSendingERC20Amount &&
       // eslint-disable-next-line no-await-in-loop
       (await relayerFeeWillOverflowBalance(
         balanceForRelayerFeeERC20,
@@ -167,20 +172,22 @@ export const gasEstimateResponseIterativeRelayerFee = async (
         .toHexString();
     }
 
-    // eslint-disable-next-line no-await-in-loop
-    const newTransactionStructs = await generateTransactionStructs(
-      updatedRelayerFee,
-    );
+    const newTransactionStructs =
+      // eslint-disable-next-line no-await-in-loop
+      await generateTransactionStructsWithRelayerFee(updatedRelayerFee);
 
     if (
+      !isDummyRelayerFee &&
       compareCircuitSizesTransactionStructs(
         newTransactionStructs,
         serializedTransactions,
       )
     ) {
-      // Same circuit sizes, no need to run gas estimates.
+      // Same circuit sizes, no need to run further gas estimates.
       return gasEstimateResponse(gasEstimate);
     }
+
+    isDummyRelayerFee = false;
 
     serializedTransactions = newTransactionStructs;
 
