@@ -28,7 +28,7 @@ export const getArtifacts = async (inputs: PublicInputs): Promise<Artifact> => {
     if (commitments > 3) {
       // native-prover-small only has INPUTS (1-10) and OUTPUTS (1-3)
       throw new Error(
-        'Native artifacts (small) only support up to 3 circuit outputs.',
+        `Native artifacts (small) only support up to 3 circuit outputs. Cannot get artifacts for circuit: ${nullifiers}x${commitments}.`,
       );
     }
   }
