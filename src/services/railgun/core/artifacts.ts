@@ -24,6 +24,15 @@ export const getArtifacts = async (inputs: PublicInputs): Promise<Artifact> => {
   const commitments = inputs.commitmentsOut.length;
   assertArtifactExists(nullifiers, commitments);
 
+  if (useNativeArtifacts) {
+    if (commitments > 3) {
+      // native-prover-small only has INPUTS (1-10) and OUTPUTS (1-3)
+      throw new Error(
+        'Native artifacts (small) only support up to 3 circuit outputs.',
+      );
+    }
+  }
+
   const artifactVariantString = getArtifactVariantString(
     nullifiers,
     commitments,

@@ -122,7 +122,7 @@ describe('artifact-downloader', () => {
       ],
       merkleRoot: BigInt(0),
       boundParamsHash: BigInt(0),
-      commitmentsOut: [BigInt(0), BigInt(1), BigInt(1), BigInt(1), BigInt(1)],
+      commitmentsOut: [BigInt(0), BigInt(1), BigInt(1)],
     };
 
     const artifacts: Artifact =
@@ -133,7 +133,7 @@ describe('artifact-downloader', () => {
     expect(artifacts.wasm).to.be.undefined;
     expect(artifacts.dat).to.not.be.undefined;
 
-    const cached: Artifact = artifactCache['6x5'];
+    const cached: Artifact = artifactCache['6x3'];
     expect(cached.vkey).to.not.be.undefined;
     expect(cached.zkey).to.not.be.undefined;
     expect(cached.wasm).to.be.undefined;
