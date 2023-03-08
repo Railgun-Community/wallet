@@ -247,14 +247,21 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
-      (txs: TransactionStruct[]) => {
+      async (txs: TransactionStruct[]) => {
         const relayAdaptParamsRandom = randomHex(31);
-        return relayAdaptContract.populateCrossContractCalls(
-          txs,
-          crossContractCalls,
-          relayShieldRequests,
-          relayAdaptParamsRandom,
-        );
+
+        // TODO: We should add the relay adapt contract gas limit here.
+        const populatedTransaction =
+          await relayAdaptContract.populateCrossContractCalls(
+            txs,
+            crossContractCalls,
+            relayShieldRequests,
+            relayAdaptParamsRandom,
+          );
+        // Remove gasLimit, we'll set to the minimum below.
+        // TODO: Remove after callbacks upgrade.
+        delete populatedTransaction.gasLimit;
+        return populatedTransaction;
       },
       networkName,
       railgunWalletID,
