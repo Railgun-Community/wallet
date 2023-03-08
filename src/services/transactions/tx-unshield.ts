@@ -167,7 +167,6 @@ export const gasEstimateForUnprovenUnshield = async (
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
-      undefined, // multiplierBasisPoints
     );
     return response;
   } catch (err) {
@@ -234,7 +233,6 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
-      undefined, // multiplierBasisPoints
     );
     return response;
   } catch (err) {

@@ -19,7 +19,6 @@ export const getGasEstimate = async (
   transaction: PopulatedTransaction | TransactionRequest,
   fromWalletAddress: string,
   sendWithPublicWallet: boolean,
-  multiplierBasisPoints = 10000,
 ): Promise<BigNumber> => {
   const evmGasType = getEVMGasTypeForTransaction(
     networkName,
@@ -40,7 +39,7 @@ export const getGasEstimate = async (
   try {
     const provider = getProviderForNetwork(networkName);
     const gasEstimate = await provider.estimateGas(estimateGasTransaction);
-    return gasEstimate.mul(multiplierBasisPoints).div(10000);
+    return gasEstimate;
   } catch (err) {
     reportAndSanitizeError(getGasEstimate.name, err);
     throw err;

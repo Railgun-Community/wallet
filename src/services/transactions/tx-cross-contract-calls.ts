@@ -39,6 +39,7 @@ import {
   NFTTokenData,
   formatToByteLength,
   ByteLength,
+  MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT,
 } from '@railgun-community/engine';
 import { fullWalletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
@@ -231,11 +232,6 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
         relayAdaptShieldNFTsTokenData,
       );
 
-    // Add 40% to the gas fee to ensure that it's successful.
-    // The final gas estimate changes depending on the Relayer Fee, which can impact the number of circuit inputs.
-    // TODO: Replace this after Callback Upgrade made to Relay Adapt contract.
-    const multiplierBasisPoints = 14000;
-
     const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
@@ -266,8 +262,22 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
-      multiplierBasisPoints,
     );
+
+    // TODO: Remove this after callbacks upgrade.
+    // If gas estimate is under the cross-contract-minimum, replace it with the minimum.
+    if (response.gasEstimateString) {
+      const minimum = BigNumber.from(
+        MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT,
+      );
+      const gasEstimateBelowMinimum = BigNumber.from(
+        response.gasEstimateString,
+      ).lt(minimum);
+      if (gasEstimateBelowMinimum) {
+        response.gasEstimateString = minimum.toHexString();
+      }
+    }
+
     return response;
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(

@@ -47,14 +47,12 @@ const getUpdatedRelayerFeeForGasEstimation = async (
   originalGasDetails: TransactionGasDetails,
   feeTokenDetails: FeeTokenDetails,
   sendWithPublicWallet: boolean,
-  multiplierBasisPoints?: number,
 ): Promise<RailgunERC20Amount> => {
   const gasEstimate = await getGasEstimate(
     networkName,
     populatedTransaction,
     fromWalletAddress,
     sendWithPublicWallet,
-    multiplierBasisPoints,
   );
 
   const updatedGasDetails: TransactionGasDetails = {
@@ -81,7 +79,6 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
   originalGasDetailsSerialized: TransactionGasDetailsSerialized,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
-  multiplierBasisPoints: Optional<number>,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   const wallet = walletForID(railgunWalletID);
   const originalGasDetails = deserializeTransactionGasDetails(
@@ -108,7 +105,6 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
     populatedTransaction,
     fromWalletAddress,
     sendWithPublicWallet,
-    multiplierBasisPoints,
   );
 
   if (sendWithPublicWallet) {
@@ -147,7 +143,6 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
       originalGasDetails,
       feeTokenDetails,
       sendWithPublicWallet,
-      multiplierBasisPoints,
     );
 
     // If Relayer fee causes overflow with the token balance,
@@ -194,7 +189,6 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
       populatedTransaction,
       fromWalletAddress,
       sendWithPublicWallet,
-      multiplierBasisPoints,
     );
 
     if (newGasEstimate.toHexString() === gasEstimate.toHexString()) {

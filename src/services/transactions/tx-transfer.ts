@@ -109,7 +109,6 @@ export const gasEstimateForUnprovenTransfer = async (
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
-      undefined, // multiplierBasisPoints
     );
     return response;
   } catch (err) {
