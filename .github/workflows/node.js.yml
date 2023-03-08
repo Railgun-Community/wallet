@@ -11,24 +11,15 @@ jobs:
     name: 🧪 Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '16'
-      - name: Install npm 6.14.16
-        run: npm i -g npm@6.14.16 --registry=https://registry.npmjs.org
-      - name: Overwrite SSH with access token for private repos
-        run: git config --global url."https://${{ secrets.PAT }}@github.com/".insteadOf ssh://git@github.com/
-      - name: Overwrite HTTPS with access token for private repos
-        run: git config --global url."https://${{ secrets.PAT }}@github.com/".insteadOf https://github.com/
-      - name: Install dependencies
-        run: npm i
-      - name: Lint code
-        run: npm run lint
-      - name: Run unit tests
-        run: npm test
+      - name: Install yarn
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+      - run: yarn test
 
   fail-report:
     if: ${{ failure() }}

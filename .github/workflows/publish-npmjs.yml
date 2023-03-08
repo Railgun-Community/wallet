@@ -2,7 +2,7 @@ name: Publish Package to npmjs
 on:
   push:
     # Sequence of patterns matched against refs/heads
-    branches:    
+    branches:
       - release
 jobs:
   build:
@@ -14,8 +14,10 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm install
-      - run: npm ci
-      - run: npm publish --access public
+      - name: Install yarn
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+      - run: yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
