@@ -162,3 +162,26 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI: FallbackProviderJsonConf
       },
     ],
   };
+
+export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI: FallbackProviderJsonConfig =
+  {
+    chainId: 5,
+    providers: [
+      {
+        provider: 'https://goerli.blockpi.network/v1/rpc/public',
+        priority: 2,
+        weight: 1,
+      },
+      {
+        provider:
+          'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+        priority: 3,
+        weight: 1,
+      },
+      {
+        provider: 'https://rpc.ankr.com/eth_goerli',
+        priority: 3,
+        weight: 1,
+      },
+    ],
+  };

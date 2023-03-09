@@ -44,6 +44,7 @@
     "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/hdnode": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
+    "@ethersproject/random": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",

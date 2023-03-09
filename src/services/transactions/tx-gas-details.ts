@@ -3,7 +3,6 @@ import { TransactionRequest } from '@ethersproject/providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import {
   RailgunTransactionGasEstimateResponse,
-  TransactionGasDetails,
   TransactionGasDetailsSerialized,
   EVMGasType,
   calculateGasLimit,
