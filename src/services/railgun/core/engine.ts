@@ -2,7 +2,6 @@ import type { AbstractLevelDOWN } from 'abstract-leveldown';
 import {
   RailgunEngine,
   RailgunWallet,
-  Database,
   ViewOnlyWallet,
   AbstractWallet,
   EngineEvent,
@@ -36,15 +35,6 @@ export const getEngine = (): RailgunEngine => {
     throw new Error('RAILGUN Engine not yet initialized.');
   }
   return engine;
-};
-
-const getActiveDB = (): Database => {
-  if (!engine) {
-    throw new Error(
-      'RAILGUN Engine not yet initialized. Please reload your app or try again.',
-    );
-  }
-  return engine.db;
 };
 
 export const walletForID = (id: string): AbstractWallet => {
@@ -165,7 +155,7 @@ export const startRailgunEngine = (
   }
 };
 
-export const closeRailgunEngine = () => {
-  getActiveDB().close();
+export const stopRailgunEngine = () => {
+  engine?.unload();
   engine = undefined;
 };

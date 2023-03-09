@@ -8,9 +8,10 @@ import {
   getPublicViewingKey,
   verifyED25519,
   EncryptedData,
+  ViewingKeyPair,
 } from '@railgun-community/engine';
 import { EncryptDataWithSharedKeyResponse } from '@railgun-community/shared-models';
-import { getRandomBytes } from './bytes-util';
+import { getRandomBytes } from './bytes';
 import crypto from 'crypto';
 
 export const verifyRelayerSignature = (
@@ -76,4 +77,12 @@ export const pbkdf2 = async (
     ),
   );
   return hexlify(key);
+};
+
+export {
+  encryptJSONDataWithSharedKey,
+  tryDecryptJSONDataWithSharedKey,
+  EncryptedData,
+  getPublicViewingKey,
+  ViewingKeyPair,
 };

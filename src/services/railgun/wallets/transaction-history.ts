@@ -25,7 +25,7 @@ import {
 } from '@railgun-community/shared-models';
 import { walletForID } from '../core/engine';
 import { BigNumber } from '@ethersproject/bignumber';
-import { parseRailgunTokenAddress } from '../util/bytes-util';
+import { parseRailgunTokenAddress } from '../util/bytes';
 import { reportAndSanitizeError } from '../../../utils/error';
 
 const transactionHistoryReceiveTokenAmountToRailgunERC20Amount = (

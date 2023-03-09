@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { getRandomBytes, parseRailgunTokenAddress } from '../bytes-util';
+import { getRandomBytes, parseRailgunTokenAddress } from '../bytes';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

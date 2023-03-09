@@ -104,29 +104,6 @@ export const gasEstimateResponseFromGasEstimate = (
   }
 };
 
-export const deserializeTransactionGasDetails = (
-  gasDetailsSerialized: TransactionGasDetailsSerialized,
-): TransactionGasDetails => {
-  switch (gasDetailsSerialized.evmGasType) {
-    case EVMGasType.Type0:
-    case EVMGasType.Type1:
-      return {
-        evmGasType: gasDetailsSerialized.evmGasType,
-        gasEstimate: BigNumber.from(gasDetailsSerialized.gasEstimateString),
-        gasPrice: BigNumber.from(gasDetailsSerialized.gasPriceString),
-      };
-    case EVMGasType.Type2:
-      return {
-        evmGasType: gasDetailsSerialized.evmGasType,
-        gasEstimate: BigNumber.from(gasDetailsSerialized.gasEstimateString),
-        maxFeePerGas: BigNumber.from(gasDetailsSerialized.maxFeePerGasString),
-        maxPriorityFeePerGas: BigNumber.from(
-          gasDetailsSerialized.maxPriorityFeePerGasString,
-        ),
-      };
-  }
-};
-
 export const setGasDetailsForPopulatedTransaction = (
   networkName: NetworkName,
   populatedTransaction: PopulatedTransaction,

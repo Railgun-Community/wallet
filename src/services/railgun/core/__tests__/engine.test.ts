@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { initTestEngine } from '../../../../tests/setup.test';
-import { closeRailgunEngine, getEngine } from '../engine';
+import { stopRailgunEngine, getEngine } from '../engine';
 import { getProver } from '../prover';
 
 chai.use(chaiAsPromised);
@@ -17,7 +17,7 @@ describe('engine', () => {
   });
 
   it('Should fail without active engine instance', () => {
-    closeRailgunEngine();
+    stopRailgunEngine();
     expect(() => getEngine()).to.throw('RAILGUN Engine not yet initialized.');
     expect(() => getProver()).to.throw('RAILGUN Engine not yet initialized.');
   });

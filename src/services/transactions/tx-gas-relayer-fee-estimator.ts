@@ -10,16 +10,13 @@ import {
   FeeTokenDetails,
   calculateMaximumGas,
   RailgunERC20AmountRecipient,
+  deserializeTransactionGasDetails,
 } from '@railgun-community/shared-models';
 import {
   DUMMY_FROM_ADDRESS,
   createDummyRelayerFeeERC20Amount,
 } from './tx-generator';
-import {
-  getGasEstimate,
-  deserializeTransactionGasDetails,
-  gasEstimateResponse,
-} from './tx-gas-details';
+import { getGasEstimate, gasEstimateResponse } from './tx-gas-details';
 import { balanceForERC20Token } from '../railgun/wallets/balance-update';
 import { walletForID } from '../railgun';
 
@@ -84,6 +81,9 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
   const originalGasDetails = deserializeTransactionGasDetails(
     originalGasDetailsSerialized,
   );
+  if (!originalGasDetails) {
+    throw new Error('Requires originalGasDetails parameter.');
+  }
 
   // Use dead address for private transaction gas estimate
   const fromWalletAddress = DUMMY_FROM_ADDRESS;

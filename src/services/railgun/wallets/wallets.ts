@@ -228,6 +228,13 @@ export const getRailgunWalletAddressData = (address: string): AddressData => {
   return RailgunEngine.decodeAddress(address);
 };
 
+export const getRailgunWalletPrivateViewingKey = (
+  railgunWalletID: string,
+): Uint8Array => {
+  const wallet = walletForID(railgunWalletID);
+  return wallet.getViewingKeyPair().privateKey;
+};
+
 export const serializeRailgunWalletAddressData = (
   addressData: AddressData,
 ): RailgunWalletAddressDataSerialized => {

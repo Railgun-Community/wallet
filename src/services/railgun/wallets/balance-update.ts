@@ -15,7 +15,7 @@ import {
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
-import { parseRailgunTokenAddress } from '../util/bytes-util';
+import { parseRailgunTokenAddress } from '../util/bytes';
 
 export type BalancesUpdatedCallback = (
   balancesEvent: RailgunBalancesEvent,

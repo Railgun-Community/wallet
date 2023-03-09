@@ -6,8 +6,8 @@ import {
   encryptDataWithSharedKey,
   pbkdf2,
   verifyRelayerSignature,
-} from '../crypto-util';
-import { bytesToHex } from '../bytes-util';
+} from '../crypto';
+import { bytesToHex } from '../bytes';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
