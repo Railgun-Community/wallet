@@ -693,10 +693,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@railgun-community/engine@4.0.16-test":
-  version "4.0.16-test"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-4.0.16-test.tgz#20bc4c23f0b1121499203c7516384cd7b9a0e867"
-  integrity sha512-FYhNY6nqb8MKtt+zW1Kc8XhJIIG5OPEWESYetmBMvcjCUXYQM3ulqIZYEOv6xIRy6EcdfAZsINZR90Ym+YqmCQ==
+"@railgun-community/engine@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-4.1.0.tgz#8c0d1bf16ed867e5c5cff09819879951fd002a49"
+  integrity sha512-CWcvbtEU3z+HQUj+DeTvRwH9aZX/HgvZ0QJAFMM2Rz9kFFKMKepZTabNulLjyRJhP/aX7EPxRX326y+/iu9PZA==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/abstract-provider" "^5.7.0"
