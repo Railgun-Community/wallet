@@ -10,6 +10,7 @@ import {
   ByteLength,
   hexlify,
   nToHex,
+  hexStringToBytes,
 } from '@railgun-community/engine';
 import { getAddress } from '@ethersproject/address';
 import {
@@ -248,6 +249,15 @@ export const serializeRailgunWalletAddressData = (
     viewingPublicKey: viewingPublicKeySerialized,
     masterPublicKey: masterPublicKeySerialized,
   };
+};
+
+export const signWithWalletViewingKey = async (
+  railgunWalletID: string,
+  message: string,
+): Promise<string> => {
+  const wallet = walletForID(railgunWalletID);
+  const signature = await wallet.signWithViewingKey(hexStringToBytes(message));
+  return hexlify(signature);
 };
 
 export const assertValidRailgunAddress = (address: string): void => {

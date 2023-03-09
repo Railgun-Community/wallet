@@ -22,6 +22,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { Contract } from '@ethersproject/contracts';
 import { getProviderForNetwork } from '../core/providers';
 import { sendErrorMessage, sendMessage } from '../../../utils';
+import { parseRailgunTokenAddress } from '../util';
 
 type CommitmentCiphertext = {
   ciphertext: Ciphertext;
@@ -230,7 +231,10 @@ const extractFirstNoteERC20AmountMapFromTransaction = async (
     return;
   }
 
-  const { tokenAddress } = tokenData;
+  const tokenAddress = parseRailgunTokenAddress(
+    tokenData.tokenAddress,
+  ).toLowerCase();
+
   if (!tokenPaymentAmounts[tokenAddress]) {
     // eslint-disable-next-line no-param-reassign
     tokenPaymentAmounts[tokenAddress] = BigNumber.from(0);
