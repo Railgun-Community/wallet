@@ -23,7 +23,7 @@ module.exports = {
     sourceType: 'module',
     project: ['./tsconfig.json', './tsconfig.test.json'],
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'no-only-tests'],
   rules: {
     'arrow-body-style': 0,
     'import/extensions': 0,
@@ -55,6 +55,7 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 2,
     'no-warning-comments': 1,
     '@typescript-eslint/no-duplicate-enum-values': 1,
+    'no-only-tests/no-only-tests': 1,
   },
   overrides: [
     {
