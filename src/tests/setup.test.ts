@@ -67,7 +67,6 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     testArtifactStore,
     useNativeArtifacts,
     false, // skipMerkletreeScans
-    {}, // tempEngineV3NewShieldEventBlockNumbersEVM
   );
   if (response.error) {
     throw new Error(response.error);

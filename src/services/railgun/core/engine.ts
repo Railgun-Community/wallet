@@ -137,9 +137,6 @@ export const startRailgunEngine = (
   artifactStore: ArtifactStore,
   useNativeArtifacts: boolean,
   skipMerkletreeScans: boolean,
-  tempEngineV3NewShieldEventBlockNumbersEVM: {
-    [chainID: number]: number;
-  },
 ): StartRailgunEngineResponse => {
   if (engine) {
     const response: StartRailgunEngineResponse = {};
@@ -153,7 +150,6 @@ export const startRailgunEngine = (
       quickSyncIPNS,
       shouldDebug ? createEngineDebugger() : undefined,
       skipMerkletreeScans,
-      tempEngineV3NewShieldEventBlockNumbersEVM,
     );
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(useNativeArtifacts);

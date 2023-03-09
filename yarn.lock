@@ -693,10 +693,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@railgun-community/engine@4.0.14-test":
-  version "4.0.14-test"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-4.0.14-test.tgz#a058ab8d1d3d31d4c05d0991b7a73d8439d488e6"
-  integrity sha512-i3SJe3XKgQ3U/wCODSCnrUSfZMdfoTLvk86/LpSRJQJ0e+23v7VMkaYn9T7NaXScYDh4vyvMfazINvpruZI/wg==
+"@railgun-community/engine@4.0.16-test":
+  version "4.0.16-test"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-4.0.16-test.tgz#20bc4c23f0b1121499203c7516384cd7b9a0e867"
+  integrity sha512-FYhNY6nqb8MKtt+zW1Kc8XhJIIG5OPEWESYetmBMvcjCUXYQM3ulqIZYEOv6xIRy6EcdfAZsINZR90Ym+YqmCQ==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/abstract-provider" "^5.7.0"
@@ -715,10 +715,10 @@
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
-"@railgun-community/shared-models@4.0.4-test":
-  version "4.0.4-test"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-4.0.4-test.tgz#b8512826e602f9b5f8c4fa8145eb136e340a0680"
-  integrity sha512-gW5NZX24vL0NyAfoe5lGtFiznVSmom6U5v380uyuYrunfP8xCQ/nzLggwbQ2oLF+FGbMzCamZBJs7V13HXcUFw==
+"@railgun-community/shared-models@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-4.1.0.tgz#0f2f5173f4c6630f681f46392df6520c7ec3cd00"
+  integrity sha512-C7SIpUmkQrCDWx4s83fUhmS7WD9Bn34OXyqpWakHIl93arqgRBX6V+MntXPgwb+OO7SowJEi6lhCewJoqRZPlg==
   dependencies:
     "@ethersproject/contracts" "^5.7.0"
     "@ethersproject/transactions" "^5.7.0"
