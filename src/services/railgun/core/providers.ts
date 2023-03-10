@@ -126,17 +126,17 @@ export const loadProvider = async (
   shouldDebug: boolean,
 ): Promise<LoadProviderResponse> => {
   try {
-    if (!providerMap[networkName]) {
-      // NOTE: This is an async call, but we need not await.
-      // Let the Engine load in the background.
-      const { chain } = NETWORK_CONFIG[networkName];
-      await loadProviderForNetwork(
-        chain,
-        networkName,
-        fallbackProviderJsonConfig,
-        shouldDebug,
-      );
-    }
+    delete providerMap[networkName];
+
+    // NOTE: This is an async call, but we need not await.
+    // Let the Engine load in the background.
+    const { chain } = NETWORK_CONFIG[networkName];
+    await loadProviderForNetwork(
+      chain,
+      networkName,
+      fallbackProviderJsonConfig,
+      shouldDebug,
+    );
 
     const railgunSmartWalletContract =
       getRailgunSmartWalletContractForNetwork(networkName);
