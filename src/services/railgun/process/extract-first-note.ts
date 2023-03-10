@@ -5,7 +5,6 @@ import {
   ABIRelayAdapt,
   formatToByteLength,
   ByteLength,
-  Ciphertext,
   TransactNote,
   hexStringToBytes,
   getSharedSymmetricKey,
@@ -23,14 +22,6 @@ import { Contract } from '@ethersproject/contracts';
 import { getProviderForNetwork } from '../core/providers';
 import { sendErrorMessage, sendMessage } from '../../../utils';
 import { parseRailgunTokenAddress } from '../util';
-
-type CommitmentCiphertext = {
-  ciphertext: Ciphertext;
-  blindedSenderViewingKey: string;
-  blindedReceiverViewingKey: string;
-  annotationData: string;
-  memo: string;
-};
 
 type BoundParams = {
   // ...
@@ -137,12 +128,13 @@ const extractFirstNoteERC20AmountMap = async (
 };
 
 const decryptReceiverNoteSafe = async (
-  commitmentCiphertext: CommitmentCiphertext,
+  ciphertext: CommitmentCiphertextStructOutput,
   viewingPrivateKey: Uint8Array,
   railgunWalletAddressData: AddressData,
   network: Network,
 ): Promise<Optional<TransactNote>> => {
   try {
+    const commitmentCiphertext = formatCommitmentCiphertext(ciphertext);
     const blindedSenderViewingKey = hexStringToBytes(
       commitmentCiphertext.blindedSenderViewingKey,
     );
@@ -197,9 +189,13 @@ const extractFirstNoteERC20AmountMapFromTransaction = async (
   const index = 0;
   const hash: string = commitments[index];
   const ciphertext = railgunTx.boundParams.commitmentCiphertext[index];
+  if (!ciphertext) {
+    sendMessage('no ciphertext found for commitment at index 0');
+    return;
+  }
 
   const decryptedReceiverNote = await decryptReceiverNoteSafe(
-    formatCommitmentCiphertext(ciphertext),
+    ciphertext,
     viewingPrivateKey,
     railgunWalletAddressData,
     network,
