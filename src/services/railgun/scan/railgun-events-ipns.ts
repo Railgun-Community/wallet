@@ -8,6 +8,7 @@ import {
   promiseTimeout,
 } from '@railgun-community/engine';
 import { reportAndSanitizeError } from '../../../utils/error';
+import { removeUndefineds } from '../../../utils/utils';
 
 const MAX_NUM_RETRIES = 3;
 
@@ -246,16 +247,26 @@ export const getRailgunEventLogIPNS = async (
     Promise.all(nullifierPageURLs.map(url => fetchJsonData<Nullifier[]>(url))),
   ]);
 
+  const commitmentEventsNonnull = removeUndefineds(
+    commitmentLogBatchUnordered.flat(),
+  );
+  const unshieldEventsNonnull = removeUndefineds(
+    unshieldLogBatchUnordered.flat(),
+  );
+  const nullifierEventsNonnull = removeUndefineds(
+    nullifierLogBatchUnordered.flat(),
+  );
+
   const eventLogUnordered: AccumulatedEvents = {
-    commitmentEvents: commitmentLogBatchUnordered
-      .flat()
-      .filter(commitmentEvent => commitmentEvent.blockNumber >= startingBlock),
-    unshieldEvents: unshieldLogBatchUnordered
-      .flat()
-      .filter(unshieldEvent => unshieldEvent.blockNumber >= startingBlock),
-    nullifierEvents: nullifierLogBatchUnordered
-      .flat()
-      .filter(nullifierEvent => nullifierEvent.blockNumber >= startingBlock),
+    commitmentEvents: commitmentEventsNonnull.filter(
+      commitmentEvent => commitmentEvent.blockNumber >= startingBlock,
+    ),
+    unshieldEvents: unshieldEventsNonnull.filter(
+      unshieldEvent => unshieldEvent.blockNumber >= startingBlock,
+    ),
+    nullifierEvents: nullifierEventsNonnull.filter(
+      nullifierEvent => nullifierEvent.blockNumber >= startingBlock,
+    ),
   };
 
   const eventLogOrdered: AccumulatedEvents = {
@@ -286,7 +297,7 @@ export const getRailgunEventLogIPNS = async (
 const fetchJsonData = async <ReturnType>(
   url: string,
   retryCount = 1,
-): Promise<ReturnType> => {
+): Promise<Optional<ReturnType>> => {
   try {
     const rsp = await axios.get(url, {
       method: 'GET',
@@ -301,8 +312,6 @@ const fetchJsonData = async <ReturnType>(
       return fetchJsonData(url, retryCount + 1);
     }
     reportAndSanitizeError(fetchJsonData.name, err);
-    throw new Error(
-      'Could not pull historical transactions. Please try again.',
-    );
+    return undefined;
   }
 };
