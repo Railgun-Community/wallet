@@ -13,7 +13,7 @@ import { removeUndefineds } from '../../../utils/utils';
 const MAX_NUM_RETRIES = 3;
 
 // 2 sec to look up chain page metadata.
-const CHAIN_PAGE_METADATA_TIMEOUT = 2000;
+const CHAIN_PAGE_METADATA_TIMEOUT = 10000;
 
 const GATEWAY_URLS: string[] = [
   'https://mex.ipfs-lb.com',
