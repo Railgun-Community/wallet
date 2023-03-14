@@ -27,7 +27,7 @@
     "@noble/ed25519": "^1.7.1",
     "@railgun-community/engine": "4.1.0",
     "@railgun-community/shared-models": "4.1.1",
-    "axios": "0.27.2",
+    "axios": "^1.3.4",
     "brotli": "^1.3.3"
   },
   "peerDependencies": {
