@@ -10,10 +10,10 @@ import {
 import { reportAndSanitizeError } from '../../../utils/error';
 import { removeUndefineds } from '../../../utils/utils';
 
-const MAX_NUM_RETRIES = 3;
+const MAX_NUM_RETRIES = 2;
 
-// 2 sec to look up chain page metadata.
-const CHAIN_PAGE_METADATA_TIMEOUT = 10000;
+// 2.5 sec to look up chain page metadata.
+const CHAIN_PAGE_METADATA_TIMEOUT = 2500;
 
 const GATEWAY_URLS: string[] = [
   'https://mex.ipfs-lb.com',

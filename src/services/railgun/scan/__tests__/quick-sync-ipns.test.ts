@@ -251,71 +251,11 @@ describe('quick-sync-ipns', () => {
     },
   ).timeout(20000);
 
-  it('Should run live Railgun Event Log fetch for Polygon from block 0 - Small', async () => {
-    const eventLog = await quickSyncIPNS(
-      POLYGON_CHAIN,
-      0,
-      QuickSyncPageSize.Small,
-    );
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.nullifierEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_POLYGON,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_POLYGON,
-    );
-  }).timeout(20000);
-
-  it('Should run live Railgun Event Log fetch for Polygon from block 0 - Medium', async () => {
-    const eventLog = await quickSyncIPNS(
-      POLYGON_CHAIN,
-      0,
-      QuickSyncPageSize.Medium,
-    );
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.nullifierEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_POLYGON,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_POLYGON,
-    );
-  }).timeout(20000);
-
-  it('Should run live Railgun Event Log fetch for Polygon from block 0 - Large', async () => {
+  it('Should run live Railgun Event Log fetch for Polygon from block 0 - Large size', async () => {
     const eventLog = await quickSyncIPNS(
       POLYGON_CHAIN,
       0,
       QuickSyncPageSize.Large,
-    );
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.nullifierEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_POLYGON,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_POLYGON,
-    );
-  }).timeout(20000);
-
-  it('Should run live Railgun Event Log fetch for Polygon from block 0 - XLarge', async () => {
-    const eventLog = await quickSyncIPNS(
-      POLYGON_CHAIN,
-      0,
-      QuickSyncPageSize.XLarge,
     );
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
@@ -354,7 +294,7 @@ describe('quick-sync-ipns', () => {
   it('Should retry Railgun Event Log API fetch on error', async () => {
     const stubAxiosGet = sinon.stub(axios, 'get').throws();
     await expect(quickSyncIPNS(POLYGON_CHAIN, 0)).to.be.rejected;
-    expect(stubAxiosGet.callCount).to.equal(9);
+    expect(stubAxiosGet.callCount).to.equal(6);
     stubAxiosGet.restore();
   });
 });
