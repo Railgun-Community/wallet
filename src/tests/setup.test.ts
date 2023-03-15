@@ -34,7 +34,7 @@ after(() => {
   fs.rm(LEPTON_TEST_DB, { recursive: true }, () => {
     warn('Error removing test db.');
   });
-  fs.rm('artifacts-v2', { recursive: true }, () => {
+  fs.rm('artifacts-v2.1', { recursive: true }, () => {
     // Note: expect this error when we aren't running artifact download tests.
     warn('Error removing test artifacts.');
   });

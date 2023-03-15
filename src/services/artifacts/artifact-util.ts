@@ -10,7 +10,7 @@ const MASTER_IPFS_HASH_ARTIFACTS =
   'QmeBrG7pii1qTqsn7rusvDiqXopHPjCT9gR4PsmW7wXqZq';
 
 export const artifactDownloadsDir = (artifactVariantString: string) => {
-  return `artifacts-v2/${artifactVariantString}`;
+  return `artifacts-v2.1/${artifactVariantString}`;
 };
 
 export const getArtifactVariantString = (
