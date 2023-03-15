@@ -22,6 +22,7 @@ import {
   RailgunReceiveNFTAmount,
   RailgunUnshieldERC20Amount,
   RailgunUnshieldNFTAmount,
+  TransactionHistoryItemCategory,
 } from '@railgun-community/shared-models';
 import { walletForID } from '../core/engine';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -145,38 +146,93 @@ const filterNFT = (tokenAmount: TransactionHistoryTokenAmount) => {
   }
 };
 
+const receiveERC20AmountsHaveShieldFee = (
+  receiveERC20Amounts: RailgunReceiveERC20Amount[],
+): boolean => {
+  return receiveERC20Amounts.find(amount => amount.shieldFee) !== null;
+};
+
+const categoryForTransactionHistoryItem = (
+  historyItem: TransactionHistoryItem,
+): TransactionHistoryItemCategory => {
+  const hasTransferNFTs = historyItem.transferNFTAmounts.length > 0;
+  const hasReceiveNFTs = historyItem.receiveNFTAmounts.length > 0;
+  const hasUnshieldNFTs = historyItem.receiveNFTAmounts.length > 0;
+  if (hasTransferNFTs || hasReceiveNFTs || hasUnshieldNFTs) {
+    // Some kind of NFT Transfer. Unhandled case.
+    return TransactionHistoryItemCategory.Unknown;
+  }
+
+  const hasTransferERC20s = historyItem.transferERC20Amounts.length > 0;
+  const hasReceiveERC20s = historyItem.receiveERC20Amounts.length > 0;
+  const hasUnshieldERC20s = historyItem.receiveERC20Amounts.length > 0;
+
+  if (hasTransferERC20s && !hasReceiveERC20s && !hasUnshieldERC20s) {
+    // Only transfer erc20s.
+    return TransactionHistoryItemCategory.TransferSendERC20s;
+  }
+
+  if (!hasTransferERC20s && hasReceiveERC20s && !hasUnshieldERC20s) {
+    // Only receive erc20s.
+    const hasShieldFee = receiveERC20AmountsHaveShieldFee(
+      historyItem.receiveERC20Amounts,
+    );
+    if (hasShieldFee) {
+      // Note: Shield fees were added to contract events in Mar 2023.
+      // Prior shields will show as TransferReceiveERC20s without fees.
+      return TransactionHistoryItemCategory.ShieldERC20s;
+    }
+    return TransactionHistoryItemCategory.TransferReceiveERC20s;
+  }
+
+  if (!hasTransferERC20s && hasReceiveERC20s && !hasUnshieldERC20s) {
+    // Only unshield erc20s.
+    return TransactionHistoryItemCategory.UnshieldERC20s;
+  }
+
+  return TransactionHistoryItemCategory.Unknown;
+};
+
 const serializeTransactionHistory = (
   transactionHistory: TransactionHistoryEntry[],
 ): TransactionHistoryItem[] => {
-  return transactionHistory.map(historyItem => ({
-    txid: formatToByteLength(historyItem.txid, ByteLength.UINT_256, true),
-    transferERC20Amounts: historyItem.transferTokenAmounts
-      .filter(filterERC20)
-      .map(transactionHistoryTransferTokenAmountToRailgunERC20Amount),
-    relayerFeeERC20Amount: historyItem.relayerFeeTokenAmount
-      ? transactionHistoryTokenAmountToRailgunERC20Amount(
-          historyItem.relayerFeeTokenAmount,
-        )
-      : undefined,
-    changeERC20Amounts: historyItem.changeTokenAmounts
-      .filter(filterERC20)
-      .map(transactionHistoryTokenAmountToRailgunERC20Amount),
-    receiveERC20Amounts: historyItem.receiveTokenAmounts
-      .filter(filterERC20)
-      .map(transactionHistoryReceiveTokenAmountToRailgunERC20Amount),
-    unshieldERC20Amounts: historyItem.unshieldTokenAmounts
-      .filter(filterERC20)
-      .map(transactionHistoryUnshieldTokenAmountToRailgunERC20Amount),
-    receiveNFTAmounts: historyItem.receiveTokenAmounts
-      .filter(filterNFT)
-      .map(transactionHistoryReceiveNFTToRailgunNFTAmount),
-    transferNFTAmounts: historyItem.transferTokenAmounts
-      .filter(filterNFT)
-      .map(transactionHistoryTransferNFTToRailgunNFTAmount),
-    unshieldNFTAmounts: historyItem.unshieldTokenAmounts
-      .filter(filterNFT)
-      .map(transactionHistoryUnshieldNFTToRailgunNFTAmount),
-    version: historyItem.version,
+  const historyItemsUncategorized: TransactionHistoryItem[] =
+    transactionHistory.map(historyEntry => ({
+      txid: formatToByteLength(historyEntry.txid, ByteLength.UINT_256, true),
+      transferERC20Amounts: historyEntry.transferTokenAmounts
+        .filter(filterERC20)
+        .map(transactionHistoryTransferTokenAmountToRailgunERC20Amount),
+      relayerFeeERC20Amount: historyEntry.relayerFeeTokenAmount
+        ? transactionHistoryTokenAmountToRailgunERC20Amount(
+            historyEntry.relayerFeeTokenAmount,
+          )
+        : undefined,
+      changeERC20Amounts: historyEntry.changeTokenAmounts
+        .filter(filterERC20)
+        .map(transactionHistoryTokenAmountToRailgunERC20Amount),
+      receiveERC20Amounts: historyEntry.receiveTokenAmounts
+        .filter(filterERC20)
+        .map(transactionHistoryReceiveTokenAmountToRailgunERC20Amount),
+      unshieldERC20Amounts: historyEntry.unshieldTokenAmounts
+        .filter(filterERC20)
+        .map(transactionHistoryUnshieldTokenAmountToRailgunERC20Amount),
+      receiveNFTAmounts: historyEntry.receiveTokenAmounts
+        .filter(filterNFT)
+        .map(transactionHistoryReceiveNFTToRailgunNFTAmount),
+      transferNFTAmounts: historyEntry.transferTokenAmounts
+        .filter(filterNFT)
+        .map(transactionHistoryTransferNFTToRailgunNFTAmount),
+      unshieldNFTAmounts: historyEntry.unshieldTokenAmounts
+        .filter(filterNFT)
+        .map(transactionHistoryUnshieldNFTToRailgunNFTAmount),
+      version: historyEntry.version,
+      category: TransactionHistoryItemCategory.Unknown,
+    }));
+
+  // Add category for items based on token types.
+  return historyItemsUncategorized.map(historyItem => ({
+    ...historyItem,
+    category: categoryForTransactionHistoryItem(historyItem),
   }));
 };
 
