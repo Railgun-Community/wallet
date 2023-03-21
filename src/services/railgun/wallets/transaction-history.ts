@@ -157,7 +157,7 @@ const categoryForTransactionHistoryItem = (
 ): TransactionHistoryItemCategory => {
   const hasTransferNFTs = historyItem.transferNFTAmounts.length > 0;
   const hasReceiveNFTs = historyItem.receiveNFTAmounts.length > 0;
-  const hasUnshieldNFTs = historyItem.receiveNFTAmounts.length > 0;
+  const hasUnshieldNFTs = historyItem.unshieldNFTAmounts.length > 0;
   if (hasTransferNFTs || hasReceiveNFTs || hasUnshieldNFTs) {
     // Some kind of NFT Transfer. Unhandled case.
     return TransactionHistoryItemCategory.Unknown;
