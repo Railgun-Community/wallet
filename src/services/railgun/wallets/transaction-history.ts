@@ -165,7 +165,7 @@ const categoryForTransactionHistoryItem = (
 
   const hasTransferERC20s = historyItem.transferERC20Amounts.length > 0;
   const hasReceiveERC20s = historyItem.receiveERC20Amounts.length > 0;
-  const hasUnshieldERC20s = historyItem.receiveERC20Amounts.length > 0;
+  const hasUnshieldERC20s = historyItem.unshieldERC20Amounts.length > 0;
 
   if (hasTransferERC20s && !hasReceiveERC20s && !hasUnshieldERC20s) {
     // Only transfer erc20s.
@@ -185,7 +185,7 @@ const categoryForTransactionHistoryItem = (
     return TransactionHistoryItemCategory.TransferReceiveERC20s;
   }
 
-  if (!hasTransferERC20s && hasReceiveERC20s && !hasUnshieldERC20s) {
+  if (!hasTransferERC20s && !hasReceiveERC20s && hasUnshieldERC20s) {
     // Only unshield erc20s.
     return TransactionHistoryItemCategory.UnshieldERC20s;
   }
