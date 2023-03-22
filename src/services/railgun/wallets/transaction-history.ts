@@ -149,7 +149,7 @@ const filterNFT = (tokenAmount: TransactionHistoryTokenAmount) => {
 const receiveERC20AmountsHaveShieldFee = (
   receiveERC20Amounts: RailgunReceiveERC20Amount[],
 ): boolean => {
-  return receiveERC20Amounts.find(amount => amount.shieldFee) !== null;
+  return receiveERC20Amounts.find(amount => amount.shieldFee) != null;
 };
 
 const categoryForTransactionHistoryItem = (
