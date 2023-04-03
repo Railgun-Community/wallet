@@ -100,13 +100,15 @@ export class ArtifactDownloader {
           decompressedData,
         );
       } else {
-        throw new Error(`Invalid artifact download: ${artifactName}`);
+        throw new Error(
+          `Invalid hash for artifact download: ${artifactName} for ${artifactVariantString}.`,
+        );
       }
 
       return path;
     } catch (err) {
       reportAndSanitizeError(this.downloadArtifact.name, err);
-      return undefined;
+      throw err;
     }
   };
 

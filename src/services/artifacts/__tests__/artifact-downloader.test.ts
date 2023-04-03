@@ -90,6 +90,7 @@ describe('artifact-downloader', () => {
       commitmentsOut: [BigInt(0), BigInt(1)],
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const artifacts: Artifact =
       await artifactGetterDownloadJustInTime.getArtifacts(inputs);
 
@@ -125,6 +126,7 @@ describe('artifact-downloader', () => {
       commitmentsOut: [BigInt(0), BigInt(1), BigInt(1)],
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const artifacts: Artifact =
       await artifactGetterDownloadJustInTime.getArtifacts(inputs);
 
@@ -138,5 +140,69 @@ describe('artifact-downloader', () => {
     expect(cached.zkey).to.not.be.undefined;
     expect(cached.wasm).to.be.undefined;
     expect(cached.dat).to.not.be.undefined;
+  }).timeout(30000);
+
+  // Skipped because we don't want to run this on every build.
+  it.skip('Should download ALL artifacts - native and nodejs', async () => {
+    setUseNativeArtifacts(true);
+
+    clearArtifactCache();
+
+    for (let i = 1; i <= 10; i += 1) {
+      for (let j = 1; j <= 3; j += 1) {
+        if (i === 10 && j === 5) {
+          continue;
+        }
+
+        // console.log(`NATIVE: ${i}x${j}...`);
+
+        const inputs: PublicInputs = {
+          nullifiers: new Array<bigint>(i),
+          merkleRoot: BigInt(0),
+          boundParamsHash: BigInt(0),
+          commitmentsOut: new Array<bigint>(j),
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const artifacts: Artifact =
+          // eslint-disable-next-line no-await-in-loop
+          await artifactGetterDownloadJustInTime.getArtifacts(inputs);
+
+        expect(artifacts.vkey).to.not.be.undefined;
+        expect(artifacts.zkey).to.not.be.undefined;
+        expect(artifacts.wasm).to.be.undefined;
+        expect(artifacts.dat).to.not.be.undefined;
+      }
+    }
+
+    clearArtifactCache();
+    setUseNativeArtifacts(false);
+
+    for (let i = 1; i <= 10; i += 1) {
+      for (let j = 1; j <= 5; j += 1) {
+        if (i === 10 && j === 5) {
+          continue;
+        }
+
+        // console.log(`NODEJS: ${i}x${j}...`);
+
+        const inputs: PublicInputs = {
+          nullifiers: new Array<bigint>(i),
+          merkleRoot: BigInt(0),
+          boundParamsHash: BigInt(0),
+          commitmentsOut: new Array<bigint>(j),
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const artifacts: Artifact =
+          // eslint-disable-next-line no-await-in-loop
+          await artifactGetterDownloadJustInTime.getArtifacts(inputs);
+
+        expect(artifacts.vkey).to.not.be.undefined;
+        expect(artifacts.zkey).to.not.be.undefined;
+        expect(artifacts.wasm).to.not.be.undefined;
+        expect(artifacts.dat).to.be.undefined;
+      }
+    }
   }).timeout(30000);
 });
