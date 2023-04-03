@@ -20,6 +20,7 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "useUnknownInCatchVariables": false,
+    "resolveJsonModule": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",

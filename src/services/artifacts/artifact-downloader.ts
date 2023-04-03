@@ -14,6 +14,7 @@ import {
 import { ArtifactStore } from './artifact-store';
 import { reportAndSanitizeError } from '../../utils/error';
 import { sendMessage } from '../../utils/logger';
+import { validateArtifactDownload } from './artifact-hash';
 
 export class ArtifactDownloader {
   private artifactStore: ArtifactStore;
@@ -86,11 +87,21 @@ export class ArtifactDownloader {
         dataFormatted,
         artifactName,
       );
-      await this.artifactStore.store(
-        artifactDownloadsDir(artifactVariantString),
-        path,
+
+      const isValid = await validateArtifactDownload(
         decompressedData,
+        artifactName,
+        artifactVariantString,
       );
+      if (isValid) {
+        await this.artifactStore.store(
+          artifactDownloadsDir(artifactVariantString),
+          path,
+          decompressedData,
+        );
+      } else {
+        throw new Error(`Invalid artifact download: ${artifactName}`);
+      }
 
       return path;
     } catch (err) {

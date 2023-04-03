@@ -17,8 +17,8 @@ import { loadProvider } from '../services/railgun/core/providers';
 import { ArtifactStore } from '../services/artifacts/artifact-store';
 import { setOnBalanceUpdateCallback } from '../services/railgun/wallets/balance-update';
 
-const LEPTON_TEST_DB = 'test.db';
-const db = new LevelDOWN(LEPTON_TEST_DB);
+const ENGINE_TEST_DB = 'test.db';
+const db = new LevelDOWN(ENGINE_TEST_DB);
 
 const setupTests = () => {
   // Uncomment to enable logger during tests (Do not commit).
@@ -31,7 +31,7 @@ before(() => {
 
 after(() => {
   const { warn } = console;
-  fs.rm(LEPTON_TEST_DB, { recursive: true }, () => {
+  fs.rm(ENGINE_TEST_DB, { recursive: true }, () => {
     warn('Error removing test db.');
   });
   fs.rm('artifacts-v2.1', { recursive: true }, () => {
