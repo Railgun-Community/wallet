@@ -4,7 +4,7 @@ import axios from 'axios';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-import { quickSyncGraphProtocol } from '../quick-sync-graph';
+import { quickSyncGraph } from '../quick-sync-graph';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -80,9 +80,9 @@ const assertContiguousCommitmentEvents = (
   }
 };
 
-describe.skip('quick-sync-graph-protocol', () => {
+describe('quick-sync-graph-protocol', () => {
   it('Should make sure Graph Protocol has no data gaps in commitments - Ethereum', async () => {
-    const eventLog = await quickSyncGraphProtocol(ETH_CHAIN, 0);
+    const eventLog = await quickSyncGraph(ETH_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -100,7 +100,7 @@ describe.skip('quick-sync-graph-protocol', () => {
   }).timeout(20000);
 
   it('Should make sure Graph Protocol has no data gaps in commitments - Polygon', async () => {
-    const eventLog = await quickSyncGraphProtocol(POLYGON_CHAIN, 0);
+    const eventLog = await quickSyncGraph(POLYGON_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -121,7 +121,7 @@ describe.skip('quick-sync-graph-protocol', () => {
   }).timeout(20000);
 
   it('Should make sure Graph Protocol has no data gaps in commitments - BNB Smart Chain', async () => {
-    const eventLog = await quickSyncGraphProtocol(BNB_CHAIN, 0);
+    const eventLog = await quickSyncGraph(BNB_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -139,7 +139,7 @@ describe.skip('quick-sync-graph-protocol', () => {
   }).timeout(20000);
 
   it('Should make sure Graph Protocol has no data gaps in commitments - Polygon Mumbai', async () => {
-    const eventLog = await quickSyncGraphProtocol(POLYGON_MUMBAI_CHAIN, 0);
+    const eventLog = await quickSyncGraph(POLYGON_MUMBAI_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -157,7 +157,7 @@ describe.skip('quick-sync-graph-protocol', () => {
   }).timeout(20000);
 
   it('Should make sure Graph Protocol has no data gaps in commitments - Arbitrum', async () => {
-    const eventLog = await quickSyncGraphProtocol(ARBITRUM_CHAIN, 0);
+    const eventLog = await quickSyncGraph(ARBITRUM_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -175,7 +175,7 @@ describe.skip('quick-sync-graph-protocol', () => {
   }).timeout(20000);
 
   it('Should make sure Graph Protocol has no data gaps in commitments - Goerli', async () => {
-    const eventLog = await quickSyncGraphProtocol(GOERLI_CHAIN, 0);
+    const eventLog = await quickSyncGraph(GOERLI_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -193,7 +193,7 @@ describe.skip('quick-sync-graph-protocol', () => {
   }).timeout(20000);
 
   it('Should make sure Graph Protocol has no data gaps in commitments - Arbitrum Goerli', async () => {
-    const eventLog = await quickSyncGraphProtocol(ARBITRUM_GOERLI_CHAIN, 0);
+    const eventLog = await quickSyncGraph(ARBITRUM_GOERLI_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -211,7 +211,7 @@ describe.skip('quick-sync-graph-protocol', () => {
   }).timeout(20000);
 
   it('Should run Railgun Event Log fetch on Polygon for corrupted block', async () => {
-    const eventLog = await quickSyncGraphProtocol(POLYGON_CHAIN, 34833640);
+    const eventLog = await quickSyncGraph(POLYGON_CHAIN, 34833640);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
@@ -242,7 +242,7 @@ describe.skip('quick-sync-graph-protocol', () => {
   }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon with starting block', async () => {
-    const eventLog = await quickSyncGraphProtocol(POLYGON_CHAIN, 30000000);
+    const eventLog = await quickSyncGraph(POLYGON_CHAIN, 30000000);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
@@ -252,7 +252,7 @@ describe.skip('quick-sync-graph-protocol', () => {
   }).timeout(20000);
 
   it('Should run live Railgun Event Log fetch for Polygon with high starting block', async () => {
-    const eventLog = await quickSyncGraphProtocol(POLYGON_CHAIN, 100000000);
+    const eventLog = await quickSyncGraph(POLYGON_CHAIN, 100000000);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.nullifierEvents).to.be.an('array');
@@ -263,7 +263,7 @@ describe.skip('quick-sync-graph-protocol', () => {
 
   it('Should retry Railgun Event Log API fetch on error', async () => {
     const stubAxiosGet = sinon.stub(axios, 'get').throws();
-    await expect(quickSyncGraphProtocol(POLYGON_CHAIN, 0)).to.be.rejected;
+    await expect(quickSyncGraph(POLYGON_CHAIN, 0)).to.be.rejected;
     expect(stubAxiosGet.callCount).to.equal(6);
     stubAxiosGet.restore();
   });

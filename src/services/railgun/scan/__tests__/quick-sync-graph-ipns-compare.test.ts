@@ -2,7 +2,7 @@ import { Chain, Nullifier } from '@railgun-community/engine';
 import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { quickSyncGraphProtocol } from '../quick-sync-graph';
+import { quickSyncGraph } from '../quick-sync-graph';
 import { quickSyncIPNS } from '../quick-sync-ipns';
 
 chai.use(chaiAsPromised);
@@ -16,7 +16,7 @@ const EXPECTED_UNSHIELD_EVENTS_ARBITRUM_GOERLI = 32;
 
 describe('quick-sync-graph-ipns-compare', () => {
   it('Should make sure Graph Protocol returns the same data as IPNS - Arbitrum Goerli', async () => {
-    const eventLog = await quickSyncGraphProtocol(ARBITRUM_GOERLI_CHAIN, 0);
+    const eventLog = await quickSyncGraph(ARBITRUM_GOERLI_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(

@@ -19,7 +19,7 @@ import {
   formatToByteLength,
   LegacyCommitmentCiphertext,
 } from '@railgun-community/engine';
-import { networkForChain } from '@railgun-community/shared-models';
+import { NetworkName, networkForChain } from '@railgun-community/shared-models';
 import { EMPTY_EVENTS } from './empty-events';
 import {
   NullifiersDocument,
@@ -27,7 +27,6 @@ import {
   UnshieldsDocument,
   Unshield as GraphUnshield,
   CommitmentsDocument,
-  execute,
   TokenType as GraphTokenType,
   LegacyGeneratedCommitment as GraphLegacyGeneratedCommitment,
   LegacyEncryptedCommitment as GraphLegacyEncryptedCommitment,
@@ -41,9 +40,13 @@ import {
   NullifiersQuery,
   UnshieldsQuery,
   CommitmentsQuery,
+  getMeshOptions,
 } from './graphql';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getAddress } from '@ethersproject/address';
+import { DocumentNode } from 'graphql';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 
 type GraphCommitment =
   | GraphLegacyEncryptedCommitment
@@ -51,30 +54,30 @@ type GraphCommitment =
   | GraphShieldCommitment
   | GraphTransactCommitment;
 
-// const getGraphSourceContext = (networkName: NetworkName): string => {
-//   switch (networkName) {
-//     case NetworkName.Ethereum:
-//       return EthereumContext;
-//     case NetworkName.EthereumGoerli:
-//       return 'https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-goerli';
-//     case NetworkName.BNBChain:
-//       return 'https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-bsc';
-//     case NetworkName.Polygon:
-//       return 'https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-polygon';
-//     case NetworkName.Arbitrum:
-//       return 'https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum';
-//     case NetworkName.ArbitrumGoerli:
-//       return 'https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum-goerli';
-//     case NetworkName.PolygonMumbai:
-//       return 'https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-mumbai';
-//     case NetworkName.Railgun:
-//     case NetworkName.EthereumRopsten_DEPRECATED:
-//     case NetworkName.Hardhat:
-//       throw new Error('No Graph API hosted service for this network');
-//   }
-// };
+const sourceNameForNetwork = (networkName: NetworkName): string => {
+  switch (networkName) {
+    case NetworkName.Ethereum:
+      return 'ethereum';
+    case NetworkName.EthereumGoerli:
+      return 'goerli';
+    case NetworkName.BNBChain:
+      return 'bsc';
+    case NetworkName.Polygon:
+      return 'matic';
+    case NetworkName.Arbitrum:
+      return 'arbitrum-one';
+    case NetworkName.ArbitrumGoerli:
+      return 'arbitrum-goerli';
+    case NetworkName.PolygonMumbai:
+      return 'mumbai';
+    case NetworkName.Railgun:
+    case NetworkName.EthereumRopsten_DEPRECATED:
+    case NetworkName.Hardhat:
+      throw new Error('No Graph API hosted service for this network');
+  }
+};
 
-export const quickSyncGraphProtocol = async (
+export const quickSyncGraph = async (
   chain: Chain,
   startingBlock: number,
 ): Promise<AccumulatedEvents> => {
@@ -85,9 +88,9 @@ export const quickSyncGraphProtocol = async (
   }
 
   const [nullifiers, unshields, commitments] = await Promise.all([
-    executeQuickSyncNullifiersQuery(startingBlock),
-    executeQuickSyncUnshieldsQuery(startingBlock),
-    executeQuickSyncCommitmentsQuery(startingBlock),
+    executeQuickSyncNullifiersQuery(network.name, startingBlock),
+    executeQuickSyncUnshieldsQuery(network.name, startingBlock),
+    executeQuickSyncCommitmentsQuery(network.name, startingBlock),
   ]);
 
   const nullifierEvents = formatNullifierEvents(nullifiers);
@@ -97,12 +100,47 @@ export const quickSyncGraphProtocol = async (
   return { nullifierEvents, unshieldEvents, commitmentEvents };
 };
 
+const getBuiltGraphClient = async (
+  networkName: NetworkName,
+): Promise<MeshInstance> => {
+  const sourceName = sourceNameForNetwork(networkName);
+  const meshOptions = await getMeshOptions();
+  const filteredSources = meshOptions.sources.filter(source => {
+    return source.name === sourceName;
+  });
+  if (filteredSources.length !== 1) {
+    throw new Error(
+      `Expected exactly one source for network ${networkName}, found ${filteredSources.length}`,
+    );
+  }
+  meshOptions.sources = [filteredSources[0]];
+  const mesh = await getMesh(meshOptions);
+  const id = mesh.pubsub.subscribe('destroy', () => {
+    mesh.pubsub.unsubscribe(id);
+  });
+  return mesh;
+};
+
+const executeSingleNetworkQuery = async (
+  networkName: NetworkName,
+  document: DocumentNode,
+  variables: Record<string, any>,
+) => {
+  const graphClient = await getBuiltGraphClient(networkName);
+  return graphClient.execute(document, variables);
+};
+
 const executeQuickSyncNullifiersQuery = async (
+  networkName: NetworkName,
   blockNumber: number,
 ): Promise<GraphNullifier[]> => {
-  const result = await execute(NullifiersDocument, {
-    blockNumber,
-  });
+  const result = await executeSingleNetworkQuery(
+    networkName,
+    NullifiersDocument,
+    {
+      blockNumber,
+    },
+  );
   if (result.errors) {
     throw new Error(result.errors[0].message);
   }
@@ -110,11 +148,16 @@ const executeQuickSyncNullifiersQuery = async (
 };
 
 const executeQuickSyncUnshieldsQuery = async (
+  networkName: NetworkName,
   blockNumber: number,
 ): Promise<GraphUnshield[]> => {
-  const result = await execute(UnshieldsDocument, {
-    blockNumber,
-  });
+  const result = await executeSingleNetworkQuery(
+    networkName,
+    UnshieldsDocument,
+    {
+      blockNumber,
+    },
+  );
   if (result.errors) {
     throw new Error(result.errors[0].message);
   }
@@ -122,11 +165,16 @@ const executeQuickSyncUnshieldsQuery = async (
 };
 
 const executeQuickSyncCommitmentsQuery = async (
+  networkName: NetworkName,
   blockNumber: number,
 ): Promise<GraphCommitment[]> => {
-  const result = await execute(CommitmentsDocument, {
-    blockNumber,
-  });
+  const result = await executeSingleNetworkQuery(
+    networkName,
+    CommitmentsDocument,
+    {
+      blockNumber,
+    },
+  );
   if (result.errors) {
     throw new Error(result.errors[0].message);
   }

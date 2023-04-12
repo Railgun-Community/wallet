@@ -20,8 +20,8 @@ import {
   setUseNativeArtifacts,
 } from './artifacts';
 import { ArtifactStore } from '../../artifacts/artifact-store';
-import { quickSyncIPNS } from '../scan/quick-sync-ipns';
 import { reportAndSanitizeError } from '../../../utils/error';
+import { quickSyncGraph } from '../scan/quick-sync-graph';
 
 let engine: Optional<RailgunEngine>;
 
@@ -137,7 +137,7 @@ export const startRailgunEngine = (
       walletSource,
       db,
       artifactGetterDownloadJustInTime,
-      quickSyncIPNS,
+      quickSyncGraph,
       shouldDebug ? createEngineDebugger() : undefined,
       skipMerkletreeScans,
     );
