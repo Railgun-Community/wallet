@@ -4,7 +4,7 @@ import axios from 'axios';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-import { quickSyncGraphProtocol } from '../quick-sync-graph-protocol';
+import { quickSyncGraphProtocol } from '../quick-sync-graph';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
