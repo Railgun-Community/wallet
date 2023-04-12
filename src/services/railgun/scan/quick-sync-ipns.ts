@@ -5,6 +5,7 @@ import {
   getRailgunEventLogIPNS,
   QuickSyncPageSize,
 } from './railgun-events-ipns';
+import { EMPTY_EVENTS } from './empty-events';
 
 export const quickSyncIPNS = async (
   chain: Chain,
@@ -14,11 +15,7 @@ export const quickSyncIPNS = async (
   const network = networkForChain(chain);
   if (!network || !network.shouldQuickSync) {
     // Return empty logs, Engine will default to full scan.
-    return {
-      commitmentEvents: [],
-      unshieldEvents: [],
-      nullifierEvents: [],
-    };
+    return EMPTY_EVENTS;
   }
 
   return getRailgunEventLogIPNS(chain, pageSize, startingBlock);
