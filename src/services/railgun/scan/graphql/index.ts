@@ -1,10 +1,14 @@
 /**
- *
- * If regenerating this file, look for "MODIFIED" on places that need updates.
- *
+ * TO UPDATE:
+ * 1. Find all places that are "MODIFIED", move them into the new built index.ts (in .graphclient)
+ * 2. add these comments (including eslint disable)
+ * 3. move the new index file here.
+ * 4. Save file to auto-prettier
+ * 5. Run `git diff src/services/railgun/scan/graphql/index.ts`
  */
 
 /* eslint-disable */
+
 // @ts-nocheck
 import {
   GraphQLResolveInfo,
@@ -14,40 +18,39 @@ import {
   GraphQLScalarTypeConfig,
 } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-import {
-  gql,
-  PubSub,
-  DefaultLogger,
-  printWithCache,
-} from '@graphql-mesh/utils';
+import { gql } from '@graphql-mesh/utils';
 
 import type { GetMeshOptions } from '@graphql-mesh/runtime';
 import type { YamlConfig } from '@graphql-mesh/types';
+import { PubSub } from '@graphql-mesh/utils';
+import { DefaultLogger } from '@graphql-mesh/utils';
 import MeshCache from '@graphql-mesh/cache-localforage';
 import { fetch as fetchFn } from '@whatwg-node/fetch';
 
+import { MeshResolvedSource } from '@graphql-mesh/runtime';
+import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
+import GraphqlHandler from '@graphql-mesh/graphql';
+import AutoPaginationTransform from '@graphprotocol/client-auto-pagination';
+import StitchingMerger from '@graphql-mesh/merger-stitching';
+import { printWithCache } from '@graphql-mesh/utils';
+import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
 import {
-  MeshResolvedSource,
   getMesh,
   ExecuteMeshFn,
   SubscribeMeshFn,
   MeshContext as BaseMeshContext,
   MeshInstance,
 } from '@graphql-mesh/runtime';
-import { MeshTransform, MeshPlugin, ImportFn } from '@graphql-mesh/types';
-import GraphqlHandler from '@graphql-mesh/graphql';
-import StitchingMerger from '@graphql-mesh/merger-stitching';
-import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
-import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
-import type { BscTypes } from './.graphclient/sources/bsc/types';
+import { ImportFn } from '@graphql-mesh/types';
 import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
 import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
+import type { BscTypes } from './.graphclient/sources/bsc/types';
 import type { MaticTypes } from './.graphclient/sources/matic/types';
 import type { GoerliTypes } from './.graphclient/sources/goerli/types';
+import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
 import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
-
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -2667,13 +2670,13 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
   derivedFrom?: derivedFromDirectiveResolver<any, any, ContextType>;
 }>;
 
-export type MeshContext = ArbitrumGoerliTypes.Context &
-  GoerliTypes.Context &
-  ArbitrumOneTypes.Context &
+export type MeshContext = ArbitrumOneTypes.Context &
+  MumbaiTypes.Context &
   EthereumTypes.Context &
   MaticTypes.Context &
+  ArbitrumGoerliTypes.Context &
   BscTypes.Context &
-  MumbaiTypes.Context &
+  GoerliTypes.Context &
   BaseMeshContext;
 
 const baseDir = pathModule.join(
@@ -2689,20 +2692,15 @@ const importFn: ImportFn = <T>(moduleId: string) => {
   )
     .split('\\')
     .join('/')
-    .replace(`${baseDir}/`, '');
+    .replace(baseDir + '/', '');
   switch (relativeModuleId) {
-    case '.graphclient/sources/arbitrum-goerli/introspectionSchema':
-      return import(
-        './.graphclient/sources/arbitrum-goerli/introspectionSchema'
-      ) as T;
-
-    case '.graphclient/sources/goerli/introspectionSchema':
-      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
-
     case '.graphclient/sources/arbitrum-one/introspectionSchema':
       return import(
         './.graphclient/sources/arbitrum-one/introspectionSchema'
       ) as T;
+
+    case '.graphclient/sources/mumbai/introspectionSchema':
+      return import('./.graphclient/sources/mumbai/introspectionSchema') as T;
 
     case '.graphclient/sources/ethereum/introspectionSchema':
       return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
@@ -2710,11 +2708,16 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     case '.graphclient/sources/matic/introspectionSchema':
       return import('./.graphclient/sources/matic/introspectionSchema') as T;
 
+    case '.graphclient/sources/arbitrum-goerli/introspectionSchema':
+      return import(
+        './.graphclient/sources/arbitrum-goerli/introspectionSchema'
+      ) as T;
+
     case '.graphclient/sources/bsc/introspectionSchema':
       return import('./.graphclient/sources/bsc/introspectionSchema') as T;
 
-    case '.graphclient/sources/mumbai/introspectionSchema':
-      return import('./.graphclient/sources/mumbai/introspectionSchema') as T;
+    case '.graphclient/sources/goerli/introspectionSchema':
+      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
 
     default:
       return Promise.reject(
@@ -2850,6 +2853,69 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
     store: sourcesStore.child('arbitrum-goerli'),
     logger: logger.child('arbitrum-goerli'),
     importFn,
+  });
+  ethereumTransforms[0] = new AutoPaginationTransform({
+    apiName: 'ethereum',
+    config: { validateSchema: true, limitOfRecords: 5000 },
+    baseDir,
+    cache,
+    pubsub,
+    importFn,
+    logger,
+  });
+  goerliTransforms[0] = new AutoPaginationTransform({
+    apiName: 'goerli',
+    config: { validateSchema: true, limitOfRecords: 5000 },
+    baseDir,
+    cache,
+    pubsub,
+    importFn,
+    logger,
+  });
+  bscTransforms[0] = new AutoPaginationTransform({
+    apiName: 'bsc',
+    config: { validateSchema: true, limitOfRecords: 5000 },
+    baseDir,
+    cache,
+    pubsub,
+    importFn,
+    logger,
+  });
+  maticTransforms[0] = new AutoPaginationTransform({
+    apiName: 'matic',
+    config: { validateSchema: true, limitOfRecords: 5000 },
+    baseDir,
+    cache,
+    pubsub,
+    importFn,
+    logger,
+  });
+  mumbaiTransforms[0] = new AutoPaginationTransform({
+    apiName: 'mumbai',
+    config: { validateSchema: true, limitOfRecords: 5000 },
+    baseDir,
+    cache,
+    pubsub,
+    importFn,
+    logger,
+  });
+  arbitrumOneTransforms[0] = new AutoPaginationTransform({
+    apiName: 'arbitrum-one',
+    config: { validateSchema: true, limitOfRecords: 5000 },
+    baseDir,
+    cache,
+    pubsub,
+    importFn,
+    logger,
+  });
+  arbitrumGoerliTransforms[0] = new AutoPaginationTransform({
+    apiName: 'arbitrum-goerli',
+    config: { validateSchema: true, limitOfRecords: 5000 },
+    baseDir,
+    cache,
+    pubsub,
+    importFn,
+    logger,
   });
   sources[0] = {
     name: 'ethereum',
