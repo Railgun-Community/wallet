@@ -2,7 +2,7 @@ query Nullifiers($blockNumber: BigInt = 0) {
   nullifiers(
     orderBy: blockNumber
     where: { blockNumber_gte: $blockNumber }
-    first: 5000
+    first: 66000
   ) {
     id
     blockNumber
@@ -17,7 +17,7 @@ query Unshields($blockNumber: BigInt = 0) {
   unshields(
     orderBy: blockNumber
     where: { blockNumber_gte: $blockNumber }
-    first: 5000
+    first: 66000
   ) {
     id
     blockNumber
@@ -39,7 +39,7 @@ query Commitments($blockNumber: BigInt = 0) {
   commitments(
     orderBy: blockNumber
     where: { blockNumber_gte: $blockNumber }
-    first: 5000
+    first: 66000
   ) {
     id
     treeNumber

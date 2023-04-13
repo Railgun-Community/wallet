@@ -1,12 +1,7 @@
 import { AccumulatedEvents, Chain } from '@railgun-community/engine';
 import { NetworkName, networkForChain } from '@railgun-community/shared-models';
 import { EMPTY_EVENTS } from './empty-events';
-import {
-  CommitmentsQuery,
-  NullifiersQuery,
-  getMeshOptions,
-  getSdk,
-} from './graphql';
+import { getMeshOptions, getSdk } from './graphql';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
@@ -65,11 +60,15 @@ export const quickSyncGraph = async (
     }),
   ]);
 
-  const commitmentsSorted = commitments.sort(sortByTreeNumberAndPosition);
+  console.log(commitments.slice(135, 140));
+
+  commitments.sort(sortByTreeNumberAndPosition);
+
+  console.log(commitments.slice(135, 140));
 
   const nullifierEvents = formatGraphNullifierEvents(nullifiers);
   const unshieldEvents = formatGraphUnshieldEvents(unshields);
-  const commitmentEvents = formatGraphCommitmentEvents(commitmentsSorted);
+  const commitmentEvents = formatGraphCommitmentEvents(commitments);
 
   return { nullifierEvents, unshieldEvents, commitmentEvents };
 };

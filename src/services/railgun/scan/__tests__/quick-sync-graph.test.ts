@@ -82,8 +82,8 @@ describe('quick-sync-graph-protocol', () => {
   it.only(
     'Should make sure Graph Protocol has no data gaps in commitments - Ethereum',
     async () => {
-      // const eventLog = await quickSyncGraph(ETH_CHAIN, 0);
-      const eventLog = await quickSyncGraph(ETH_CHAIN, 14858124);
+      const eventLog = await quickSyncGraph(ETH_CHAIN, 0);
+      // const eventLog = await quickSyncGraph(ETH_CHAIN, 14858124);
       expect(eventLog).to.be.an('object');
       expect(eventLog.commitmentEvents).to.be.an('array');
       expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -96,7 +96,7 @@ describe('quick-sync-graph-protocol', () => {
         EXPECTED_UNSHIELD_EVENTS_ETH,
       );
 
-      console.log(eventLog.commitmentEvents.slice(0, 5));
+      console.log(eventLog.commitmentEvents.slice(135, 140));
 
       const shouldThrow = true;
       assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);

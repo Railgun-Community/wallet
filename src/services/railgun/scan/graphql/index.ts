@@ -43,13 +43,13 @@ import {
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
-import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
-import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
-import type { BscTypes } from './.graphclient/sources/bsc/types';
-import type { MaticTypes } from './.graphclient/sources/matic/types';
 import type { GoerliTypes } from './.graphclient/sources/goerli/types';
 import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
+import type { MaticTypes } from './.graphclient/sources/matic/types';
+import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
+import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
+import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
+import type { BscTypes } from './.graphclient/sources/bsc/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -2670,12 +2670,12 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
 }>;
 
 export type MeshContext = ArbitrumGoerliTypes.Context &
-  EthereumTypes.Context &
-  MaticTypes.Context &
-  ArbitrumOneTypes.Context &
-  GoerliTypes.Context &
-  MumbaiTypes.Context &
   BscTypes.Context &
+  ArbitrumOneTypes.Context &
+  MaticTypes.Context &
+  MumbaiTypes.Context &
+  EthereumTypes.Context &
+  GoerliTypes.Context &
   BaseMeshContext;
 
 const baseDir = pathModule.join(
@@ -2698,25 +2698,25 @@ const importFn: ImportFn = <T>(moduleId: string) => {
         './.graphclient/sources/arbitrum-goerli/introspectionSchema'
       ) as T;
 
-    case '.graphclient/sources/ethereum/introspectionSchema':
-      return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
-
-    case '.graphclient/sources/matic/introspectionSchema':
-      return import('./.graphclient/sources/matic/introspectionSchema') as T;
+    case '.graphclient/sources/bsc/introspectionSchema':
+      return import('./.graphclient/sources/bsc/introspectionSchema') as T;
 
     case '.graphclient/sources/arbitrum-one/introspectionSchema':
       return import(
         './.graphclient/sources/arbitrum-one/introspectionSchema'
       ) as T;
 
-    case '.graphclient/sources/goerli/introspectionSchema':
-      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
+    case '.graphclient/sources/matic/introspectionSchema':
+      return import('./.graphclient/sources/matic/introspectionSchema') as T;
 
     case '.graphclient/sources/mumbai/introspectionSchema':
       return import('./.graphclient/sources/mumbai/introspectionSchema') as T;
 
-    case '.graphclient/sources/bsc/introspectionSchema':
-      return import('./.graphclient/sources/bsc/introspectionSchema') as T;
+    case '.graphclient/sources/ethereum/introspectionSchema':
+      return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
+
+    case '.graphclient/sources/goerli/introspectionSchema':
+      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
 
     default:
       return Promise.reject(
@@ -3042,7 +3042,6 @@ export function getBuiltGraphSDK<TGlobalContext = any, TOperationContext = any>(
 }
 export type NullifiersQueryVariables = Exact<{
   blockNumber?: InputMaybe<Scalars['BigInt']>;
-  skip?: InputMaybe<Scalars['Int']>;
 }>;
 
 export type NullifiersQuery = {
@@ -3061,7 +3060,6 @@ export type NullifiersQuery = {
 
 export type UnshieldsQueryVariables = Exact<{
   blockNumber?: InputMaybe<Scalars['BigInt']>;
-  skip?: InputMaybe<Scalars['Int']>;
 }>;
 
 export type UnshieldsQuery = {
@@ -3083,7 +3081,6 @@ export type UnshieldsQuery = {
 
 export type CommitmentsQueryVariables = Exact<{
   blockNumber?: InputMaybe<Scalars['BigInt']>;
-  skip?: InputMaybe<Scalars['Int']>;
 }>;
 
 export type CommitmentsQuery = {
@@ -3168,12 +3165,11 @@ export type CommitmentsQuery = {
 };
 
 export const NullifiersDocument = gql`
-  query Nullifiers($blockNumber: BigInt = 0, $skip: Int = 0) {
+  query Nullifiers($blockNumber: BigInt = 0) {
     nullifiers(
       orderBy: blockNumber
       where: { blockNumber_gte: $blockNumber }
-      first: 1000
-      skip: $skip
+      first: 10000
     ) {
       id
       blockNumber
@@ -3185,12 +3181,11 @@ export const NullifiersDocument = gql`
   }
 ` as unknown as DocumentNode<NullifiersQuery, NullifiersQueryVariables>;
 export const UnshieldsDocument = gql`
-  query Unshields($blockNumber: BigInt = 0, $skip: Int = 0) {
+  query Unshields($blockNumber: BigInt = 0) {
     unshields(
       orderBy: blockNumber
       where: { blockNumber_gte: $blockNumber }
-      first: 1000
-      skip: $skip
+      first: 10000
     ) {
       id
       blockNumber
@@ -3209,12 +3204,11 @@ export const UnshieldsDocument = gql`
   }
 ` as unknown as DocumentNode<UnshieldsQuery, UnshieldsQueryVariables>;
 export const CommitmentsDocument = gql`
-  query Commitments($blockNumber: BigInt = 0, $skip: Int = 0) {
+  query Commitments($blockNumber: BigInt = 0) {
     commitments(
       orderBy: blockNumber
       where: { blockNumber_gte: $blockNumber }
-      first: 1000
-      skip: $skip
+      first: 10000
     ) {
       id
       treeNumber
