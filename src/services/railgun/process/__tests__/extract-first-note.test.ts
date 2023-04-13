@@ -132,7 +132,9 @@ const createGoerliRelayAdaptUnshieldTransactions = async (
 };
 
 describe('extract-first-note', () => {
-  before(async () => {
+  before(async function run() {
+    this.timeout(10000);
+
     initTestEngine();
     engine = getEngine();
 
