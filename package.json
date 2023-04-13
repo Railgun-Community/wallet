@@ -35,7 +35,7 @@
     "@graphql-mesh/types": "^0.91.14",
     "@graphql-mesh/utils": "^0.43.22",
     "@noble/ed25519": "^1.7.1",
-    "@railgun-community/engine": "4.2.5",
+    "@railgun-community/engine": "4.2.6",
     "@railgun-community/shared-models": "4.1.8",
     "@whatwg-node/fetch": "^0.8.4",
     "axios": "0.27.2",
