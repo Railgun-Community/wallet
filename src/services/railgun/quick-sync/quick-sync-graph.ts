@@ -2,7 +2,6 @@ import { AccumulatedEvents, Chain } from '@railgun-community/engine';
 import { NetworkName, networkForChain } from '@railgun-community/shared-models';
 import { EMPTY_EVENTS } from './empty-events';
 import { getMeshOptions, getSdk } from './graphql';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
   GraphCommitment,

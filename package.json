@@ -25,6 +25,7 @@
     "build-graphql": "graphclient build && rm -rf src/services/railgun/scan/graphql/.graphclient && mv .graphclient src/services/railgun/scan/graphql"
   },
   "dependencies": {
+    "@graphql-mesh/runtime": "^0.46.23",
     "@noble/ed25519": "^1.7.1",
     "@railgun-community/engine": "4.2.5",
     "@railgun-community/shared-models": "4.1.8",
