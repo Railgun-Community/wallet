@@ -70,6 +70,7 @@ const assertContiguousCommitmentEvents = (
       nextStartPosition += event.commitments.length;
     }
 
+    // TODO: This logic may need an update if the tree is less than 65536 commitments.
     if (nextStartPosition >= 65536) {
       // Roll over to next tree.
       nextTreeNumber += 1;

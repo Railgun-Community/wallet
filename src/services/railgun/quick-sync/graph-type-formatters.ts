@@ -154,7 +154,9 @@ const formatLegacyCommitmentCiphertext = (
 ): LegacyCommitmentCiphertext => {
   return {
     ciphertext: formatCiphertext(graphLegacyCommitmentCiphertext.ciphertext),
-    ephemeralKeys: graphLegacyCommitmentCiphertext.ephemeralKeys,
+    ephemeralKeys: graphLegacyCommitmentCiphertext.ephemeralKeys.map(
+      ephemeralKey => formatTo32Bytes(ephemeralKey, false),
+    ),
     memo: graphLegacyCommitmentCiphertext.memo,
   };
 };
@@ -185,7 +187,7 @@ const formatLegacyGeneratedCommitment = (
   commitment: GraphLegacyGeneratedCommitment,
 ): LegacyGeneratedCommitment => {
   return {
-    txid: formatTo32Bytes(commitment.transactionHash, false),
+    txid: formatTo32Bytes(commitment.transactionHash, true),
     commitmentType: CommitmentType.LegacyGeneratedCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
     preImage: formatPreImage(commitment.preimage),
@@ -198,7 +200,7 @@ const formatLegacyEncryptedCommitment = (
   commitment: GraphLegacyEncryptedCommitment,
 ): LegacyEncryptedCommitment => {
   return {
-    txid: formatTo32Bytes(commitment.transactionHash, false),
+    txid: formatTo32Bytes(commitment.transactionHash, true),
     commitmentType: CommitmentType.LegacyEncryptedCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
     ciphertext: formatLegacyCommitmentCiphertext(commitment.legacyCiphertext),
@@ -210,7 +212,7 @@ const formatShieldCommitment = (
   commitment: GraphShieldCommitment,
 ): ShieldCommitment => {
   const shieldCommitment: ShieldCommitment = {
-    txid: formatTo32Bytes(commitment.transactionHash, false),
+    txid: formatTo32Bytes(commitment.transactionHash, true),
     commitmentType: CommitmentType.ShieldCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
     preImage: formatPreImage(commitment.preimage),
@@ -229,7 +231,7 @@ const formatTransactCommitment = (
   commitment: GraphTransactCommitment,
 ): TransactCommitment => {
   return {
-    txid: formatTo32Bytes(commitment.transactionHash, false),
+    txid: formatTo32Bytes(commitment.transactionHash, true),
     commitmentType: CommitmentType.TransactCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
     ciphertext: formatCommitmentCiphertext(commitment.ciphertext),

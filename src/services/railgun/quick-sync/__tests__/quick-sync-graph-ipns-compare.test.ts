@@ -23,11 +23,28 @@ const POLYGON_MUMBAI_CHAIN: Chain =
 const ARBITRUM_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Arbitrum].chain;
 
 const compareFieldsGraphToIPNS = async (chain: Chain) => {
-  const eventLog = await quickSyncGraph(chain, 0);
+  const eventLog = await quickSyncGraph(chain, 30144284);
   expect(eventLog).to.be.an('object');
   expect(eventLog.commitmentEvents).to.be.an('array');
 
-  const eventLogIPNS = await quickSyncIPNS(chain, 0);
+  const eventLogIPNS = await quickSyncIPNS(chain, 30144284);
+
+  // Debugging polygon merkletree...
+  // // @ts-ignore
+  // delete eventLog.commitmentEvents[0].commitments[0].commitmentType;
+  // expect(eventLog.commitmentEvents[0].commitments[0]).to.deep.equal(
+  //   eventLogIPNS.commitmentEvents[0].commitments[0],
+  // );
+  // // @ts-ignore
+  // delete eventLog.commitmentEvents[5].commitments[0].commitmentType;
+  // expect(eventLog.commitmentEvents[5].commitments[0]).to.deep.equal(
+  //   eventLogIPNS.commitmentEvents[1].commitments[0],
+  // );
+  // // @ts-ignore
+  // delete eventLog.commitmentEvents[7].commitments[0].commitmentType;
+  // expect(eventLog.commitmentEvents[7].commitments[0]).to.deep.equal(
+  //   eventLogIPNS.commitmentEvents[2].commitments[0],
+  // );
 
   const maxNullifiers = Math.min(
     eventLog.nullifierEvents.length,
@@ -36,10 +53,6 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
   const maxUnshields = Math.min(
     eventLog.unshieldEvents.length,
     eventLogIPNS.unshieldEvents.length,
-  );
-  const maxCommitments = Math.min(
-    eventLog.commitmentEvents.length,
-    eventLogIPNS.commitmentEvents.length,
   );
 
   eventLog.nullifierEvents.sort(sortNullifiers);
@@ -54,18 +67,18 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
     });
 
   // TODO: Add these back when events are correctly synced up.
-  // eventLog.unshieldEvents.sort(sortUnshields);
-  // eventLogIPNS.unshieldEvents.sort(sortUnshields);
-  // eventLog.unshieldEvents
-  //   .slice(0, maxUnshields)
-  //   .forEach((unshieldEvent, index) => {
-  //     expect(unshieldEvent).to.deep.equal(
-  //       eventLogIPNS.unshieldEvents[index],
-  //       `Unshield event ${index} does not match`,
-  //     );
-  //   });
+  eventLog.unshieldEvents.sort(sortUnshields);
+  eventLogIPNS.unshieldEvents.sort(sortUnshields);
+  eventLog.unshieldEvents
+    .slice(0, maxUnshields)
+    .forEach((unshieldEvent, index) => {
+      expect(unshieldEvent).to.deep.equal(
+        eventLogIPNS.unshieldEvents[index],
+        `Unshield event ${index} does not match`,
+      );
+    });
 
-  const commitmentEventsIPNSFlattened = eventLog.commitmentEvents
+  const commitmentEventsIPNSFlattened = eventLogIPNS.commitmentEvents
     .map(commitmentEvent =>
       commitmentEvent.commitments.map(commitment => ({
         ...commitmentEvent,
@@ -73,9 +86,30 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
       })),
     )
     .flat();
+  const maxCommitments = Math.min(
+    eventLog.commitmentEvents.length,
+    commitmentEventsIPNSFlattened.length,
+  );
   expect(eventLog.commitmentEvents.slice(0, maxCommitments)).to.deep.equal(
     commitmentEventsIPNSFlattened.slice(0, maxCommitments),
   );
+
+  // Check commitment fields
+  const ipnsIndividualCommitments = commitmentEventsIPNSFlattened
+    .slice(0, maxCommitments)
+    .map(commitmentEvent => commitmentEvent.commitments[0]);
+
+  eventLog.commitmentEvents
+    .slice(0, maxCommitments)
+    .map(commitmentEvent => {
+      // @ts-ignore
+      // eslint-disable-next-line no-param-reassign
+      delete commitmentEvent.commitments[0].commitmentType;
+      return commitmentEvent.commitments[0];
+    })
+    .forEach((commitment, index) => {
+      expect(commitment).to.deep.equal(ipnsIndividualCommitments[index]);
+    });
 };
 
 describe.skip('quick-sync-graph-ipns-compare', () => {
