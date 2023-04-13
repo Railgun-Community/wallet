@@ -1,10 +1,16 @@
 import { AccumulatedEvents, Chain } from '@railgun-community/engine';
 import { NetworkName, networkForChain } from '@railgun-community/shared-models';
 import { EMPTY_EVENTS } from './empty-events';
-import { getMeshOptions, getSdk } from './graphql';
+import {
+  CommitmentsQuery,
+  NullifiersQuery,
+  getMeshOptions,
+  getSdk,
+} from './graphql';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
+  GraphCommitment,
   formatGraphCommitmentEvents,
   formatGraphNullifierEvents,
   formatGraphUnshieldEvents,
@@ -54,16 +60,51 @@ export const quickSyncGraph = async (
     sdk.Unshields({
       blockNumber: startingBlock.toString(),
     }),
-    sdk.Commitments({
-      blockNumber: startingBlock.toString(),
-    }),
+    autoPaginationQuery(
+      (skip: number) =>
+        sdk.Commitments({
+          blockNumber: startingBlock.toString(),
+          skip,
+        }),
+      50000,
+    ),
   ]);
+
+  const commitmentsSorted = commitments.sort(sortByTreeNumberAndPosition);
 
   const nullifierEvents = formatGraphNullifierEvents(nullifiers);
   const unshieldEvents = formatGraphUnshieldEvents(unshields);
-  const commitmentEvents = formatGraphCommitmentEvents(commitments);
+  const commitmentEvents = formatGraphCommitmentEvents(commitmentsSorted);
 
   return { nullifierEvents, unshieldEvents, commitmentEvents };
+};
+
+const autoPaginationQuery = async (
+  query: (skip: number) => Promise<CommitmentsQuery>,
+  maxLimit: number,
+  results: GraphCommitment[] = [],
+  skip = 0,
+): Promise<CommitmentsQuery> => {
+  const results = await query(skip);
+};
+
+const sortByTreeNumberAndPosition = (
+  a: GraphCommitment,
+  b: GraphCommitment,
+) => {
+  if (a.treeNumber < b.treeNumber) {
+    return -1;
+  }
+  if (a.treeNumber > b.treeNumber) {
+    return 1;
+  }
+  if (a.treePosition < b.treePosition) {
+    return -1;
+  }
+  if (a.treePosition > b.treePosition) {
+    return 1;
+  }
+  return 0;
 };
 
 const getBuiltGraphClient = async (

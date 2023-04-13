@@ -4,58 +4,30 @@ sources:
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-ethereum
-    transforms:
-      - autoPagination:
-          validateSchema: true
-          limitOfRecords: 5000
   - name: goerli
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-goerli
-    transforms:
-      - autoPagination:
-          validateSchema: true
-          limitOfRecords: 5000
   - name: bsc
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-bsc
-    transforms:
-      - autoPagination:
-          validateSchema: true
-          limitOfRecords: 5000
   - name: matic
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-polygon
-    transforms:
-      - autoPagination:
-          validateSchema: true
-          limitOfRecords: 5000
   - name: mumbai
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-mumbai
-    transforms:
-      - autoPagination:
-          validateSchema: true
-          limitOfRecords: 5000
   - name: arbitrum-one
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum
-    transforms:
-      - autoPagination:
-          validateSchema: true
-          limitOfRecords: 5000
   - name: arbitrum-goerli
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum-goerli
-    transforms:
-      - autoPagination:
-          validateSchema: true
-          limitOfRecords: 5000
 
 documents:
   - ./src/services/railgun/scan/graphql/quick-sync-query.graphql

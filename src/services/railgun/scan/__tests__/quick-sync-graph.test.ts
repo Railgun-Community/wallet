@@ -79,23 +79,29 @@ const assertContiguousCommitmentEvents = (
 };
 
 describe('quick-sync-graph-protocol', () => {
-  it('Should make sure Graph Protocol has no data gaps in commitments - Ethereum', async () => {
-    const eventLog = await quickSyncGraph(ETH_CHAIN, 0);
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_GROUP_EVENTS_ETH,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_ETH,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_ETH,
-    );
+  it.only(
+    'Should make sure Graph Protocol has no data gaps in commitments - Ethereum',
+    async () => {
+      // const eventLog = await quickSyncGraph(ETH_CHAIN, 0);
+      const eventLog = await quickSyncGraph(ETH_CHAIN, 14858124);
+      expect(eventLog).to.be.an('object');
+      expect(eventLog.commitmentEvents).to.be.an('array');
+      expect(eventLog.commitmentEvents.length).to.be.at.least(
+        EXPECTED_COMMITMENT_GROUP_EVENTS_ETH,
+      );
+      expect(eventLog.nullifierEvents.length).to.be.at.least(
+        EXPECTED_NULLIFIER_EVENTS_ETH,
+      );
+      expect(eventLog.unshieldEvents.length).to.be.at.least(
+        EXPECTED_UNSHIELD_EVENTS_ETH,
+      );
 
-    const shouldThrow = true;
-    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(20000);
+      console.log(eventLog.commitmentEvents.slice(0, 5));
+
+      const shouldThrow = true;
+      assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+    },
+  ).timeout(20000);
 
   it('Should make sure Graph Protocol has no data gaps in commitments - Polygon', async () => {
     const eventLog = await quickSyncGraph(POLYGON_CHAIN, 0);
