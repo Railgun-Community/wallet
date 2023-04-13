@@ -60,14 +60,9 @@ export const quickSyncGraph = async (
     sdk.Unshields({
       blockNumber: startingBlock.toString(),
     }),
-    autoPaginationQuery(
-      (skip: number) =>
-        sdk.Commitments({
-          blockNumber: startingBlock.toString(),
-          skip,
-        }),
-      50000,
-    ),
+    sdk.Commitments({
+      blockNumber: startingBlock.toString(),
+    }),
   ]);
 
   const commitmentsSorted = commitments.sort(sortByTreeNumberAndPosition);
@@ -77,15 +72,6 @@ export const quickSyncGraph = async (
   const commitmentEvents = formatGraphCommitmentEvents(commitmentsSorted);
 
   return { nullifierEvents, unshieldEvents, commitmentEvents };
-};
-
-const autoPaginationQuery = async (
-  query: (skip: number) => Promise<CommitmentsQuery>,
-  maxLimit: number,
-  results: GraphCommitment[] = [],
-  skip = 0,
-): Promise<CommitmentsQuery> => {
-  const results = await query(skip);
 };
 
 const sortByTreeNumberAndPosition = (

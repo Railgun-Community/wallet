@@ -4,30 +4,44 @@ sources:
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-ethereum
+    transforms:
+      - autoPagination: {}
   - name: goerli
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-goerli
+    transforms:
+      - autoPagination: {}
   - name: bsc
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-bsc
+    transforms:
+      - autoPagination: {}
   - name: matic
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-polygon
+    transforms:
+      - autoPagination: {}
   - name: mumbai
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-mumbai
+    transforms:
+      - autoPagination: {}
   - name: arbitrum-one
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum
+    transforms:
+      - autoPagination: {}
   - name: arbitrum-goerli
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum-goerli
+    transforms:
+      - autoPagination: {}
 
 documents:
   - ./src/services/railgun/scan/graphql/quick-sync-query.graphql
