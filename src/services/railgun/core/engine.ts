@@ -21,7 +21,10 @@ import {
 } from './artifacts';
 import { ArtifactStore } from '../../artifacts/artifact-store';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { quickSyncGraph } from '../scan/quick-sync-graph';
+import {
+  QUICK_SYNC_TYPE_DEFAULT,
+  getQuickSyncImplementation,
+} from '../quick-sync/quick-sync-types';
 
 let engine: Optional<RailgunEngine>;
 
@@ -118,6 +121,7 @@ export const setOnMerkletreeScanCallback = (
  * @param artifactStore - Persistent store for downloading large artifact files. See Quickstart Developer Guide for platform implementations.
  * @param useNativeArtifacts - Whether to download native C++ or web-assembly artifacts. TRUE for mobile. FALSE for nodejs and browser.
  * @param skipMerkletreeScans - Whether to skip merkletree syncs and private balance scans. Only set to TRUE in shield-only applications that don't load private wallets or balances.
+ * @param quickSyncType - QuickSyncType.IPNS (Events delivered via IPNS lookups) or QuickSyncType.Graph (events delivered via Graph Protocol and graphql)
  * @returns
  */
 export const startRailgunEngine = (
@@ -127,6 +131,7 @@ export const startRailgunEngine = (
   artifactStore: ArtifactStore,
   useNativeArtifacts: boolean,
   skipMerkletreeScans: boolean,
+  quickSyncType = QUICK_SYNC_TYPE_DEFAULT,
 ): StartRailgunEngineResponse => {
   if (engine) {
     const response: StartRailgunEngineResponse = {};
@@ -137,7 +142,7 @@ export const startRailgunEngine = (
       walletSource,
       db,
       artifactGetterDownloadJustInTime,
-      quickSyncGraph,
+      getQuickSyncImplementation(quickSyncType),
       shouldDebug ? createEngineDebugger() : undefined,
       skipMerkletreeScans,
     );
