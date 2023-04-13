@@ -1,14 +1,16 @@
 /**
  * TO UPDATE:
  * 1. Find all places that are "MODIFIED", move them into the new built index.ts (in .graphclient)
- * 2. add these comments (including eslint disable)
- * 3. move the new index file here.
- * 4. Save file to auto-prettier
- * 5. Run `git diff src/services/railgun/scan/graphql/index.ts`
+ * 2. add these comments (including eslint disables)
+ * 3. move the modified index file to quick-sync/graphql/
  */
-/* eslint-disable */
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/ban-types */
 // @ts-nocheck
+
 import {
   GraphQLResolveInfo,
   SelectionSetNode,
@@ -17,31 +19,32 @@ import {
   GraphQLScalarTypeConfig,
 } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-import { gql } from '@graphql-mesh/utils';
+import {
+  gql,
+  PubSub,
+  DefaultLogger,
+  printWithCache,
+} from '@graphql-mesh/utils';
 
 import type { GetMeshOptions } from '@graphql-mesh/runtime';
 import type { YamlConfig } from '@graphql-mesh/types';
-import { PubSub } from '@graphql-mesh/utils';
-import { DefaultLogger } from '@graphql-mesh/utils';
 import MeshCache from '@graphql-mesh/cache-localforage';
 import { fetch as fetchFn } from '@whatwg-node/fetch';
 
-import { MeshResolvedSource } from '@graphql-mesh/runtime';
-import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
-import GraphqlHandler from '@graphql-mesh/graphql';
-import StitchingMerger from '@graphql-mesh/merger-stitching';
-import { printWithCache } from '@graphql-mesh/utils';
-import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
 import {
+  MeshResolvedSource,
   getMesh,
   ExecuteMeshFn,
   SubscribeMeshFn,
   MeshContext as BaseMeshContext,
   MeshInstance,
 } from '@graphql-mesh/runtime';
+import { MeshTransform, MeshPlugin, ImportFn } from '@graphql-mesh/types';
+import GraphqlHandler from '@graphql-mesh/graphql';
+import StitchingMerger from '@graphql-mesh/merger-stitching';
+import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
-import { ImportFn } from '@graphql-mesh/types';
 import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
 import type { GoerliTypes } from './.graphclient/sources/goerli/types';
 import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
@@ -49,6 +52,7 @@ import type { BscTypes } from './.graphclient/sources/bsc/types';
 import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
 import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
 import type { MaticTypes } from './.graphclient/sources/matic/types';
+
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -2690,7 +2694,7 @@ const importFn: ImportFn = <T>(moduleId: string) => {
   )
     .split('\\')
     .join('/')
-    .replace(baseDir + '/', '');
+    .replace(`${baseDir}/`, '');
   switch (relativeModuleId) {
     case '.graphclient/sources/arbitrum-one/introspectionSchema':
       return import(

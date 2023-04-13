@@ -25,10 +25,19 @@
     "build-graphql": "graphclient build && rm -rf src/services/railgun/scan/graphql/.graphclient && mv .graphclient src/services/railgun/scan/graphql"
   },
   "dependencies": {
+    "@graphql-mesh/cache-localforage": "^0.7.20",
+    "@graphql-mesh/cross-helpers": "^0.3.4",
+    "@graphql-mesh/graphql": "^0.34.16",
+    "@graphql-mesh/http": "^0.3.28",
+    "@graphql-mesh/merger-stitching": "^0.18.24",
     "@graphql-mesh/runtime": "^0.46.23",
+    "@graphql-mesh/store": "^0.9.20",
+    "@graphql-mesh/types": "^0.91.14",
+    "@graphql-mesh/utils": "^0.43.22",
     "@noble/ed25519": "^1.7.1",
     "@railgun-community/engine": "4.2.5",
     "@railgun-community/shared-models": "4.1.8",
+    "@whatwg-node/fetch": "^0.8.4",
     "axios": "0.27.2",
     "brotli": "^1.3.3",
     "graphql": "^16.6.0"
