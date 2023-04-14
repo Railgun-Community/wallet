@@ -165,7 +165,7 @@ const decryptReceiverNoteSafe = async (
       false, // isSentNote
       false, // isLegacyDecryption
       tokenDataGetter,
-      0, // blockNumber - not used
+      undefined, // blockNumber - not used
     );
     return note;
   } catch (err) {

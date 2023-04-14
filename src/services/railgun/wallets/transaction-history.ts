@@ -240,10 +240,14 @@ const serializeTransactionHistory = (
 export const getWalletTransactionHistory = async (
   chain: Chain,
   railgunWalletID: string,
+  startingBlock: Optional<number>,
 ): Promise<TransactionHistorySerializedResponse> => {
   try {
     const wallet = walletForID(railgunWalletID);
-    const transactionHistory = await wallet.getTransactionHistory(chain);
+    const transactionHistory = await wallet.getTransactionHistory(
+      chain,
+      startingBlock,
+    );
     return {
       items: serializeTransactionHistory(transactionHistory),
     };

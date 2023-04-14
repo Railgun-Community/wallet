@@ -40,7 +40,12 @@ describe('transaction-history', () => {
   });
 
   it('Should get wallet transaction history', async () => {
-    const resp = await getWalletTransactionHistory(POLYGON_CHAIN, wallet.id);
+    // TODO: This should ensure merkletree is scanned first.
+    const resp = await getWalletTransactionHistory(
+      POLYGON_CHAIN,
+      wallet.id,
+      undefined,
+    );
     if (resp.items == null) {
       throw new Error('items is null');
     }
