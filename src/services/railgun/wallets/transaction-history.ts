@@ -199,6 +199,7 @@ const serializeTransactionHistory = (
   const historyItemsUncategorized: TransactionHistoryItem[] =
     transactionHistory.map(historyEntry => ({
       txid: formatToByteLength(historyEntry.txid, ByteLength.UINT_256, true),
+      blockNumber: historyEntry.blockNumber,
       transferERC20Amounts: historyEntry.transferTokenAmounts
         .filter(filterERC20)
         .map(transactionHistoryTransferTokenAmountToRailgunERC20Amount),
