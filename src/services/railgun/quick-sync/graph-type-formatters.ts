@@ -16,6 +16,8 @@ import {
   Ciphertext,
   formatToByteLength,
   LegacyCommitmentCiphertext,
+  serializeTokenData,
+  serializePreImage,
 } from '@railgun-community/engine';
 import {
   Nullifier as GraphNullifier,
@@ -114,23 +116,31 @@ const formatCommitment = (commitment: GraphCommitment): Commitment => {
   }
 };
 
-const formatToken = (graphToken: GraphToken): TokenData => {
-  return {
-    tokenAddress: graphToken.tokenAddress,
-    tokenType: graphTokenTypeToEngineTokenType(graphToken.tokenType),
-    tokenSubID: formatTo32Bytes(graphToken.tokenSubID, true),
-  };
+// const formatToken = (graphToken: GraphToken): TokenData => {
+//   return {
+//     tokenAddress: graphToken.tokenAddress,
+//     tokenType: formatTo20Bytes(
+//       graphTokenTypeToEngineTokenType(graphToken.tokenType).toString(),
+//       true,
+//     ) as unknown as TokenType,
+//     tokenSubID: formatTo20Bytes(graphToken.tokenSubID, true),
+//   };
+// };
+
+const formatSerializedToken = (graphToken: GraphToken): TokenData => {
+  return serializeTokenData(
+    graphToken.tokenAddress,
+    graphTokenTypeToEngineTokenType(graphToken.tokenType),
+    graphToken.tokenSubID,
+  );
 };
 
 const formatPreImage = (graphPreImage: GraphCommitmentPreimage): PreImage => {
-  return {
-    npk: formatTo32Bytes(graphPreImage.npk, false),
-    token: formatToken(graphPreImage.token),
-    value: formatTo16Bytes(
-      BigNumber.from(graphPreImage.value).toHexString(),
-      false,
-    ),
-  };
+  return serializePreImage(
+    graphPreImage.npk,
+    formatSerializedToken(graphPreImage.token),
+    BigInt(graphPreImage.value),
+  );
 };
 
 const formatCiphertext = (graphCiphertext: GraphCiphertext): Ciphertext => {
@@ -145,6 +155,10 @@ const formatTo16Bytes = (value: string, prefix: boolean) => {
   return formatToByteLength(value, ByteLength.UINT_128, prefix);
 };
 
+const formatTo20Bytes = (value: string, prefix: boolean) => {
+  return formatToByteLength(value, ByteLength.Address, prefix);
+};
+
 const formatTo32Bytes = (value: string, prefix: boolean) => {
   return formatToByteLength(value, ByteLength.UINT_256, prefix);
 };
@@ -157,7 +171,9 @@ const formatLegacyCommitmentCiphertext = (
     ephemeralKeys: graphLegacyCommitmentCiphertext.ephemeralKeys.map(
       ephemeralKey => formatTo32Bytes(ephemeralKey, false),
     ),
-    memo: graphLegacyCommitmentCiphertext.memo,
+    memo: graphLegacyCommitmentCiphertext.memo.map(m =>
+      formatTo32Bytes(m, false),
+    ),
   };
 };
 
@@ -191,7 +207,10 @@ const formatLegacyGeneratedCommitment = (
     commitmentType: CommitmentType.LegacyGeneratedCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
     preImage: formatPreImage(commitment.preimage),
-    encryptedRandom: commitment.encryptedRandom as [string, string],
+    encryptedRandom: [
+      formatTo32Bytes(commitment.encryptedRandom[0], false),
+      formatTo16Bytes(commitment.encryptedRandom[1], false),
+    ] as [string, string],
     blockNumber: Number(commitment.blockNumber),
   };
 };
@@ -219,7 +238,9 @@ const formatShieldCommitment = (
     blockNumber: Number(commitment.blockNumber),
     encryptedBundle: commitment.encryptedBundle as [string, string, string],
     shieldKey: commitment.shieldKey,
-    fee: commitment.fee ?? undefined,
+    fee: commitment.fee
+      ? BigNumber.from(commitment.fee).toHexString()
+      : undefined,
   };
   if (!shieldCommitment.fee) {
     delete shieldCommitment.fee;
