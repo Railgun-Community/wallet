@@ -155,10 +155,6 @@ const formatTo16Bytes = (value: string, prefix: boolean) => {
   return formatToByteLength(value, ByteLength.UINT_128, prefix);
 };
 
-const formatTo20Bytes = (value: string, prefix: boolean) => {
-  return formatToByteLength(value, ByteLength.Address, prefix);
-};
-
 const formatTo32Bytes = (value: string, prefix: boolean) => {
   return formatToByteLength(value, ByteLength.UINT_256, prefix);
 };

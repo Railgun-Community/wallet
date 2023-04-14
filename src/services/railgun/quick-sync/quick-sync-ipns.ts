@@ -11,6 +11,7 @@ export const quickSyncIPNS = async (
   chain: Chain,
   startingBlock: number,
   pageSize: QuickSyncPageSize = DEFAULT_QUICK_SYNC_PAGE_SIZE,
+  defaultGateway: Optional<string> = undefined,
 ): Promise<AccumulatedEvents> => {
   const network = networkForChain(chain);
   if (!network || !network.shouldQuickSync) {
@@ -18,5 +19,5 @@ export const quickSyncIPNS = async (
     return EMPTY_EVENTS;
   }
 
-  return getRailgunEventLogIPNS(chain, pageSize, startingBlock);
+  return getRailgunEventLogIPNS(chain, pageSize, startingBlock, defaultGateway);
 };

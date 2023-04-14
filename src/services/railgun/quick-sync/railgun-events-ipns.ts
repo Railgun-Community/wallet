@@ -15,7 +15,7 @@ const MAX_NUM_RETRIES = 2;
 // 2.5 sec to look up chain page metadata.
 const CHAIN_PAGE_METADATA_TIMEOUT = 2500;
 
-const GATEWAY_URLS: string[] = [
+export const IPFS_GATEWAY_URLS: string[] = [
   'https://mex.ipfs-lb.com',
   'https://ams.ipfs-lb.com',
   'https://sin.ipfs-lb.com',
@@ -135,9 +135,15 @@ const getChainPageMatadata = async (
 const getBestLookupChainPageMetadataAndGateway = async (
   chain: Chain,
   pageSize: QuickSyncPageSize,
+  gatewayOverride?: string,
 ): Promise<ChainPageMetadataAndGateway> => {
   const chainPageMetadataAndGateways = await Promise.all(
-    GATEWAY_URLS.map(async gateway => {
+    IPFS_GATEWAY_URLS.filter(url => {
+      if (gatewayOverride) {
+        return url === gatewayOverride;
+      }
+      return true;
+    }).map(async gateway => {
       const chainPageMetadata = await getChainPageMatadata(
         gateway,
         chain,
@@ -183,9 +189,14 @@ export const getRailgunEventLogIPNS = async (
   chain: Chain,
   pageSize: QuickSyncPageSize,
   startingBlock: number,
+  gatewayOverride?: string,
 ): Promise<AccumulatedEvents> => {
   const { chainPageMetadata, gateway } =
-    await getBestLookupChainPageMetadataAndGateway(chain, pageSize);
+    await getBestLookupChainPageMetadataAndGateway(
+      chain,
+      pageSize,
+      gatewayOverride,
+    );
 
   const numPagesCommitments = chainPageMetadata.commitment.num_pages;
   const startPageCommitments = getStartingPageIndex(
