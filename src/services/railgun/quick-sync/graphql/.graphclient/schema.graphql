@@ -725,6 +725,7 @@ interface Commitment {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   treeNumber: Int!
+  batchStartTreePosition: Int!
   treePosition: Int!
   commitmentType: CommitmentType!
   hash: BigInt!
@@ -955,6 +956,14 @@ input Commitment_filter {
   treeNumber_lte: Int
   treeNumber_in: [Int!]
   treeNumber_not_in: [Int!]
+  batchStartTreePosition: Int
+  batchStartTreePosition_not: Int
+  batchStartTreePosition_gt: Int
+  batchStartTreePosition_lt: Int
+  batchStartTreePosition_gte: Int
+  batchStartTreePosition_lte: Int
+  batchStartTreePosition_in: [Int!]
+  batchStartTreePosition_not_in: [Int!]
   treePosition: Int
   treePosition_not: Int
   treePosition_gt: Int
@@ -987,6 +996,7 @@ enum Commitment_orderBy {
   blockTimestamp
   transactionHash
   treeNumber
+  batchStartTreePosition
   treePosition
   commitmentType
   hash
@@ -1065,6 +1075,7 @@ type LegacyEncryptedCommitment implements Commitment {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   treeNumber: Int!
+  batchStartTreePosition: Int!
   treePosition: Int!
   commitmentType: CommitmentType!
   hash: BigInt!
@@ -1116,6 +1127,14 @@ input LegacyEncryptedCommitment_filter {
   treeNumber_lte: Int
   treeNumber_in: [Int!]
   treeNumber_not_in: [Int!]
+  batchStartTreePosition: Int
+  batchStartTreePosition_not: Int
+  batchStartTreePosition_gt: Int
+  batchStartTreePosition_lt: Int
+  batchStartTreePosition_gte: Int
+  batchStartTreePosition_lte: Int
+  batchStartTreePosition_in: [Int!]
+  batchStartTreePosition_not_in: [Int!]
   treePosition: Int
   treePosition_not: Int
   treePosition_gt: Int
@@ -1169,6 +1188,7 @@ enum LegacyEncryptedCommitment_orderBy {
   blockTimestamp
   transactionHash
   treeNumber
+  batchStartTreePosition
   treePosition
   commitmentType
   hash
@@ -1182,6 +1202,7 @@ type LegacyGeneratedCommitment implements Commitment {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   treeNumber: Int!
+  batchStartTreePosition: Int!
   treePosition: Int!
   commitmentType: CommitmentType!
   hash: BigInt!
@@ -1234,6 +1255,14 @@ input LegacyGeneratedCommitment_filter {
   treeNumber_lte: Int
   treeNumber_in: [Int!]
   treeNumber_not_in: [Int!]
+  batchStartTreePosition: Int
+  batchStartTreePosition_not: Int
+  batchStartTreePosition_gt: Int
+  batchStartTreePosition_lt: Int
+  batchStartTreePosition_gte: Int
+  batchStartTreePosition_lte: Int
+  batchStartTreePosition_in: [Int!]
+  batchStartTreePosition_not_in: [Int!]
   treePosition: Int
   treePosition_not: Int
   treePosition_gt: Int
@@ -1293,6 +1322,7 @@ enum LegacyGeneratedCommitment_orderBy {
   blockTimestamp
   transactionHash
   treeNumber
+  batchStartTreePosition
   treePosition
   commitmentType
   hash
@@ -1394,6 +1424,7 @@ type ShieldCommitment implements Commitment {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   treeNumber: Int!
+  batchStartTreePosition: Int!
   treePosition: Int!
   commitmentType: CommitmentType!
   hash: BigInt!
@@ -1448,6 +1479,14 @@ input ShieldCommitment_filter {
   treeNumber_lte: Int
   treeNumber_in: [Int!]
   treeNumber_not_in: [Int!]
+  batchStartTreePosition: Int
+  batchStartTreePosition_not: Int
+  batchStartTreePosition_gt: Int
+  batchStartTreePosition_lt: Int
+  batchStartTreePosition_gte: Int
+  batchStartTreePosition_lte: Int
+  batchStartTreePosition_in: [Int!]
+  batchStartTreePosition_not_in: [Int!]
   treePosition: Int
   treePosition_not: Int
   treePosition_gt: Int
@@ -1525,6 +1564,7 @@ enum ShieldCommitment_orderBy {
   blockTimestamp
   transactionHash
   treeNumber
+  batchStartTreePosition
   treePosition
   commitmentType
   hash
@@ -1604,6 +1644,7 @@ type TransactCommitment implements Commitment {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   treeNumber: Int!
+  batchStartTreePosition: Int!
   treePosition: Int!
   commitmentType: CommitmentType!
   hash: BigInt!
@@ -1655,6 +1696,14 @@ input TransactCommitment_filter {
   treeNumber_lte: Int
   treeNumber_in: [Int!]
   treeNumber_not_in: [Int!]
+  batchStartTreePosition: Int
+  batchStartTreePosition_not: Int
+  batchStartTreePosition_gt: Int
+  batchStartTreePosition_lt: Int
+  batchStartTreePosition_gte: Int
+  batchStartTreePosition_lte: Int
+  batchStartTreePosition_in: [Int!]
+  batchStartTreePosition_not_in: [Int!]
   treePosition: Int
   treePosition_not: Int
   treePosition_gt: Int
@@ -1708,6 +1757,7 @@ enum TransactCommitment_orderBy {
   blockTimestamp
   transactionHash
   treeNumber
+  batchStartTreePosition
   treePosition
   commitmentType
   hash

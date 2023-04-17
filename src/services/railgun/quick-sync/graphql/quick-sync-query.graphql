@@ -43,6 +43,7 @@ query Commitments($blockNumber: BigInt = 0) {
   ) {
     id
     treeNumber
+    batchStartTreePosition
     treePosition
     blockNumber
     transactionHash
@@ -52,6 +53,7 @@ query Commitments($blockNumber: BigInt = 0) {
     ... on LegacyGeneratedCommitment {
       id
       treeNumber
+      batchStartTreePosition
       treePosition
       blockNumber
       transactionHash
@@ -77,6 +79,7 @@ query Commitments($blockNumber: BigInt = 0) {
       blockTimestamp
       transactionHash
       treeNumber
+      batchStartTreePosition
       treePosition
       commitmentType
       hash
@@ -98,6 +101,7 @@ query Commitments($blockNumber: BigInt = 0) {
       blockTimestamp
       transactionHash
       treeNumber
+      batchStartTreePosition
       treePosition
       commitmentType
       hash
@@ -122,6 +126,7 @@ query Commitments($blockNumber: BigInt = 0) {
       blockTimestamp
       transactionHash
       treeNumber
+      batchStartTreePosition
       treePosition
       commitmentType
       hash

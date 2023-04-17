@@ -93,6 +93,7 @@ export type Commitment = {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
@@ -320,6 +321,14 @@ export type Commitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -352,6 +361,7 @@ export type Commitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
   | 'hash';
@@ -428,6 +438,7 @@ export type LegacyEncryptedCommitment = Commitment & {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
@@ -479,6 +490,14 @@ export type LegacyEncryptedCommitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -532,6 +551,7 @@ export type LegacyEncryptedCommitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
   | 'hash'
@@ -544,6 +564,7 @@ export type LegacyGeneratedCommitment = Commitment & {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
@@ -596,6 +617,14 @@ export type LegacyGeneratedCommitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -655,6 +684,7 @@ export type LegacyGeneratedCommitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
   | 'hash'
@@ -1003,6 +1033,7 @@ export type ShieldCommitment = Commitment & {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
@@ -1057,6 +1088,14 @@ export type ShieldCommitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -1134,6 +1173,7 @@ export type ShieldCommitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
   | 'hash'
@@ -1460,6 +1500,7 @@ export type TransactCommitment = Commitment & {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
@@ -1511,6 +1552,14 @@ export type TransactCommitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -1564,6 +1613,7 @@ export type TransactCommitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
   | 'hash'

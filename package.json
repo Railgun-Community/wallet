@@ -22,7 +22,7 @@
     "eslint": "eslint src/**/* --ext .ts,.tsx --fix",
     "lint": "npm run check-circular-deps && npm run eslint && npm run tsc && npm run tsc-test",
     "prepare": "npm run compile",
-    "build-graphql": "graphclient build && rm -rf src/services/railgun/scan/graphql/.graphclient && mv .graphclient src/services/railgun/scan/graphql"
+    "build-graphql": "graphclient build && rm -rf src/services/railgun/quick-sync/graphql/.graphclient && mv .graphclient src/services/railgun/quick-sync/graphql"
   },
   "dependencies": {
     "@graphql-mesh/cache-localforage": "^0.7.20",

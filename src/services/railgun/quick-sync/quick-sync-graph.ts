@@ -5,6 +5,7 @@ import { getMeshOptions, getSdk } from './graphql';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
   GraphCommitment,
+  GraphCommitmentBatch,
   formatGraphCommitmentEvents,
   formatGraphNullifierEvents,
   formatGraphUnshieldEvents,
@@ -81,17 +82,40 @@ export const quickSyncGraph = async (
     ),
   ]);
 
-  commitments.sort(sortByTreeNumberAndPosition);
-
   const filteredNullifiers = removeDuplicatesByID(nullifiers);
   const filteredUnshields = removeDuplicatesByID(unshields);
   const filteredCommitments = removeDuplicatesByID(commitments);
+  const graphCommitmentBatches =
+    createGraphCommitmentBatches(filteredCommitments);
+
+  graphCommitmentBatches.sort(sortByTreeNumberAndStartPosition);
 
   const nullifierEvents = formatGraphNullifierEvents(filteredNullifiers);
   const unshieldEvents = formatGraphUnshieldEvents(filteredUnshields);
-  const commitmentEvents = formatGraphCommitmentEvents(filteredCommitments);
+  const commitmentEvents = formatGraphCommitmentEvents(graphCommitmentBatches);
 
   return { nullifierEvents, unshieldEvents, commitmentEvents };
+};
+
+const createGraphCommitmentBatches = (
+  flattenedCommitments: GraphCommitment[],
+): GraphCommitmentBatch[] => {
+  const graphCommitmentMap: MapType<GraphCommitmentBatch> = {};
+  for (const commitment of flattenedCommitments) {
+    const startPosition = commitment.batchStartTreePosition;
+    if (graphCommitmentMap[startPosition]) {
+      graphCommitmentMap[startPosition].commitments.push(commitment);
+    } else {
+      graphCommitmentMap[commitment.batchStartTreePosition] = {
+        commitments: [commitment],
+        transactionHash: commitment.transactionHash,
+        treeNumber: commitment.treeNumber,
+        startPosition: commitment.batchStartTreePosition,
+        blockNumber: Number(commitment.blockNumber),
+      };
+    }
+  }
+  return Object.values(graphCommitmentMap);
 };
 
 const autoPaginatingQuery = async <ReturnType extends { blockNumber: string }>(
@@ -126,9 +150,9 @@ const removeDuplicatesByID = <T extends { id: string }>(array: T[]): T[] => {
   });
 };
 
-const sortByTreeNumberAndPosition = (
-  a: GraphCommitment,
-  b: GraphCommitment,
+const sortByTreeNumberAndStartPosition = (
+  a: GraphCommitmentBatch,
+  b: GraphCommitmentBatch,
 ) => {
   if (a.treeNumber < b.treeNumber) {
     return -1;
@@ -136,10 +160,10 @@ const sortByTreeNumberAndPosition = (
   if (a.treeNumber > b.treeNumber) {
     return 1;
   }
-  if (a.treePosition < b.treePosition) {
+  if (a.startPosition < b.startPosition) {
     return -1;
   }
-  if (a.treePosition > b.treePosition) {
+  if (a.startPosition > b.startPosition) {
     return 1;
   }
   return 0;

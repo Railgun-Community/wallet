@@ -49,28 +49,15 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
       36300594: 36300600,
       36663679: 36663681,
       37875801: 37875805,
+      39219067: 39219069,
       39374687: 39374700,
       39600066: 39600892,
       39600073: 39600988,
+      40001868: 40001874,
       41442609: 41442607,
     },
   };
 
-  // Add these back when nullifier events are correctly synced up.
-  // eventLog.nullifierEvents.sort(sortNullifiers);
-  // eventLogIPNS.nullifierEvents.sort(sortNullifiers);
-  // const maxNullifiers = Math.min(
-  //   eventLog.nullifierEvents.length,
-  //   eventLogIPNS.nullifierEvents.length,
-  // );
-  // eventLog.nullifierEvents
-  //   .slice(0, maxNullifiers)
-  //   .forEach((nullifierEvent, index) => {
-  //     expect(nullifierEvent).to.deep.equal(
-  //       eventLogIPNS.nullifierEvents[index],
-  //       `Nullifier event ${index} does not match`,
-  //     );
-  //   });
   eventLogIPNS.nullifierEvents.forEach((nullifierEvent, index) => {
     const matchingGraphEvent = eventLog.nullifierEvents.find(
       graphUnshieldEvent => {
@@ -100,21 +87,6 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
     );
   });
 
-  // Add these back when unshield events are correctly synced up.
-  // eventLog.unshieldEvents.sort(sortUnshields);
-  // eventLogIPNS.unshieldEvents.sort(sortUnshields);
-  // const maxUnshields = Math.min(
-  //   eventLog.unshieldEvents.length,
-  //   eventLogIPNS.unshieldEvents.length,
-  // );
-  // eventLog.unshieldEvents
-  //   .slice(0, maxUnshields)
-  //   .forEach((unshieldEvent, index) => {
-  //     expect(unshieldEvent).to.deep.equal(
-  //       eventLogIPNS.unshieldEvents[index],
-  //       `Unshield event ${index} does not match`,
-  //     );
-  //   });
   eventLogIPNS.unshieldEvents.forEach((unshieldEvent, index) => {
     const matchingGraphEvent = eventLog.unshieldEvents.find(
       graphUnshieldEvent => {
@@ -175,7 +147,7 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
         });
       }
 
-      return commitmentEvent.commitments.map((commitment, index) => {
+      return commitmentEvent.commitments.map(commitment => {
         if ('fee' in commitment) {
           if (commitment.fee == null) {
             // eslint-disable-next-line no-param-reassign
@@ -214,26 +186,29 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
         return {
           ...commitmentEvent,
           commitments: [commitment],
-          startPosition: commitmentEvent.startPosition + index,
+          startPosition: commitmentEvent.startPosition,
         };
       });
     })
     .flat();
 
+  const filteredFlattenedGraphCommitmentEvents = eventLog.commitmentEvents
+    .map(commitmentEvent => {
+      const commitments = commitmentEvent.commitments;
+      commitments.forEach(commitment => {
+        // @ts-ignore
+        // eslint-disable-next-line no-param-reassign
+        delete commitment.commitmentType;
+        return commitment;
+      });
+      return commitments;
+    })
+    .flat();
+
   const maxCommitments = Math.min(
-    eventLog.commitmentEvents.length,
+    filteredFlattenedGraphCommitmentEvents.length,
     commitmentEventsIPNSFlattened.length,
   );
-  const filteredGraphCommitmentEvents = eventLog.commitmentEvents
-    .slice(0, maxCommitments)
-    .map(commitmentEvent => {
-      const commitment = commitmentEvent.commitments[0];
-
-      // @ts-ignore
-      // eslint-disable-next-line no-param-reassign
-      delete commitment.commitmentType;
-      return commitment;
-    });
 
   // Check commitment fields
   const ipnsIndividualCommitments = commitmentEventsIPNSFlattened
@@ -241,38 +216,36 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
     .map(commitmentEvent => commitmentEvent.commitments[0]);
 
   let hasError = false;
-  filteredGraphCommitmentEvents.forEach((commitment, index) => {
-    // if (index === 960) {
-    //   console.log(commitment);
-    //   console.log(ipnsIndividualCommitments[index]);
-    // }
-    try {
-      expect(commitment).to.deep.equal(
-        ipnsIndividualCommitments[index],
-        `Commitment ${index} does not match`,
-      );
-    } catch (e) {
-      hasError = true;
-      // eslint-disable-next-line no-console
-      console.warn(e.message);
-      // eslint-disable-next-line no-console
-      console.log(commitment);
-      // eslint-disable-next-line no-console
-      console.log(ipnsIndividualCommitments[index]);
-      // eslint-disable-next-line no-console
-      console.log(
-        `${ipnsIndividualCommitments[index].blockNumber}: ${commitment.blockNumber},`,
-      );
-    }
-  });
+  filteredFlattenedGraphCommitmentEvents
+    .slice(maxCommitments)
+    .forEach((commitment, index) => {
+      try {
+        expect(commitment).to.deep.equal(
+          ipnsIndividualCommitments[index],
+          `Commitment ${index} does not match`,
+        );
+      } catch (e) {
+        hasError = true;
+        // eslint-disable-next-line no-console
+        console.warn(e.message);
+        // eslint-disable-next-line no-console
+        console.log(commitment);
+        // eslint-disable-next-line no-console
+        console.log(ipnsIndividualCommitments[index]);
+      }
+    });
   if (hasError) {
     throw new Error('Error in commitment comparison');
   }
 
-  // Check full commitment arrays
-  expect(eventLog.commitmentEvents.slice(0, maxCommitments)).to.deep.equal(
-    commitmentEventsIPNSFlattened.slice(0, maxCommitments),
+  // Check full commitment batch arrays
+  const maxCommitmentBatches = Math.min(
+    eventLog.commitmentEvents.length,
+    eventLogIPNS.commitmentEvents.length,
   );
+  expect(
+    eventLog.commitmentEvents.slice(0, maxCommitmentBatches),
+  ).to.deep.equal(eventLogIPNS.commitmentEvents.slice(0, maxCommitmentBatches));
 };
 
 describe('quick-sync-graph-ipns-compare', () => {

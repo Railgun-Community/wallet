@@ -42,6 +42,14 @@ export type GraphCommitment =
   | GraphShieldCommitment
   | GraphTransactCommitment;
 
+export type GraphCommitmentBatch = {
+  transactionHash: string;
+  commitments: GraphCommitment[];
+  treeNumber: number;
+  startPosition: number;
+  blockNumber: number;
+};
+
 const graphTokenTypeToEngineTokenType = (
   graphTokenType: GraphTokenType,
 ): TokenType => {
@@ -86,15 +94,15 @@ export const formatGraphUnshieldEvents = (
 };
 
 export const formatGraphCommitmentEvents = (
-  graphCommitments: GraphCommitment[],
+  graphCommitmentBatches: GraphCommitmentBatch[],
 ): CommitmentEvent[] => {
-  return graphCommitments.map(graphCommitment => {
+  return graphCommitmentBatches.map(graphCommitmentBatch => {
     return {
-      txid: formatTo32Bytes(graphCommitment.transactionHash, false),
-      commitments: [formatCommitment(graphCommitment)],
-      treeNumber: graphCommitment.treeNumber,
-      startPosition: graphCommitment.treePosition,
-      blockNumber: Number(graphCommitment.blockNumber),
+      txid: formatTo32Bytes(graphCommitmentBatch.transactionHash, false),
+      commitments: graphCommitmentBatch.commitments.map(formatCommitment),
+      treeNumber: graphCommitmentBatch.treeNumber,
+      startPosition: graphCommitmentBatch.startPosition,
+      blockNumber: graphCommitmentBatch.blockNumber,
     };
   });
 };
