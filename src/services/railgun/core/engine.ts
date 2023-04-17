@@ -160,7 +160,7 @@ export const startRailgunEngine = (
   }
 };
 
-export const stopRailgunEngine = () => {
-  engine?.unload();
+export const stopRailgunEngine = async () => {
+  await engine?.unload();
   engine = undefined;
 };

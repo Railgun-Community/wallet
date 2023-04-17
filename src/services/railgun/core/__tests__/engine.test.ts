@@ -16,8 +16,8 @@ describe('engine', () => {
     expect(getEngine()).to.not.be.undefined;
   });
 
-  it('Should fail without active engine instance', () => {
-    stopRailgunEngine();
+  it('Should fail without active engine instance', async () => {
+    await stopRailgunEngine();
     expect(() => getEngine()).to.throw('RAILGUN Engine not yet initialized.');
     expect(() => getProver()).to.throw('RAILGUN Engine not yet initialized.');
   });
