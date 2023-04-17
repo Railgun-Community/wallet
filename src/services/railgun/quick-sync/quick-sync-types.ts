@@ -7,7 +7,7 @@ export enum QuickSyncType {
   Graph = 'Graph',
 }
 
-export const QUICK_SYNC_TYPE_DEFAULT: QuickSyncType = QuickSyncType.IPNS;
+export const QUICK_SYNC_TYPE_DEFAULT: QuickSyncType = QuickSyncType.Graph;
 
 export const getQuickSyncImplementation = (
   quickSyncType: QuickSyncType,
