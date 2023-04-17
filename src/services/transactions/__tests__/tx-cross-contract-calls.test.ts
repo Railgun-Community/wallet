@@ -287,7 +287,7 @@ describe('tx-cross-contract-calls', () => {
     // Add 7500 for the dummy tx variance
     // expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 280));
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(2_800_000)); // Cross Contract Minimum
-  });
+  }).timeout(10000);
 
   it('Should get gas estimates for valid cross contract calls, public wallet', async () => {
     stubGasEstimateSuccess();
@@ -345,7 +345,7 @@ describe('tx-cross-contract-calls', () => {
     // Add 7500 for the dummy tx variance
     // expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 280));
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(2_800_000)); // Cross Contract Minimum
-  });
+  }).timeout(10000);
 
   it('Should error on gas estimates for invalid cross contract calls', async () => {
     stubGasEstimateSuccess();

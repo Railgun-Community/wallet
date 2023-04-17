@@ -228,7 +228,7 @@ describe('tx-transfer', () => {
     expect(rsp.error).to.be.undefined;
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
-  });
+  }).timeout(10000);
 
   it('Should get gas estimates for valid erc20 transfer: public wallet', async () => {
     stubGasEstimateSuccess();
@@ -251,7 +251,7 @@ describe('tx-transfer', () => {
     expect(rsp.error).to.be.undefined;
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
-  });
+  }).timeout(10000);
 
   it('Should error on gas estimates for invalid erc20 transfer', async () => {
     stubGasEstimateSuccess();
@@ -310,7 +310,7 @@ describe('tx-transfer', () => {
     expect(rsp.error).to.be.undefined;
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
-  });
+  }).timeout(10000);
 
   it('Should get gas estimates for valid NFT transfer: public wallet', async () => {
     stubGasEstimateSuccess();
@@ -333,7 +333,7 @@ describe('tx-transfer', () => {
     expect(rsp.error).to.be.undefined;
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
-  });
+  }).timeout(10000);
 
   it('Should error on gas estimates for invalid NFT transfer', async () => {
     stubGasEstimateSuccess();

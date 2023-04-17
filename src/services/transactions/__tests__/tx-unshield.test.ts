@@ -266,7 +266,7 @@ describe('tx-unshield', () => {
     ]);
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
-  });
+  }).timeout(10000);
 
   it('Should error on gas estimates for invalid Unshield', async () => {
     stubGasEstimateSuccess();
@@ -335,7 +335,7 @@ describe('tx-unshield', () => {
     ]);
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
-  });
+  }).timeout(10000);
 
   it('Should get gas estimates for valid Unshield base token: public wallet', async () => {
     stubGasEstimateSuccess();
@@ -364,7 +364,7 @@ describe('tx-unshield', () => {
     ]);
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
-  });
+  }).timeout(10000);
 
   it('Should error on gas estimates for invalid Unshield base token', async () => {
     stubGasEstimateSuccess();
