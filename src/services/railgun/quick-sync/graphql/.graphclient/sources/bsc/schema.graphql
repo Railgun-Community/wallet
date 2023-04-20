@@ -1778,6 +1778,7 @@ type Unshield {
   token: Token!
   amount: BigInt!
   fee: BigInt!
+  eventLogIndex: BigInt!
 }
 
 input Unshield_filter {
@@ -1864,6 +1865,14 @@ input Unshield_filter {
   fee_lte: BigInt
   fee_in: [BigInt!]
   fee_not_in: [BigInt!]
+  eventLogIndex: BigInt
+  eventLogIndex_not: BigInt
+  eventLogIndex_gt: BigInt
+  eventLogIndex_lt: BigInt
+  eventLogIndex_gte: BigInt
+  eventLogIndex_lte: BigInt
+  eventLogIndex_in: [BigInt!]
+  eventLogIndex_not_in: [BigInt!]
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
   and: [Unshield_filter]
@@ -1883,6 +1892,7 @@ enum Unshield_orderBy {
   token__tokenSubID
   amount
   fee
+  eventLogIndex
 }
 
 type _Block_ {

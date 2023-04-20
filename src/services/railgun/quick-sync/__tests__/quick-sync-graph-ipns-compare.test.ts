@@ -39,6 +39,7 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
     IPFS_GATEWAY_URLS[0],
   );
 
+  // Incorrect block numbers stored on IPNS
   const IPNSBlockReassigns: Record<number, Record<number, number>> = {
     [ETHEREUM_CHAIN.id]: {
       16683581: 16683582,
@@ -55,6 +56,8 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
       39600073: 39600988,
       40001868: 40001874,
       41442609: 41442607,
+      41669011: 41669012,
+      41695360: 41695362,
     },
   };
 
@@ -112,6 +115,14 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
       // eslint-disable-next-line no-param-reassign
       unshieldEvent.blockNumber = newBlockNumber;
     }
+
+    expect(matchingGraphEvent.eventLogIndex).to.be.a('number');
+    expect(matchingGraphEvent.timestamp).to.be.a('number');
+
+    // @ts-ignore
+    delete matchingGraphEvent.eventLogIndex;
+    delete matchingGraphEvent.timestamp;
+
     expect(matchingGraphEvent).to.deep.equal(
       unshieldEvent,
       `Unshield ${index} does not match`,
@@ -121,7 +132,6 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
   // Standardize fields which have changed over time, and have previous values cached in IPNS DB.
   const commitmentEventsIPNSFlattened = eventLogIPNS.commitmentEvents
     .map(commitmentEvent => {
-      // Fix IPNS wrong blocks
       if (
         IPNSBlockReassigns[chain.id] &&
         IPNSBlockReassigns[chain.id][commitmentEvent.blockNumber]
@@ -196,9 +206,14 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
     .map(commitmentEvent => {
       const commitments = commitmentEvent.commitments;
       commitments.forEach(commitment => {
+        expect(commitment.commitmentType).to.be.a('string');
+        expect(commitment.timestamp).to.be.a('number');
+
         // @ts-ignore
         // eslint-disable-next-line no-param-reassign
         delete commitment.commitmentType;
+        // eslint-disable-next-line no-param-reassign
+        delete commitment.timestamp;
         return commitment;
       });
       return commitments;
@@ -243,9 +258,13 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
     eventLog.commitmentEvents.length,
     eventLogIPNS.commitmentEvents.length,
   );
-  expect(
-    eventLog.commitmentEvents.slice(0, maxCommitmentBatches),
-  ).to.deep.equal(eventLogIPNS.commitmentEvents.slice(0, maxCommitmentBatches));
+  eventLog.commitmentEvents
+    .slice(0, maxCommitmentBatches)
+    .forEach((commitmentBatch, index) => {
+      expect(commitmentBatch).to.deep.equal(
+        eventLogIPNS.commitmentEvents[index],
+      );
+    });
 };
 
 describe('quick-sync-graph-ipns-compare', () => {

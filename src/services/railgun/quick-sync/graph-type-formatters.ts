@@ -82,6 +82,8 @@ export const formatGraphUnshieldEvents = (
   return unshields.map(unshield => {
     return {
       txid: formatTo32Bytes(unshield.transactionHash, false),
+      timestamp: Number(unshield.blockTimestamp),
+      eventLogIndex: Number(unshield.eventLogIndex),
       toAddress: getAddress(unshield.to),
       tokenType: graphTokenTypeToEngineTokenType(unshield.token.tokenType),
       tokenAddress: getAddress(unshield.token.tokenAddress),
@@ -208,6 +210,7 @@ const formatLegacyGeneratedCommitment = (
 ): LegacyGeneratedCommitment => {
   return {
     txid: formatTo32Bytes(commitment.transactionHash, true),
+    timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.LegacyGeneratedCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
     preImage: formatPreImage(commitment.preimage),
@@ -224,6 +227,7 @@ const formatLegacyEncryptedCommitment = (
 ): LegacyEncryptedCommitment => {
   return {
     txid: formatTo32Bytes(commitment.transactionHash, true),
+    timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.LegacyEncryptedCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
     ciphertext: formatLegacyCommitmentCiphertext(commitment.legacyCiphertext),
@@ -236,6 +240,7 @@ const formatShieldCommitment = (
 ): ShieldCommitment => {
   const shieldCommitment: ShieldCommitment = {
     txid: formatTo32Bytes(commitment.transactionHash, true),
+    timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.ShieldCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
     preImage: formatPreImage(commitment.preimage),
@@ -257,6 +262,7 @@ const formatTransactCommitment = (
 ): TransactCommitment => {
   return {
     txid: formatTo32Bytes(commitment.transactionHash, true),
+    timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.TransactCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
     ciphertext: formatCommitmentCiphertext(commitment.ciphertext),

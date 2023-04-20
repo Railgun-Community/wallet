@@ -40,12 +40,12 @@ import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import type { BscTypes } from './.graphclient/sources/bsc/types';
-import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
+import type { GoerliTypes } from './.graphclient/sources/goerli/types';
 import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
 import type { MaticTypes } from './.graphclient/sources/matic/types';
-import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
-import type { GoerliTypes } from './.graphclient/sources/goerli/types';
+import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
 import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
+import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
 
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -592,10 +592,10 @@ export type Commitment = {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
-  batchStartTreePosition: Scalars['Int'];
 };
 
 export type CommitmentCiphertext = {
@@ -820,6 +820,14 @@ export type Commitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -844,14 +852,6 @@ export type Commitment_filter = {
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Commitment_filter>>>;
   or?: InputMaybe<Array<InputMaybe<Commitment_filter>>>;
-  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
-  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
 };
 
 export type Commitment_orderBy =
@@ -860,10 +860,10 @@ export type Commitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
-  | 'hash'
-  | 'batchStartTreePosition';
+  | 'hash';
 
 export type LegacyCommitmentCiphertext = {
   id: Scalars['Bytes'];
@@ -937,11 +937,11 @@ export type LegacyEncryptedCommitment = Commitment & {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
   legacyCiphertext: LegacyCommitmentCiphertext; // MODIFIED
-  batchStartTreePosition: Scalars['Int'];
 };
 
 export type LegacyEncryptedCommitment_filter = {
@@ -989,6 +989,14 @@ export type LegacyEncryptedCommitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -1034,14 +1042,6 @@ export type LegacyEncryptedCommitment_filter = {
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<LegacyEncryptedCommitment_filter>>>;
   or?: InputMaybe<Array<InputMaybe<LegacyEncryptedCommitment_filter>>>;
-  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
-  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
 };
 
 export type LegacyEncryptedCommitment_orderBy =
@@ -1050,12 +1050,12 @@ export type LegacyEncryptedCommitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
   | 'hash'
   | 'ciphertext'
-  | 'ciphertext__id'
-  | 'batchStartTreePosition';
+  | 'ciphertext__id';
 
 export type LegacyGeneratedCommitment = Commitment & {
   id: Scalars['Bytes'];
@@ -1063,12 +1063,12 @@ export type LegacyGeneratedCommitment = Commitment & {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
   preimage: CommitmentPreimage;
   encryptedRandom: Array<Scalars['Bytes']>;
-  batchStartTreePosition: Scalars['Int'];
 };
 
 export type LegacyGeneratedCommitment_filter = {
@@ -1116,6 +1116,14 @@ export type LegacyGeneratedCommitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -1167,14 +1175,6 @@ export type LegacyGeneratedCommitment_filter = {
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<LegacyGeneratedCommitment_filter>>>;
   or?: InputMaybe<Array<InputMaybe<LegacyGeneratedCommitment_filter>>>;
-  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
-  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
 };
 
 export type LegacyGeneratedCommitment_orderBy =
@@ -1183,6 +1183,7 @@ export type LegacyGeneratedCommitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
   | 'hash'
@@ -1190,8 +1191,7 @@ export type LegacyGeneratedCommitment_orderBy =
   | 'preimage__id'
   | 'preimage__npk'
   | 'preimage__value'
-  | 'encryptedRandom'
-  | 'batchStartTreePosition';
+  | 'encryptedRandom';
 
 export type Nullifier = {
   id: Scalars['Bytes'];
@@ -1280,6 +1280,7 @@ export type ShieldCommitment = Commitment & {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
@@ -1287,7 +1288,6 @@ export type ShieldCommitment = Commitment & {
   encryptedBundle: Array<Scalars['Bytes']>;
   shieldKey: Scalars['Bytes'];
   fee?: Maybe<Scalars['BigInt']>;
-  batchStartTreePosition: Scalars['Int'];
 };
 
 export type ShieldCommitment_filter = {
@@ -1335,6 +1335,14 @@ export type ShieldCommitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -1404,14 +1412,6 @@ export type ShieldCommitment_filter = {
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<ShieldCommitment_filter>>>;
   or?: InputMaybe<Array<InputMaybe<ShieldCommitment_filter>>>;
-  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
-  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
 };
 
 export type ShieldCommitment_orderBy =
@@ -1420,6 +1420,7 @@ export type ShieldCommitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
   | 'hash'
@@ -1429,8 +1430,7 @@ export type ShieldCommitment_orderBy =
   | 'preimage__value'
   | 'encryptedBundle'
   | 'shieldKey'
-  | 'fee'
-  | 'batchStartTreePosition';
+  | 'fee';
 
 export type Token = {
   id: Scalars['Bytes'];
@@ -1490,11 +1490,11 @@ export type TransactCommitment = Commitment & {
   blockTimestamp: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   treeNumber: Scalars['Int'];
+  batchStartTreePosition: Scalars['Int'];
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
   ciphertext: CommitmentCiphertext;
-  batchStartTreePosition: Scalars['Int'];
 };
 
 export type TransactCommitment_filter = {
@@ -1542,6 +1542,14 @@ export type TransactCommitment_filter = {
   treeNumber_lte?: InputMaybe<Scalars['Int']>;
   treeNumber_in?: InputMaybe<Array<Scalars['Int']>>;
   treeNumber_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
   treePosition?: InputMaybe<Scalars['Int']>;
   treePosition_not?: InputMaybe<Scalars['Int']>;
   treePosition_gt?: InputMaybe<Scalars['Int']>;
@@ -1587,14 +1595,6 @@ export type TransactCommitment_filter = {
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<TransactCommitment_filter>>>;
   or?: InputMaybe<Array<InputMaybe<TransactCommitment_filter>>>;
-  batchStartTreePosition?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_not?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lt?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_gte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_lte?: InputMaybe<Scalars['Int']>;
-  batchStartTreePosition_in?: InputMaybe<Array<Scalars['Int']>>;
-  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['Int']>>;
 };
 
 export type TransactCommitment_orderBy =
@@ -1603,6 +1603,7 @@ export type TransactCommitment_orderBy =
   | 'blockTimestamp'
   | 'transactionHash'
   | 'treeNumber'
+  | 'batchStartTreePosition'
   | 'treePosition'
   | 'commitmentType'
   | 'hash'
@@ -1611,8 +1612,7 @@ export type TransactCommitment_orderBy =
   | 'ciphertext__blindedSenderViewingKey'
   | 'ciphertext__blindedReceiverViewingKey'
   | 'ciphertext__annotationData'
-  | 'ciphertext__memo'
-  | 'batchStartTreePosition';
+  | 'ciphertext__memo';
 
 export type Unshield = {
   id: Scalars['Bytes'];
@@ -1623,6 +1623,7 @@ export type Unshield = {
   token: Token;
   amount: Scalars['BigInt'];
   fee: Scalars['BigInt'];
+  eventLogIndex: Scalars['BigInt'];
 };
 
 export type Unshield_filter = {
@@ -1709,6 +1710,14 @@ export type Unshield_filter = {
   fee_lte?: InputMaybe<Scalars['BigInt']>;
   fee_in?: InputMaybe<Array<Scalars['BigInt']>>;
   fee_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  eventLogIndex?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_not?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_gt?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_lt?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_gte?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_lte?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  eventLogIndex_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Unshield_filter>>>;
@@ -1727,7 +1736,8 @@ export type Unshield_orderBy =
   | 'token__tokenAddress'
   | 'token__tokenSubID'
   | 'amount'
-  | 'fee';
+  | 'fee'
+  | 'eventLogIndex';
 
 export type _Block_ = {
   /** The hash of the block */
@@ -2461,6 +2471,11 @@ export type CommitmentResolvers<
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  batchStartTreePosition?: Resolver<
+    ResolversTypes['Int'],
+    ParentType,
+    ContextType
+  >;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   commitmentType?: Resolver<
     ResolversTypes['CommitmentType'],
@@ -2468,11 +2483,6 @@ export type CommitmentResolvers<
     ContextType
   >;
   hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
-    ParentType,
-    ContextType
-  >;
 }>;
 
 export type CommitmentCiphertextResolvers<
@@ -2531,6 +2541,11 @@ export type LegacyEncryptedCommitmentResolvers<
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  batchStartTreePosition?: Resolver<
+    ResolversTypes['Int'],
+    ParentType,
+    ContextType
+  >;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   commitmentType?: Resolver<
     ResolversTypes['CommitmentType'],
@@ -2540,11 +2555,6 @@ export type LegacyEncryptedCommitmentResolvers<
   hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   ciphertext?: Resolver<
     ResolversTypes['LegacyCommitmentCiphertext'],
-    ParentType,
-    ContextType
-  >;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
     ParentType,
     ContextType
   >;
@@ -2560,6 +2570,11 @@ export type LegacyGeneratedCommitmentResolvers<
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  batchStartTreePosition?: Resolver<
+    ResolversTypes['Int'],
+    ParentType,
+    ContextType
+  >;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   commitmentType?: Resolver<
     ResolversTypes['CommitmentType'],
@@ -2574,11 +2589,6 @@ export type LegacyGeneratedCommitmentResolvers<
   >;
   encryptedRandom?: Resolver<
     Array<ResolversTypes['Bytes']>,
-    ParentType,
-    ContextType
-  >;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
     ParentType,
     ContextType
   >;
@@ -2607,6 +2617,11 @@ export type ShieldCommitmentResolvers<
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  batchStartTreePosition?: Resolver<
+    ResolversTypes['Int'],
+    ParentType,
+    ContextType
+  >;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   commitmentType?: Resolver<
     ResolversTypes['CommitmentType'],
@@ -2626,11 +2641,6 @@ export type ShieldCommitmentResolvers<
   >;
   shieldKey?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   fee?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
-    ParentType,
-    ContextType
-  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -2654,6 +2664,11 @@ export type TransactCommitmentResolvers<
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  batchStartTreePosition?: Resolver<
+    ResolversTypes['Int'],
+    ParentType,
+    ContextType
+  >;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   commitmentType?: Resolver<
     ResolversTypes['CommitmentType'],
@@ -2663,11 +2678,6 @@ export type TransactCommitmentResolvers<
   hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   ciphertext?: Resolver<
     ResolversTypes['CommitmentCiphertext'],
-    ParentType,
-    ContextType
-  >;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
     ParentType,
     ContextType
   >;
@@ -2686,6 +2696,7 @@ export type UnshieldResolvers<
   token?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
   amount?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   fee?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  eventLogIndex?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -2741,13 +2752,13 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
   derivedFrom?: derivedFromDirectiveResolver<any, any, ContextType>;
 }>;
 
-export type MeshContext = BscTypes.Context &
+export type MeshContext = GoerliTypes.Context &
   ArbitrumGoerliTypes.Context &
-  EthereumTypes.Context &
-  GoerliTypes.Context &
-  ArbitrumOneTypes.Context &
   MumbaiTypes.Context &
+  EthereumTypes.Context &
   MaticTypes.Context &
+  BscTypes.Context &
+  ArbitrumOneTypes.Context &
   BaseMeshContext;
 
 const baseDir = pathModule.join(
@@ -2765,30 +2776,30 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     .join('/')
     .replace(`${baseDir  }/`, '');
   switch (relativeModuleId) {
-    case '.graphclient/sources/bsc/introspectionSchema':
-      return import('./.graphclient/sources/bsc/introspectionSchema') as T;
+    case '.graphclient/sources/goerli/introspectionSchema':
+      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
 
     case '.graphclient/sources/arbitrum-goerli/introspectionSchema':
       return import(
         './.graphclient/sources/arbitrum-goerli/introspectionSchema'
       ) as T;
 
+    case '.graphclient/sources/mumbai/introspectionSchema':
+      return import('./.graphclient/sources/mumbai/introspectionSchema') as T;
+
     case '.graphclient/sources/ethereum/introspectionSchema':
       return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
 
-    case '.graphclient/sources/goerli/introspectionSchema':
-      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
+    case '.graphclient/sources/matic/introspectionSchema':
+      return import('./.graphclient/sources/matic/introspectionSchema') as T;
+
+    case '.graphclient/sources/bsc/introspectionSchema':
+      return import('./.graphclient/sources/bsc/introspectionSchema') as T;
 
     case '.graphclient/sources/arbitrum-one/introspectionSchema':
       return import(
         './.graphclient/sources/arbitrum-one/introspectionSchema'
       ) as T;
-
-    case '.graphclient/sources/mumbai/introspectionSchema':
-      return import('./.graphclient/sources/mumbai/introspectionSchema') as T;
-
-    case '.graphclient/sources/matic/introspectionSchema':
-      return import('./.graphclient/sources/matic/introspectionSchema') as T;
 
     default:
       return Promise.reject(
@@ -3082,6 +3093,7 @@ export type UnshieldsQuery = {
       | 'fee'
       | 'blockTimestamp'
       | 'amount'
+      | 'eventLogIndex'
     > & {
       token: Pick<Token, 'id' | 'tokenType' | 'tokenSubID' | 'tokenAddress'>;
     }
@@ -3207,6 +3219,7 @@ export const UnshieldsDocument = gql`
       fee
       blockTimestamp
       amount
+      eventLogIndex
       token {
         id
         tokenType

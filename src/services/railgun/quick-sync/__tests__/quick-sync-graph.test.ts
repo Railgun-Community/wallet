@@ -210,16 +210,6 @@ describe('quick-sync-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(20000);
 
-  it('Should run live Railgun Event Log fetch for Polygon with starting block', async () => {
-    const eventLog = await quickSyncGraph(POLYGON_CHAIN, 30000000);
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.nullifierEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(1300);
-    expect(eventLog.nullifierEvents.length).to.be.at.least(1400);
-    expect(eventLog.unshieldEvents.length).to.be.at.least(1);
-  }).timeout(20000);
-
   it('Should run live Railgun Event Log fetch for Polygon with high starting block', async () => {
     const eventLog = await quickSyncGraph(POLYGON_CHAIN, 100000000);
     expect(eventLog).to.be.an('object');

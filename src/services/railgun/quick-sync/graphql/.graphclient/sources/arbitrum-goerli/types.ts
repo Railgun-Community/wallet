@@ -1633,6 +1633,7 @@ export type Unshield = {
   token: Token;
   amount: Scalars['BigInt'];
   fee: Scalars['BigInt'];
+  eventLogIndex: Scalars['BigInt'];
 };
 
 export type Unshield_filter = {
@@ -1719,6 +1720,14 @@ export type Unshield_filter = {
   fee_lte?: InputMaybe<Scalars['BigInt']>;
   fee_in?: InputMaybe<Array<Scalars['BigInt']>>;
   fee_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  eventLogIndex?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_not?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_gt?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_lt?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_gte?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_lte?: InputMaybe<Scalars['BigInt']>;
+  eventLogIndex_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  eventLogIndex_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Unshield_filter>>>;
@@ -1737,7 +1746,8 @@ export type Unshield_orderBy =
   | 'token__tokenAddress'
   | 'token__tokenSubID'
   | 'amount'
-  | 'fee';
+  | 'fee'
+  | 'eventLogIndex';
 
 export type _Block_ = {
   /** The hash of the block */

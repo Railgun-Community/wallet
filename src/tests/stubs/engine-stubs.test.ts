@@ -42,6 +42,7 @@ const getMockBalanceData = async (
         tree,
         position: 0,
         txid: '123',
+        timestamp: undefined,
         spendtxid: '123',
         note: TransactNote.createTransfer(
           addressData, // receiver

@@ -26,6 +26,7 @@ query Unshields($blockNumber: BigInt = 0) {
     fee
     blockTimestamp
     amount
+    eventLogIndex
     token {
       id
       tokenType
