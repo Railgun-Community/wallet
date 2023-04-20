@@ -68,7 +68,7 @@ export const formatGraphNullifierEvents = (
 ): Nullifier[] => {
   return nullifiers.map(nullifier => {
     return {
-      txid: formatTo32Bytes(nullifier.transactionHash, true),
+      txid: formatTo32Bytes(nullifier.transactionHash, false),
       nullifier: formatTo32Bytes(nullifier.nullifier, false),
       treeNumber: nullifier.treeNumber,
       blockNumber: Number(nullifier.blockNumber),
@@ -81,7 +81,7 @@ export const formatGraphUnshieldEvents = (
 ): UnshieldStoredEvent[] => {
   return unshields.map(unshield => {
     return {
-      txid: formatTo32Bytes(unshield.transactionHash, true),
+      txid: formatTo32Bytes(unshield.transactionHash, false),
       timestamp: Number(unshield.blockTimestamp),
       eventLogIndex: Number(unshield.eventLogIndex),
       toAddress: getAddress(unshield.to),
@@ -209,7 +209,7 @@ const formatLegacyGeneratedCommitment = (
   commitment: GraphLegacyGeneratedCommitment,
 ): LegacyGeneratedCommitment => {
   return {
-    txid: formatTo32Bytes(commitment.transactionHash, true),
+    txid: formatTo32Bytes(commitment.transactionHash, false),
     timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.LegacyGeneratedCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
@@ -226,7 +226,7 @@ const formatLegacyEncryptedCommitment = (
   commitment: GraphLegacyEncryptedCommitment,
 ): LegacyEncryptedCommitment => {
   return {
-    txid: formatTo32Bytes(commitment.transactionHash, true),
+    txid: formatTo32Bytes(commitment.transactionHash, false),
     timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.LegacyEncryptedCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
@@ -239,7 +239,7 @@ const formatShieldCommitment = (
   commitment: GraphShieldCommitment,
 ): ShieldCommitment => {
   const shieldCommitment: ShieldCommitment = {
-    txid: formatTo32Bytes(commitment.transactionHash, true),
+    txid: formatTo32Bytes(commitment.transactionHash, false),
     timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.ShieldCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
@@ -261,7 +261,7 @@ const formatTransactCommitment = (
   commitment: GraphTransactCommitment,
 ): TransactCommitment => {
   return {
-    txid: formatTo32Bytes(commitment.transactionHash, true),
+    txid: formatTo32Bytes(commitment.transactionHash, false),
     timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.TransactCommitment,
     hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
