@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { fullWalletForID } from '../../core/engine';
-import { createRailgunWallet } from '../wallets';
+import { createRailgunWallet } from '../../wallets/wallets';
 import { getWalletTransactionHistory } from '../transaction-history';
 import {
   MOCK_DB_ENCRYPTION_KEY,
