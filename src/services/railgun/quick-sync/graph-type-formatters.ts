@@ -68,7 +68,7 @@ export const formatGraphNullifierEvents = (
 ): Nullifier[] => {
   return nullifiers.map(nullifier => {
     return {
-      txid: formatTo32Bytes(nullifier.transactionHash, false),
+      txid: formatTo32Bytes(nullifier.transactionHash, true),
       nullifier: formatTo32Bytes(nullifier.nullifier, false),
       treeNumber: nullifier.treeNumber,
       blockNumber: Number(nullifier.blockNumber),
@@ -81,7 +81,7 @@ export const formatGraphUnshieldEvents = (
 ): UnshieldStoredEvent[] => {
   return unshields.map(unshield => {
     return {
-      txid: formatTo32Bytes(unshield.transactionHash, false),
+      txid: formatTo32Bytes(unshield.transactionHash, true),
       timestamp: Number(unshield.blockTimestamp),
       eventLogIndex: Number(unshield.eventLogIndex),
       toAddress: getAddress(unshield.to),

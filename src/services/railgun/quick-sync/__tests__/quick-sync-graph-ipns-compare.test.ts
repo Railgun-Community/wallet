@@ -62,11 +62,17 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
   };
 
   eventLogIPNS.nullifierEvents.forEach((nullifierEvent, index) => {
+    // eslint-disable-next-line no-param-reassign
+    nullifierEvent.txid = formatToByteLength(
+      nullifierEvent.txid,
+      ByteLength.UINT_256,
+      true,
+    );
     const matchingGraphEvent = eventLog.nullifierEvents.find(
-      graphUnshieldEvent => {
+      graphNullifierEvent => {
         return (
-          graphUnshieldEvent.txid === nullifierEvent.txid &&
-          graphUnshieldEvent.nullifier === nullifierEvent.nullifier
+          graphNullifierEvent.txid === nullifierEvent.txid &&
+          graphNullifierEvent.nullifier === nullifierEvent.nullifier
         );
       },
     );
@@ -91,6 +97,13 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
   });
 
   eventLogIPNS.unshieldEvents.forEach((unshieldEvent, index) => {
+    // eslint-disable-next-line no-param-reassign
+    unshieldEvent.txid = formatToByteLength(
+      unshieldEvent.txid,
+      ByteLength.UINT_256,
+      true,
+    );
+
     const matchingGraphEvent = eventLog.unshieldEvents.find(
       graphUnshieldEvent => {
         return (
