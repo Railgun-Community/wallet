@@ -13,10 +13,15 @@ import {
   nToHex,
   TokenType,
   AddressData,
+  CommitmentCiphertext,
 } from '@railgun-community/engine';
 import { getEngine, walletForID } from '../core/engine';
 import { getRailgunWalletAddressData } from '../wallets';
-import { Network } from '@railgun-community/shared-models';
+import {
+  Chain,
+  Network,
+  RailgunERC20Amount,
+} from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Contract } from '@ethersproject/contracts';
 import { getProviderForNetwork } from '../core/providers';
@@ -103,38 +108,65 @@ const extractFirstNoteERC20AmountMap = async (
 
   const railgunWallet = walletForID(railgunWalletID);
   const railgunWalletAddress = railgunWallet.getAddress();
-  const viewingPrivateKey = railgunWallet.viewingKeyPair.privateKey;
-  const railgunWalletAddressData =
+  const receivingViewingPrivateKey = railgunWallet.viewingKeyPair.privateKey;
+  const receivingRailgunAddressData =
     getRailgunWalletAddressData(railgunWalletAddress);
 
-  const tokenPaymentAmounts: MapType<BigNumber> = {};
+  const erc20PaymentAmounts: MapType<BigNumber> = {};
 
   // eslint-disable-next-line no-underscore-dangle
   const railgunTxs: TransactionData[] = parsedTransaction.args._transactions;
 
   await Promise.all(
-    railgunTxs.map((railgunTx: TransactionData) =>
-      extractFirstNoteERC20AmountMapFromTransaction(
-        railgunTx,
-        tokenPaymentAmounts,
-        viewingPrivateKey,
-        railgunWalletAddressData,
-        network,
-      ),
-    ),
+    railgunTxs.map(async (railgunTx: TransactionData) => {
+      const { commitments, boundParams } = railgunTx;
+
+      // Extract first commitment (index 0)
+      const index = 0;
+      const commitmentCiphertextStructOutput =
+        boundParams.commitmentCiphertext[index];
+      const commitmentHash: string = commitments[index];
+      if (!commitmentCiphertextStructOutput) {
+        sendMessage('no ciphertext found for commitment at index 0');
+        return;
+      }
+
+      const commitmentCiphertext = formatCommitmentCiphertext(
+        commitmentCiphertextStructOutput,
+      );
+
+      const erc20PaymentAmount =
+        await extractERC20AmountFromCommitmentCiphertext(
+          network,
+          commitmentCiphertext,
+          commitmentHash,
+          receivingViewingPrivateKey,
+          receivingRailgunAddressData,
+        );
+      if (!erc20PaymentAmount) {
+        return;
+      }
+
+      const { tokenAddress, amountString } = erc20PaymentAmount;
+
+      if (!erc20PaymentAmounts[tokenAddress]) {
+        erc20PaymentAmounts[tokenAddress] = BigNumber.from(0);
+      }
+      erc20PaymentAmounts[tokenAddress] =
+        erc20PaymentAmounts[tokenAddress].add(amountString);
+    }),
   );
 
-  return tokenPaymentAmounts;
+  return erc20PaymentAmounts;
 };
 
 const decryptReceiverNoteSafe = async (
-  ciphertext: CommitmentCiphertextStructOutput,
-  viewingPrivateKey: Uint8Array,
-  railgunWalletAddressData: AddressData,
-  network: Network,
+  commitmentCiphertext: CommitmentCiphertext,
+  receivingViewingPrivateKey: Uint8Array,
+  receivingRailgunAddressData: AddressData,
+  chain: Chain,
 ): Promise<Optional<TransactNote>> => {
   try {
-    const commitmentCiphertext = formatCommitmentCiphertext(ciphertext);
     const blindedSenderViewingKey = hexStringToBytes(
       commitmentCiphertext.blindedSenderViewingKey,
     );
@@ -142,7 +174,7 @@ const decryptReceiverNoteSafe = async (
       commitmentCiphertext.blindedReceiverViewingKey,
     );
     const sharedKey = await getSharedSymmetricKey(
-      viewingPrivateKey,
+      receivingViewingPrivateKey,
       blindedSenderViewingKey,
     );
     if (!sharedKey) {
@@ -151,10 +183,10 @@ const decryptReceiverNoteSafe = async (
     }
 
     const { db } = getEngine();
-    const tokenDataGetter = new TokenDataGetter(db, network.chain);
+    const tokenDataGetter = new TokenDataGetter(db, chain);
 
     const note = await TransactNote.decrypt(
-      railgunWalletAddressData,
+      receivingRailgunAddressData,
       commitmentCiphertext.ciphertext,
       sharedKey,
       commitmentCiphertext.memo,
@@ -177,29 +209,18 @@ const decryptReceiverNoteSafe = async (
   }
 };
 
-const extractFirstNoteERC20AmountMapFromTransaction = async (
-  railgunTx: TransactionData,
-  tokenPaymentAmounts: MapType<BigNumber>,
-  viewingPrivateKey: Uint8Array,
-  railgunWalletAddressData: AddressData,
+export const extractERC20AmountFromCommitmentCiphertext = async (
   network: Network,
-) => {
-  const { commitments } = railgunTx;
-
-  // First commitment should always be the fee.
-  const index = 0;
-  const hash: string = commitments[index];
-  const ciphertext = railgunTx.boundParams.commitmentCiphertext[index];
-  if (!ciphertext) {
-    sendMessage('no ciphertext found for commitment at index 0');
-    return;
-  }
-
+  commitmentCiphertext: CommitmentCiphertext,
+  commitmentHash: string,
+  receivingViewingPrivateKey: Uint8Array,
+  receivingRailgunAddressData: AddressData,
+): Promise<Optional<RailgunERC20Amount>> => {
   const decryptedReceiverNote = await decryptReceiverNoteSafe(
-    ciphertext,
-    viewingPrivateKey,
-    railgunWalletAddressData,
-    network,
+    commitmentCiphertext,
+    receivingViewingPrivateKey,
+    receivingRailgunAddressData,
+    network.chain,
   );
   if (!decryptedReceiverNote) {
     // Addressed to us, but different note than fee.
@@ -209,14 +230,14 @@ const extractFirstNoteERC20AmountMapFromTransaction = async (
 
   if (
     decryptedReceiverNote.receiverAddressData.masterPublicKey !==
-    railgunWalletAddressData.masterPublicKey
+    receivingRailgunAddressData.masterPublicKey
   ) {
     sendMessage('invalid masterPublicKey');
     return;
   }
 
   const noteHash = nToHex(decryptedReceiverNote.hash, ByteLength.UINT_256);
-  const commitHash = formatToByteLength(hash, ByteLength.UINT_256);
+  const commitHash = formatToByteLength(commitmentHash, ByteLength.UINT_256);
   if (noteHash !== commitHash) {
     sendMessage('invalid commitHash');
     return;
@@ -232,12 +253,15 @@ const extractFirstNoteERC20AmountMapFromTransaction = async (
     tokenData.tokenAddress,
   ).toLowerCase();
 
-  if (!tokenPaymentAmounts[tokenAddress]) {
-    // eslint-disable-next-line no-param-reassign
-    tokenPaymentAmounts[tokenAddress] = BigNumber.from(0);
-  }
-  // eslint-disable-next-line no-param-reassign
-  tokenPaymentAmounts[tokenAddress] = tokenPaymentAmounts[tokenAddress].add(
+  const amountString = BigNumber.from(
     decryptedReceiverNote.value.toString(),
-  );
+  ).toHexString();
+
+  const erc20Amount: RailgunERC20Amount = {
+    tokenAddress,
+    amountString,
+  };
+  return erc20Amount;
 };
+
+export { CommitmentCiphertext };
