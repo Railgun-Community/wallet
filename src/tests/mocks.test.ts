@@ -9,6 +9,8 @@ import {
   RailgunNFTAmount,
 } from '@railgun-community/shared-models';
 import { BalancesUpdatedCallback } from '../services/railgun/wallets/balance-update';
+import { BoundParamsStruct } from '@railgun-community/engine/dist/typechain-types/contracts/logic/RailgunLogic';
+import { CommitmentCiphertext } from '@railgun-community/engine';
 
 export const MOCK_MNEMONIC =
   'test test test test test test test test test test test junk';
@@ -71,10 +73,54 @@ export const MOCK_NFT_AMOUNTS: RailgunNFTAmount[] = [
   },
 ];
 
+export const MOCK_COMMITMENTS: string[] = [
+  '0x0000000000000000000000000000000000000000000000000000000000000003',
+];
+
 export const MOCK_NULLIFIERS: string[] = [
   '0x0000000000000000000000000000000000000000000000000000000000000001',
   '0x0000000000000000000000000000000000000000000000000000000000000002',
 ];
+
+export const MOCK_BOUND_PARAMS = {
+  commitmentCiphertext: [
+    {
+      ciphertext: [
+        '0xba002e1e01f1d63d7fa06c83880b2bef23063903d3f4a2b8f7eb800f6c45491c',
+        '0x8687c2941bddfc807aa3512ebef36e889a82f3885383877e55b7f86e488b6360',
+        '0x40521d04c766273db030a1ee070706493383f26b8fd677cb51acf0fd30682a37',
+        '0x6588e860594d6709193c391b4e79de12cecdaed31eef71a2894af5729c0209f7',
+      ],
+      blindedSenderViewingKey:
+        '0x2b0f49a1c0fb28ed4cc26fe0531848a25422e5ebdf5bf3df34f67d36d8a484fc',
+      blindedReceiverViewingKey:
+        '0x2b0f49a1c0fb28ed4cc26fe0531848a25422e5ebdf5bf3df34f67d36d8a484fc',
+      memo: '0x',
+      annotationData:
+        '0x3f5ff6e7bab3653afd46501dac3d55bd72b33355e41bfc02fcd63a78fe9d5da550957fabde36c9ded90126755f80a3fa3cdd0d84be4686c4192e920d85dd',
+    },
+  ],
+} as BoundParamsStruct;
+
+export const MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT: CommitmentCiphertext =
+  {
+    annotationData:
+      '0x3f5ff6e7bab3653afd46501dac3d55bd72b33355e41bfc02fcd63a78fe9d5da550957fabde36c9ded90126755f80a3fa3cdd0d84be4686c4192e920d85dd',
+    blindedReceiverViewingKey:
+      '2b0f49a1c0fb28ed4cc26fe0531848a25422e5ebdf5bf3df34f67d36d8a484fc',
+    blindedSenderViewingKey:
+      '2b0f49a1c0fb28ed4cc26fe0531848a25422e5ebdf5bf3df34f67d36d8a484fc',
+    ciphertext: {
+      data: [
+        '8687c2941bddfc807aa3512ebef36e889a82f3885383877e55b7f86e488b6360',
+        '40521d04c766273db030a1ee070706493383f26b8fd677cb51acf0fd30682a37',
+        '6588e860594d6709193c391b4e79de12cecdaed31eef71a2894af5729c0209f7',
+      ],
+      iv: 'ba002e1e01f1d63d7fa06c83880b2bef',
+      tag: '23063903d3f4a2b8f7eb800f6c45491c',
+    },
+    memo: '0x',
+  };
 
 export const MOCK_NFT_AMOUNT_RECIPIENTS: RailgunNFTAmountRecipient[] =
   MOCK_NFT_AMOUNTS.map(nftAmount => ({

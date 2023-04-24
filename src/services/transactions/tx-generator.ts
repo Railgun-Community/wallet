@@ -219,7 +219,7 @@ const transactionsFromERC20Amounts = async (
   if (relayerFeeERC20AmountRecipient && !sendWithPublicWallet) {
     assertValidRailgunAddress(relayerFeeERC20AmountRecipient.recipientAddress);
 
-    // Add Relayer Fee
+    // Add Relayer Fee - must be first transaction in the batch, and first output for the transaction.
     transactionBatch.addOutput(
       erc20NoteFromERC20AmountRecipient(
         relayerFeeERC20AmountRecipient,

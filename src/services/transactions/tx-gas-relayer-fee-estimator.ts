@@ -1,6 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import { TransactionStruct } from '@railgun-community/engine';
+import {
+  CommitmentCiphertext,
+  TransactionStruct,
+} from '@railgun-community/engine';
 import {
   NetworkName,
   TransactionGasDetails,
@@ -11,6 +14,7 @@ import {
   calculateMaximumGas,
   RailgunERC20AmountRecipient,
   deserializeTransactionGasDetails,
+  CommitmentSummary,
 } from '@railgun-community/shared-models';
 import {
   DUMMY_FROM_ADDRESS,
@@ -19,6 +23,8 @@ import {
 import { getGasEstimate, gasEstimateResponse } from './tx-gas-details';
 import { balanceForERC20Token } from '../railgun/wallets/balance-update';
 import { walletForID } from '../railgun';
+import { CommitmentCiphertextStruct } from '@railgun-community/engine/dist/typechain-types/contracts/logic/RailgunLogic';
+import { convertTransactionStructToCommitmentSummary } from '../railgun/util/commitment';
 
 const MAX_ITERATIONS_RELAYER_FEE_REESTIMATION = 5;
 
@@ -61,6 +67,18 @@ const getUpdatedRelayerFeeForGasEstimation = async (
     calculateRelayerFeeERC20Amount(feeTokenDetails, updatedGasDetails);
 
   return relayerFeeERC20Amount;
+};
+
+const getRelayerFeeCommitment = (
+  transactionStructs: TransactionStruct[],
+): CommitmentSummary => {
+  const transactionIndex = 0;
+  const relayerFeeCommitment = transactionStructs[transactionIndex];
+  const relayerFeeCommitmentIndex = 0;
+  return convertTransactionStructToCommitmentSummary(
+    relayerFeeCommitment,
+    relayerFeeCommitmentIndex,
+  );
 };
 
 export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
@@ -108,7 +126,11 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
   );
 
   if (sendWithPublicWallet) {
-    return gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
+    return gasEstimateResponse(
+      gasEstimate,
+      undefined, // relayerFeeCommitment
+      isGasEstimateWithDummyProof,
+    );
   }
 
   if (!feeTokenDetails) {
@@ -131,6 +153,8 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
       networkName,
       feeTokenDetails.tokenAddress,
     );
+
+  let relayerFeeCommitment = getRelayerFeeCommitment(serializedTransactions);
 
   // Iteratively calculate new relayer fee and estimate new gas amount.
   // This change if the number of circuits changes because of the additional Relayer Fees.
@@ -162,21 +186,27 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
         .toHexString();
     }
 
-    const newTransactionStructs =
+    const newSerializedTransactions =
       // eslint-disable-next-line no-await-in-loop
       await generateDummyTransactionStructsWithRelayerFee(updatedRelayerFee);
 
+    relayerFeeCommitment = getRelayerFeeCommitment(newSerializedTransactions);
+
     if (
       compareCircuitSizesTransactionStructs(
-        newTransactionStructs,
+        newSerializedTransactions,
         serializedTransactions,
       )
     ) {
       // Same circuit sizes, no need to run further gas estimates.
-      return gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
+      return gasEstimateResponse(
+        gasEstimate,
+        relayerFeeCommitment,
+        isGasEstimateWithDummyProof,
+      );
     }
 
-    serializedTransactions = newTransactionStructs;
+    serializedTransactions = newSerializedTransactions;
 
     // eslint-disable-next-line no-await-in-loop
     populatedTransaction = await generatePopulatedTransaction(
@@ -192,12 +222,20 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
     );
 
     if (newGasEstimate.toHexString() === gasEstimate.toHexString()) {
-      return gasEstimateResponse(newGasEstimate, isGasEstimateWithDummyProof);
+      return gasEstimateResponse(
+        newGasEstimate,
+        relayerFeeCommitment,
+        isGasEstimateWithDummyProof,
+      );
     }
     gasEstimate = newGasEstimate;
   }
 
-  return gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
+  return gasEstimateResponse(
+    gasEstimate,
+    relayerFeeCommitment,
+    isGasEstimateWithDummyProof,
+  );
 };
 
 const compareCircuitSizesTransactionStructs = (

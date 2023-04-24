@@ -181,6 +181,7 @@ export const gasEstimateForShield = async (
         fromWalletAddress,
         sendWithPublicWallet,
       ),
+      undefined, // relayerFeeCommitment
       isGasEstimateWithDummyProof,
     );
   } catch (err) {

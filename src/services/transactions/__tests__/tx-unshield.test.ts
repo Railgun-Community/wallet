@@ -28,9 +28,12 @@ import {
   initTestEngineNetwork,
 } from '../../../tests/setup.test';
 import {
+  MOCK_BOUND_PARAMS,
+  MOCK_COMMITMENTS,
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FEE_TOKEN_DETAILS,
+  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
   MOCK_MNEMONIC,
   MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
   MOCK_NULLIFIERS,
@@ -186,9 +189,8 @@ describe('tx-unshield', () => {
       'generateDummyTransactions',
     ).resolves([
       {
-        commitments: [
-          '0x0000000000000000000000000000000000000000000000000000000000000003',
-        ],
+        commitments: MOCK_COMMITMENTS,
+        boundParams: MOCK_BOUND_PARAMS,
         nullifiers: MOCK_NULLIFIERS,
       },
     ] as unknown as TransactionStruct[]);
@@ -229,6 +231,10 @@ describe('tx-unshield', () => {
       false, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
+    expect(rsp.relayerFeeCommitment).to.not.be.undefined;
+    expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
+      MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
+    );
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [
@@ -314,6 +320,10 @@ describe('tx-unshield', () => {
       false, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
+    expect(rsp.relayerFeeCommitment).to.not.be.undefined;
+    expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
+      MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
+    );
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [
@@ -351,6 +361,7 @@ describe('tx-unshield', () => {
       true, // sendWithPublicWallet
     );
     expect(rsp.error).to.be.undefined;
+    expect(rsp.relayerFeeCommitment).to.be.undefined;
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [

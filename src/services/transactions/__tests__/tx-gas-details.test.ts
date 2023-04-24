@@ -3,6 +3,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub } from 'sinon';
 import {
+  CommitmentSummary,
   createFallbackProviderFromJsonConfig,
   decimalToHexString,
   EVMGasType,
@@ -51,7 +52,11 @@ describe('tx-gas', () => {
     );
 
     const isGasEstimateWithDummyProof = false;
-    const rsp = gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
+    const rsp = gasEstimateResponse(
+      gasEstimate,
+      undefined, // relayerFeeCommitment
+      isGasEstimateWithDummyProof,
+    );
 
     expect(gasEstimateStub.callCount).to.equal(1);
 
@@ -76,7 +81,11 @@ describe('tx-gas', () => {
       true, // sendWithPublicWallet
     );
     const isGasEstimateWithDummyProof = true;
-    const rsp = gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
+    const rsp = gasEstimateResponse(
+      gasEstimate,
+      undefined, // relayerFeeCommitment
+      isGasEstimateWithDummyProof,
+    );
     expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.not.be.undefined;
   }).timeout(10000);
@@ -98,7 +107,11 @@ describe('tx-gas', () => {
       false, // sendWithPublicWallet
     );
     const isGasEstimateWithDummyProof = true;
-    const rsp = gasEstimateResponse(gasEstimate, isGasEstimateWithDummyProof);
+    const rsp = gasEstimateResponse(
+      gasEstimate,
+      {} as CommitmentSummary,
+      isGasEstimateWithDummyProof,
+    );
     expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.not.be.undefined;
   }).timeout(10000);

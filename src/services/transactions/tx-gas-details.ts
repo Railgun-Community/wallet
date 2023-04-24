@@ -8,6 +8,7 @@ import {
   calculateGasLimit,
   NetworkName,
   getEVMGasTypeForTransaction,
+  CommitmentSummary,
 } from '@railgun-community/shared-models';
 import { getProviderForNetwork } from '../railgun';
 import { reportAndSanitizeError } from '../../utils/error';
@@ -69,6 +70,7 @@ const shouldRemoveGasLimitForL2GasEstimate = (networkName: NetworkName) => {
 
 export const gasEstimateResponse = (
   gasEstimate: BigNumber,
+  relayerFeeCommitment: Optional<CommitmentSummary>,
   isGasEstimateWithDummyProof: boolean,
 ): RailgunTransactionGasEstimateResponse => {
   // TODO: This variance will be different on L2s.
@@ -77,29 +79,30 @@ export const gasEstimateResponse = (
     ? gasEstimate.add(GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION)
     : gasEstimate;
 
-  const railResponse: RailgunTransactionGasEstimateResponse = {
+  const response: RailgunTransactionGasEstimateResponse = {
     gasEstimateString: gasEstimateWithDummyProofVariance.toHexString(),
+    relayerFeeCommitment,
   };
-  return railResponse;
+  return response;
 };
 
 export const gasEstimateResponseFromGasEstimate = (
   gasEstimate: BigNumber,
 ): RailgunTransactionGasEstimateResponse => {
   try {
-    const railResponse: RailgunTransactionGasEstimateResponse = {
+    const response: RailgunTransactionGasEstimateResponse = {
       gasEstimateString: gasEstimate.toHexString(),
     };
-    return railResponse;
+    return response;
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(
       gasEstimateResponseFromGasEstimate.name,
       err,
     );
-    const railResponse: RailgunTransactionGasEstimateResponse = {
+    const response: RailgunTransactionGasEstimateResponse = {
       error: sanitizedError.message,
     };
-    return railResponse;
+    return response;
   }
 };
 

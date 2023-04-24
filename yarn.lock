@@ -2291,10 +2291,10 @@
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
-"@railgun-community/shared-models@4.1.12":
-  version "4.1.12"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-4.1.12.tgz#2054cb92440b6368827aa14bfe5478fa5c7f0038"
-  integrity sha512-BxZtUwH/RfHG4Ps0JPzCpfdC1d+yaDmnRcc1RGUzXWQXM3hTVRbYWpykVaHPtsPCmiibxWroPZEl8eovA4juDg==
+"@railgun-community/shared-models@4.1.14":
+  version "4.1.14"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-4.1.14.tgz#2f17a8305d52c046c06ad6c22ee010256db54326"
+  integrity sha512-rTQB9JSMKzAwb0+jmSKbXAtqHiarpcFfuQnSApCihZQRLdRmKapI3+ShkB37/tvsDf9aGSIqwUUQsUju8kzsTQ==
   dependencies:
     "@ethersproject/contracts" "^5.7.0"
     "@ethersproject/transactions" "^5.7.0"
