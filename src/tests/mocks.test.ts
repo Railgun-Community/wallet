@@ -86,38 +86,41 @@ export const MOCK_BOUND_PARAMS = {
   commitmentCiphertext: [
     {
       ciphertext: [
-        '0xba002e1e01f1d63d7fa06c83880b2bef23063903d3f4a2b8f7eb800f6c45491c',
-        '0x8687c2941bddfc807aa3512ebef36e889a82f3885383877e55b7f86e488b6360',
-        '0x40521d04c766273db030a1ee070706493383f26b8fd677cb51acf0fd30682a37',
-        '0x6588e860594d6709193c391b4e79de12cecdaed31eef71a2894af5729c0209f7',
+        '0x7d6854cd1fc49f0602ccd933422ed2e2ee070a9f1806843d5c81c08253134950',
+        '0x8f54329134103720a7dac44d6f2a632ff18e7599b9bc1bf39d639e998a223b80',
+        '0xed1ec36daf72e389fc567b2b5507fb6bff80b601bd3c0c441e4e97f28551f2f2',
+        '0xede74ef3a06347178de5e4204f6bf8c475be62bcdb9911bd31be952f2e8af096',
       ],
       blindedSenderViewingKey:
-        '0x2b0f49a1c0fb28ed4cc26fe0531848a25422e5ebdf5bf3df34f67d36d8a484fc',
+        '0x898bc07d416014a2854f756b9f8873bde925b043e9e01ea6d97183b91217b5b6',
       blindedReceiverViewingKey:
-        '0x2b0f49a1c0fb28ed4cc26fe0531848a25422e5ebdf5bf3df34f67d36d8a484fc',
+        '0x898bc07d416014a2854f756b9f8873bde925b043e9e01ea6d97183b91217b5b6',
       memo: '0x',
       annotationData:
-        '0x3f5ff6e7bab3653afd46501dac3d55bd72b33355e41bfc02fcd63a78fe9d5da550957fabde36c9ded90126755f80a3fa3cdd0d84be4686c4192e920d85dd',
+        '0xfaeb57df19481f9ad59b8619a5687b2623aa2280d0df93aa77258326df9e6657bbdb72d305e1373906a47c6e684c34c2553c7e061baac1f744e8ece042c6',
     },
   ],
-} as BoundParamsStruct;
+};
+
+export const MOCK_COMMITMENT_HASH =
+  '0x2b13bccd4974c797df42a89221ed6e19e50c32055058cdcc5a8ea836233e4cab';
 
 export const MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT: CommitmentCiphertext =
   {
     annotationData:
-      '0x3f5ff6e7bab3653afd46501dac3d55bd72b33355e41bfc02fcd63a78fe9d5da550957fabde36c9ded90126755f80a3fa3cdd0d84be4686c4192e920d85dd',
+      '0xfaeb57df19481f9ad59b8619a5687b2623aa2280d0df93aa77258326df9e6657bbdb72d305e1373906a47c6e684c34c2553c7e061baac1f744e8ece042c6',
     blindedReceiverViewingKey:
-      '2b0f49a1c0fb28ed4cc26fe0531848a25422e5ebdf5bf3df34f67d36d8a484fc',
+      '898bc07d416014a2854f756b9f8873bde925b043e9e01ea6d97183b91217b5b6',
     blindedSenderViewingKey:
-      '2b0f49a1c0fb28ed4cc26fe0531848a25422e5ebdf5bf3df34f67d36d8a484fc',
+      '898bc07d416014a2854f756b9f8873bde925b043e9e01ea6d97183b91217b5b6',
     ciphertext: {
       data: [
-        '8687c2941bddfc807aa3512ebef36e889a82f3885383877e55b7f86e488b6360',
-        '40521d04c766273db030a1ee070706493383f26b8fd677cb51acf0fd30682a37',
-        '6588e860594d6709193c391b4e79de12cecdaed31eef71a2894af5729c0209f7',
+        '8f54329134103720a7dac44d6f2a632ff18e7599b9bc1bf39d639e998a223b80',
+        'ed1ec36daf72e389fc567b2b5507fb6bff80b601bd3c0c441e4e97f28551f2f2',
+        'ede74ef3a06347178de5e4204f6bf8c475be62bcdb9911bd31be952f2e8af096',
       ],
-      iv: 'ba002e1e01f1d63d7fa06c83880b2bef',
-      tag: '23063903d3f4a2b8f7eb800f6c45491c',
+      iv: '7d6854cd1fc49f0602ccd933422ed2e2',
+      tag: 'ee070a9f1806843d5c81c08253134950',
     },
     memo: '0x',
   };
