@@ -152,7 +152,7 @@ const receiveERC20AmountsHaveShieldFee = (
   return receiveERC20Amounts.find(amount => amount.shieldFee) != null;
 };
 
-const categoryForTransactionHistoryItem = (
+export const categoryForTransactionHistoryItem = (
   historyItem: TransactionHistoryItem,
 ): TransactionHistoryItemCategory => {
   const hasTransferNFTs = historyItem.transferNFTAmounts.length > 0;
