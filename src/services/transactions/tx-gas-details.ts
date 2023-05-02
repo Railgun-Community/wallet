@@ -13,6 +13,7 @@ import {
 import { getProviderForNetwork } from '../railgun';
 import { reportAndSanitizeError } from '../../utils/error';
 import { GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION } from '@railgun-community/engine';
+import { sendErrorMessage } from '../../utils';
 
 export const getGasEstimate = async (
   networkName: NetworkName,
@@ -41,6 +42,10 @@ export const getGasEstimate = async (
     const gasEstimate = await provider.estimateGas(estimateGasTransaction);
     return gasEstimate;
   } catch (err) {
+    if (!(err instanceof Error)) {
+      throw err;
+    }
+    sendErrorMessage(err);
     reportAndSanitizeError(getGasEstimate.name, err);
     throw err;
   }
