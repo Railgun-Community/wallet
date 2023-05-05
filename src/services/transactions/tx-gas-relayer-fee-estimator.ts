@@ -1,9 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { PopulatedTransaction } from '@ethersproject/contracts';
-import {
-  CommitmentCiphertext,
-  TransactionStruct,
-} from '@railgun-community/engine';
+import { TransactionStruct } from '@railgun-community/engine';
 import {
   NetworkName,
   TransactionGasDetails,
@@ -23,7 +20,6 @@ import {
 import { getGasEstimate, gasEstimateResponse } from './tx-gas-details';
 import { balanceForERC20Token } from '../railgun/wallets/balance-update';
 import { walletForID } from '../railgun';
-import { CommitmentCiphertextStruct } from '@railgun-community/engine/dist/typechain-types/contracts/logic/RailgunLogic';
 import { convertTransactionStructToCommitmentSummary } from '../railgun/util/commitment';
 
 const MAX_ITERATIONS_RELAYER_FEE_REESTIMATION = 5;
@@ -147,12 +143,11 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
   );
 
   // Get private balance of matching token.
-  const balanceForRelayerFeeERC20: Optional<BigNumber> =
-    await balanceForERC20Token(
-      wallet,
-      networkName,
-      feeTokenDetails.tokenAddress,
-    );
+  const balanceForRelayerFeeERC20 = await balanceForERC20Token(
+    wallet,
+    networkName,
+    feeTokenDetails.tokenAddress,
+  );
 
   let relayerFeeCommitment = getRelayerFeeCommitment(serializedTransactions);
 
@@ -172,7 +167,6 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
     // If Relayer fee causes overflow with the token balance,
     // then use the MAX amount for Relayer Fee, which is BALANCE - SENDING AMOUNT.
     if (
-      balanceForRelayerFeeERC20 &&
       relayerFeeMatchingSendingERC20Amount &&
       // eslint-disable-next-line no-await-in-loop
       (await relayerFeeWillOverflowBalance(

@@ -112,7 +112,7 @@ export const balanceForERC20Token = async (
   wallet: AbstractWallet,
   networkName: NetworkName,
   tokenAddress: string,
-): Promise<Optional<BigNumber>> => {
+): Promise<BigNumber> => {
   const { chain } = NETWORK_CONFIG[networkName];
   const balances = await wallet.balances(chain);
   const tokenBalances = getSerializedERC20Balances(balances);
@@ -121,9 +121,8 @@ export const balanceForERC20Token = async (
     tokenBalance =>
       tokenBalance.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
   );
-
   if (!matchingTokenBalance) {
-    return undefined;
+    return BigNumber.from(0);
   }
 
   return BigNumber.from(matchingTokenBalance.amountString);
