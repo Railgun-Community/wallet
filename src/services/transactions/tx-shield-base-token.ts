@@ -131,6 +131,7 @@ export const gasEstimateForShieldBaseToken = async (
         populatedTransaction,
         fromWalletAddress,
         sendWithPublicWallet,
+        false, // isCrossContractCall
       ),
       undefined, // relayerFeeCommitment
       isGasEstimateWithDummyProof,

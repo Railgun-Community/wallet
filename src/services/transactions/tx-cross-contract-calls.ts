@@ -76,8 +76,11 @@ const createPopulatedCrossContractCalls = (
         return populatedTransaction;
       });
   } catch (err) {
+    if (!(err instanceof Error)) {
+      throw err;
+    }
     reportAndSanitizeError(createPopulatedCrossContractCalls.name, err);
-    throw new Error('Invalid cross contract calls.');
+    throw new Error(`Invalid cross-contract calls: ${err.message}`);
   }
 };
 
@@ -257,6 +260,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
             crossContractCalls,
             relayShieldRequests,
             relayAdaptParamsRandom,
+            true, // isGasEstimate
+            !sendWithPublicWallet, // isRelayerTransaction
           );
         // Remove gasLimit, we'll set to the minimum below.
         // TODO: Remove after callbacks upgrade.
@@ -269,6 +274,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
+      true, // isCrossContractCall
     );
 
     // TODO: Remove this after callbacks upgrade.
@@ -364,6 +370,7 @@ export const generateCrossContractCallsProof = async (
         relayAdaptShieldNFTsTokenData,
       );
 
+    const isRelayerTransaction = !sendWithPublicWallet;
     const relayAdaptParamsRandom = randomHex(31);
     const relayAdaptParams =
       await relayAdaptContract.getRelayAdaptParamsCrossContractCalls(
@@ -371,6 +378,7 @@ export const generateCrossContractCallsProof = async (
         crossContractCalls,
         relayShieldRequests,
         relayAdaptParamsRandom,
+        isRelayerTransaction,
       );
     const relayAdaptID: AdaptID = {
       contract: relayAdaptContract.address,
@@ -403,6 +411,8 @@ export const generateCrossContractCallsProof = async (
         crossContractCalls,
         relayShieldRequests,
         relayAdaptParamsRandom,
+        false, // isGasEstimate
+        isRelayerTransaction,
       );
     delete populatedTransaction.from;
 

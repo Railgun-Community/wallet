@@ -180,6 +180,7 @@ export const gasEstimateForShield = async (
         populatedTransaction,
         fromWalletAddress,
         sendWithPublicWallet,
+        false, // isCrossContractCall
       ),
       undefined, // relayerFeeCommitment
       isGasEstimateWithDummyProof,

@@ -1,4 +1,4 @@
-import { FallbackProvider, TransactionReceipt } from '@ethersproject/providers';
+import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
@@ -18,7 +18,6 @@ import {
   EVMGasType,
   TransactionGasDetailsSerialized,
   RailgunERC20AmountRecipient,
-  createFallbackProviderFromJsonConfig,
   decimalToHexString,
 } from '@railgun-community/shared-models';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -32,7 +31,6 @@ import {
   MOCK_COMMITMENTS,
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
   MOCK_FEE_TOKEN_DETAILS,
   MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
   MOCK_MNEMONIC,
@@ -54,6 +52,7 @@ import {
   getRelayAdaptTransactionError,
   populateProvedCrossContractCalls,
 } from '../tx-cross-contract-calls';
+import FormattedRelayAdaptErrorLogs from './json/formatted-relay-adapt-error-logs.json';
 
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
@@ -369,7 +368,9 @@ describe('tx-cross-contract-calls', () => {
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
     );
-    expect(rsp.error).to.equal('Invalid cross contract calls.');
+    expect(rsp.error).to.include(
+      'Invalid cross-contract calls: invalid arrayify value',
+    );
   });
 
   it('Should error on cross contract calls gas estimate for ethers rejections', async () => {
@@ -387,7 +388,9 @@ describe('tx-cross-contract-calls', () => {
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
     );
-    expect(rsp.error).to.equal('test rejection - gas estimate');
+    expect(rsp.error).to.equal(
+      'RelayAdapt multicall failed at index UNKNOWN with error: test rejection - gas estimate',
+    );
   });
 
   // WITHDRAW - PROVE AND SEND
@@ -593,30 +596,10 @@ describe('tx-cross-contract-calls', () => {
     );
   });
 
-  it.skip('Should invalidate cross contract call as unsuccessful', async () => {
-    const provider = createFallbackProviderFromJsonConfig(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
+  it('Should decode and parse relay adapt error logs (from failed Sushi V2 LP removal)', () => {
+    const transactionError = getRelayAdaptTransactionError(
+      FormattedRelayAdaptErrorLogs,
     );
-    const txReceipt: TransactionReceipt = await provider.getTransactionReceipt(
-      '0x56c3b9bfb573e6f49f21b8e09282edd01a93bbb965b1f4debbf7316ea3d878dd',
-    );
-    expect(txReceipt).to.not.equal(
-      null,
-      'Could not get live transaction receipt (RPC error)',
-    );
-    expect(getRelayAdaptTransactionError(txReceipt.logs)).to.equal(
-      'Unknown Relay Adapt error.',
-    );
-
-    const txReceipt2: TransactionReceipt = await provider.getTransactionReceipt(
-      '0xeeaf0c55b4c34516402ce1c0d1eb4e3d2664b11204f2fc9988ec57ae7a1220ff',
-    );
-    expect(txReceipt).to.not.equal(
-      null,
-      'Could not get live transaction receipt (RPC error)',
-    );
-    expect(getRelayAdaptTransactionError(txReceipt2.logs)).to.equal(
-      'ERC20: transfer amount exceeds allowance',
-    );
-  }).timeout(10000);
+    expect(transactionError).to.equal('ds-math-sub-underflow');
+  });
 });

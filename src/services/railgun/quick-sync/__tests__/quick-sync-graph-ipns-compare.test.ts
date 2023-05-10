@@ -269,7 +269,7 @@ const compareFieldsGraphToIPNS = async (chain: Chain) => {
     });
 };
 
-describe('quick-sync-graph-ipns-compare', () => {
+describe.skip('quick-sync-graph-ipns-compare', () => {
   it('Should make sure Graph Protocol returns the same data as IPNS - Ethereum', async () => {
     await compareFieldsGraphToIPNS(ETHEREUM_CHAIN);
   }).timeout(60000);

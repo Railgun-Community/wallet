@@ -109,6 +109,7 @@ export const gasEstimateForUnprovenTransfer = async (
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
+      false, // isCrossContractCall
     );
     return response;
   } catch (err) {

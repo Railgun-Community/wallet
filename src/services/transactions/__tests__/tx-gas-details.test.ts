@@ -49,6 +49,7 @@ describe('tx-gas', () => {
       populatedTransaction,
       MOCK_ETH_WALLET_ADDRESS,
       true, // sendWithPublicWallet
+      false, // isCrossContractCall
     );
 
     const isGasEstimateWithDummyProof = false;
@@ -79,6 +80,7 @@ describe('tx-gas', () => {
       tx,
       MOCK_ETH_WALLET_ADDRESS,
       true, // sendWithPublicWallet
+      false, // isCrossContractCall
     );
     const isGasEstimateWithDummyProof = true;
     const rsp = gasEstimateResponse(
@@ -105,6 +107,7 @@ describe('tx-gas', () => {
       tx,
       MOCK_ETH_WALLET_ADDRESS,
       false, // sendWithPublicWallet
+      false, // isCrossContractCall
     );
     const isGasEstimateWithDummyProof = true;
     const rsp = gasEstimateResponse(

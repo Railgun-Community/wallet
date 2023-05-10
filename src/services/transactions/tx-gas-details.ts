@@ -12,7 +12,10 @@ import {
 } from '@railgun-community/shared-models';
 import { getProviderForNetwork } from '../railgun';
 import { reportAndSanitizeError } from '../../utils/error';
-import { GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION } from '@railgun-community/engine';
+import {
+  GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION,
+  RelayAdaptContract,
+} from '@railgun-community/engine';
 import { sendErrorMessage } from '../../utils';
 
 export const getGasEstimate = async (
@@ -20,6 +23,7 @@ export const getGasEstimate = async (
   transaction: PopulatedTransaction | TransactionRequest,
   fromWalletAddress: string,
   sendWithPublicWallet: boolean,
+  isCrossContractCall: boolean,
 ): Promise<BigNumber> => {
   const evmGasType = getEVMGasTypeForTransaction(
     networkName,
@@ -28,18 +32,21 @@ export const getGasEstimate = async (
 
   // Add 'from' field, which is required, as a mock address.
   // Note that DEPOSIT needs a real address, as it checks the balance for transfer.
-  const estimateGasTransaction: TransactionRequest = {
+  const estimateGasTransactionRequest: TransactionRequest = {
     ...transaction,
     from: fromWalletAddress,
     type: evmGasType,
   };
   if (shouldRemoveGasLimitForL2GasEstimate(networkName)) {
-    delete estimateGasTransaction.gasLimit;
+    delete estimateGasTransactionRequest.gasLimit;
   }
 
   try {
-    const provider = getProviderForNetwork(networkName);
-    const gasEstimate = await provider.estimateGas(estimateGasTransaction);
+    const gasEstimate = await estimateGas(
+      networkName,
+      estimateGasTransactionRequest,
+      isCrossContractCall,
+    );
     return gasEstimate;
   } catch (err) {
     if (!(err instanceof Error)) {
@@ -49,6 +56,22 @@ export const getGasEstimate = async (
     reportAndSanitizeError(getGasEstimate.name, err);
     throw err;
   }
+};
+
+const estimateGas = (
+  networkName: NetworkName,
+  transaction: TransactionRequest,
+  isCrossContractCall: boolean,
+): Promise<BigNumber> => {
+  const provider = getProviderForNetwork(networkName);
+  if (isCrossContractCall) {
+    // Includes custom error handler for relay-adapt transactions.
+    return RelayAdaptContract.estimateGasWithErrorHandler(
+      provider,
+      transaction as PopulatedTransaction, // TODO: Remove this after upgrade engine 4.3.1
+    );
+  }
+  return provider.estimateGas(transaction);
 };
 
 /**

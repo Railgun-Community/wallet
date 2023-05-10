@@ -167,6 +167,7 @@ export const gasEstimateForUnprovenUnshield = async (
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
+      false, // isCrossContractCall
     );
     return response;
   } catch (err) {
@@ -233,6 +234,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
       originalGasDetailsSerialized,
       feeTokenDetails,
       sendWithPublicWallet,
+      false, // isCrossContractCall
     );
     return response;
   } catch (err) {
