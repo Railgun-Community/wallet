@@ -68,7 +68,7 @@ const estimateGas = (
     // Includes custom error handler for relay-adapt transactions.
     return RelayAdaptContract.estimateGasWithErrorHandler(
       provider,
-      transaction as PopulatedTransaction, // TODO: Remove this after upgrade engine 4.3.1
+      transaction,
     );
   }
   return provider.estimateGas(transaction);
