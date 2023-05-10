@@ -20,11 +20,8 @@ import {
   ChainType,
   NetworkName,
   RailgunReceiveERC20Amount,
-  RailgunReceiveNFTAmount,
   RailgunSendERC20Amount,
-  RailgunSendNFTAmount,
   RailgunUnshieldERC20Amount,
-  RailgunUnshieldNFTAmount,
   TransactionHistoryItem,
   TransactionHistoryItemCategory,
 } from '@railgun-community/shared-models';

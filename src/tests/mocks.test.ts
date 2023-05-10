@@ -9,7 +9,6 @@ import {
   RailgunNFTAmount,
 } from '@railgun-community/shared-models';
 import { BalancesUpdatedCallback } from '../services/railgun/wallets/balance-update';
-import { BoundParamsStruct } from '@railgun-community/engine/dist/typechain-types/contracts/logic/RailgunLogic';
 import { CommitmentCiphertext } from '@railgun-community/engine';
 
 export const MOCK_MNEMONIC =
