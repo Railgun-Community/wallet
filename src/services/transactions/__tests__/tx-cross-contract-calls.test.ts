@@ -50,6 +50,7 @@ import {
   gasEstimateForUnprovenCrossContractCalls,
   generateCrossContractCallsProof,
   getRelayAdaptTransactionError,
+  parseRelayAdaptRevertData,
   populateProvedCrossContractCalls,
 } from '../tx-cross-contract-calls';
 import FormattedRelayAdaptErrorLogs from './json/formatted-relay-adapt-error-logs.json';
@@ -599,6 +600,13 @@ describe('tx-cross-contract-calls', () => {
   it('Should decode and parse relay adapt error logs (from failed Sushi V2 LP removal)', () => {
     const transactionError = getRelayAdaptTransactionError(
       FormattedRelayAdaptErrorLogs,
+    );
+    expect(transactionError).to.equal('ds-math-sub-underflow');
+  });
+
+  it('Should parse relay adapt log revert data (from failed Sushi V2 LP removal)', () => {
+    const transactionError = parseRelayAdaptRevertData(
+      FormattedRelayAdaptErrorLogs[6].data,
     );
     expect(transactionError).to.equal('ds-math-sub-underflow');
   });

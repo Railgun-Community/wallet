@@ -463,3 +463,17 @@ export const getRelayAdaptTransactionError = (
     throw err;
   }
 };
+
+export const parseRelayAdaptRevertData = (data: string): Optional<string> => {
+  try {
+    const relayAdaptError = RelayAdaptContract.customRelayAdaptErrorParse(data);
+    if (relayAdaptError) {
+      sendErrorMessage(relayAdaptError);
+      return relayAdaptError;
+    }
+    return undefined;
+  } catch (err) {
+    reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
+    throw err;
+  }
+};
