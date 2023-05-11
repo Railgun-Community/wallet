@@ -2268,10 +2268,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.4.tgz#72f84f7d4d15a0deedb679860f07f59953dc21eb"
   integrity sha512-8F5S6nGAZ/xO3mgFegLtwB9dcEs1Hynn+h775or4dFhWNP+Eh6c8N2vrdlkIfLZ+lFIP798lELBrQC0mplXE7A==
 
-"@railgun-community/engine@4.3.3":
-  version "4.3.3"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-4.3.3.tgz#480ed4fa5ee128cadc8c189e685a98ebb14b1ae7"
-  integrity sha512-J372GE5wf+SNdVP5gMgOfbITFLTaTWjPgzV19l4XkQWre6RzQoKYnDRvOfbv3mYW2z748qO4jNb9ePTjrw+wHg==
+"@railgun-community/engine@4.3.5":
+  version "4.3.5"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-4.3.5.tgz#aa8eed7e9f2752ee350f40b8491560368314ce44"
+  integrity sha512-/3NGD5MH6U90u+0fTqkp2Ghu3teFSj26G6JUH3q8t+bqeXA1qDX5GrJLr2+dqmtNK2/LbeSXS361PjSsVjaC/g==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/abstract-provider" "^5.7.0"

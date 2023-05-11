@@ -464,9 +464,9 @@ export const getRelayAdaptTransactionError = (
   }
 };
 
-export const parseRelayAdaptRevertData = (data: string): Optional<string> => {
+export const parseRelayAdaptReturnValue = (data: string): Optional<string> => {
   try {
-    const relayAdaptError = RelayAdaptContract.customRelayAdaptErrorParse(data);
+    const relayAdaptError = RelayAdaptContract.parseRelayAdaptReturnValue(data);
     if (relayAdaptError) {
       sendErrorMessage(relayAdaptError);
       return relayAdaptError;
