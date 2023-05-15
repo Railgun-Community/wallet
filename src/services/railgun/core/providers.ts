@@ -150,13 +150,8 @@ export const loadProvider = async (
       nft: BigNumber.from(nft).toHexString(),
     };
 
-    const response: LoadProviderResponse = {
-      feesSerialized,
-    };
-    return response;
+    return { feesSerialized };
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(loadProvider.name, err);
-    const response: LoadProviderResponse = { error: sanitizedError.message };
-    return response;
+    throw reportAndSanitizeError(loadProvider.name, err);
   }
 };

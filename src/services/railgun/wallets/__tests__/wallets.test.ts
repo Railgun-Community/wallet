@@ -37,13 +37,13 @@ describe('wallets', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
-    const { railgunWalletInfo, error } = await createRailgunWallet(
+    const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
       { [NetworkName.Ethereum]: 0, [NetworkName.Polygon]: 2 }, // creationBlockNumbers
     );
     if (!railgunWalletInfo) {
-      throw new Error(`Could not create wallet: ${error}`);
+      throw new Error(`Could not create wallet`);
     }
     wallet = fullWalletForID(railgunWalletInfo.id);
   });
@@ -123,14 +123,13 @@ describe('wallets', () => {
   });
 
   it('Should error for unknown load wallet', async () => {
-    const loadWalletResponse = await loadWalletByID(
-      MOCK_DB_ENCRYPTION_KEY,
-      'unknown',
-      false, // isViewOnlyWallet
-    );
-    expect(loadWalletResponse.error).to.include(
-      'Could not load RAILGUN wallet',
-    );
+    await expect(
+      loadWalletByID(
+        MOCK_DB_ENCRYPTION_KEY,
+        'unknown',
+        false, // isViewOnlyWallet
+      ),
+    ).rejectedWith('Could not load RAILGUN wallet');
   });
 
   it('Should validate RAILGUN addresses', async () => {

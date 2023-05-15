@@ -31,52 +31,41 @@ export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
 
     return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      refreshRailgunBalances.name,
-      err,
-    );
-    const response: RailgunBalanceResponse = { error: sanitizedError.message };
-    return response;
+    throw reportAndSanitizeError(refreshRailgunBalances.name, err);
   }
 };
 
 export const scanUpdatesForMerkletreeAndWallets = async (
   chain: Chain,
-): Promise<RailgunBalanceResponse> => {
+): Promise<void> => {
   try {
     const engine = getEngine();
     await engine.scanHistory(chain);
 
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
     // which calls `onBalancesUpdate` (balance-update.ts).
-    return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       scanUpdatesForMerkletreeAndWallets.name,
       err,
     );
-    const response: RailgunBalanceResponse = { error: sanitizedError.message };
-    return response;
   }
 };
 
 export const rescanFullMerkletreesAndWallets = async (
   chain: Chain,
-): Promise<RailgunBalanceResponse> => {
+): Promise<void> => {
   try {
     const engine = getEngine();
     await engine.fullRescanMerkletreesAndWallets(chain);
 
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
     // which calls `onBalancesUpdate` (balance-update.ts).
-    return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       rescanFullMerkletreesAndWallets.name,
       err,
     );
-    const response: RailgunBalanceResponse = { error: sanitizedError.message };
-    return response;
   }
 };
 

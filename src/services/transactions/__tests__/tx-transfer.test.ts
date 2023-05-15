@@ -227,7 +227,6 @@ describe('tx-transfer', () => {
     expect(erc20NoteSpy.args[3][0].amountString).to.equal('0x0275a61bf8737eb4'); // New estimated Relayer Fee
     expect(erc20NoteSpy.args[4][0].amountString).to.equal('0x100'); // token1
     expect(erc20NoteSpy.args[5][0].amountString).to.equal('0x200'); // token2
-    expect(rsp.error).to.be.undefined;
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
       MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
@@ -254,7 +253,6 @@ describe('tx-transfer', () => {
     expect(erc20NoteSpy.args.length).to.equal(2); // Number of calls (without relayer fees)
     expect(erc20NoteSpy.args[0][0].amountString).to.equal('0x100'); // token1
     expect(erc20NoteSpy.args[1][0].amountString).to.equal('0x200'); // token2
-    expect(rsp.error).to.be.undefined;
     expect(rsp.relayerFeeCommitment).to.be.undefined;
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
@@ -262,34 +260,36 @@ describe('tx-transfer', () => {
 
   it('Should error on gas estimates for invalid erc20 transfer', async () => {
     stubGasEstimateSuccess();
-    const rsp = await gasEstimateForUnprovenTransfer(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_MEMO,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
-      [], // nftAmountRecipients
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-    );
-    expect(rsp.error).to.equal('Invalid RAILGUN address.');
+    await expect(
+      gasEstimateForUnprovenTransfer(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_MEMO,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
+        [], // nftAmountRecipients
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+      ),
+    ).rejectedWith('Invalid RAILGUN address.');
   });
 
   it('Should error on transfer gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
-    const rsp = await gasEstimateForUnprovenTransfer(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_MEMO,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      [], // nftAmountRecipients
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-    );
-    expect(rsp.error).to.equal('test rejection - gas estimate');
+    await expect(
+      gasEstimateForUnprovenTransfer(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_MEMO,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS,
+        [], // nftAmountRecipients
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+      ),
+    ).rejectedWith('test rejection - gas estimate');
   });
 
   // TRANSFER NFT - GAS ESTIMATE
@@ -314,7 +314,6 @@ describe('tx-transfer', () => {
     expect(nftNoteSpy.args[1][0].tokenSubID).to.equal('0x02'); // nft2
     expect(nftNoteSpy.args[2][0].tokenSubID).to.equal('0x01'); // nft1
     expect(nftNoteSpy.args[3][0].tokenSubID).to.equal('0x02'); // nft2
-    expect(rsp.error).to.be.undefined;
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
       MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
@@ -341,7 +340,6 @@ describe('tx-transfer', () => {
     expect(nftNoteSpy.args.length).to.equal(2); // Number of calls (without relayer fees)
     expect(nftNoteSpy.args[0][0].tokenSubID).to.equal('0x01'); // nft1
     expect(nftNoteSpy.args[1][0].tokenSubID).to.equal('0x02'); // nft2
-    expect(rsp.error).to.be.undefined;
     expect(rsp.relayerFeeCommitment).to.be.undefined;
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
@@ -349,18 +347,19 @@ describe('tx-transfer', () => {
 
   it('Should error on gas estimates for invalid NFT transfer', async () => {
     stubGasEstimateSuccess();
-    const rsp = await gasEstimateForUnprovenTransfer(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_MEMO,
-      [], // erc20AmountRecipients
-      MOCK_NFT_AMOUNT_RECIPIENTS_INVALID,
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-    );
-    expect(rsp.error).to.equal('Invalid RAILGUN address.');
+    await expect(
+      gasEstimateForUnprovenTransfer(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_MEMO,
+        [], // erc20AmountRecipients
+        MOCK_NFT_AMOUNT_RECIPIENTS_INVALID,
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+      ),
+    ).rejectedWith('Invalid RAILGUN address.');
   });
 
   // TRANSFER ERC20 - PROVE AND SEND
@@ -370,7 +369,7 @@ describe('tx-transfer', () => {
     setCachedProvedTransaction(undefined);
     spyOnERC20Note();
     spyOnNFTNote();
-    const proofResponse = await generateTransferProof(
+    await generateTransferProof(
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -391,7 +390,6 @@ describe('tx-transfer', () => {
     expect(nftNoteSpy.args[0][0].nftAddress).to.equal(
       MOCK_NFT_AMOUNT_RECIPIENTS[0].nftAddress,
     );
-    expect(proofResponse.error).to.be.undefined;
     const populateResponse = await populateProvedTransfer(
       NetworkName.Polygon,
       railgunWallet.id,
@@ -404,7 +402,6 @@ describe('tx-transfer', () => {
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
-    expect(populateResponse.error).to.be.undefined;
     expect(populateResponse.serializedTransaction).to.equal(
       '0x01cc8080821000808080820123c0',
     );
@@ -433,26 +430,25 @@ describe('tx-transfer', () => {
   it('Should error on populate transfer tx for unproved transaction', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    const rsp = await populateProvedTransfer(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      false, // showSenderAddressToRecipient
-      MOCK_MEMO,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. No proof found.',
-    );
+    await expect(
+      populateProvedTransfer(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        false, // showSenderAddressToRecipient
+        MOCK_MEMO,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS,
+        MOCK_NFT_AMOUNT_RECIPIENTS,
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith('Invalid proof for this transaction. No proof found.');
   });
 
   it('Should error on populate transfer tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
-    const proofResponse = await generateTransferProof(
+    await generateTransferProof(
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -465,20 +461,20 @@ describe('tx-transfer', () => {
       overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
-    expect(proofResponse.error).to.be.undefined;
-    const rsp = await populateProvedTransfer(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      true, // showSenderAddressToRecipient
-      MOCK_MEMO,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
-      MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
+    await expect(
+      populateProvedTransfer(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        true, // showSenderAddressToRecipient
+        MOCK_MEMO,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
+        MOCK_NFT_AMOUNT_RECIPIENTS,
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });

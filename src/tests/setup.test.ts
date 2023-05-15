@@ -60,7 +60,7 @@ const testArtifactStore = new ArtifactStore(
 
 export const initTestEngine = (useNativeArtifacts = false) => {
   const shouldDebug = false;
-  const response = startRailgunEngine(
+  startRailgunEngine(
     TEST_WALLET_SOURCE,
     db,
     shouldDebug,
@@ -68,9 +68,6 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     useNativeArtifacts,
     false, // skipMerkletreeScans
   );
-  if (response.error) {
-    throw new Error(response.error);
-  }
 
   // TODO: Clear listeners when test engine is reset.
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);

@@ -1,5 +1,4 @@
 import {
-  RailgunProveTransactionResponse,
   RailgunERC20Amount,
   NetworkName,
   ProofType,
@@ -35,7 +34,7 @@ export const generateUnshieldProof = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
-): Promise<RailgunProveTransactionResponse> => {
+): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);
 
@@ -80,16 +79,11 @@ export const generateUnshieldProof = async (
       overallBatchMinGasPrice,
       nullifiers,
     });
-    return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       generateUnshieldProof.name,
       err,
     );
-    const railResponse: RailgunProveTransactionResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
   }
 };
 
@@ -103,7 +97,7 @@ export const generateUnshieldBaseTokenProof = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
-): Promise<RailgunProveTransactionResponse> => {
+): Promise<void> => {
   try {
     assertNotBlockedAddress(publicWalletAddress);
     assertValidEthAddress(publicWalletAddress);
@@ -209,15 +203,7 @@ export const generateUnshieldBaseTokenProof = async (
       overallBatchMinGasPrice,
       nullifiers,
     });
-    return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      generateUnshieldBaseTokenProof.name,
-      err,
-    );
-    const railResponse: RailgunProveTransactionResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
+    throw reportAndSanitizeError(generateUnshieldBaseTokenProof.name, err);
   }
 };

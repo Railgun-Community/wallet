@@ -11,7 +11,6 @@ import {
   TransactionHistoryUnshieldTokenAmount,
 } from '@railgun-community/engine';
 import {
-  LoadRailgunWalletResponse,
   TransactionHistorySerializedResponse,
   TransactionHistoryItem,
   RailgunERC20Amount,
@@ -254,9 +253,6 @@ export const getWalletTransactionHistory = async (
     };
   } catch (err) {
     reportAndSanitizeError(getWalletTransactionHistory.name, err);
-    const response: LoadRailgunWalletResponse = {
-      error: 'Could not load RAILGUN wallet transaction history.',
-    };
-    return response;
+    throw new Error('Could not load RAILGUN wallet transaction history.');
   }
 };

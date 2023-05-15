@@ -57,14 +57,7 @@ export const populateProvedUnshield = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      populateProvedUnshield.name,
-      err,
-    );
-    const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
+    throw reportAndSanitizeError(populateProvedUnshield.name, err);
   }
 };
 
@@ -116,14 +109,7 @@ export const populateProvedUnshieldBaseToken = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      populateProvedUnshieldBaseToken.name,
-      err,
-    );
-    const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
+    throw reportAndSanitizeError(populateProvedUnshieldBaseToken.name, err);
   }
 };
 
@@ -171,14 +157,7 @@ export const gasEstimateForUnprovenUnshield = async (
     );
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      gasEstimateForUnprovenUnshield.name,
-      err,
-    );
-    const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
+    throw reportAndSanitizeError(gasEstimateForUnprovenUnshield.name, err);
   }
 };
 
@@ -238,13 +217,9 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
     );
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       gasEstimateForUnprovenUnshieldBaseToken.name,
       err,
     );
-    const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
   }
 };

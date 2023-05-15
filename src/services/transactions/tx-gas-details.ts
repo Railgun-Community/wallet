@@ -123,14 +123,10 @@ export const gasEstimateResponseFromGasEstimate = (
     };
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       gasEstimateResponseFromGasEstimate.name,
       err,
     );
-    const response: RailgunTransactionGasEstimateResponse = {
-      error: sanitizedError.message,
-    };
-    return response;
   }
 };
 

@@ -218,7 +218,6 @@ describe('tx-cross-contract-calls', () => {
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
     );
-    expect(rsp.error).to.be.undefined;
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
       MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
@@ -312,7 +311,6 @@ describe('tx-cross-contract-calls', () => {
       true, // sendWithPublicWallet
     );
 
-    expect(rsp.error).to.be.undefined;
     expect(rsp.relayerFeeCommitment).to.be.undefined;
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
@@ -356,40 +354,40 @@ describe('tx-cross-contract-calls', () => {
 
   it('Should error on gas estimates for invalid cross contract calls', async () => {
     stubGasEstimateSuccess();
-    const rsp = await gasEstimateForUnprovenCrossContractCalls(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_TOKEN_AMOUNTS,
-      MOCK_NFT_AMOUNTS,
-      MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
-      MOCK_NFT_AMOUNTS,
-      ['abc'], // Invalid
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-    );
-    expect(rsp.error).to.include(
-      'Invalid cross-contract calls: invalid arrayify value',
-    );
+    await expect(
+      gasEstimateForUnprovenCrossContractCalls(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_TOKEN_AMOUNTS,
+        MOCK_NFT_AMOUNTS,
+        MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+        MOCK_NFT_AMOUNTS,
+        ['abc'], // Invalid
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+      ),
+    ).rejectedWith('Invalid cross-contract calls: invalid arrayify value');
   });
 
   it('Should error on cross contract calls gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
-    const rsp = await gasEstimateForUnprovenCrossContractCalls(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_TOKEN_AMOUNTS,
-      MOCK_NFT_AMOUNTS,
-      MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
-      MOCK_NFT_AMOUNTS,
-      mockCrossContractCallsSerialized,
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-    );
-    expect(rsp.error).to.equal(
+    await expect(
+      gasEstimateForUnprovenCrossContractCalls(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_TOKEN_AMOUNTS,
+        MOCK_NFT_AMOUNTS,
+        MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+        MOCK_NFT_AMOUNTS,
+        mockCrossContractCallsSerialized,
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+      ),
+    ).rejectedWith(
       'RelayAdapt multicall failed at index UNKNOWN with error: test rejection - gas estimate',
     );
   });
@@ -400,7 +398,7 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
     spyOnSetUnshield();
-    const proofResponse = await generateCrossContractCallsProof(
+    await generateCrossContractCallsProof(
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -414,7 +412,6 @@ describe('tx-cross-contract-calls', () => {
       overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
-    expect(proofResponse.error).to.be.undefined;
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [
@@ -495,7 +492,6 @@ describe('tx-cross-contract-calls', () => {
       overallBatchMinGasPrice,
       gasDetailsSerialized, // gasDetailsSerialized
     );
-    expect(populateResponse.error).to.be.undefined;
     expect(populateResponse.serializedTransaction).to.equal(
       '0x01cc8080821000808080820123c0',
     );
@@ -523,20 +519,21 @@ describe('tx-cross-contract-calls', () => {
 
   it('Should error on populate tx for invalid cross contract calls', async () => {
     stubGasEstimateSuccess();
-    const rsp = await populateProvedCrossContractCalls(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_TOKEN_AMOUNTS_DIFFERENT,
-      MOCK_NFT_AMOUNTS,
-      MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
-      MOCK_NFT_AMOUNTS,
-      ['123'], // Invalid
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
+    await expect(
+      populateProvedCrossContractCalls(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_TOKEN_AMOUNTS_DIFFERENT,
+        MOCK_NFT_AMOUNTS,
+        MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+        MOCK_NFT_AMOUNTS,
+        ['123'], // Invalid
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldERC20Amounts.',
     );
   });
@@ -544,27 +541,26 @@ describe('tx-cross-contract-calls', () => {
   it('Should error on populate cross contract calls tx for unproved transaction', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    const rsp = await populateProvedCrossContractCalls(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_TOKEN_AMOUNTS,
-      MOCK_NFT_AMOUNTS,
-      MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
-      MOCK_NFT_AMOUNTS,
-      mockCrossContractCallsSerialized,
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. No proof found.',
-    );
+    await expect(
+      populateProvedCrossContractCalls(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_TOKEN_AMOUNTS,
+        MOCK_NFT_AMOUNTS,
+        MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+        MOCK_NFT_AMOUNTS,
+        mockCrossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith('Invalid proof for this transaction. No proof found.');
   });
 
   it('Should error on populate cross contract calls tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
-    const proofResponse = await generateCrossContractCallsProof(
+    await generateCrossContractCallsProof(
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -578,21 +574,21 @@ describe('tx-cross-contract-calls', () => {
       overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
-    expect(proofResponse.error).to.be.undefined;
-    const rsp = await populateProvedCrossContractCalls(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_TOKEN_AMOUNTS_DIFFERENT,
-      MOCK_NFT_AMOUNTS,
-      MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
-      MOCK_NFT_AMOUNTS,
-      mockCrossContractCallsSerialized,
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
+    await expect(
+      populateProvedCrossContractCalls(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_TOKEN_AMOUNTS_DIFFERENT,
+        MOCK_NFT_AMOUNTS,
+        MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
+        MOCK_NFT_AMOUNTS,
+        mockCrossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldERC20Amounts.',
     );
   });

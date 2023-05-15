@@ -14,7 +14,6 @@ import {
   NetworkName,
   ProofType,
   RailgunNFTAmountRecipient,
-  RailgunProveTransactionResponse,
   RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 import { PopulatedTransaction } from '@ethersproject/contracts';
@@ -172,19 +171,17 @@ describe.skip('tx-proof-unshield', () => {
 
   it('Should prove unshield', async () => {
     const sendWithPublicWallet = false;
-    const response: RailgunProveTransactionResponse =
-      await generateUnshieldProof(
-        NetworkName.Hardhat,
-        railgunWallet.id,
-        MOCK_DB_ENCRYPTION_KEY,
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-        () => {}, // progressCallback
-      );
-    expect(response.error).to.equal(undefined, `Error: ${response.error}`);
+    await generateUnshieldProof(
+      NetworkName.Hardhat,
+      railgunWallet.id,
+      MOCK_DB_ENCRYPTION_KEY,
+      erc20AmountRecipients,
+      nftAmountRecipients,
+      relayerFeeERC20AmountRecipient,
+      sendWithPublicWallet,
+      overallBatchMinGasPrice,
+      () => {}, // progressCallback
+    );
     expect(getCachedProvedTransaction()).to.deep.equal({
       proofType: ProofType.Unshield,
       populatedTransaction: MOCK_POPULATED_TX,

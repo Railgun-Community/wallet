@@ -92,32 +92,33 @@ describe('tx-shield-base-token', () => {
       MOCK_TOKEN_AMOUNTS[0],
       MOCK_ETH_WALLET_ADDRESS,
     );
-    expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
 
   it('Should error on gas estimates for invalid shield base token', async () => {
     stubSuccess();
-    const rsp = await gasEstimateForShieldBaseToken(
-      NetworkName.Polygon,
-      '123456789',
-      shieldPrivateKey,
-      MOCK_TOKEN_AMOUNTS[0],
-      MOCK_ETH_WALLET_ADDRESS,
-    );
-    expect(rsp.error).to.equal('Invalid RAILGUN address.');
+    await expect(
+      gasEstimateForShieldBaseToken(
+        NetworkName.Polygon,
+        '123456789',
+        shieldPrivateKey,
+        MOCK_TOKEN_AMOUNTS[0],
+        MOCK_ETH_WALLET_ADDRESS,
+      ),
+    ).rejectedWith('Invalid RAILGUN address.');
   });
 
   it('Should error for ethers rejections', async () => {
     stubFailure();
-    const rsp = await gasEstimateForShieldBaseToken(
-      NetworkName.Polygon,
-      railgunAddress,
-      shieldPrivateKey,
-      MOCK_TOKEN_AMOUNTS[0],
-      MOCK_ETH_WALLET_ADDRESS,
-    );
-    expect(rsp.error).to.equal('test rejection - gas estimate');
+    await expect(
+      gasEstimateForShieldBaseToken(
+        NetworkName.Polygon,
+        railgunAddress,
+        shieldPrivateKey,
+        MOCK_TOKEN_AMOUNTS[0],
+        MOCK_ETH_WALLET_ADDRESS,
+      ),
+    ).rejectedWith('test rejection - gas estimate');
   });
 
   it('Should send tx for valid shield base token', async () => {
@@ -129,7 +130,6 @@ describe('tx-shield-base-token', () => {
       MOCK_TOKEN_AMOUNTS[0],
       gasDetailsSerialized,
     );
-    expect(rsp.error).to.be.undefined;
     const parsedTx = deserializeTransaction(
       rsp.serializedTransaction ?? '',
       2,
@@ -142,13 +142,14 @@ describe('tx-shield-base-token', () => {
 
   it('Should error on send tx for invalid shield base token', async () => {
     stubSuccess();
-    const rsp = await populateShieldBaseToken(
-      NetworkName.Polygon,
-      '123456789',
-      shieldPrivateKey,
-      MOCK_TOKEN_AMOUNTS[0],
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal('Invalid RAILGUN address.');
+    await expect(
+      populateShieldBaseToken(
+        NetworkName.Polygon,
+        '123456789',
+        shieldPrivateKey,
+        MOCK_TOKEN_AMOUNTS[0],
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith('Invalid RAILGUN address.');
   });
 });

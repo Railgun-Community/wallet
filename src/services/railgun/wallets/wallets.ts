@@ -16,7 +16,6 @@ import { getAddress } from '@ethersproject/address';
 import {
   RailgunWalletInfo,
   LoadRailgunWalletResponse,
-  UnloadRailgunWalletResponse,
   RailgunWalletAddressDataSerialized,
   NetworkName,
   NETWORK_CONFIG,
@@ -131,14 +130,10 @@ export const createRailgunWallet = async (
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       createRailgunWallet.name,
       err,
     );
-    const response: LoadRailgunWalletResponse = {
-      error: sanitizedError.message,
-    };
-    return response;
   }
 };
 
@@ -156,14 +151,7 @@ export const createViewOnlyRailgunWallet = async (
     const response: LoadRailgunWalletResponse = { railgunWalletInfo };
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      createViewOnlyRailgunWallet.name,
-      err,
-    );
-    const response: LoadRailgunWalletResponse = {
-      error: sanitizedError.message,
-    };
-    return response;
+    throw reportAndSanitizeError(createViewOnlyRailgunWallet.name, err);
   }
 };
 
@@ -182,27 +170,16 @@ export const loadWalletByID = async (
     return response;
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(loadWalletByID.name, err);
-    const response: LoadRailgunWalletResponse = {
-      error: `Could not load RAILGUN wallet: ${sanitizedError.message}`,
-    };
-    return response;
+    throw new Error(`Could not load RAILGUN wallet: ${sanitizedError.message}`);
   }
 };
 
-export const unloadWalletByID = (
-  railgunWalletID: string,
-): UnloadRailgunWalletResponse => {
+export const unloadWalletByID = (railgunWalletID: string): void => {
   try {
     const engine = getEngine();
     engine.unloadWallet(railgunWalletID);
-    const response: UnloadRailgunWalletResponse = {};
-    return response;
   } catch (err) {
-    reportAndSanitizeError(unloadWalletByID.name, err);
-    const response: UnloadRailgunWalletResponse = {
-      error: 'Could not unload RAILGUN wallet.',
-    };
-    return response;
+    throw new Error('Could not unload RAILGUN wallet.');
   }
 };
 
