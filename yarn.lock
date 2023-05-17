@@ -2291,10 +2291,9 @@
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
-"@railgun-community/shared-models@4.2.2":
+"@railgun-community/shared-models@github:railgun-community/shared-models#staltz/no-response-error-dist":
   version "4.2.2"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-4.2.2.tgz#61d108fa910d10581ab7ef594ae0d4d51b73fecd"
-  integrity sha512-jztN89eVnC8eOEPDnPX52bCMBL8nYT7/dvSk9jNhiWC7FEzk645BBG4P3ORL/5to/XW7aoLr5Vrn07gey5MzEQ==
+  resolved "https://codeload.github.com/railgun-community/shared-models/tar.gz/5ccd0f0e41626cf6f416f371983d50913d716373"
   dependencies:
     "@ethersproject/contracts" "^5.7.0"
     "@ethersproject/transactions" "^5.7.0"
