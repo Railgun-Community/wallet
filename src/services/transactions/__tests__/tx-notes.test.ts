@@ -27,6 +27,7 @@ import { fullWalletForID } from '../../railgun/core/engine';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import {
   compareERC20AmountRecipientArrays,
+  compareERC20AmountRecipients,
   erc20NoteFromERC20AmountRecipient,
 } from '../tx-notes';
 
@@ -252,5 +253,42 @@ describe('tx-notes', () => {
         erc20AmountRecipients5,
       ),
     ).to.be.false;
+  });
+
+  it.only('Should compare erc20 amount recipients', () => {
+    const sameA: RailgunERC20AmountRecipient[] = [
+      {
+        tokenAddress: '0x1234',
+        amountString: '100',
+        recipientAddress: 'hello',
+      },
+      {
+        tokenAddress: '0x1234',
+        amountString: '200',
+        recipientAddress: 'hello2',
+      },
+    ];
+    const sameB: RailgunERC20AmountRecipient[] = [
+      {
+        tokenAddress: '0x1234',
+        amountString: '200',
+        recipientAddress: 'hello2',
+      },
+      {
+        tokenAddress: '0x1234',
+        amountString: '100',
+        recipientAddress: 'hello',
+      },
+    ];
+    const differentC: RailgunERC20AmountRecipient[] = [
+      {
+        tokenAddress: '0x1234',
+        amountString: '100',
+        recipientAddress: 'hello',
+      },
+    ];
+
+    expect(compareERC20AmountRecipientArrays(sameA, sameB)).to.be.true;
+    expect(compareERC20AmountRecipientArrays(sameA, differentC)).to.be.false;
   });
 });

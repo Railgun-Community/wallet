@@ -151,14 +151,15 @@ export const compareERC20AmountRecipientArrays = (
     return false;
   }
   for (const erc20Amount of a) {
-    const found = b.find(ta => ta.tokenAddress === erc20Amount.tokenAddress);
+    const found = b.find(
+      ta =>
+        ta.tokenAddress === erc20Amount.tokenAddress &&
+        ta.recipientAddress === erc20Amount.recipientAddress,
+    );
     if (!found) {
       return false;
     }
     if (found.amountString !== erc20Amount.amountString) {
-      return false;
-    }
-    if (found.recipientAddress !== erc20Amount.recipientAddress) {
       return false;
     }
   }
