@@ -255,7 +255,7 @@ describe('tx-notes', () => {
     ).to.be.false;
   });
 
-  it.only('Should compare erc20 amount recipients', () => {
+  it('Should compare erc20 amount recipients', () => {
     const sameA: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '0x1234',
