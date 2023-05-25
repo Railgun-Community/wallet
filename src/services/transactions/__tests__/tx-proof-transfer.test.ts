@@ -14,7 +14,6 @@ import {
   NetworkName,
   ProofType,
   RailgunNFTAmountRecipient,
-  RailgunProveTransactionResponse,
   RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
 import { PopulatedTransaction } from '@ethersproject/contracts';
@@ -171,21 +170,19 @@ describe.skip('tx-proofs', () => {
 
   it('Should prove transfer', async () => {
     const sendWithPublicWallet = false;
-    const response: RailgunProveTransactionResponse =
-      await generateTransferProof(
-        NetworkName.Hardhat,
-        railgunWallet.id,
-        MOCK_DB_ENCRYPTION_KEY,
-        false, // showSenderAddressToRecipient
-        MOCK_MEMO,
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-        () => {}, // progressCallback
-      );
-    expect(response.error).to.equal(undefined, `Error: ${response.error}`);
+    await generateTransferProof(
+      NetworkName.Hardhat,
+      railgunWallet.id,
+      MOCK_DB_ENCRYPTION_KEY,
+      false, // showSenderAddressToRecipient
+      MOCK_MEMO,
+      erc20AmountRecipients,
+      nftAmountRecipients,
+      relayerFeeERC20AmountRecipient,
+      sendWithPublicWallet,
+      overallBatchMinGasPrice,
+      () => {}, // progressCallback
+    );
     expect(getCachedProvedTransaction()).to.deep.equal({
       proofType: ProofType.Transfer,
       populatedTransaction: MOCK_POPULATED_TX,

@@ -27,6 +27,7 @@ import { Contract } from '@ethersproject/contracts';
 import { getProviderForNetwork } from '../core/providers';
 import { sendErrorMessage, sendMessage } from '../../../utils';
 import { parseRailgunTokenAddress } from '../util';
+import { reportAndSanitizeError } from '../../../utils/error';
 
 type BoundParams = {
   // ...
@@ -201,10 +202,7 @@ const decryptReceiverNoteSafe = async (
     );
     return note;
   } catch (err) {
-    if (!(err instanceof Error)) {
-      throw err;
-    }
-    sendErrorMessage(`Decryption error: ${err.message}`);
+    reportAndSanitizeError(decryptReceiverNoteSafe.name, err);
     return undefined;
   }
 };

@@ -1,6 +1,5 @@
 import {
   RailgunPopulateTransactionResponse,
-  RailgunProveTransactionResponse,
   RailgunTransactionGasEstimateResponse,
   RailgunERC20Amount,
   TransactionGasDetailsSerialized,
@@ -174,14 +173,7 @@ export const populateProvedCrossContractCalls = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      populateProvedCrossContractCalls.name,
-      err,
-    );
-    const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
+    throw reportAndSanitizeError(populateProvedCrossContractCalls.name, err);
   }
 };
 
@@ -293,14 +285,10 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       gasEstimateForUnprovenCrossContractCalls.name,
       err,
     );
-    const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
   }
 };
 
@@ -317,7 +305,7 @@ export const generateCrossContractCallsProof = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
-): Promise<RailgunProveTransactionResponse> => {
+): Promise<void> => {
   try {
     const wallet = fullWalletForID(railgunWalletID);
 
@@ -434,16 +422,8 @@ export const generateCrossContractCallsProof = async (
       overallBatchMinGasPrice,
       nullifiers,
     });
-    return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      generateCrossContractCallsProof.name,
-      err,
-    );
-    const railResponse: RailgunProveTransactionResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
+    throw reportAndSanitizeError(generateCrossContractCallsProof.name, err);
   }
 };
 
@@ -459,8 +439,7 @@ export const getRelayAdaptTransactionError = (
     }
     return undefined;
   } catch (err) {
-    reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
-    throw err;
+    throw reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
   }
 };
 
@@ -473,7 +452,6 @@ export const parseRelayAdaptReturnValue = (data: string): Optional<string> => {
     }
     return undefined;
   } catch (err) {
-    reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
-    throw err;
+    throw reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
   }
 };

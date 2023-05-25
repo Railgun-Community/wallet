@@ -118,32 +118,33 @@ describe('tx-shield', () => {
       MOCK_NFT_AMOUNT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
-    expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
 
   it('Should error on gas estimates for invalid shield', async () => {
     stubSuccess();
-    const rsp = await gasEstimateForShield(
-      NetworkName.Polygon,
-      shieldPrivateKey,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
-      MOCK_NFT_AMOUNT_RECIPIENTS,
-      MOCK_ETH_WALLET_ADDRESS,
-    );
-    expect(rsp.error).to.equal('Invalid RAILGUN address.');
+    await expect(
+      gasEstimateForShield(
+        NetworkName.Polygon,
+        shieldPrivateKey,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
+        MOCK_NFT_AMOUNT_RECIPIENTS,
+        MOCK_ETH_WALLET_ADDRESS,
+      ),
+    ).rejectedWith('Invalid RAILGUN address.');
   });
 
   it('Should error for ethers rejections', async () => {
     stubFailure();
-    const rsp = await gasEstimateForShield(
-      NetworkName.Polygon,
-      shieldPrivateKey,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      MOCK_NFT_AMOUNT_RECIPIENTS,
-      MOCK_ETH_WALLET_ADDRESS,
-    );
-    expect(rsp.error).to.equal('test rejection - gas estimate');
+    await expect(
+      gasEstimateForShield(
+        NetworkName.Polygon,
+        shieldPrivateKey,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS,
+        MOCK_NFT_AMOUNT_RECIPIENTS,
+        MOCK_ETH_WALLET_ADDRESS,
+      ),
+    ).rejectedWith('test rejection - gas estimate');
   });
 
   it('Should send tx for valid shield - no gas details', async () => {
@@ -155,7 +156,6 @@ describe('tx-shield', () => {
       MOCK_NFT_AMOUNT_RECIPIENTS,
       undefined, // gasDetailsSerialized
     );
-    expect(rsp.error).to.be.undefined;
     const parsedTx = deserializeTransaction(
       rsp.serializedTransaction ?? '',
       2,
@@ -179,7 +179,6 @@ describe('tx-shield', () => {
       MOCK_NFT_AMOUNT_RECIPIENTS,
       gasDetailsSerialized,
     );
-    expect(rsp.error).to.be.undefined;
     const parsedTx = deserializeTransaction(
       rsp.serializedTransaction ?? '',
       2,
@@ -200,13 +199,14 @@ describe('tx-shield', () => {
 
   it('Should error on send tx for invalid shield', async () => {
     stubSuccess();
-    const rsp = await populateShield(
-      NetworkName.Polygon,
-      shieldPrivateKey,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
-      MOCK_NFT_AMOUNT_RECIPIENTS,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal('Invalid RAILGUN address.');
+    await expect(
+      populateShield(
+        NetworkName.Polygon,
+        shieldPrivateKey,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
+        MOCK_NFT_AMOUNT_RECIPIENTS,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith('Invalid RAILGUN address.');
   });
 });

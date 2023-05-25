@@ -1,5 +1,4 @@
 import {
-  RailgunProveTransactionResponse,
   NetworkName,
   ProofType,
   RailgunERC20AmountRecipient,
@@ -26,7 +25,7 @@ export const generateTransferProof = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
   progressCallback: ProverProgressCallback,
-): Promise<RailgunProveTransactionResponse> => {
+): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);
 
@@ -71,15 +70,10 @@ export const generateTransferProof = async (
       overallBatchMinGasPrice,
       nullifiers,
     });
-    return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       generateTransferProof.name,
       err,
     );
-    const railResponse: RailgunProveTransactionResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
   }
 };

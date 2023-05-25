@@ -61,7 +61,6 @@ describe('tx-gas', () => {
 
     expect(gasEstimateStub.callCount).to.equal(1);
 
-    expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
   });
 
@@ -88,7 +87,6 @@ describe('tx-gas', () => {
       undefined, // relayerFeeCommitment
       isGasEstimateWithDummyProof,
     );
-    expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.not.be.undefined;
   }).timeout(10000);
 
@@ -115,7 +113,6 @@ describe('tx-gas', () => {
       {} as CommitmentSummary,
       isGasEstimateWithDummyProof,
     );
-    expect(rsp.error).to.be.undefined;
     expect(rsp.gasEstimateString).to.not.be.undefined;
   }).timeout(10000);
 

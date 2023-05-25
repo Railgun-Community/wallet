@@ -57,14 +57,10 @@ export const populateProvedTransfer = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       populateProvedTransfer.name,
       err,
     );
-    const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
   }
 };
 
@@ -113,13 +109,9 @@ export const gasEstimateForUnprovenTransfer = async (
     );
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
+    throw reportAndSanitizeError(
       gasEstimateForUnprovenTransfer.name,
       err,
     );
-    const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
   }
 };

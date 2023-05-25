@@ -230,7 +230,6 @@ describe('tx-unshield', () => {
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
     );
-    expect(rsp.error).to.be.undefined;
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
       MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
@@ -276,32 +275,34 @@ describe('tx-unshield', () => {
 
   it('Should error on gas estimates for invalid Unshield', async () => {
     stubGasEstimateSuccess();
-    const rsp = await gasEstimateForUnprovenUnshield(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
-      [], // nftAmountRecipients
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-    );
-    expect(rsp.error).to.equal('Invalid wallet address.');
+    await expect(
+      gasEstimateForUnprovenUnshield(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
+        [], // nftAmountRecipients
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+      ),
+    ).rejectedWith('Invalid wallet address.');
   });
 
   it('Should error on unshield gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
-    const rsp = await gasEstimateForUnprovenUnshield(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      [], // nftAmountRecipients
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-    );
-    expect(rsp.error).to.equal('test rejection - gas estimate');
+    await expect(
+      gasEstimateForUnprovenUnshield(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS,
+        [], // nftAmountRecipients
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+      ),
+    ).rejectedWith('test rejection - gas estimate');
   });
 
   // WITHDRAW BASE TOKEN - GAS ESTIMATE
@@ -319,7 +320,6 @@ describe('tx-unshield', () => {
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
     );
-    expect(rsp.error).to.be.undefined;
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
       MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
@@ -360,7 +360,6 @@ describe('tx-unshield', () => {
       MOCK_FEE_TOKEN_DETAILS,
       true, // sendWithPublicWallet
     );
-    expect(rsp.error).to.be.undefined;
     expect(rsp.relayerFeeCommitment).to.be.undefined;
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
@@ -379,32 +378,34 @@ describe('tx-unshield', () => {
 
   it('Should error on gas estimates for invalid Unshield base token', async () => {
     stubGasEstimateSuccess();
-    const rsp = await gasEstimateForUnprovenUnshieldBaseToken(
-      NetworkName.Polygon,
-      MOCK_RAILGUN_WALLET_ADDRESS,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_TOKEN_AMOUNTS[0],
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-    );
-    expect(rsp.error).to.equal('Invalid wallet address.');
+    await expect(
+      gasEstimateForUnprovenUnshieldBaseToken(
+        NetworkName.Polygon,
+        MOCK_RAILGUN_WALLET_ADDRESS,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_TOKEN_AMOUNTS[0],
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+      ),
+    ).rejectedWith('Invalid wallet address.');
   });
 
   it('Should error on unshield base token gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
-    const rsp = await gasEstimateForUnprovenUnshieldBaseToken(
-      NetworkName.Polygon,
-      MOCK_ETH_WALLET_ADDRESS,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_TOKEN_AMOUNTS[0],
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-    );
-    expect(rsp.error).to.equal('test rejection - gas estimate');
+    await expect(
+      gasEstimateForUnprovenUnshieldBaseToken(
+        NetworkName.Polygon,
+        MOCK_ETH_WALLET_ADDRESS,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_TOKEN_AMOUNTS[0],
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+      ),
+    ).rejectedWith('test rejection - gas estimate');
   });
 
   // WITHDRAW - PROVE AND SEND
@@ -413,7 +414,7 @@ describe('tx-unshield', () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
     spyOnSetUnshield();
-    const proofResponse = await generateUnshieldProof(
+    await generateUnshieldProof(
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -424,7 +425,6 @@ describe('tx-unshield', () => {
       overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
-    expect(proofResponse.error).to.be.undefined;
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [
@@ -470,7 +470,6 @@ describe('tx-unshield', () => {
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
-    expect(populateResponse.error).to.be.undefined;
     expect(populateResponse.serializedTransaction).to.equal(
       '0x01cc8080821000808080820123c0',
     );
@@ -498,17 +497,18 @@ describe('tx-unshield', () => {
 
   it('Should error on populate tx for invalid Unshield', async () => {
     stubGasEstimateSuccess();
-    const rsp = await populateProvedUnshield(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
-      MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
+    await expect(
+      populateProvedUnshield(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
+        MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });
@@ -516,24 +516,23 @@ describe('tx-unshield', () => {
   it('Should error on populate unshield tx for unproved transaction', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    const rsp = await populateProvedUnshield(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS,
-      [], // nftAmountRecipients
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. No proof found.',
-    );
+    await expect(
+      populateProvedUnshield(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS,
+        [], // nftAmountRecipients
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith('Invalid proof for this transaction. No proof found.');
   });
 
   it('Should error on populate unshield tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
-    const proofResponse = await generateUnshieldProof(
+    await generateUnshieldProof(
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -544,18 +543,18 @@ describe('tx-unshield', () => {
       overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
-    expect(proofResponse.error).to.be.undefined;
-    const rsp = await populateProvedUnshield(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
-      [], // nftAmountRecipients
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
+    await expect(
+      populateProvedUnshield(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
+        [], // nftAmountRecipients
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });
@@ -566,7 +565,7 @@ describe('tx-unshield', () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
     spyOnSetUnshield();
-    const proofResponse = await generateUnshieldBaseTokenProof(
+    await generateUnshieldBaseTokenProof(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -577,7 +576,6 @@ describe('tx-unshield', () => {
       overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
-    expect(proofResponse.error).to.be.undefined;
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [
@@ -607,7 +605,6 @@ describe('tx-unshield', () => {
       overallBatchMinGasPrice,
       gasDetailsSerialized,
     );
-    expect(populateResponse.error).to.be.undefined;
     expect(populateResponse.serializedTransaction).to.equal(
       '0x01cc8080821000808080820123c0',
     );
@@ -631,17 +628,18 @@ describe('tx-unshield', () => {
 
   it('Should error on populate tx for invalid Unshield Base Token', async () => {
     stubGasEstimateSuccess();
-    const rsp = await populateProvedUnshieldBaseToken(
-      NetworkName.Polygon,
-      MOCK_ETH_WALLET_ADDRESS,
-      railgunWallet.id,
-      MOCK_TOKEN_AMOUNTS_DIFFERENT[0],
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
+    await expect(
+      populateProvedUnshieldBaseToken(
+        NetworkName.Polygon,
+        MOCK_ETH_WALLET_ADDRESS,
+        railgunWallet.id,
+        MOCK_TOKEN_AMOUNTS_DIFFERENT[0],
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });
@@ -649,24 +647,23 @@ describe('tx-unshield', () => {
   it('Should error on populate Unshield Base Token tx for unproved transaction', async () => {
     stubGasEstimateSuccess();
     setCachedProvedTransaction(undefined);
-    const rsp = await populateProvedUnshieldBaseToken(
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_ETH_WALLET_ADDRESS,
-      MOCK_TOKEN_AMOUNTS[0],
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
-      'Invalid proof for this transaction. No proof found.',
-    );
+    await expect(
+      populateProvedUnshieldBaseToken(
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_ETH_WALLET_ADDRESS,
+        MOCK_TOKEN_AMOUNTS[0],
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith('Invalid proof for this transaction. No proof found.');
   });
 
   it('Should error on populate Unshield Base Token tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
-    const proofResponse = await generateUnshieldBaseTokenProof(
+    await generateUnshieldBaseTokenProof(
       NetworkName.Polygon,
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
@@ -677,18 +674,18 @@ describe('tx-unshield', () => {
       overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
-    expect(proofResponse.error).to.be.undefined;
-    const rsp = await populateProvedUnshieldBaseToken(
-      NetworkName.Polygon,
-      MOCK_ETH_WALLET_ADDRESS,
-      railgunWallet.id,
-      MOCK_TOKEN_AMOUNTS_DIFFERENT[0],
-      relayerFeeERC20AmountRecipient,
-      false, // sendWithPublicWallet
-      overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(rsp.error).to.equal(
+    await expect(
+      populateProvedUnshieldBaseToken(
+        NetworkName.Polygon,
+        MOCK_ETH_WALLET_ADDRESS,
+        railgunWallet.id,
+        MOCK_TOKEN_AMOUNTS_DIFFERENT[0],
+        relayerFeeERC20AmountRecipient,
+        false, // sendWithPublicWallet
+        overallBatchMinGasPrice,
+        gasDetailsSerialized,
+      ),
+    ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });

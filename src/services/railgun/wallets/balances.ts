@@ -1,8 +1,5 @@
 import { Chain } from '@railgun-community/engine';
-import {
-  RailgunBalanceRefreshTrigger,
-  RailgunBalanceResponse,
-} from '@railgun-community/shared-models';
+import { RailgunBalanceRefreshTrigger } from '@railgun-community/shared-models';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { getEngine, walletForID } from '../core/engine';
 
@@ -11,7 +8,7 @@ export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
   railgunWalletID: string,
   fullRescan: boolean,
   progressCallback?: (progress: number) => void,
-): Promise<RailgunBalanceResponse> => {
+): Promise<void> => {
   try {
     const wallet = walletForID(railgunWalletID);
     if (fullRescan) {
@@ -28,55 +25,36 @@ export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
     // So the user will see balances refresh from existing merkletree first.
     const engine = getEngine();
     await engine.scanHistory(chain);
-
-    return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      refreshRailgunBalances.name,
-      err,
-    );
-    const response: RailgunBalanceResponse = { error: sanitizedError.message };
-    return response;
+    throw reportAndSanitizeError(refreshRailgunBalances.name, err);
   }
 };
 
 export const scanUpdatesForMerkletreeAndWallets = async (
   chain: Chain,
-): Promise<RailgunBalanceResponse> => {
+): Promise<void> => {
   try {
     const engine = getEngine();
     await engine.scanHistory(chain);
 
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
     // which calls `onBalancesUpdate` (balance-update.ts).
-    return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      scanUpdatesForMerkletreeAndWallets.name,
-      err,
-    );
-    const response: RailgunBalanceResponse = { error: sanitizedError.message };
-    return response;
+    throw reportAndSanitizeError(scanUpdatesForMerkletreeAndWallets.name, err);
   }
 };
 
 export const rescanFullMerkletreesAndWallets = async (
   chain: Chain,
-): Promise<RailgunBalanceResponse> => {
+): Promise<void> => {
   try {
     const engine = getEngine();
     await engine.fullRescanMerkletreesAndWallets(chain);
 
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
     // which calls `onBalancesUpdate` (balance-update.ts).
-    return {};
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      rescanFullMerkletreesAndWallets.name,
-      err,
-    );
-    const response: RailgunBalanceResponse = { error: sanitizedError.message };
-    return response;
+    throw reportAndSanitizeError(rescanFullMerkletreesAndWallets.name, err);
   }
 };
 

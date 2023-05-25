@@ -138,27 +138,21 @@ describe('extract-first-note', () => {
     initTestEngine();
     engine = getEngine();
 
-    const { railgunWalletInfo, error } = await createRailgunWallet(
+    const { railgunWalletInfo } = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_1,
       undefined,
     );
-    if (error) {
-      throw new Error(error);
-    }
     if (!railgunWalletInfo) {
       throw new Error('No railgun wallet created');
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
 
-    const response = await loadProvider(
+    await loadProvider(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
       GOERLI_NETWORK.name,
       false, // shouldDebug
     );
-    if (response.error) {
-      throw new Error(response.error);
-    }
 
     const provider = getProviderForNetwork(GOERLI_NETWORK.name);
 

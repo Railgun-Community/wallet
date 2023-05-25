@@ -77,7 +77,7 @@ describe('balances', () => {
       knownWalletID,
       fullRescan,
     );
-    expect(response).to.deep.equal({});
+    expect(response).to.be.undefined;
     expect(walletScanStub.calledOnce).to.be.true;
     expect(engineScanStub.calledOnce).to.be.true;
   });
@@ -85,10 +85,9 @@ describe('balances', () => {
   it('Should throw if no active wallet for ID', async () => {
     const fullRescan = false;
     const chain: Chain = { type: ChainType.EVM, id: 1 };
-    const response = await refreshRailgunBalances(chain, 'unknown', fullRescan);
-    expect(response).to.deep.equal({
-      error: 'No RAILGUN wallet for ID',
-    });
+    await expect(
+      refreshRailgunBalances(chain, 'unknown', fullRescan),
+    ).rejectedWith('No RAILGUN wallet for ID');
     expect(walletScanStub.notCalled).to.be.true;
     expect(engineScanStub.notCalled).to.be.true;
   });
@@ -96,14 +95,14 @@ describe('balances', () => {
   it('Should scan for updates to merkletree and wallets', async () => {
     const chain: Chain = { type: ChainType.EVM, id: 1 };
     const response = await scanUpdatesForMerkletreeAndWallets(chain);
-    expect(response).to.deep.equal({});
+    expect(response).to.be.undefined;
     expect(engineScanStub.calledOnce).to.be.true;
   });
 
   it('Should run full rescan of merkletree and wallets', async () => {
     const chain: Chain = { type: ChainType.EVM, id: 1 };
     const response = await rescanFullMerkletreesAndWallets(chain);
-    expect(response).to.deep.equal({});
+    expect(response).to.be.undefined;
     expect(engineFullScanStub.calledOnce).to.be.true;
   });
 });

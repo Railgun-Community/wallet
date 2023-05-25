@@ -36,7 +36,6 @@ describe('providers', () => {
       NetworkName.PolygonMumbai,
       shouldDebug,
     );
-    expect(response.error).to.be.undefined;
     expect(response.feesSerialized).to.deep.equal({
       shield: '0x19',
       nft: '0x19',
@@ -85,12 +84,13 @@ describe('providers', () => {
 
   it('Should fail with invalid json', async () => {
     const shouldDebug = true;
-    const response = await loadProvider(
-      {} as FallbackProviderJsonConfig,
-      NetworkName.BNBChain,
-      shouldDebug,
-    );
-    expect(response.error).to.equal(
+    await expect(
+      loadProvider(
+        {} as FallbackProviderJsonConfig,
+        NetworkName.BNBChain,
+        shouldDebug,
+      ),
+    ).rejectedWith(
       'Invalid fallback provider config: Cannot read properties of undefined (reading map)',
     );
   });

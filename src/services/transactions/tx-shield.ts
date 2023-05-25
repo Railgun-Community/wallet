@@ -147,11 +147,7 @@ export const populateShield = async (
       serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
     };
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(populateShield.name, err);
-    const railResponse: RailgunPopulateTransactionResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
+    throw reportAndSanitizeError(populateShield.name, err);
   }
 };
 
@@ -186,13 +182,6 @@ export const gasEstimateForShield = async (
       isGasEstimateWithDummyProof,
     );
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      gasEstimateForShield.name,
-      err,
-    );
-    const railResponse: RailgunTransactionGasEstimateResponse = {
-      error: sanitizedError.message,
-    };
-    return railResponse;
+    throw reportAndSanitizeError(gasEstimateForShield.name, err);
   }
 };

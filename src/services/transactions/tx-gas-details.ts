@@ -16,7 +16,6 @@ import {
   GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION,
   RelayAdaptContract,
 } from '@railgun-community/engine';
-import { sendErrorMessage } from '../../utils';
 
 export const getGasEstimate = async (
   networkName: NetworkName,
@@ -49,12 +48,7 @@ export const getGasEstimate = async (
     );
     return gasEstimate;
   } catch (err) {
-    if (!(err instanceof Error)) {
-      throw err;
-    }
-    sendErrorMessage(err);
-    reportAndSanitizeError(getGasEstimate.name, err);
-    throw err;
+    throw reportAndSanitizeError(getGasEstimate.name, err);
   }
 };
 
@@ -123,14 +117,7 @@ export const gasEstimateResponseFromGasEstimate = (
     };
     return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      gasEstimateResponseFromGasEstimate.name,
-      err,
-    );
-    const response: RailgunTransactionGasEstimateResponse = {
-      error: sanitizedError.message,
-    };
-    return response;
+    throw reportAndSanitizeError(gasEstimateResponseFromGasEstimate.name, err);
   }
 };
 

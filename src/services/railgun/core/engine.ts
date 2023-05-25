@@ -10,7 +10,6 @@ import {
 } from '@railgun-community/engine';
 import {
   MerkletreeScanUpdateEvent,
-  StartRailgunEngineResponse,
   MerkletreeScanStatus,
 } from '@railgun-community/shared-models';
 import { sendErrorMessage, sendMessage } from '../../../utils/logger';
@@ -127,11 +126,8 @@ export const startRailgunEngine = (
   artifactStore: ArtifactStore,
   useNativeArtifacts: boolean,
   skipMerkletreeScans: boolean,
-): StartRailgunEngineResponse => {
-  if (engine) {
-    const response: StartRailgunEngineResponse = {};
-    return response;
-  }
+): void => {
+  if (engine) return
   try {
     engine = new RailgunEngine(
       walletSource,
@@ -143,15 +139,8 @@ export const startRailgunEngine = (
     );
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(useNativeArtifacts);
-
-    const response: StartRailgunEngineResponse = {};
-    return response;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(startRailgunEngine.name, err);
-    const response: StartRailgunEngineResponse = {
-      error: sanitizedError.message,
-    };
-    return response;
+    throw reportAndSanitizeError(startRailgunEngine.name, err);
   }
 };
 
