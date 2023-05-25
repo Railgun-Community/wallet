@@ -107,8 +107,7 @@ export class ArtifactDownloader {
 
       return path;
     } catch (err) {
-      reportAndSanitizeError(this.downloadArtifact.name, err);
-      throw err;
+      throw reportAndSanitizeError(this.downloadArtifact.name, err);
     }
   };
 

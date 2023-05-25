@@ -439,8 +439,7 @@ export const getRelayAdaptTransactionError = (
     }
     return undefined;
   } catch (err) {
-    reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
-    throw err;
+    throw reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
   }
 };
 
@@ -453,7 +452,6 @@ export const parseRelayAdaptReturnValue = (data: string): Optional<string> => {
     }
     return undefined;
   } catch (err) {
-    reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
-    throw err;
+    throw reportAndSanitizeError(getRelayAdaptTransactionError.name, err);
   }
 };
