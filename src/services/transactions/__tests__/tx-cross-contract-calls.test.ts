@@ -141,7 +141,7 @@ describe('tx-cross-contract-calls', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
-    const { railgunWalletInfo } = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
@@ -151,7 +151,7 @@ describe('tx-cross-contract-calls', () => {
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
 
-    const { railgunWalletInfo: relayerWalletInfo } = await createRailgunWallet(
+    const relayerWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers

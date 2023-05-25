@@ -199,7 +199,7 @@ describe('transaction-history', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
-    const { railgunWalletInfo } = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
       { [NetworkName.Ethereum]: 0, [NetworkName.Polygon]: 2 }, // creationBlockNumbers

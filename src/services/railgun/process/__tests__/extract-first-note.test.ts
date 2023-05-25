@@ -138,7 +138,7 @@ describe('extract-first-note', () => {
     initTestEngine();
     engine = getEngine();
 
-    const { railgunWalletInfo } = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_1,
       undefined,

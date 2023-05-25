@@ -91,14 +91,11 @@ describe('tx-shield', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
-    const railgunWalletResponse = await createRailgunWallet(
+    await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!railgunWalletResponse.railgunWalletInfo) {
-      throw new Error('No railgun wallet created.');
-    }
   });
   afterEach(() => {
     gasEstimateStub?.restore();

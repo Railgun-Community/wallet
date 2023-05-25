@@ -63,15 +63,13 @@ describe('tx-shield-base-token', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
-    const railgunWalletResponse = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!railgunWalletResponse.railgunWalletInfo) {
-      throw new Error('No railgun wallet created.');
-    }
-    railgunAddress = railgunWalletResponse.railgunWalletInfo.railgunAddress;
+
+    railgunAddress = railgunWalletInfo.railgunAddress;
     relayAdaptPopulateShieldBaseToken = Sinon.stub(
       RelayAdaptContract.prototype,
       'populateShieldBaseToken',

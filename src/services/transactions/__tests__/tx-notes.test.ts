@@ -27,7 +27,6 @@ import { fullWalletForID } from '../../railgun/core/engine';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import {
   compareERC20AmountRecipientArrays,
-  compareERC20AmountRecipients,
   erc20NoteFromERC20AmountRecipient,
 } from '../tx-notes';
 
@@ -51,15 +50,12 @@ describe('tx-notes', () => {
     this.timeout(10000);
     initTestEngine();
     await initTestEngineNetwork();
-    const railgunWalletResponse = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!railgunWalletResponse.railgunWalletInfo) {
-      throw new Error('No railgun wallet created.');
-    }
-    railgunWalletID = railgunWalletResponse.railgunWalletInfo.id;
+    railgunWalletID = railgunWalletInfo.id;
   });
 
   it('Should test erc20 note creation', () => {

@@ -53,7 +53,7 @@ describe.skip('tx-proof-unshield', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
-    const { railgunWalletInfo } = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
@@ -74,7 +74,7 @@ describe.skip('tx-proof-unshield', () => {
     );
     nftAmountRecipients = MOCK_NFT_AMOUNT_RECIPIENTS;
 
-    const { railgunWalletInfo: relayerWalletInfo } = await createRailgunWallet(
+    const relayerWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers

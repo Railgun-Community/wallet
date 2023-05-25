@@ -68,7 +68,7 @@ describe('providers', () => {
     ).to.throw;
 
     // Check that new wallet has merkletree.
-    const { railgunWalletInfo } = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_PROVIDERS_ONLY,
       undefined, // creationBlockNumbers

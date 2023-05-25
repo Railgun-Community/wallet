@@ -37,7 +37,7 @@ describe('wallets', () => {
   before(async () => {
     initTestEngine();
     await initTestEngineNetwork();
-    const { railgunWalletInfo } = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
       { [NetworkName.Ethereum]: 0, [NetworkName.Polygon]: 2 }, // creationBlockNumbers
@@ -49,7 +49,7 @@ describe('wallets', () => {
   });
 
   it('Should create view only wallet', async () => {
-    const { railgunWalletInfo } = await createViewOnlyRailgunWallet(
+    const railgunWalletInfo = await createViewOnlyRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       await wallet.generateShareableViewingKey(),
       undefined, // creationBlockNumbers
@@ -82,42 +82,34 @@ describe('wallets', () => {
   });
 
   it('Should create and load wallet from valid mnemonic', async () => {
-    const response = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
       undefined, // creationBlockNumbers
     );
-    expect(response.railgunWalletInfo).to.not.be.undefined;
-    expect(response.railgunWalletInfo?.id).to.be.a('string');
-    expect(response.railgunWalletInfo?.railgunAddress).to.be.a('string');
-    expect(response.railgunWalletInfo?.id).to.equal(wallet.id);
+    expect(railgunWalletInfo.railgunAddress).to.be.a('string');
+    expect(railgunWalletInfo.id).to.equal(wallet.id);
 
-    const loadWalletResponse = await loadWalletByID(
+    const loadWalletInfo = await loadWalletByID(
       MOCK_DB_ENCRYPTION_KEY,
-      response.railgunWalletInfo?.id ?? '',
+      railgunWalletInfo.id,
       false, // isViewOnlyWallet
     );
-    expect(loadWalletResponse.railgunWalletInfo).to.not.be.undefined;
-    expect(loadWalletResponse.railgunWalletInfo?.id).to.equal(
-      response.railgunWalletInfo?.id,
-    );
-    expect(loadWalletResponse.railgunWalletInfo?.railgunAddress).to.equal(
-      response.railgunWalletInfo?.railgunAddress,
-    );
+    expect(loadWalletInfo.railgunAddress).to.be.a('string');
+    expect(loadWalletInfo.id).to.equal(wallet.id);
   });
 
   it('Should load wallet from db after Engine wallet unload', async () => {
     expect(Object.keys(getEngine().wallets)).to.include(wallet.id);
     unloadWalletByID(wallet.id);
     expect(Object.keys(getEngine().wallets)).to.not.include(wallet.id);
-    const loadWalletResponse = await loadWalletByID(
+    const railgunWalletInfo = await loadWalletByID(
       MOCK_DB_ENCRYPTION_KEY,
       wallet.id,
       false, // isViewOnlyWallet
     );
-    expect(loadWalletResponse.railgunWalletInfo).to.not.be.undefined;
-    expect(loadWalletResponse.railgunWalletInfo?.id).to.equal(wallet.id);
-    expect(loadWalletResponse.railgunWalletInfo?.railgunAddress).to.equal(
+    expect(railgunWalletInfo.id).to.equal(wallet.id);
+    expect(railgunWalletInfo.railgunAddress).to.equal(
       wallet.getAddress(undefined),
     );
   });

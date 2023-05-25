@@ -15,7 +15,6 @@ import {
 import { getAddress } from '@ethersproject/address';
 import {
   RailgunWalletInfo,
-  LoadRailgunWalletResponse,
   RailgunWalletAddressDataSerialized,
   NetworkName,
   NETWORK_CONFIG,
@@ -120,20 +119,11 @@ export const createRailgunWallet = async (
   encryptionKey: string,
   mnemonic: string,
   creationBlockNumbers: Optional<MapType<number>>,
-): Promise<LoadRailgunWalletResponse> => {
+): Promise<RailgunWalletInfo> => {
   try {
-    const railgunWalletInfo = await createWallet(
-      encryptionKey,
-      mnemonic,
-      creationBlockNumbers,
-    );
-    const response: LoadRailgunWalletResponse = { railgunWalletInfo };
-    return response;
+    return await createWallet(encryptionKey, mnemonic, creationBlockNumbers);
   } catch (err) {
-    throw reportAndSanitizeError(
-      createRailgunWallet.name,
-      err,
-    );
+    throw reportAndSanitizeError(createRailgunWallet.name, err);
   }
 };
 
@@ -141,15 +131,13 @@ export const createViewOnlyRailgunWallet = async (
   encryptionKey: string,
   shareableViewingKey: string,
   creationBlockNumbers: Optional<MapType<number>>,
-): Promise<LoadRailgunWalletResponse> => {
+): Promise<RailgunWalletInfo> => {
   try {
-    const railgunWalletInfo = await createViewOnlyWallet(
+    return await createViewOnlyWallet(
       encryptionKey,
       shareableViewingKey,
       creationBlockNumbers,
     );
-    const response: LoadRailgunWalletResponse = { railgunWalletInfo };
-    return response;
   } catch (err) {
     throw reportAndSanitizeError(createViewOnlyRailgunWallet.name, err);
   }
@@ -159,15 +147,13 @@ export const loadWalletByID = async (
   encryptionKey: string,
   railgunWalletID: string,
   isViewOnlyWallet: boolean,
-): Promise<LoadRailgunWalletResponse> => {
+): Promise<RailgunWalletInfo> => {
   try {
-    const railgunWalletInfo = await loadExistingWallet(
+    return await loadExistingWallet(
       encryptionKey,
       railgunWalletID,
       isViewOnlyWallet,
     );
-    const response: LoadRailgunWalletResponse = { railgunWalletInfo };
-    return response;
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(loadWalletByID.name, err);
     throw new Error(`Could not load RAILGUN wallet: ${sanitizedError.message}`);

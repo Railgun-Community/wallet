@@ -27,7 +27,7 @@ let knownWalletID: string;
 describe('balances', () => {
   before(async () => {
     initTestEngine();
-    const { railgunWalletInfo } = await createRailgunWallet(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
