@@ -6,11 +6,9 @@ import {
   RailgunERC20Amount,
   RailgunERC20AmountRecipient,
   TransactionGasDetailsSerialized,
-  ValidateCachedProvedTransactionResponse,
   RailgunNFTAmount,
 } from '@railgun-community/shared-models';
 import { shouldSetOverallBatchMinGasPriceForNetwork } from '../../utils/gas-price';
-import { sendErrorMessage } from '../../utils/logger';
 import { compareStringArrays } from '../../utils/utils';
 import { setGasDetailsForPopulatedTransaction } from './tx-gas-details';
 import {
@@ -63,25 +61,29 @@ export const populateProvedTransaction = async (
   populatedTransaction: PopulatedTransaction;
   nullifiers: string[];
 }> => {
-  const validation = validateCachedProvedTransaction(
-    networkName,
-    proofType,
-    railgunWalletID,
-    showSenderAddressToRecipient,
-    memoText,
-    erc20AmountRecipients,
-    nftAmountRecipients,
-    relayAdaptUnshieldERC20Amounts,
-    relayAdaptUnshieldNFTAmounts,
-    relayAdaptShieldERC20Addresses,
-    relayAdaptShieldNFTs,
-    crossContractCallsSerialized,
-    relayerFeeERC20AmountRecipient,
-    sendWithPublicWallet,
-    overallBatchMinGasPrice,
-  );
-  if (!validation.isValid) {
-    throw new Error(`Invalid proof for this transaction. ${validation.error}`);
+  try {
+    validateCachedProvedTransaction(
+      networkName,
+      proofType,
+      railgunWalletID,
+      showSenderAddressToRecipient,
+      memoText,
+      erc20AmountRecipients,
+      nftAmountRecipients,
+      relayAdaptUnshieldERC20Amounts,
+      relayAdaptUnshieldNFTAmounts,
+      relayAdaptShieldERC20Addresses,
+      relayAdaptShieldNFTs,
+      crossContractCallsSerialized,
+      relayerFeeERC20AmountRecipient,
+      sendWithPublicWallet,
+      overallBatchMinGasPrice,
+    );
+  } catch (err) {
+    if (!(err instanceof Error)) {
+      throw err;
+    }
+    throw new Error(`Invalid proof for this transaction. ${err.message}`);
   }
 
   const { populatedTransaction, nullifiers } = getCachedProvedTransaction();
@@ -160,25 +162,24 @@ export const validateCachedProvedTransaction = (
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<string>,
-): ValidateCachedProvedTransactionResponse => {
-  let error: Optional<string>;
+): void => {
   if (!cachedProvedTransaction) {
-    error = 'No proof found.';
+    throw new Error('No proof found.');
   } else if (cachedProvedTransaction.proofType !== proofType) {
-    error = 'Mismatch: proofType.';
+    throw new Error('Mismatch: proofType.');
   } else if (cachedProvedTransaction.railgunWalletID !== railgunWalletID) {
-    error = 'Mismatch: railgunWalletID.';
+    throw new Error('Mismatch: railgunWalletID.');
   } else if (
     proofType === ProofType.Transfer &&
     cachedProvedTransaction.showSenderAddressToRecipient !==
       showSenderAddressToRecipient
   ) {
-    error = 'Mismatch: showSenderAddressToRecipient.';
+    throw new Error('Mismatch: showSenderAddressToRecipient.');
   } else if (
     proofType === ProofType.Transfer &&
     cachedProvedTransaction.memoText !== memoText
   ) {
-    error = 'Mismatch: memoText.';
+    throw new Error('Mismatch: memoText.');
   } else if (
     shouldValidateERC20AmountRecipients(proofType) &&
     !compareERC20AmountRecipientArrays(
@@ -186,14 +187,14 @@ export const validateCachedProvedTransaction = (
       cachedProvedTransaction.erc20AmountRecipients,
     )
   ) {
-    error = 'Mismatch: erc20AmountRecipients.';
+    throw new Error('Mismatch: erc20AmountRecipients.');
   } else if (
     !compareNFTAmountRecipientArrays(
       nftAmountRecipients,
       cachedProvedTransaction.nftAmountRecipients,
     )
   ) {
-    error = 'Mismatch: nftAmountRecipients.';
+    throw new Error('Mismatch: nftAmountRecipients.');
   } else if (
     shouldValidateRelayAdaptAmounts(proofType) &&
     !compareERC20AmountArrays(
@@ -201,7 +202,7 @@ export const validateCachedProvedTransaction = (
       cachedProvedTransaction.relayAdaptUnshieldERC20Amounts,
     )
   ) {
-    error = 'Mismatch: relayAdaptUnshieldERC20Amounts.';
+    throw new Error('Mismatch: relayAdaptUnshieldERC20Amounts.');
   } else if (
     shouldValidateRelayAdaptAmounts(proofType) &&
     !compareNFTAmountArrays(
@@ -209,7 +210,7 @@ export const validateCachedProvedTransaction = (
       cachedProvedTransaction.relayAdaptUnshieldNFTAmounts,
     )
   ) {
-    error = 'Mismatch: relayAdaptUnshieldNFTAmounts.';
+    throw new Error('Mismatch: relayAdaptUnshieldNFTAmounts.');
   } else if (
     shouldValidateRelayAdaptAmounts(proofType) &&
     !compareStringArrays(
@@ -217,7 +218,7 @@ export const validateCachedProvedTransaction = (
       cachedProvedTransaction.relayAdaptShieldERC20Addresses,
     )
   ) {
-    error = 'Mismatch: relayAdaptShieldERC20Addresses.';
+    throw new Error('Mismatch: relayAdaptShieldERC20Addresses.');
   } else if (
     shouldValidateRelayAdaptAmounts(proofType) &&
     !compareNFTAmountArrays(
@@ -225,7 +226,7 @@ export const validateCachedProvedTransaction = (
       cachedProvedTransaction.relayAdaptShieldNFTs,
     )
   ) {
-    error = 'Mismatch: relayAdaptShieldNFTs.';
+    throw new Error('Mismatch: relayAdaptShieldNFTs.');
   } else if (
     shouldValidateCrossContractCalls(proofType) &&
     !compareStringArrays(
@@ -233,34 +234,22 @@ export const validateCachedProvedTransaction = (
       cachedProvedTransaction.crossContractCallsSerialized,
     )
   ) {
-    error = 'Mismatch: crossContractCallsSerialized.';
+    throw new Error('Mismatch: crossContractCallsSerialized.');
   } else if (
     !compareERC20AmountRecipients(
       cachedProvedTransaction.relayerFeeERC20AmountRecipient,
       relayerFeeERC20AmountRecipient,
     )
   ) {
-    error = 'Mismatch: relayerFeeERC20AmountRecipient.';
+    throw new Error('Mismatch: relayerFeeERC20AmountRecipient.');
   } else if (
     sendWithPublicWallet !== cachedProvedTransaction.sendWithPublicWallet
   ) {
-    error = 'Mismatch: sendWithPublicWallet.';
+    throw new Error('Mismatch: sendWithPublicWallet.');
   } else if (
     shouldSetOverallBatchMinGasPriceForNetwork(networkName) &&
     overallBatchMinGasPrice !== cachedProvedTransaction.overallBatchMinGasPrice
   ) {
-    error = 'Mismatch: overallBatchMinGasPrice.';
+    throw new Error('Mismatch: overallBatchMinGasPrice.');
   }
-
-  if (error) {
-    sendErrorMessage(error);
-    return {
-      error,
-      isValid: false,
-    };
-  }
-
-  return {
-    isValid: true,
-  };
 };

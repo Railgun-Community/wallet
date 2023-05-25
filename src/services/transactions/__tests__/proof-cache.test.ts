@@ -25,7 +25,6 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const networkName = NetworkName.BNBChain;
-const proofType = ProofType.Transfer;
 const railgunWalletID = '123';
 const showSenderAddressToRecipient = true;
 const memoText = 'Some memo';
@@ -52,90 +51,31 @@ const nullifiers = ['0x1234'];
 const sendWithPublicWallet = false;
 const overallBatchMinGasPrice = '0x1000';
 
+const setCached = (proofType: ProofType) => {
+  setCachedProvedTransaction({
+    populatedTransaction: {} as PopulatedTransaction,
+    proofType,
+    showSenderAddressToRecipient,
+    memoText,
+    railgunWalletID,
+    erc20AmountRecipients,
+    nftAmountRecipients,
+    relayAdaptUnshieldERC20Amounts,
+    relayAdaptUnshieldNFTAmounts,
+    relayAdaptShieldERC20Addresses,
+    relayAdaptShieldNFTs,
+    crossContractCallsSerialized,
+    relayerFeeERC20AmountRecipient,
+    sendWithPublicWallet: false,
+    overallBatchMinGasPrice,
+    nullifiers,
+  });
+};
+
 describe('proof-cache', () => {
   it('Should validate cached transaction correctly', () => {
     setCachedProvedTransaction(undefined);
-    expect(
-      validateCachedProvedTransaction(
-        networkName,
-        proofType,
-        railgunWalletID,
-        showSenderAddressToRecipient,
-        memoText,
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        relayAdaptUnshieldERC20Amounts,
-        relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
-
-    setCachedProvedTransaction({
-      populatedTransaction: {} as PopulatedTransaction,
-      proofType,
-      showSenderAddressToRecipient,
-      memoText,
-      railgunWalletID,
-      erc20AmountRecipients,
-      nftAmountRecipients,
-      relayAdaptUnshieldERC20Amounts,
-      relayAdaptUnshieldNFTAmounts,
-      relayAdaptShieldERC20Addresses,
-      relayAdaptShieldNFTs,
-      crossContractCallsSerialized,
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet: false,
-      overallBatchMinGasPrice,
-      nullifiers,
-    });
-
-    // Same same
-    expect(
-      validateCachedProvedTransaction(
-        networkName,
-        proofType,
-        railgunWalletID,
-        showSenderAddressToRecipient,
-        memoText,
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        relayAdaptUnshieldERC20Amounts,
-        relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.true;
-
-    expect(
-      validateCachedProvedTransaction(
-        networkName,
-        ProofType.Unshield,
-        railgunWalletID,
-        showSenderAddressToRecipient,
-        memoText,
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        relayAdaptUnshieldERC20Amounts,
-        relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
-
-    expect(
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
         ProofType.CrossContractCalls,
@@ -152,13 +92,76 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('No proof found.');
 
-    expect(
+    setCached(ProofType.CrossContractCalls);
+
+    // Same same
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        proofType,
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
+        crossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ),
+    ).to.not.throw();
+
+    expect(() =>
+      validateCachedProvedTransaction(
+        networkName,
+        ProofType.Unshield,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
+        crossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ),
+    ).to.throw('Mismatch: proofType.');
+
+    expect(() =>
+      validateCachedProvedTransaction(
+        networkName,
+        ProofType.Transfer,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        relayAdaptShieldERC20Addresses,
+        relayAdaptShieldNFTs,
+        crossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ),
+    ).to.throw('Mismatch: proofType.');
+
+    expect(() =>
+      validateCachedProvedTransaction(
+        networkName,
+        ProofType.CrossContractCalls,
         '987',
         showSenderAddressToRecipient,
         memoText,
@@ -172,15 +175,19 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: railgunWalletID.');
 
-    expect(
+    // Set new for Transfer proof type
+    setCached(ProofType.Transfer);
+
+    // Requires ProofType.Transfer
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        proofType,
+        ProofType.Transfer,
         railgunWalletID,
-        false,
+        false, // showSenderAddressToRecipient
         memoText,
         erc20AmountRecipients,
         nftAmountRecipients,
@@ -192,13 +199,14 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: showSenderAddressToRecipient.');
 
-    expect(
+    // Requires ProofType.Transfer
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        proofType,
+        ProofType.Transfer,
         railgunWalletID,
         showSenderAddressToRecipient,
         'different memo',
@@ -212,13 +220,14 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: memoText.');
 
-    expect(
+    // Requires ProofType.Transfer
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        proofType,
+        ProofType.Transfer,
         railgunWalletID,
         showSenderAddressToRecipient,
         memoText,
@@ -238,13 +247,15 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: erc20AmountRecipients.');
 
-    expect(
+    setCached(ProofType.CrossContractCalls);
+
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        proofType,
+        ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
         memoText,
@@ -258,13 +269,13 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: nftAmountRecipients.');
 
-    expect(
+    // Note: requires ProofType.CrossContractCalls
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
         ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -284,13 +295,13 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: relayAdaptUnshieldERC20Amounts.');
 
-    expect(
+    // Note: requires ProofType.CrossContractCalls
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
         ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
@@ -305,10 +316,10 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: relayAdaptUnshieldNFTAmounts.');
 
-    expect(
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
         // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
@@ -326,10 +337,31 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: relayAdaptShieldERC20Addresses.');
 
-    expect(
+    expect(() =>
+      validateCachedProvedTransaction(
+        networkName,
+        // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        [],
+        relayAdaptShieldNFTs,
+        crossContractCallsSerialized,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ),
+    ).to.throw('Mismatch: relayAdaptShieldERC20Addresses.');
+
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
         // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
@@ -347,10 +379,10 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: relayAdaptShieldNFTs.');
 
-    expect(
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
         // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
@@ -368,13 +400,13 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: crossContractCallsSerialized.');
 
-    expect(
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        proofType,
+        ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
         memoText,
@@ -392,13 +424,13 @@ describe('proof-cache', () => {
         },
         sendWithPublicWallet,
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: relayerFeeERC20AmountRecipient.');
 
-    expect(
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        proofType,
+        ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
         memoText,
@@ -412,13 +444,13 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         true, // sendWithPublicWallet
         overallBatchMinGasPrice,
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: sendWithPublicWallet.');
 
-    expect(
+    expect(() =>
       validateCachedProvedTransaction(
         networkName,
-        proofType,
+        ProofType.CrossContractCalls,
         railgunWalletID,
         showSenderAddressToRecipient,
         memoText,
@@ -432,7 +464,7 @@ describe('proof-cache', () => {
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         '0x2000',
-      ).isValid,
-    ).to.be.false;
+      ),
+    ).to.throw('Mismatch: overallBatchMinGasPrice.');
   });
 });
