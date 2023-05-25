@@ -97,7 +97,7 @@ describe('quick-sync-graph', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(20000);
+  }).timeout(45000);
 
   it('Should make sure Graph query has no data gaps in commitments - Polygon', async () => {
     const eventLog = await quickSyncGraph(POLYGON_CHAIN, 0);
@@ -118,7 +118,7 @@ describe('quick-sync-graph', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(20000);
+  }).timeout(45000);
 
   it('Should make sure Graph query has no data gaps in commitments - BNB Smart Chain', async () => {
     const eventLog = await quickSyncGraph(BNB_CHAIN, 0);
@@ -136,7 +136,7 @@ describe('quick-sync-graph', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(20000);
+  }).timeout(45000);
 
   it('Should make sure Graph query has no data gaps in commitments - Polygon Mumbai', async () => {
     const eventLog = await quickSyncGraph(POLYGON_MUMBAI_CHAIN, 0);
@@ -154,7 +154,7 @@ describe('quick-sync-graph', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(20000);
+  }).timeout(45000);
 
   it('Should make sure Graph query has no data gaps in commitments - Arbitrum', async () => {
     const eventLog = await quickSyncGraph(ARBITRUM_CHAIN, 0);
@@ -172,7 +172,7 @@ describe('quick-sync-graph', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(20000);
+  }).timeout(45000);
 
   it('Should make sure Graph query has no data gaps in commitments - Goerli', async () => {
     const eventLog = await quickSyncGraph(GOERLI_CHAIN, 0);
@@ -190,7 +190,7 @@ describe('quick-sync-graph', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(20000);
+  }).timeout(45000);
 
   it('Should make sure Graph query has no data gaps in commitments - Arbitrum Goerli', async () => {
     const eventLog = await quickSyncGraph(ARBITRUM_GOERLI_CHAIN, 0);
@@ -208,7 +208,7 @@ describe('quick-sync-graph', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(20000);
+  }).timeout(45000);
 
   it('Should run live Railgun Event Log fetch for Polygon with high starting block', async () => {
     const eventLog = await quickSyncGraph(POLYGON_CHAIN, 100000000);
@@ -218,5 +218,5 @@ describe('quick-sync-graph', () => {
     expect(eventLog.commitmentEvents.length).to.equal(0);
     expect(eventLog.nullifierEvents.length).to.equal(0);
     expect(eventLog.unshieldEvents.length).to.equal(0);
-  }).timeout(20000);
+  }).timeout(45000);
 });
