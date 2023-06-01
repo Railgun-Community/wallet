@@ -1,7 +1,7 @@
 {
-  "name": "@railgun-community/quickstart",
+  "name": "@railgun-community/wallet",
   "version": "5.1.0",
-  "description": "RAILGUN Quickstart SDK, compatible with mobile, browser and nodejs environments.",
+  "description": "RAILGUN Wallet SDK, compatible with mobile, browser and nodejs environments.",
   "main": "dist/index.js",
   "license": "MIT",
   "files": [

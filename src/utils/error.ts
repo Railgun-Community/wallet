@@ -6,7 +6,7 @@ export const reportAndSanitizeError = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   err: Error | any,
 ): Error => {
-  sendErrorMessage(`Caught error in Quickstart: ${func}`);
+  sendErrorMessage(`Caught error in RAILGUN Wallet SDK: ${func}`);
 
   if (err instanceof Error) {
     const error = sanitizeError(err);
