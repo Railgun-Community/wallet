@@ -14,4 +14,4 @@ git checkout main;
 git rebase origin/release;
 git push --tags --no-verify;
 git push --no-verify;
-echo https://github.com/Railgun-Community/quickstart/actions;
+echo https://github.com/Railgun-Community/wallet/actions;
