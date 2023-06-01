@@ -6,6 +6,7 @@ import { NetworkName } from '@railgun-community/shared-models';
 import {
   setOnMerkletreeScanCallback,
   startRailgunEngine,
+  stopRailgunEngine,
 } from '../services/railgun/core/engine';
 import {
   MOCK_BALANCES_UPDATE_CALLBACK,
@@ -75,12 +76,10 @@ export const initTestEngine = (useNativeArtifacts = false) => {
 };
 
 export const initTestEngineNetwork = async () => {
-  const shouldDebug = false;
-
   // Don't wait for async. It will try to load historical events, which takes a while.
-  return loadProvider(
-    MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
-    NetworkName.Polygon,
-    shouldDebug,
-  );
+  return loadProvider(MOCK_FALLBACK_PROVIDER_JSON_CONFIG, NetworkName.Polygon);
+};
+
+export const closeTestEngine = async () => {
+  await stopRailgunEngine();
 };

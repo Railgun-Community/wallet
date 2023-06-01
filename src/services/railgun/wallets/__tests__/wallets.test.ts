@@ -9,11 +9,9 @@ import {
   createRailgunWallet,
   createViewOnlyRailgunWallet,
   getRailgunAddress,
-  getRailgunWalletAddressData,
   getWalletMnemonic,
   getWalletShareableViewingKey,
   loadWalletByID,
-  serializeRailgunWalletAddressData,
   unloadWalletByID,
   validateRailgunAddress,
 } from '../wallets';
@@ -22,6 +20,7 @@ import {
   MOCK_MNEMONIC_2,
 } from '../../../../tests/mocks.test';
 import {
+  closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../../tests/setup.test';
@@ -46,6 +45,9 @@ describe('wallets', () => {
       throw new Error(`Could not create wallet`);
     }
     wallet = fullWalletForID(railgunWalletInfo.id);
+  });
+  after(async () => {
+    await closeTestEngine();
   });
 
   it('Should create view only wallet', async () => {
@@ -144,17 +146,5 @@ describe('wallets', () => {
         '0zk1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqunpd9kxwatwqyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhshkca',
       ),
     ).to.be.true;
-  });
-
-  it('Should serialize wallet address data', async () => {
-    const addressData = getRailgunWalletAddressData(wallet.getAddress());
-    const serializedAddressData =
-      serializeRailgunWalletAddressData(addressData);
-    expect(serializedAddressData.viewingPublicKey).to.equal(
-      '7d998037030c4817a0204a633edb2d337043e63f43be1ffeecf1ecefbcaad90e',
-    );
-    expect(serializedAddressData.masterPublicKey).to.equal(
-      '2c291b0b24c82a8ab10f2d8b05958c882b91847e6e36d1dcc52bfa6660494091',
-    );
   });
 });

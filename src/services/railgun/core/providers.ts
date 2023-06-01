@@ -1,5 +1,3 @@
-import { BaseProvider } from '@ethersproject/providers';
-import { BigNumber } from '@ethersproject/bignumber';
 import {
   FallbackProviderJsonConfig,
   createFallbackProviderFromJsonConfig,
@@ -15,11 +13,12 @@ import {
   RelayAdaptContract,
 } from '@railgun-community/engine';
 import { reportAndSanitizeError } from '../../../utils/error';
+import { FallbackProvider } from 'ethers';
 
-const providerMap: MapType<BaseProvider> = {};
+const providerMap: MapType<FallbackProvider> = {};
 export const getProviderForNetwork = (
   networkName: NetworkName,
-): BaseProvider => {
+): FallbackProvider => {
   const provider = providerMap[networkName];
   if (!provider) {
     throw new Error(`Provider not yet loaded for network ${networkName}`);
@@ -29,7 +28,7 @@ export const getProviderForNetwork = (
 
 export const setProviderForNetwork = (
   networkName: NetworkName,
-  provider: BaseProvider,
+  provider: FallbackProvider,
 ): void => {
   providerMap[networkName] = provider;
 };
@@ -80,12 +79,10 @@ const loadProviderForNetwork = async (
   chain: Chain,
   networkName: NetworkName,
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
-  shouldDebug: boolean,
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
   const provider = createFallbackProviderFromJsonConfig(
     fallbackProviderJsonConfig,
-    shouldDebug ? sendMessage : undefined,
   );
 
   const network = NETWORK_CONFIG[networkName];
@@ -123,31 +120,32 @@ const loadProviderForNetwork = async (
 export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
-  shouldDebug: boolean,
 ): Promise<LoadProviderResponse> => {
   try {
     delete providerMap[networkName];
 
     const { chain } = NETWORK_CONFIG[networkName];
+    if (fallbackProviderJsonConfig.chainId !== chain.id) {
+      throw new Error('Invalid chain ID');
+    }
+
     await loadProviderForNetwork(
       chain,
       networkName,
       fallbackProviderJsonConfig,
-      shouldDebug,
     );
 
     const railgunSmartWalletContract =
       getRailgunSmartWalletContractForNetwork(networkName);
 
-    // Returned as Hex strings.
     const { shield, unshield, nft } = await railgunSmartWalletContract.fees();
 
     // Note: Shield and Unshield fees are in basis points.
-    //  NFT fee is in wei.
+    // NFT fee is in wei (though currently 0).
     const feesSerialized = {
-      shield: BigNumber.from(shield).toHexString(),
-      unshield: BigNumber.from(unshield).toHexString(),
-      nft: BigNumber.from(nft).toHexString(),
+      shield: shield.toString(),
+      unshield: unshield.toString(),
+      nft: nft.toString(),
     };
 
     return { feesSerialized };

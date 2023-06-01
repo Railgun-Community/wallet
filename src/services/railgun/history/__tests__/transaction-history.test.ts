@@ -11,6 +11,7 @@ import {
   MOCK_MNEMONIC_2,
 } from '../../../../tests/mocks.test';
 import {
+  closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../../tests/setup.test';
@@ -35,7 +36,7 @@ let wallet: RailgunWallet;
 const transferERC20AmountsSend: RailgunSendERC20Amount[] = [
   {
     tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-    amountString: '0x435532c61b0800',
+    amount: BigInt('0x435532c61b0800'),
     recipientAddress:
       '0zk1qygxrr7l92f6wltkpqlqcqstftfn0cn0x5ckyl5tjz6a4kyxnwy9arv7j6fe3z53llg8qt4s7axfdazyrrps78np9pylk4055gkz9e2gd8ulmk0urqt55y3m07t',
     walletSource: 'railway web',
@@ -43,7 +44,7 @@ const transferERC20AmountsSend: RailgunSendERC20Amount[] = [
   },
   {
     tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-    amountString: '0x01626218b4586000',
+    amount: BigInt('0x01626218b4586000'),
     recipientAddress:
       '0zk1qygxrr7l92f6wltkpqlqcqstftfn0cn0x5ckyl5tjz6a4kyxnwy9arv7j6fe3z53llg8qt4s7axfdazyrrps78np9pylk4055gkz9e2gd8ulmk0urqt55y3m07t',
     walletSource: 'railway web',
@@ -51,7 +52,7 @@ const transferERC20AmountsSend: RailgunSendERC20Amount[] = [
   },
   {
     tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-    amountString: '0x0120d3a540a09800',
+    amount: BigInt('0x0120d3a540a09800'),
     recipientAddress:
       '0zk1qygxrr7l92f6wltkpqlqcqstftfn0cn0x5ckyl5tjz6a4kyxnwy9arv7j6fe3z53llg8qt4s7axfdazyrrps78np9pylk4055gkz9e2gd8ulmk0urqt55y3m07t',
     walletSource: 'railway web',
@@ -65,7 +66,7 @@ const MOCKED_TRANSFER_SEND_TRX: TransactionHistoryItem = {
   changeERC20Amounts: [
     {
       tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-      amountString: '0xabdf14769f1800',
+      amount: BigInt('0xabdf14769f1800'),
     },
   ],
   receiveERC20Amounts: [],
@@ -81,7 +82,7 @@ const MOCKED_TRANSFER_SEND_TRX: TransactionHistoryItem = {
 const receiveERC20AmountsReceive: RailgunReceiveERC20Amount[] = [
   {
     tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-    amountString: '0x0b470553066cd0f8',
+    amount: BigInt('0x0b470553066cd0f8'),
     memoText: 'este va a ser un memo corto',
     senderAddress:
       '0zk1qyy0deg6tdmfum0dcxj8j69p9ue9emvyyuv46ltdrxcmfr06wafh8rv7j6fe3z53lalv6k0cvxsap0xqpcgjnplrkrz5nsykud3u5nstfclh96k4uwwcq8un6tm',
@@ -106,7 +107,7 @@ const MOCKED_TRANSFER_RECEIVE_TRX: TransactionHistoryItem = {
 const receiveERC20AmountsShield: RailgunReceiveERC20Amount[] = [
   {
     tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-    amountString: '0x1bafa9ee16e78000',
+    amount: BigInt('0x1bafa9ee16e78000'),
     shieldFee: '0x11c37937e08000',
     senderAddress: '',
     memoText: '',
@@ -130,7 +131,7 @@ const MOCKED_SHIELD_TRX: TransactionHistoryItem = {
 const unshieldERC20AmountsUnshield: RailgunUnshieldERC20Amount[] = [
   {
     tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-    amountString: '0x06316e3f4d951280',
+    amount: BigInt('0x06316e3f4d951280'),
     recipientAddress: '0xc7FfA542736321A3dd69246d73987566a5486968',
     unshieldFee: '0x03f937fa6b8580',
     walletSource: 'railway web',
@@ -155,7 +156,7 @@ const MOCKED_UNSHIELD_TRX: TransactionHistoryItem = {
 const receiveERC20AmountsUnknow: RailgunReceiveERC20Amount[] = [
   {
     tokenAddress: '0x8f3cf7ad23cd3cadbd9735aff958023239c6a063',
-    amountString: '0x0f3603f585000c34',
+    amount: BigInt('0x0f3603f585000c34'),
     shieldFee: '0x09c26a7ae13400',
     senderAddress: '',
     memoText: '',
@@ -164,7 +165,7 @@ const receiveERC20AmountsUnknow: RailgunReceiveERC20Amount[] = [
 const unshieldERC20AmountsUnknow: RailgunUnshieldERC20Amount[] = [
   {
     tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-    amountString: '0x0dd7d4f70b73c000',
+    amount: BigInt('0x0dd7d4f70b73c000'),
     recipientAddress: '0xc7FfA542736321A3dd69246d73987566a5486968',
     unshieldFee: '0x08e1bc9bf04000',
     memoText: '',
@@ -177,12 +178,12 @@ const MOCKED_UNKNOWN_SWAP_TRX: TransactionHistoryItem = {
   transferERC20Amounts: [],
   relayerFeeERC20Amount: {
     tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-    amountString: '0x14b8daefd04c0000',
+    amount: BigInt('0x14b8daefd04c0000'),
   },
   changeERC20Amounts: [
     {
       tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-      amountString: '0x012d2a0caec49380',
+      amount: BigInt('0x012d2a0caec49380'),
     },
   ],
   receiveERC20Amounts: receiveERC20AmountsUnknow,
@@ -209,19 +210,19 @@ describe('transaction-history', () => {
     }
     wallet = fullWalletForID(railgunWalletInfo.id);
   });
+  after(async () => {
+    await closeTestEngine();
+  });
 
   // TODO: This should ensure merkletree is scanned first.
   it.skip('Should get wallet transaction history', async () => {
-    const resp = await getWalletTransactionHistory(
+    const items = await getWalletTransactionHistory(
       POLYGON_CHAIN,
       wallet.id,
       undefined,
     );
-    if (resp.items == null) {
-      throw new Error('items is null');
-    }
-    expect(resp.items.length).to.be.greaterThanOrEqual(6);
-    resp.items.forEach(item => {
+    expect(items.length).to.be.greaterThanOrEqual(6);
+    items.forEach(item => {
       expect(item.txid.length === 66); // '0x' + 32 bytes
     });
   });

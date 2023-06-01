@@ -1,14 +1,11 @@
-import { PopulatedTransaction } from '@ethersproject/contracts';
-import { TransactionRequest } from '@ethersproject/providers';
-import { BigNumber } from '@ethersproject/bignumber';
 import {
   RailgunTransactionGasEstimateResponse,
-  TransactionGasDetailsSerialized,
   EVMGasType,
   calculateGasLimit,
   NetworkName,
   getEVMGasTypeForTransaction,
   CommitmentSummary,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import { getProviderForNetwork } from '../railgun';
 import { reportAndSanitizeError } from '../../utils/error';
@@ -16,14 +13,15 @@ import {
   GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION,
   RelayAdaptContract,
 } from '@railgun-community/engine';
+import { ContractTransaction } from 'ethers';
 
 export const getGasEstimate = async (
   networkName: NetworkName,
-  transaction: PopulatedTransaction | TransactionRequest,
+  transaction: ContractTransaction,
   fromWalletAddress: string,
   sendWithPublicWallet: boolean,
   isCrossContractCall: boolean,
-): Promise<BigNumber> => {
+): Promise<bigint> => {
   const evmGasType = getEVMGasTypeForTransaction(
     networkName,
     sendWithPublicWallet,
@@ -31,7 +29,7 @@ export const getGasEstimate = async (
 
   // Add 'from' field, which is required, as a mock address.
   // Note that DEPOSIT needs a real address, as it checks the balance for transfer.
-  const estimateGasTransactionRequest: TransactionRequest = {
+  const estimateGasTransactionRequest: ContractTransaction = {
     ...transaction,
     from: fromWalletAddress,
     type: evmGasType,
@@ -54,9 +52,9 @@ export const getGasEstimate = async (
 
 const estimateGas = (
   networkName: NetworkName,
-  transaction: TransactionRequest,
+  transaction: ContractTransaction,
   isCrossContractCall: boolean,
-): Promise<BigNumber> => {
+): Promise<bigint> => {
   const provider = getProviderForNetwork(networkName);
   if (isCrossContractCall) {
     // Includes custom error handler for relay-adapt transactions.
@@ -91,88 +89,67 @@ const shouldRemoveGasLimitForL2GasEstimate = (networkName: NetworkName) => {
 };
 
 export const gasEstimateResponse = (
-  gasEstimate: BigNumber,
+  gasEstimate: bigint,
   relayerFeeCommitment: Optional<CommitmentSummary>,
   isGasEstimateWithDummyProof: boolean,
 ): RailgunTransactionGasEstimateResponse => {
   // TODO: This variance will be different on L2s.
   // However, it's small enough that it shouldn't matter very much.
   const gasEstimateWithDummyProofVariance = isGasEstimateWithDummyProof
-    ? gasEstimate.add(GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION)
+    ? gasEstimate + BigInt(GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION)
     : gasEstimate;
 
   const response: RailgunTransactionGasEstimateResponse = {
-    gasEstimateString: gasEstimateWithDummyProofVariance.toHexString(),
+    gasEstimate: gasEstimateWithDummyProofVariance,
     relayerFeeCommitment,
   };
   return response;
 };
 
-export const gasEstimateResponseFromGasEstimate = (
-  gasEstimate: BigNumber,
-): RailgunTransactionGasEstimateResponse => {
-  try {
-    const response: RailgunTransactionGasEstimateResponse = {
-      gasEstimateString: gasEstimate.toHexString(),
-    };
-    return response;
-  } catch (err) {
-    throw reportAndSanitizeError(gasEstimateResponseFromGasEstimate.name, err);
-  }
-};
-
-export const setGasDetailsForPopulatedTransaction = (
+export const setGasDetailsForTransaction = (
   networkName: NetworkName,
-  populatedTransaction: PopulatedTransaction,
-  gasDetailsSerialized: TransactionGasDetailsSerialized,
+  transaction: ContractTransaction,
+  gasDetails: TransactionGasDetails,
   sendWithPublicWallet: boolean,
 ) => {
-  const gasEstimate = BigNumber.from(gasDetailsSerialized.gasEstimateString);
+  const { gasEstimate } = gasDetails;
 
   // eslint-disable-next-line no-param-reassign
-  populatedTransaction.gasLimit = calculateGasLimit(gasEstimate);
+  transaction.gasLimit = calculateGasLimit(gasEstimate);
 
   const evmGasType = getEVMGasTypeForTransaction(
     networkName,
     sendWithPublicWallet,
   );
 
-  if (gasDetailsSerialized.evmGasType !== evmGasType) {
+  if (gasDetails.evmGasType !== evmGasType) {
     const transactionType = sendWithPublicWallet ? 'self-signed' : 'Relayer';
     throw new Error(
-      `Invalid evmGasType for ${networkName} (${transactionType}): expected Type${evmGasType}, received Type${gasDetailsSerialized.evmGasType} in gasDetailsSerialized. Retrieve appropriate gas type with getEVMGasTypeForTransaction (@railgun-community/shared-models).`,
+      `Invalid evmGasType for ${networkName} (${transactionType}): expected Type${evmGasType}, received Type${gasDetails.evmGasType} in gasDetails. Retrieve appropriate gas type with getEVMGasTypeForTransaction (@railgun-community/shared-models).`,
     );
   }
 
   // eslint-disable-next-line no-param-reassign
-  populatedTransaction.type = gasDetailsSerialized.evmGasType;
+  transaction.type = gasDetails.evmGasType;
 
-  switch (gasDetailsSerialized.evmGasType) {
+  switch (gasDetails.evmGasType) {
     case EVMGasType.Type0: {
-      const gasPrice = BigNumber.from(gasDetailsSerialized.gasPriceString);
       // eslint-disable-next-line no-param-reassign
-      populatedTransaction.gasPrice = gasPrice;
+      transaction.gasPrice = gasDetails.gasPrice;
       // eslint-disable-next-line no-param-reassign
-      delete populatedTransaction.accessList;
+      delete transaction.accessList;
       break;
     }
     case EVMGasType.Type1: {
-      const gasPrice = BigNumber.from(gasDetailsSerialized.gasPriceString);
       // eslint-disable-next-line no-param-reassign
-      populatedTransaction.gasPrice = gasPrice;
+      transaction.gasPrice = gasDetails.gasPrice;
       break;
     }
     case EVMGasType.Type2: {
-      const maxFeePerGas = BigNumber.from(
-        gasDetailsSerialized.maxFeePerGasString,
-      );
-      const maxPriorityFeePerGas = BigNumber.from(
-        gasDetailsSerialized.maxPriorityFeePerGasString,
-      );
       // eslint-disable-next-line no-param-reassign
-      populatedTransaction.maxFeePerGas = maxFeePerGas;
+      transaction.maxFeePerGas = gasDetails.maxFeePerGas;
       // eslint-disable-next-line no-param-reassign
-      populatedTransaction.maxPriorityFeePerGas = maxPriorityFeePerGas;
+      transaction.maxPriorityFeePerGas = gasDetails.maxPriorityFeePerGas;
       break;
     }
   }

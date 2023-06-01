@@ -1,4 +1,3 @@
-import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
@@ -13,16 +12,12 @@ import {
   RailgunERC20Amount,
   NetworkName,
   NETWORK_CONFIG,
-  deserializeTransaction,
-  serializeUnsignedTransaction,
   EVMGasType,
-  TransactionGasDetailsSerialized,
   RailgunERC20AmountRecipient,
-  decimalToHexString,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import { BigNumber } from '@ethersproject/bignumber';
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
+  closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../tests/setup.test';
@@ -54,6 +49,7 @@ import {
   populateProvedCrossContractCalls,
 } from '../tx-cross-contract-calls';
 import FormattedRelayAdaptErrorLogs from './json/formatted-relay-adapt-error-logs.json';
+import { ContractTransaction, FallbackProvider } from 'ethers';
 
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
@@ -84,46 +80,43 @@ const mockNFTTokenData1 = createNFTTokenDataFromRailgunNFTAmount(
   MOCK_NFT_AMOUNTS[1],
 );
 
-const mockCrossContractCalls: PopulatedTransaction[] = [
+const mockCrossContractCalls: ContractTransaction[] = [
   {
     to: MOCK_ETH_WALLET_ADDRESS,
     data: '0x0789',
-    value: BigNumber.from('0x01'),
+    value: BigInt('0x01'),
   },
   {
     to: MOCK_ETH_WALLET_ADDRESS,
     data: '0x9789',
-    value: BigNumber.from('0x02'),
+    value: BigInt('0x02'),
   },
 ];
-const mockCrossContractCallsSerialized: string[] = mockCrossContractCalls.map(
-  serializeUnsignedTransaction,
-);
 
 const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
-    amountString: '100',
+    amount: 100n,
   },
   {
     tokenAddress: MOCK_TOKEN_ADDRESS_2,
-    amountString: '300',
+    amount: 300n,
   },
 ];
 
-const overallBatchMinGasPrice = '0x1000';
+const overallBatchMinGasPrice = BigInt('0x1000');
 
-const gasDetailsSerialized: TransactionGasDetailsSerialized = {
+const gasDetails: TransactionGasDetails = {
   evmGasType: EVMGasType.Type1,
-  gasEstimateString: '0x00',
-  gasPriceString: overallBatchMinGasPrice,
+  gasEstimate: 2000n,
+  gasPrice: overallBatchMinGasPrice,
 };
 
 const stubGasEstimateSuccess = () => {
   gasEstimateStub = Sinon.stub(
     FallbackProvider.prototype,
     'estimateGas',
-  ).resolves(BigNumber.from('200'));
+  ).resolves(BigInt('200'));
 };
 
 const stubGasEstimateFailure = () => {
@@ -138,7 +131,8 @@ const spyOnSetUnshield = () => {
 };
 
 describe('tx-cross-contract-calls', () => {
-  before(async () => {
+  before(async function run() {
+    this.timeout(5000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletInfo = await createRailgunWallet(
@@ -187,20 +181,21 @@ describe('tx-cross-contract-calls', () => {
     relayAdaptPopulateCrossContractCalls = Sinon.stub(
       RelayAdaptContract.prototype,
       'populateCrossContractCalls',
-    ).resolves({ data: '0x0123' } as PopulatedTransaction);
+    ).resolves({ data: '0x0123' } as ContractTransaction);
   });
   afterEach(() => {
     gasEstimateStub?.restore();
     addUnshieldDataSpy?.restore();
     erc20NoteSpy?.restore();
   });
-  after(() => {
+  after(async () => {
     railProveStub.restore();
     railDummyProveStub.restore();
     relayAdaptPopulateCrossContractCalls.restore();
+    await closeTestEngine();
   });
 
-  // WITHDRAW - GAS ESTIMATE
+  // UNSHIELD - GAS ESTIMATE
 
   it('Should get gas estimates for valid cross contract calls', async () => {
     stubGasEstimateSuccess();
@@ -213,7 +208,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       MOCK_NFT_AMOUNTS,
-      mockCrossContractCallsSerialized,
+      mockCrossContractCalls,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
@@ -290,8 +285,8 @@ describe('tx-cross-contract-calls', () => {
       ], // run 2 - nft 1
     ]);
     // Add 7500 for the dummy tx variance
-    // expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 280));
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(2_800_000)); // Cross Contract Minimum
+    // expect(rsp.gasEstimate).to.equal(7500n + 280n);
+    expect(rsp.gasEstimate).to.equal(2_800_000n); // Cross Contract Minimum
   }).timeout(10000);
 
   it('Should get gas estimates for valid cross contract calls, public wallet', async () => {
@@ -305,7 +300,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       MOCK_NFT_AMOUNTS,
-      mockCrossContractCallsSerialized,
+      mockCrossContractCalls,
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       true, // sendWithPublicWallet
@@ -348,8 +343,8 @@ describe('tx-cross-contract-calls', () => {
       ], // run 1 - nft 1
     ]);
     // Add 7500 for the dummy tx variance
-    // expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 280));
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(2_800_000)); // Cross Contract Minimum
+    // expect(rsp.gasEstimate).to.equal(7500n + 280n);
+    expect(rsp.gasEstimate).to.equal(2_800_000n); // Cross Contract Minimum
   }).timeout(10000);
 
   it('Should error on gas estimates for invalid cross contract calls', async () => {
@@ -363,12 +358,12 @@ describe('tx-cross-contract-calls', () => {
         MOCK_NFT_AMOUNTS,
         MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
         MOCK_NFT_AMOUNTS,
-        ['abc'], // Invalid
+        [{ data: 'abc' } as ContractTransaction], // Invalid
         MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
         MOCK_FEE_TOKEN_DETAILS,
         false, // sendWithPublicWallet
       ),
-    ).rejectedWith('Invalid cross-contract calls: invalid arrayify value');
+    ).rejectedWith(`Cross-contract calls require to and data fields.`);
   });
 
   it('Should error on cross contract calls gas estimate for ethers rejections', async () => {
@@ -382,7 +377,7 @@ describe('tx-cross-contract-calls', () => {
         MOCK_NFT_AMOUNTS,
         MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
         MOCK_NFT_AMOUNTS,
-        mockCrossContractCallsSerialized,
+        mockCrossContractCalls,
         MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
         MOCK_FEE_TOKEN_DETAILS,
         false, // sendWithPublicWallet
@@ -392,7 +387,7 @@ describe('tx-cross-contract-calls', () => {
     );
   });
 
-  // WITHDRAW - PROVE AND SEND
+  // UNSHIELD - PROVE AND SEND
 
   it('Should populate tx for valid cross contract calls', async () => {
     stubGasEstimateSuccess();
@@ -406,7 +401,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       MOCK_NFT_AMOUNTS,
-      mockCrossContractCallsSerialized,
+      mockCrossContractCalls,
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -486,35 +481,27 @@ describe('tx-cross-contract-calls', () => {
       MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       MOCK_NFT_AMOUNTS,
-      mockCrossContractCallsSerialized,
+      mockCrossContractCalls,
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
-      gasDetailsSerialized, // gasDetailsSerialized
-    );
-    expect(populateResponse.serializedTransaction).to.equal(
-      '0x01cc8080821000808080820123c0',
+      gasDetails, // gasDetails
     );
     expect(populateResponse.nullifiers).to.deep.equal([
       '0x0000000000000000000000000000000000000000000000000000000000000001',
       '0x0000000000000000000000000000000000000000000000000000000000000002',
     ]);
 
-    const deserialized = deserializeTransaction(
-      populateResponse.serializedTransaction as string,
-      2,
-      1,
-    );
+    const { transaction } = populateResponse;
 
-    expect(deserialized.nonce).to.equal(2);
-    expect(deserialized.gasPrice?.toString()).to.equal('4096');
-    expect(deserialized.gasLimit).to.equal(undefined);
-    expect(deserialized.value?.toString()).to.equal('0');
-    expect(deserialized.data).to.equal('0x0123');
-    expect(deserialized.to).to.equal(null);
-    expect(deserialized.chainId).to.equal(1);
-    expect(deserialized.type).to.equal(1);
-    expect(Object.keys(deserialized).length).to.equal(8);
+    expect(transaction.nonce).to.equal(undefined);
+    expect(transaction.gasPrice?.toString()).to.equal('4096');
+    expect(transaction.gasLimit).to.equal(2400n);
+    expect(transaction.value?.toString()).to.equal(undefined);
+    expect(transaction.data).to.equal('0x0123');
+    expect(transaction.to).to.equal(undefined);
+    expect(transaction.chainId).to.equal(undefined);
+    expect(transaction.type).to.equal(1);
   });
 
   it('Should error on populate tx for invalid cross contract calls', async () => {
@@ -527,11 +514,11 @@ describe('tx-cross-contract-calls', () => {
         MOCK_NFT_AMOUNTS,
         MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
         MOCK_NFT_AMOUNTS,
-        ['123'], // Invalid
+        [{ data: '123' } as ContractTransaction], // Invalid
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldERC20Amounts.',
@@ -549,11 +536,11 @@ describe('tx-cross-contract-calls', () => {
         MOCK_NFT_AMOUNTS,
         MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
         MOCK_NFT_AMOUNTS,
-        mockCrossContractCallsSerialized,
+        mockCrossContractCalls,
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith('Invalid proof for this transaction. No proof found.');
   });
@@ -568,7 +555,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_NFT_AMOUNTS,
       MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
       MOCK_NFT_AMOUNTS,
-      mockCrossContractCallsSerialized,
+      mockCrossContractCalls,
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -582,11 +569,11 @@ describe('tx-cross-contract-calls', () => {
         MOCK_NFT_AMOUNTS,
         MOCK_TOKEN_AMOUNTS.map(t => t.tokenAddress),
         MOCK_NFT_AMOUNTS,
-        mockCrossContractCallsSerialized,
+        mockCrossContractCalls,
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldERC20Amounts.',

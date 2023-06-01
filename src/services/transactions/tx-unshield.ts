@@ -2,13 +2,12 @@ import {
   RailgunPopulateTransactionResponse,
   RailgunTransactionGasEstimateResponse,
   RailgunERC20Amount,
-  TransactionGasDetailsSerialized,
   NetworkName,
   ProofType,
   FeeTokenDetails,
-  serializeUnsignedTransaction,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
@@ -19,7 +18,6 @@ import { populateProvedTransaction } from './proof-cache';
 import { randomHex, TransactionStruct } from '@railgun-community/engine';
 import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
-import { BigNumber } from '@ethersproject/bignumber';
 import { reportAndSanitizeError } from '../../utils/error';
 
 export const populateProvedUnshield = async (
@@ -29,32 +27,31 @@ export const populateProvedUnshield = async (
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
-  gasDetailsSerialized: TransactionGasDetailsSerialized,
+  overallBatchMinGasPrice: Optional<bigint>,
+  gasDetails: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const { populatedTransaction, nullifiers } =
-      await populateProvedTransaction(
-        networkName,
-        ProofType.Unshield,
-        railgunWalletID,
-        false, // showSenderAddressToRecipient
-        undefined, // memoText
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        undefined, // relayAdaptUnshieldERC20AmountRecipients
-        undefined, // relayAdaptUnshieldNFTAmounts
-        undefined, // relayAdaptShieldERC20Addresses
-        undefined, // relayAdaptShieldNFTs
-        undefined, // crossContractCallsSerialized
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-        gasDetailsSerialized,
-      );
+    const { transaction, nullifiers } = await populateProvedTransaction(
+      networkName,
+      ProofType.Unshield,
+      railgunWalletID,
+      false, // showSenderAddressToRecipient
+      undefined, // memoText
+      erc20AmountRecipients,
+      nftAmountRecipients,
+      undefined, // relayAdaptUnshieldERC20AmountRecipients
+      undefined, // relayAdaptUnshieldNFTAmounts
+      undefined, // relayAdaptShieldERC20Addresses
+      undefined, // relayAdaptShieldNFTs
+      undefined, // crossContractCalls
+      relayerFeeERC20AmountRecipient,
+      sendWithPublicWallet,
+      overallBatchMinGasPrice,
+      gasDetails,
+    );
     return {
       nullifiers,
-      serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
+      transaction,
     };
   } catch (err) {
     throw reportAndSanitizeError(populateProvedUnshield.name, err);
@@ -68,8 +65,8 @@ export const populateProvedUnshieldBaseToken = async (
   wrappedERC20Amount: RailgunERC20Amount,
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
-  gasDetailsSerialized: TransactionGasDetailsSerialized,
+  overallBatchMinGasPrice: Optional<bigint>,
+  gasDetails: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     const erc20AmountRecipients: RailgunERC20AmountRecipient[] = [
@@ -85,28 +82,27 @@ export const populateProvedUnshieldBaseToken = async (
     // Empty NFT Recipients.
     const nftAmountRecipients: RailgunNFTAmountRecipient[] = [];
 
-    const { populatedTransaction, nullifiers } =
-      await populateProvedTransaction(
-        networkName,
-        ProofType.UnshieldBaseToken,
-        railgunWalletID,
-        false, // showSenderAddressToRecipient
-        undefined, // memoText
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        relayAdaptUnshieldERC20Amounts,
-        undefined, // relayAdaptUnshieldNFTAmounts
-        undefined, // relayAdaptShieldERC20Addresses
-        undefined, // relayAdaptShieldNFTs
-        undefined, // crossContractCallsSerialized
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-        gasDetailsSerialized,
-      );
+    const { transaction, nullifiers } = await populateProvedTransaction(
+      networkName,
+      ProofType.UnshieldBaseToken,
+      railgunWalletID,
+      false, // showSenderAddressToRecipient
+      undefined, // memoText
+      erc20AmountRecipients,
+      nftAmountRecipients,
+      relayAdaptUnshieldERC20Amounts,
+      undefined, // relayAdaptUnshieldNFTAmounts
+      undefined, // relayAdaptShieldERC20Addresses
+      undefined, // relayAdaptShieldNFTs
+      undefined, // crossContractCalls
+      relayerFeeERC20AmountRecipient,
+      sendWithPublicWallet,
+      overallBatchMinGasPrice,
+      gasDetails,
+    );
     return {
       nullifiers,
-      serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
+      transaction,
     };
   } catch (err) {
     throw reportAndSanitizeError(populateProvedUnshieldBaseToken.name, err);
@@ -119,12 +115,12 @@ export const gasEstimateForUnprovenUnshield = async (
   encryptionKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  originalGasDetailsSerialized: TransactionGasDetailsSerialized,
+  originalGasDetails: TransactionGasDetails,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
-    const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
+    const overallBatchMinGasPrice = 0n;
 
     const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
@@ -150,7 +146,7 @@ export const gasEstimateForUnprovenUnshield = async (
       networkName,
       railgunWalletID,
       erc20AmountRecipients,
-      originalGasDetailsSerialized,
+      originalGasDetails,
       feeTokenDetails,
       sendWithPublicWallet,
       false, // isCrossContractCall
@@ -167,7 +163,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
   railgunWalletID: string,
   encryptionKey: string,
   wrappedERC20Amount: RailgunERC20Amount,
-  originalGasDetailsSerialized: TransactionGasDetailsSerialized,
+  originalGasDetails: TransactionGasDetails,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
@@ -180,7 +176,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
     // Empty NFT Recipients.
     const nftAmountRecipients: RailgunNFTAmountRecipient[] = [];
 
-    const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
+    const overallBatchMinGasPrice = 0n;
 
     const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
@@ -210,7 +206,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
       networkName,
       railgunWalletID,
       relayAdaptUnshieldERC20AmountRecipients,
-      originalGasDetailsSerialized,
+      originalGasDetails,
       feeTokenDetails,
       sendWithPublicWallet,
       false, // isCrossContractCall

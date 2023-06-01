@@ -1,8 +1,8 @@
 import {
+  CommitmentCiphertextStructOutput,
   TransactionStruct,
   formatCommitmentCiphertext,
 } from '@railgun-community/engine';
-import { CommitmentCiphertextStructOutput } from '@railgun-community/engine/dist/typechain-types/contracts/logic/RailgunSmartWallet';
 import {
   CommitmentCiphertext,
   CommitmentSummary,

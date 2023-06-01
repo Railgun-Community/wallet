@@ -23,7 +23,7 @@ export const generateTransferProof = async (
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
+  overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: ProverProgressCallback,
 ): Promise<void> => {
   try {
@@ -45,10 +45,7 @@ export const generateTransferProof = async (
       overallBatchMinGasPrice,
       progressCallback,
     );
-    const populatedTransaction = await generateTransact(
-      transactions,
-      networkName,
-    );
+    const transaction = await generateTransact(transactions, networkName);
 
     const nullifiers = nullifiersForTransactions(transactions);
 
@@ -63,17 +60,14 @@ export const generateTransferProof = async (
       relayAdaptUnshieldNFTAmounts: undefined,
       relayAdaptShieldERC20Addresses: undefined,
       relayAdaptShieldNFTs: undefined,
-      crossContractCallsSerialized: undefined,
+      crossContractCalls: undefined,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
-      populatedTransaction,
+      transaction,
       overallBatchMinGasPrice,
       nullifiers,
     });
   } catch (err) {
-    throw reportAndSanitizeError(
-      generateTransferProof.name,
-      err,
-    );
+    throw reportAndSanitizeError(generateTransferProof.name, err);
   }
 };

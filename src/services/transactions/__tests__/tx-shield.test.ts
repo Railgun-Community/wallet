@@ -1,17 +1,14 @@
-import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from '@ethersproject/bignumber';
 import Sinon, { SinonStub } from 'sinon';
 import {
   NetworkName,
-  deserializeTransaction,
   EVMGasType,
-  TransactionGasDetailsSerialized,
   RailgunERC20AmountRecipient,
-  decimalToHexString,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import {
+  closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../tests/setup.test';
@@ -31,6 +28,7 @@ import {
 } from '../tx-shield';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { getRandomBytes } from '../../railgun';
+import { FallbackProvider } from 'ethers';
 
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;
@@ -40,22 +38,22 @@ const shieldPrivateKey = getRandomBytes(32);
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const gasDetailsSerialized: TransactionGasDetailsSerialized = {
+const gasDetails: TransactionGasDetails = {
   evmGasType: EVMGasType.Type2,
-  gasEstimateString: '0x10',
-  maxFeePerGasString: '0x1000',
-  maxPriorityFeePerGasString: '0x100',
+  gasEstimate: BigInt('0x10'),
+  maxFeePerGas: BigInt('0x1000'),
+  maxPriorityFeePerGas: BigInt('0x100'),
 };
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunERC20AmountRecipient[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
-    amountString: '0x100',
+    amount: BigInt(0x100),
     recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
   },
   {
     tokenAddress: MOCK_TOKEN_ADDRESS_2,
-    amountString: '0x200',
+    amount: BigInt(0x200),
     recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
   },
 ];
@@ -63,12 +61,12 @@ const MOCK_TOKEN_AMOUNT_RECIPIENTS: RailgunERC20AmountRecipient[] = [
 const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunERC20AmountRecipient[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
-    amountString: '0x100',
+    amount: BigInt(0x100),
     recipientAddress: '0x1234',
   },
   {
     tokenAddress: MOCK_TOKEN_ADDRESS_2,
-    amountString: '0x200',
+    amount: BigInt(0x200),
     recipientAddress: '0x1234',
   },
 ];
@@ -77,7 +75,7 @@ const stubSuccess = () => {
   gasEstimateStub = Sinon.stub(
     FallbackProvider.prototype,
     'estimateGas',
-  ).resolves(BigNumber.from(decimalToHexString(200)));
+  ).resolves(200n);
 };
 
 const stubFailure = () => {
@@ -88,7 +86,8 @@ const stubFailure = () => {
 };
 
 describe('tx-shield', () => {
-  before(async () => {
+  before(async function run() {
+    this.timeout(5000);
     initTestEngine();
     await initTestEngineNetwork();
     await createRailgunWallet(
@@ -100,6 +99,9 @@ describe('tx-shield', () => {
   afterEach(() => {
     gasEstimateStub?.restore();
     sendTxStub?.restore();
+  });
+  after(async () => {
+    await closeTestEngine();
   });
 
   it('Should get expected signature message for shieldPrivateKey', () => {
@@ -115,7 +117,7 @@ describe('tx-shield', () => {
       MOCK_NFT_AMOUNT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
+    expect(rsp.gasEstimate).to.equal(200n);
   });
 
   it('Should error on gas estimates for invalid shield', async () => {
@@ -146,52 +148,42 @@ describe('tx-shield', () => {
 
   it('Should send tx for valid shield - no gas details', async () => {
     stubSuccess();
-    const rsp = await populateShield(
+    const { transaction } = await populateShield(
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      undefined, // gasDetailsSerialized
+      undefined, // gasDetails
     );
-    const parsedTx = deserializeTransaction(
-      rsp.serializedTransaction ?? '',
-      2,
-      1,
+    expect(transaction).to.be.an('object');
+    expect(transaction.data).to.be.a('string');
+    expect(transaction.to).to.equal(
+      '0x19b620929f97b7b990801496c3b361ca5def8c71',
     );
-    expect(parsedTx).to.be.an('object');
-    expect(parsedTx.data).to.be.a('string');
-    expect(parsedTx.to).to.equal('0x19B620929f97b7b990801496c3b361CA5dEf8C71');
-    expect(parsedTx.gasPrice).to.be.undefined;
-    expect(parsedTx.gasLimit).to.be.undefined;
-    expect(parsedTx.maxFeePerGas).to.be.undefined;
-    expect(parsedTx.maxPriorityFeePerGas).to.be.undefined;
+    expect(transaction.gasPrice).to.be.undefined;
+    expect(transaction.gasLimit).to.be.undefined;
+    expect(transaction.maxFeePerGas).to.be.undefined;
+    expect(transaction.maxPriorityFeePerGas).to.be.undefined;
   });
 
   it('Should send tx for valid shield - gas details', async () => {
     stubSuccess();
-    const rsp = await populateShield(
+    const { transaction } = await populateShield(
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      gasDetailsSerialized,
+      gasDetails,
     );
-    const parsedTx = deserializeTransaction(
-      rsp.serializedTransaction ?? '',
-      2,
-      1,
+    expect(transaction).to.be.an('object');
+    expect(transaction.data).to.be.a('string');
+    expect(transaction.to).to.equal(
+      '0x19b620929f97b7b990801496c3b361ca5def8c71',
     );
-    expect(parsedTx).to.be.an('object');
-    expect(parsedTx.data).to.be.a('string');
-    expect(parsedTx.to).to.equal('0x19B620929f97b7b990801496c3b361CA5dEf8C71');
-    expect(parsedTx.gasPrice).to.be.null;
-    expect((parsedTx.gasLimit as BigNumber).toHexString()).to.equal('0x13');
-    expect((parsedTx.maxFeePerGas as BigNumber).toHexString()).to.equal(
-      '0x1000',
-    );
-    expect((parsedTx.maxPriorityFeePerGas as BigNumber).toHexString()).to.equal(
-      '0x0100',
-    );
+    expect(transaction.gasPrice).to.be.undefined;
+    expect(transaction.gasLimit).to.equal(BigInt('0x13'));
+    expect(transaction.maxFeePerGas).to.equal(BigInt('0x1000'));
+    expect(transaction.maxPriorityFeePerGas).to.equal(BigInt('0x0100'));
   });
 
   it('Should error on send tx for invalid shield', async () => {
@@ -202,7 +194,7 @@ describe('tx-shield', () => {
         shieldPrivateKey,
         MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
         MOCK_NFT_AMOUNT_RECIPIENTS,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith('Invalid RAILGUN address.');
   });

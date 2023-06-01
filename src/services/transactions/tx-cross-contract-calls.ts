@@ -2,17 +2,14 @@ import {
   RailgunPopulateTransactionResponse,
   RailgunTransactionGasEstimateResponse,
   RailgunERC20Amount,
-  TransactionGasDetailsSerialized,
   NetworkName,
-  NETWORK_CONFIG,
   ProofType,
   TransactionReceiptLog,
   FeeTokenDetails,
-  deserializeTransaction,
-  serializeUnsignedTransaction,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
   RailgunNFTAmount,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
@@ -25,8 +22,6 @@ import {
   setCachedProvedTransaction,
 } from './proof-cache';
 import { sendErrorMessage } from '../../utils/logger';
-import { BigNumber } from '@ethersproject/bignumber';
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   RelayAdaptHelper,
   AdaptID,
@@ -44,42 +39,32 @@ import { fullWalletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { reportAndSanitizeError } from '../../utils/error';
+import { ContractTransaction } from 'ethers';
 
-const createPopulatedCrossContractCalls = (
-  crossContractCallsSerialized: string[],
-  networkName: NetworkName,
-): PopulatedTransaction[] => {
-  if (!crossContractCallsSerialized.length) {
+const createValidCrossContractCalls = (
+  crossContractCalls: ContractTransaction[],
+): ContractTransaction[] => {
+  if (!crossContractCalls.length) {
     throw new Error('No cross contract calls in transaction.');
   }
   try {
-    return crossContractCallsSerialized
-      .map(serialized =>
-        deserializeTransaction(
-          serialized,
-          undefined, // nonce
-          NETWORK_CONFIG[networkName].chain.id,
-        ),
-      )
-      .map(transactionRequest => {
-        const populatedTransaction: PopulatedTransaction = {
-          to: transactionRequest.to,
-          value: transactionRequest.value
-            ? BigNumber.from(transactionRequest.value)
-            : undefined,
-          data: transactionRequest.data
-            ? hexlify(transactionRequest.data, true)
-            : undefined,
-        };
-        assertNotBlockedAddress(populatedTransaction.to);
-        return populatedTransaction;
-      });
+    return crossContractCalls.map(transactionRequest => {
+      if (!transactionRequest.to || !transactionRequest.data) {
+        throw new Error(`Cross-contract calls require 'to' and 'data' fields.`);
+      }
+      const transaction: ContractTransaction = {
+        to: transactionRequest.to,
+        value: transactionRequest.value,
+        data: hexlify(transactionRequest.data, true),
+      };
+      assertNotBlockedAddress(transaction.to);
+      return transaction;
+    });
   } catch (err) {
     if (!(err instanceof Error)) {
       throw err;
     }
-    reportAndSanitizeError(createPopulatedCrossContractCalls.name, err);
-    throw new Error(`Invalid cross-contract calls: ${err.message}`);
+    throw reportAndSanitizeError(createValidCrossContractCalls.name, err);
   }
 };
 
@@ -140,37 +125,36 @@ export const populateProvedCrossContractCalls = async (
   relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[],
   relayAdaptShieldERC20Addresses: string[],
   relayAdaptShieldNFTs: RailgunNFTAmount[],
-  crossContractCallsSerialized: string[],
+  crossContractCalls: ContractTransaction[],
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
-  gasDetailsSerialized: TransactionGasDetailsSerialized,
+  overallBatchMinGasPrice: Optional<bigint>,
+  gasDetails: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const { populatedTransaction, nullifiers } =
-      await populateProvedTransaction(
-        networkName,
-        ProofType.CrossContractCalls,
-        railgunWalletID,
-        false, // showSenderAddressToRecipient
-        undefined, // memoText
-        [], // erc20AmountRecipients
-        [], // nftAmountRecipients
-        relayAdaptUnshieldERC20Amounts,
-        relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-        gasDetailsSerialized,
-      );
-    delete populatedTransaction.from;
+    const { transaction, nullifiers } = await populateProvedTransaction(
+      networkName,
+      ProofType.CrossContractCalls,
+      railgunWalletID,
+      false, // showSenderAddressToRecipient
+      undefined, // memoText
+      [], // erc20AmountRecipients
+      [], // nftAmountRecipients
+      relayAdaptUnshieldERC20Amounts,
+      relayAdaptUnshieldNFTAmounts,
+      relayAdaptShieldERC20Addresses,
+      relayAdaptShieldNFTs,
+      crossContractCalls,
+      relayerFeeERC20AmountRecipient,
+      sendWithPublicWallet,
+      overallBatchMinGasPrice,
+      gasDetails,
+    );
+    delete transaction.from;
 
     return {
       nullifiers,
-      serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
+      transaction,
     };
   } catch (err) {
     throw reportAndSanitizeError(populateProvedCrossContractCalls.name, err);
@@ -185,8 +169,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
   relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[],
   relayAdaptShieldERC20Addresses: string[],
   relayAdaptShieldNFTs: RailgunNFTAmount[],
-  crossContractCallsSerialized: string[],
-  originalGasDetailsSerialized: TransactionGasDetailsSerialized,
+  crossContractCalls: ContractTransaction[],
+  originalGasDetails: TransactionGasDetails,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
@@ -195,12 +179,10 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
     setCachedProvedTransaction(undefined);
 
-    const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
+    const overallBatchMinGasPrice = 0n;
 
-    const crossContractCalls = createPopulatedCrossContractCalls(
-      crossContractCallsSerialized,
-      networkName,
-    );
+    const validCrossContractCalls =
+      createValidCrossContractCalls(crossContractCalls);
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
@@ -246,24 +228,23 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
         const relayAdaptParamsRandom = randomHex(31);
 
         // TODO: We should add the relay adapt contract gas limit here.
-        const populatedTransaction =
-          await relayAdaptContract.populateCrossContractCalls(
-            txs,
-            crossContractCalls,
-            relayShieldRequests,
-            relayAdaptParamsRandom,
-            true, // isGasEstimate
-            !sendWithPublicWallet, // isRelayerTransaction
-          );
+        const transaction = await relayAdaptContract.populateCrossContractCalls(
+          txs,
+          validCrossContractCalls,
+          relayShieldRequests,
+          relayAdaptParamsRandom,
+          true, // isGasEstimate
+          !sendWithPublicWallet, // isRelayerTransaction
+        );
         // Remove gasLimit, we'll set to the minimum below.
         // TODO: Remove after callbacks upgrade.
-        delete populatedTransaction.gasLimit;
-        return populatedTransaction;
+        delete transaction.gasLimit;
+        return transaction;
       },
       networkName,
       railgunWalletID,
       relayAdaptUnshieldERC20AmountRecipients,
-      originalGasDetailsSerialized,
+      originalGasDetails,
       feeTokenDetails,
       sendWithPublicWallet,
       true, // isCrossContractCall
@@ -271,15 +252,10 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 
     // TODO: Remove this after callbacks upgrade.
     // If gas estimate is under the cross-contract-minimum, replace it with the minimum.
-    if (response.gasEstimateString) {
-      const minimum = BigNumber.from(
-        MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT,
-      );
-      const gasEstimateBelowMinimum = BigNumber.from(
-        response.gasEstimateString,
-      ).lt(minimum);
-      if (gasEstimateBelowMinimum) {
-        response.gasEstimateString = minimum.toHexString();
+    if (response.gasEstimate) {
+      const minimum = MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT;
+      if (response.gasEstimate < minimum) {
+        response.gasEstimate = minimum;
       }
     }
 
@@ -300,10 +276,10 @@ export const generateCrossContractCallsProof = async (
   relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[],
   relayAdaptShieldERC20Addresses: string[],
   relayAdaptShieldNFTs: RailgunNFTAmount[],
-  crossContractCallsSerialized: string[],
+  crossContractCalls: ContractTransaction[],
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
+  overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: ProverProgressCallback,
 ): Promise<void> => {
   try {
@@ -311,10 +287,8 @@ export const generateCrossContractCallsProof = async (
 
     setCachedProvedTransaction(undefined);
 
-    const crossContractCalls = createPopulatedCrossContractCalls(
-      crossContractCallsSerialized,
-      networkName,
-    );
+    const validCrossContractCalls =
+      createValidCrossContractCalls(crossContractCalls);
 
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
@@ -363,7 +337,7 @@ export const generateCrossContractCallsProof = async (
     const relayAdaptParams =
       await relayAdaptContract.getRelayAdaptParamsCrossContractCalls(
         dummyUnshieldTxs,
-        crossContractCalls,
+        validCrossContractCalls,
         relayShieldRequests,
         relayAdaptParamsRandom,
         isRelayerTransaction,
@@ -393,16 +367,15 @@ export const generateCrossContractCallsProof = async (
 
     const nullifiers = nullifiersForTransactions(transactions);
 
-    const populatedTransaction =
-      await relayAdaptContract.populateCrossContractCalls(
-        transactions,
-        crossContractCalls,
-        relayShieldRequests,
-        relayAdaptParamsRandom,
-        false, // isGasEstimate
-        isRelayerTransaction,
-      );
-    delete populatedTransaction.from;
+    const transaction = await relayAdaptContract.populateCrossContractCalls(
+      transactions,
+      validCrossContractCalls,
+      relayShieldRequests,
+      relayAdaptParamsRandom,
+      false, // isGasEstimate
+      isRelayerTransaction,
+    );
+    delete transaction.from;
 
     setCachedProvedTransaction({
       proofType: ProofType.CrossContractCalls,
@@ -415,10 +388,10 @@ export const generateCrossContractCallsProof = async (
       relayAdaptUnshieldNFTAmounts,
       relayAdaptShieldERC20Addresses,
       relayAdaptShieldNFTs,
-      crossContractCallsSerialized,
+      crossContractCalls: validCrossContractCalls,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
-      populatedTransaction,
+      transaction,
       overallBatchMinGasPrice,
       nullifiers,
     });
@@ -445,10 +418,11 @@ export const getRelayAdaptTransactionError = (
 
 export const parseRelayAdaptReturnValue = (data: string): Optional<string> => {
   try {
-    const relayAdaptError = RelayAdaptContract.parseRelayAdaptReturnValue(data);
-    if (relayAdaptError) {
-      sendErrorMessage(relayAdaptError);
-      return relayAdaptError;
+    const relayAdaptErrorParsed =
+      RelayAdaptContract.parseRelayAdaptReturnValue(data);
+    if (relayAdaptErrorParsed) {
+      sendErrorMessage(relayAdaptErrorParsed.error);
+      return relayAdaptErrorParsed.error;
     }
     return undefined;
   } catch (err) {

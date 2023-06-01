@@ -2,8 +2,6 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   RailgunWallet,
-  ByteLength,
-  nToHex,
   Balances,
   Chain,
   ChainType,
@@ -21,7 +19,7 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MNEMONIC,
 } from '../../../../tests/mocks.test';
-import { initTestEngine } from '../../../../tests/setup.test';
+import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -61,8 +59,9 @@ describe('balance-update', () => {
   afterEach(() => {
     walletBalanceStub.resetHistory();
   });
-  after(() => {
+  after(async () => {
     walletBalanceStub.restore();
+    await closeTestEngine();
   });
 
   it('Should not pull balances without callback', async () => {
@@ -85,7 +84,7 @@ describe('balance-update', () => {
     expect(formattedBalances.erc20Amounts.length).to.equal(1);
     expect(formattedBalances.erc20Amounts[0]).to.deep.equal({
       tokenAddress: '0x0000000000000000000000000000000000012536',
-      amountString: nToHex(BigInt(10), ByteLength.UINT_256, true),
+      amount: 10n,
     });
   });
 });

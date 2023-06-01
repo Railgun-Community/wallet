@@ -1,17 +1,15 @@
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   RailgunPopulateTransactionResponse,
   RailgunTransactionGasEstimateResponse,
   RailgunERC20Amount,
-  TransactionGasDetailsSerialized,
   NetworkName,
-  serializeUnsignedTransaction,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
   gasEstimateResponse,
   getGasEstimate,
-  setGasDetailsForPopulatedTransaction,
+  setGasDetailsForTransaction,
 } from './tx-gas-details';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import {
@@ -22,27 +20,27 @@ import {
 } from '@railgun-community/engine';
 import { assertValidRailgunAddress } from '../railgun';
 import { reportAndSanitizeError } from '../../utils/error';
+import { ContractTransaction } from 'ethers';
 
 const generateShieldBaseTokenTransaction = async (
   networkName: NetworkName,
   railgunAddress: string,
   shieldPrivateKey: string,
   wrappedERC20Amount: RailgunERC20Amount,
-): Promise<PopulatedTransaction> => {
+): Promise<ContractTransaction> => {
   try {
     const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
     const { masterPublicKey, viewingPublicKey } =
       RailgunEngine.decodeAddress(railgunAddress);
     const random = randomHex(16);
 
-    const amount = BigInt(wrappedERC20Amount.amountString);
-    const wrappedAddress = wrappedERC20Amount.tokenAddress;
+    const { amount, tokenAddress } = wrappedERC20Amount;
 
     const shield = new ShieldNoteERC20(
       masterPublicKey,
       random,
       amount,
-      wrappedAddress,
+      tokenAddress,
     );
 
     const shieldRequest = await shield.serialize(
@@ -50,10 +48,11 @@ const generateShieldBaseTokenTransaction = async (
       viewingPublicKey,
     );
 
-    const populatedTransaction =
-      await relayAdaptContract.populateShieldBaseToken(shieldRequest);
+    const transaction = await relayAdaptContract.populateShieldBaseToken(
+      shieldRequest,
+    );
 
-    return populatedTransaction;
+    return transaction;
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(
       generateShieldBaseTokenTransaction.name,
@@ -68,36 +67,33 @@ export const populateShieldBaseToken = async (
   railgunAddress: string,
   shieldPrivateKey: string,
   wrappedERC20Amount: RailgunERC20Amount,
-  gasDetailsSerialized?: TransactionGasDetailsSerialized,
+  gasDetails?: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     assertValidRailgunAddress(railgunAddress);
 
-    const populatedTransaction = await generateShieldBaseTokenTransaction(
+    const transaction = await generateShieldBaseTokenTransaction(
       networkName,
       railgunAddress,
       shieldPrivateKey,
       wrappedERC20Amount,
     );
 
-    if (gasDetailsSerialized) {
+    if (gasDetails) {
       const sendWithPublicWallet = true;
-      setGasDetailsForPopulatedTransaction(
+      setGasDetailsForTransaction(
         networkName,
-        populatedTransaction,
-        gasDetailsSerialized,
+        transaction,
+        gasDetails,
         sendWithPublicWallet,
       );
     }
 
     return {
-      serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
+      transaction,
     };
   } catch (err) {
-    throw reportAndSanitizeError(
-      populateShieldBaseToken.name,
-      err,
-    );
+    throw reportAndSanitizeError(populateShieldBaseToken.name, err);
   }
 };
 
@@ -112,7 +108,7 @@ export const gasEstimateForShieldBaseToken = async (
     assertValidRailgunAddress(railgunAddress);
     assertNotBlockedAddress(fromWalletAddress);
 
-    const populatedTransaction = await generateShieldBaseTokenTransaction(
+    const transaction = await generateShieldBaseTokenTransaction(
       networkName,
       railgunAddress,
       shieldPrivateKey,
@@ -124,7 +120,7 @@ export const gasEstimateForShieldBaseToken = async (
     return gasEstimateResponse(
       await getGasEstimate(
         networkName,
-        populatedTransaction,
+        transaction,
         fromWalletAddress,
         sendWithPublicWallet,
         false, // isCrossContractCall
@@ -133,9 +129,6 @@ export const gasEstimateForShieldBaseToken = async (
       isGasEstimateWithDummyProof,
     );
   } catch (err) {
-    throw reportAndSanitizeError(
-      gasEstimateForShieldBaseToken.name,
-      err,
-    );
+    throw reportAndSanitizeError(gasEstimateForShieldBaseToken.name, err);
   }
 };

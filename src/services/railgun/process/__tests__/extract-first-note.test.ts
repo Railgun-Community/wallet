@@ -1,4 +1,3 @@
-import { Provider } from '@ethersproject/providers';
 import {
   AddressData,
   getPublicViewingKey,
@@ -18,29 +17,23 @@ import {
 } from '@railgun-community/engine';
 import { getProviderForNetwork, loadProvider } from '../../core/providers';
 import { extractFirstNoteERC20AmountMapFromTransactionRequest } from '../extract-first-note';
-import { BigNumber } from '@ethersproject/bignumber';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
 } from '../../../../tests/mocks.test';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { randomBytes } from '@ethersproject/random';
 import {
   createEngineWalletBalancesStub,
   createEngineVerifyProofStub,
   restoreEngineStubs,
 } from '../../../../tests/stubs/engine-stubs.test';
-import {
-  decimalToHexString,
-  NetworkName,
-  NETWORK_CONFIG,
-} from '@railgun-community/shared-models';
+import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import { createRailgunWallet } from '../../wallets';
 import { fullWalletForID, getEngine } from '../../core/engine';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { initTestEngine } from '../../../../tests/setup.test';
+import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
+import { randomBytes } from 'ethers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -80,7 +73,7 @@ const MOCK_MNEMONIC_1 =
 const createGoerliTransferTransactions = async (
   receiverAddressData: AddressData,
   senderAddressData: AddressData,
-  fee: BigNumber,
+  fee: bigint,
   tokenAddress: string,
 ): Promise<TransactionStruct[]> => {
   const transaction = new TransactionBatch(GOERLI_NETWORK.chain);
@@ -89,7 +82,7 @@ const createGoerliTransferTransactions = async (
       receiverAddressData,
       senderAddressData,
       RANDOM_TRANSACT,
-      BigInt(fee.toHexString()),
+      fee,
       getTokenDataERC20(tokenAddress),
       await mockViewingKeys(),
       false, // shouldShowSender
@@ -107,7 +100,7 @@ const createGoerliTransferTransactions = async (
 const createGoerliRelayAdaptUnshieldTransactions = async (
   receiverAddressData: AddressData,
   senderAddressData: AddressData,
-  fee: BigNumber,
+  fee: bigint,
   tokenAddress: string,
 ): Promise<TransactionStruct[]> => {
   const transaction = new TransactionBatch(GOERLI_NETWORK.chain);
@@ -116,7 +109,7 @@ const createGoerliRelayAdaptUnshieldTransactions = async (
       receiverAddressData,
       senderAddressData,
       RANDOM_TRANSACT,
-      BigInt(fee.toHexString()),
+      fee,
       getTokenDataERC20(tokenAddress),
       await mockViewingKeys(),
       false, // shouldShowSender
@@ -151,7 +144,6 @@ describe('extract-first-note', () => {
     await loadProvider(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
       GOERLI_NETWORK.name,
-      false, // shouldDebug
     );
 
     const provider = getProviderForNetwork(GOERLI_NETWORK.name);
@@ -163,12 +155,12 @@ describe('extract-first-note', () => {
 
     proxyContract = new RailgunSmartWalletContract(
       ropstenProxyContractAddress,
-      provider as Provider,
+      provider,
       GOERLI_NETWORK.chain,
     );
     relayAdaptContract = new RelayAdaptContract(
       ropstenRelayAdaptContractAddress,
-      provider as Provider,
+      provider,
     );
 
     const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));
@@ -179,13 +171,13 @@ describe('extract-first-note', () => {
     );
     createEngineVerifyProofStub();
   });
-
-  after(() => {
+  after(async () => {
     restoreEngineStubs();
+    await closeTestEngine();
   });
 
   it('Should extract fee correctly - transfer', async () => {
-    const fee = BigNumber.from('1000');
+    const fee = BigInt('1000');
     const senderAddressData = RailgunEngine.decodeAddress(
       '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
     );
@@ -195,22 +187,22 @@ describe('extract-first-note', () => {
       fee,
       MOCK_TOKEN_ADDRESS,
     );
-    const populatedTransaction = await proxyContract.transact(transactions);
+    const transaction = await proxyContract.transact(transactions);
     const firstNoteERC20AmountMap =
       await extractFirstNoteERC20AmountMapFromTransactionRequest(
         railgunWallet.id,
         NETWORK_CONFIG[NetworkName.EthereumGoerli],
-        populatedTransaction,
+        transaction,
         false, // useRelayAdapt
       );
     expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(1);
-    expect(
-      firstNoteERC20AmountMap[MOCK_TOKEN_ADDRESS.toLowerCase()].toHexString(),
-    ).to.equal(decimalToHexString(1000));
+    expect(firstNoteERC20AmountMap[MOCK_TOKEN_ADDRESS.toLowerCase()]).to.equal(
+      1000n,
+    );
   }).timeout(60000);
 
   it('Should fail for incorrect receiver address - transfer', async () => {
-    const fee = BigNumber.from('1000');
+    const fee = BigInt('1000');
     const receiverAddressData = RailgunEngine.decodeAddress(
       '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
     );
@@ -223,19 +215,19 @@ describe('extract-first-note', () => {
       fee,
       MOCK_TOKEN_ADDRESS,
     );
-    const populatedTransaction = await proxyContract.transact(transactions);
+    const transaction = await proxyContract.transact(transactions);
     const firstNoteERC20AmountMap =
       await extractFirstNoteERC20AmountMapFromTransactionRequest(
         railgunWallet.id,
         NETWORK_CONFIG[NetworkName.EthereumGoerli],
-        populatedTransaction,
+        transaction,
         false, // useRelayAdapt
       );
     expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(0);
   }).timeout(60000);
 
   it('Should extract fee correctly - relay adapt', async () => {
-    const fee = BigNumber.from('1000');
+    const fee = BigInt('1000');
     const senderAddressData = RailgunEngine.decodeAddress(
       '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
     );
@@ -245,27 +237,26 @@ describe('extract-first-note', () => {
       fee,
       MOCK_TOKEN_ADDRESS,
     );
-    const populatedTransaction =
-      await relayAdaptContract.populateUnshieldBaseToken(
-        transactions,
-        MOCK_ETH_WALLET_ADDRESS,
-        RANDOM_RELAY_ADAPT,
-      );
+    const transaction = await relayAdaptContract.populateUnshieldBaseToken(
+      transactions,
+      MOCK_ETH_WALLET_ADDRESS,
+      RANDOM_RELAY_ADAPT,
+    );
     const firstNoteERC20AmountMap =
       await extractFirstNoteERC20AmountMapFromTransactionRequest(
         railgunWallet.id,
         GOERLI_NETWORK,
-        populatedTransaction,
+        transaction,
         true, // useRelayAdapt
       );
     expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(1);
-    expect(
-      firstNoteERC20AmountMap[MOCK_TOKEN_ADDRESS.toLowerCase()].toHexString(),
-    ).to.equal(decimalToHexString(1000));
+    expect(firstNoteERC20AmountMap[MOCK_TOKEN_ADDRESS.toLowerCase()]).to.equal(
+      1000n,
+    );
   }).timeout(60000);
 
   it('Should fail for incorrect receiver address - relay adapt', async () => {
-    const fee = BigNumber.from('1000');
+    const fee = BigInt('1000');
     const receiverAddressData = RailgunEngine.decodeAddress(
       '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
     );
@@ -278,17 +269,16 @@ describe('extract-first-note', () => {
       fee,
       MOCK_TOKEN_ADDRESS,
     );
-    const populatedTransaction =
-      await relayAdaptContract.populateUnshieldBaseToken(
-        transactions,
-        MOCK_ETH_WALLET_ADDRESS,
-        RANDOM_RELAY_ADAPT,
-      );
+    const transaction = await relayAdaptContract.populateUnshieldBaseToken(
+      transactions,
+      MOCK_ETH_WALLET_ADDRESS,
+      RANDOM_RELAY_ADAPT,
+    );
     const firstNoteERC20AmountMap =
       await extractFirstNoteERC20AmountMapFromTransactionRequest(
         railgunWallet.id,
         NETWORK_CONFIG[NetworkName.EthereumGoerli],
-        populatedTransaction,
+        transaction,
         true, // useRelayAdapt
       );
     expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(0);

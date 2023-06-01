@@ -1,4 +1,3 @@
-import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
@@ -15,15 +14,12 @@ import {
   RailgunERC20Amount,
   NetworkName,
   NETWORK_CONFIG,
-  deserializeTransaction,
   EVMGasType,
-  TransactionGasDetailsSerialized,
   RailgunERC20AmountRecipient,
-  decimalToHexString,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import { BigNumber } from '@ethersproject/bignumber';
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
+  closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../tests/setup.test';
@@ -57,6 +53,7 @@ import {
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { setCachedProvedTransaction } from '../proof-cache';
+import { ContractTransaction, FallbackProvider } from 'ethers';
 
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
@@ -95,20 +92,20 @@ const mockNFTTokenData1 = getTokenDataNFT(
 const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
-    amountString: '0x0100',
+    amount: BigInt(0x0100),
   },
   {
     tokenAddress: MOCK_TOKEN_ADDRESS_2,
-    amountString: '0x0300',
+    amount: BigInt(0x0300),
   },
 ];
 
-const overallBatchMinGasPrice = '0x1000';
+const overallBatchMinGasPrice = BigInt('0x1000');
 
-const gasDetailsSerialized: TransactionGasDetailsSerialized = {
+const gasDetails: TransactionGasDetails = {
   evmGasType: EVMGasType.Type1,
-  gasEstimateString: '0x00',
-  gasPriceString: overallBatchMinGasPrice,
+  gasEstimate: 1000n,
+  gasPrice: overallBatchMinGasPrice,
 };
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunERC20AmountRecipient[] =
@@ -133,7 +130,7 @@ const stubGasEstimateSuccess = () => {
   gasEstimateStub = Sinon.stub(
     FallbackProvider.prototype,
     'estimateGas',
-  ).resolves(BigNumber.from('200'));
+  ).resolves(BigInt('200'));
 };
 
 const stubGasEstimateFailure = () => {
@@ -148,7 +145,8 @@ const spyOnSetUnshield = () => {
 };
 
 describe('tx-unshield', () => {
-  before(async () => {
+  before(async function run() {
+    this.timeout(5000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletInfo = await createRailgunWallet(
@@ -197,25 +195,26 @@ describe('tx-unshield', () => {
     railTransactStub = Sinon.stub(
       RailgunSmartWalletContract.prototype,
       'transact',
-    ).resolves({ data: '0x0123' } as PopulatedTransaction);
+    ).resolves({ data: '0x0123' } as ContractTransaction);
     relayAdaptPopulateUnshieldBaseToken = Sinon.stub(
       RelayAdaptContract.prototype,
       'populateUnshieldBaseToken',
-    ).resolves({ data: '0x0123' } as PopulatedTransaction);
+    ).resolves({ data: '0x0123' } as ContractTransaction);
   });
   afterEach(() => {
     gasEstimateStub?.restore();
     addUnshieldDataSpy?.restore();
     erc20NoteSpy?.restore();
   });
-  after(() => {
+  after(async () => {
     railProveStub.restore();
     railDummyProveStub.restore();
     railTransactStub.restore();
     relayAdaptPopulateUnshieldBaseToken.restore();
+    await closeTestEngine();
   });
 
-  // WITHDRAW - GAS ESTIMATE
+  // UNSHIELD - GAS ESTIMATE
 
   it('Should get gas estimates for valid Unshield', async () => {
     stubGasEstimateSuccess();
@@ -270,7 +269,7 @@ describe('tx-unshield', () => {
       ], // run 2 - token 2
     ]);
     // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
+    expect(rsp.gasEstimate).to.equal(7500n + 200n);
   }).timeout(10000);
 
   it('Should error on gas estimates for invalid Unshield', async () => {
@@ -305,7 +304,7 @@ describe('tx-unshield', () => {
     ).rejectedWith('test rejection - gas estimate');
   });
 
-  // WITHDRAW BASE TOKEN - GAS ESTIMATE
+  // UNSHIELD BASE TOKEN - GAS ESTIMATE
 
   it('Should get gas estimates for valid Unshield base token', async () => {
     stubGasEstimateSuccess();
@@ -344,7 +343,7 @@ describe('tx-unshield', () => {
       ],
     ]);
     // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
+    expect(rsp.gasEstimate).to.equal(7500n + 200n);
   }).timeout(10000);
 
   it('Should get gas estimates for valid Unshield base token: public wallet', async () => {
@@ -373,7 +372,7 @@ describe('tx-unshield', () => {
       ],
     ]);
     // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
+    expect(rsp.gasEstimate).to.equal(7500n + 200n);
   }).timeout(10000);
 
   it('Should error on gas estimates for invalid Unshield base token', async () => {
@@ -408,7 +407,7 @@ describe('tx-unshield', () => {
     ).rejectedWith('test rejection - gas estimate');
   });
 
-  // WITHDRAW - PROVE AND SEND
+  // UNSHIELD - PROVE AND SEND
 
   it('Should populate tx for valid Unshield', async () => {
     stubGasEstimateSuccess();
@@ -468,31 +467,23 @@ describe('tx-unshield', () => {
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(populateResponse.serializedTransaction).to.equal(
-      '0x01cc8080821000808080820123c0',
+      gasDetails,
     );
     expect(populateResponse.nullifiers).to.deep.equal([
       '0x0000000000000000000000000000000000000000000000000000000000000001',
       '0x0000000000000000000000000000000000000000000000000000000000000002',
     ]);
 
-    const deserialized = deserializeTransaction(
-      populateResponse.serializedTransaction as string,
-      2,
-      1,
-    );
+    const { transaction } = populateResponse;
 
-    expect(deserialized.nonce).to.equal(2);
-    expect(deserialized.gasPrice?.toString()).to.equal('4096');
-    expect(deserialized.gasLimit).to.equal(undefined);
-    expect(deserialized.value?.toString()).to.equal('0');
-    expect(deserialized.data).to.equal('0x0123');
-    expect(deserialized.to).to.equal(null);
-    expect(deserialized.chainId).to.equal(1);
-    expect(deserialized.type).to.equal(1);
-    expect(Object.keys(deserialized).length).to.equal(8);
+    expect(transaction.nonce).to.equal(undefined);
+    expect(transaction.gasPrice?.toString()).to.equal('4096');
+    expect(transaction.gasLimit).to.equal(1200n);
+    expect(transaction.value?.toString()).to.equal(undefined);
+    expect(transaction.data).to.equal('0x0123');
+    expect(transaction.to).to.equal(undefined);
+    expect(transaction.chainId).to.equal(undefined);
+    expect(transaction.type).to.equal(1);
   });
 
   it('Should error on populate tx for invalid Unshield', async () => {
@@ -506,7 +497,7 @@ describe('tx-unshield', () => {
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
@@ -525,7 +516,7 @@ describe('tx-unshield', () => {
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith('Invalid proof for this transaction. No proof found.');
   });
@@ -552,14 +543,14 @@ describe('tx-unshield', () => {
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
     );
   });
 
-  // WITHDRAW BASE TOKEN - PROVE AND SEND
+  // UNSHIELD BASE TOKEN - PROVE AND SEND
 
   it('Should populate tx for valid Unshield Base Token', async () => {
     stubGasEstimateSuccess();
@@ -603,27 +594,19 @@ describe('tx-unshield', () => {
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(populateResponse.serializedTransaction).to.equal(
-      '0x01cc8080821000808080820123c0',
+      gasDetails,
     );
 
-    const deserialized = deserializeTransaction(
-      populateResponse.serializedTransaction as string,
-      2,
-      1,
-    );
+    const { transaction } = populateResponse;
 
-    expect(deserialized.nonce).to.equal(2);
-    expect(deserialized.gasPrice?.toString()).to.equal('4096');
-    expect(deserialized.gasLimit).to.equal(undefined);
-    expect(deserialized.value?.toString()).to.equal('0');
-    expect(deserialized.data).to.equal('0x0123');
-    expect(deserialized.to).to.equal(null);
-    expect(deserialized.chainId).to.equal(1);
-    expect(deserialized.type).to.equal(1);
-    expect(Object.keys(deserialized).length).to.equal(8);
+    expect(transaction.nonce).to.equal(undefined);
+    expect(transaction.gasPrice?.toString()).to.equal('4096');
+    expect(transaction.gasLimit).to.equal(1200n);
+    expect(transaction.value?.toString()).to.equal(undefined);
+    expect(transaction.data).to.equal('0x0123');
+    expect(transaction.to).to.equal(undefined);
+    expect(transaction.chainId).to.equal(undefined);
+    expect(transaction.type).to.equal(1);
   }).timeout(60000);
 
   it('Should error on populate tx for invalid Unshield Base Token', async () => {
@@ -633,11 +616,11 @@ describe('tx-unshield', () => {
         NetworkName.Polygon,
         MOCK_ETH_WALLET_ADDRESS,
         railgunWallet.id,
-        MOCK_TOKEN_AMOUNTS_DIFFERENT[0],
+        MOCK_TOKEN_AMOUNTS_DIFFERENT[1],
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
@@ -656,7 +639,7 @@ describe('tx-unshield', () => {
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith('Invalid proof for this transaction. No proof found.');
   });
@@ -668,7 +651,7 @@ describe('tx-unshield', () => {
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
-      MOCK_TOKEN_AMOUNTS[0],
+      MOCK_TOKEN_AMOUNTS[1],
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
@@ -679,11 +662,11 @@ describe('tx-unshield', () => {
         NetworkName.Polygon,
         MOCK_ETH_WALLET_ADDRESS,
         railgunWallet.id,
-        MOCK_TOKEN_AMOUNTS_DIFFERENT[0],
+        MOCK_TOKEN_AMOUNTS_DIFFERENT[1],
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',

@@ -6,7 +6,7 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MNEMONIC,
 } from '../../../../tests/mocks.test';
-import { initTestEngine } from '../../../../tests/setup.test';
+import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { createRailgunWallet } from '../wallets';
 import {
   refreshRailgunBalances,
@@ -62,11 +62,12 @@ describe('balances', () => {
     walletFullScanStub.resetHistory();
     engineFullScanStub.resetHistory();
   });
-  after(() => {
+  after(async () => {
     walletScanStub.restore();
     engineScanStub.restore();
     walletFullScanStub.restore();
     engineFullScanStub.restore();
+    await closeTestEngine();
   });
 
   it('Should run wallet scan if active wallet for ID', async () => {

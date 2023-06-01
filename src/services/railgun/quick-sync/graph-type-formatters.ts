@@ -33,8 +33,7 @@ import {
   Ciphertext as GraphCiphertext,
   Token as GraphToken,
 } from './graphql';
-import { getAddress } from '@ethersproject/address';
-import { BigNumber } from '@ethersproject/bignumber';
+import { getAddress } from 'ethers';
 
 export type GraphCommitment =
   | GraphLegacyEncryptedCommitment
@@ -88,8 +87,8 @@ export const formatGraphUnshieldEvents = (
       tokenType: graphTokenTypeToEngineTokenType(unshield.token.tokenType),
       tokenAddress: getAddress(unshield.token.tokenAddress),
       tokenSubID: unshield.token.tokenSubID,
-      amount: bigIntToHex(unshield.amount),
-      fee: bigIntToHex(unshield.fee),
+      amount: bigIntStringToHex(unshield.amount),
+      fee: bigIntStringToHex(unshield.fee),
       blockNumber: Number(unshield.blockNumber),
     };
   });
@@ -201,8 +200,8 @@ const formatCommitmentCiphertext = (
   };
 };
 
-const bigIntToHex = (bigint: string): string => {
-  return BigNumber.from(bigint).toHexString();
+const bigIntStringToHex = (bigintString: string): string => {
+  return BigInt(bigintString).toString(16);
 };
 
 const formatLegacyGeneratedCommitment = (
@@ -212,7 +211,7 @@ const formatLegacyGeneratedCommitment = (
     txid: formatTo32Bytes(commitment.transactionHash, false),
     timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.LegacyGeneratedCommitment,
-    hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
+    hash: formatTo32Bytes(bigIntStringToHex(commitment.hash), false),
     preImage: formatPreImage(commitment.preimage),
     encryptedRandom: [
       formatTo32Bytes(commitment.encryptedRandom[0], false),
@@ -229,7 +228,7 @@ const formatLegacyEncryptedCommitment = (
     txid: formatTo32Bytes(commitment.transactionHash, false),
     timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.LegacyEncryptedCommitment,
-    hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
+    hash: formatTo32Bytes(bigIntStringToHex(commitment.hash), false),
     ciphertext: formatLegacyCommitmentCiphertext(commitment.legacyCiphertext),
     blockNumber: Number(commitment.blockNumber),
   };
@@ -242,14 +241,12 @@ const formatShieldCommitment = (
     txid: formatTo32Bytes(commitment.transactionHash, false),
     timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.ShieldCommitment,
-    hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
+    hash: formatTo32Bytes(bigIntStringToHex(commitment.hash), false),
     preImage: formatPreImage(commitment.preimage),
     blockNumber: Number(commitment.blockNumber),
     encryptedBundle: commitment.encryptedBundle as [string, string, string],
     shieldKey: commitment.shieldKey,
-    fee: commitment.fee
-      ? BigNumber.from(commitment.fee).toHexString()
-      : undefined,
+    fee: commitment.fee ? commitment.fee.toString() : undefined,
   };
   if (!shieldCommitment.fee) {
     delete shieldCommitment.fee;
@@ -264,7 +261,7 @@ const formatTransactCommitment = (
     txid: formatTo32Bytes(commitment.transactionHash, false),
     timestamp: Number(commitment.blockTimestamp),
     commitmentType: CommitmentType.TransactCommitment,
-    hash: formatTo32Bytes(bigIntToHex(commitment.hash), false),
+    hash: formatTo32Bytes(bigIntStringToHex(commitment.hash), false),
     ciphertext: formatCommitmentCiphertext(commitment.ciphertext),
     blockNumber: Number(commitment.blockNumber),
   };

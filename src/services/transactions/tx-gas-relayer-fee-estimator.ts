@@ -1,16 +1,12 @@
-import { BigNumber } from '@ethersproject/bignumber';
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import { TransactionStruct } from '@railgun-community/engine';
 import {
   NetworkName,
   TransactionGasDetails,
   RailgunERC20Amount,
-  TransactionGasDetailsSerialized,
   RailgunTransactionGasEstimateResponse,
   FeeTokenDetails,
   calculateMaximumGas,
   RailgunERC20AmountRecipient,
-  deserializeTransactionGasDetails,
   CommitmentSummary,
 } from '@railgun-community/shared-models';
 import {
@@ -21,6 +17,7 @@ import { getGasEstimate, gasEstimateResponse } from './tx-gas-details';
 import { balanceForERC20Token } from '../railgun/wallets/balance-update';
 import { walletForID } from '../railgun';
 import { convertTransactionStructToCommitmentSummary } from '../railgun/util/commitment';
+import { ContractTransaction } from 'ethers';
 
 const MAX_ITERATIONS_RELAYER_FEE_REESTIMATION = 5;
 
@@ -28,14 +25,13 @@ export const calculateRelayerFeeERC20Amount = (
   feeTokenDetails: FeeTokenDetails,
   gasDetails: TransactionGasDetails,
 ): RailgunERC20Amount => {
-  const tokenFeePerUnitGas = BigNumber.from(feeTokenDetails.feePerUnitGas);
-  const oneUnitGas = BigNumber.from(10).pow(18);
+  const tokenFeePerUnitGas = BigInt(feeTokenDetails.feePerUnitGas);
+  const oneUnitGas = 10n ** 18n;
   const maximumGas = calculateMaximumGas(gasDetails);
-  const tokenFee = tokenFeePerUnitGas.mul(maximumGas).div(oneUnitGas);
-
+  const tokenFee = (tokenFeePerUnitGas * maximumGas) / oneUnitGas;
   return {
     tokenAddress: feeTokenDetails.tokenAddress,
-    amountString: tokenFee.toHexString(),
+    amount: tokenFee,
   };
 };
 
@@ -55,24 +51,18 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
   generateDummyTransactionStructsWithRelayerFee: (
     relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
   ) => Promise<TransactionStruct[]>,
-  generatePopulatedTransaction: (
+  generateTransaction: (
     serializedTransactions: TransactionStruct[],
-  ) => Promise<PopulatedTransaction>,
+  ) => Promise<ContractTransaction>,
   networkName: NetworkName,
   railgunWalletID: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
-  originalGasDetailsSerialized: TransactionGasDetailsSerialized,
+  originalGasDetails: TransactionGasDetails,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
   isCrossContractCall: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   const wallet = walletForID(railgunWalletID);
-  const originalGasDetails = deserializeTransactionGasDetails(
-    originalGasDetailsSerialized,
-  );
-  if (!originalGasDetails) {
-    throw new Error('Requires originalGasDetails parameter.');
-  }
 
   // Use dead address for private transaction gas estimate
   const fromWalletAddress = DUMMY_FROM_ADDRESS;
@@ -85,13 +75,11 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
 
   let serializedTransactions =
     await generateDummyTransactionStructsWithRelayerFee(dummyRelayerFee);
-  let populatedTransaction = await generatePopulatedTransaction(
-    serializedTransactions,
-  );
+  let transaction = await generateTransaction(serializedTransactions);
 
   let gasEstimate = await getGasEstimate(
     networkName,
-    populatedTransaction,
+    transaction,
     fromWalletAddress,
     sendWithPublicWallet,
     isCrossContractCall,
@@ -140,7 +128,7 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
     // If Relayer fee causes overflow with the token balance,
     // then use the MAX amount for Relayer Fee, which is BALANCE - SENDING AMOUNT.
     if (
-      !balanceForRelayerFeeERC20.isZero() &&
+      balanceForRelayerFeeERC20 > 0n &&
       relayerFeeMatchingSendingERC20Amount &&
       // eslint-disable-next-line no-await-in-loop
       (await relayerFeeWillOverflowBalance(
@@ -149,9 +137,8 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
         updatedRelayerFee,
       ))
     ) {
-      updatedRelayerFee.amountString = balanceForRelayerFeeERC20
-        .sub(relayerFeeMatchingSendingERC20Amount.amountString)
-        .toHexString();
+      updatedRelayerFee.amount =
+        balanceForRelayerFeeERC20 - relayerFeeMatchingSendingERC20Amount.amount;
     }
 
     const newSerializedTransactions =
@@ -177,20 +164,18 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
     serializedTransactions = newSerializedTransactions;
 
     // eslint-disable-next-line no-await-in-loop
-    populatedTransaction = await generatePopulatedTransaction(
-      serializedTransactions,
-    );
+    transaction = await generateTransaction(serializedTransactions);
 
     // eslint-disable-next-line no-await-in-loop
     const newGasEstimate = await getGasEstimate(
       networkName,
-      populatedTransaction,
+      transaction,
       fromWalletAddress,
       sendWithPublicWallet,
       isCrossContractCall,
     );
 
-    if (newGasEstimate.toHexString() === gasEstimate.toHexString()) {
+    if (newGasEstimate === gasEstimate) {
       return gasEstimateResponse(
         newGasEstimate,
         relayerFeeCommitment,
@@ -228,12 +213,12 @@ const compareCircuitSizesTransactionStructs = (
 };
 
 const relayerFeeWillOverflowBalance = async (
-  tokenBalance: BigNumber,
+  tokenBalance: bigint,
   sendingERC20Amount: RailgunERC20Amount,
   relayerFeeERC20Amount: RailgunERC20Amount,
 ) => {
-  const sendingAmount = BigNumber.from(sendingERC20Amount.amountString);
-  const relayerFeeAmount = BigNumber.from(relayerFeeERC20Amount.amountString);
+  const sendingAmount = sendingERC20Amount.amount;
+  const relayerFeeAmount = relayerFeeERC20Amount.amount;
 
-  return sendingAmount.add(relayerFeeAmount).gt(tokenBalance);
+  return sendingAmount + relayerFeeAmount > tokenBalance;
 };

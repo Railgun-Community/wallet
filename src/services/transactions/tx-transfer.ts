@@ -2,13 +2,12 @@ import {
   RailgunPopulateTransactionResponse,
   RailgunTransactionGasEstimateResponse,
   RailgunERC20Amount,
-  TransactionGasDetailsSerialized,
   NetworkName,
   ProofType,
   FeeTokenDetails,
-  serializeUnsignedTransaction,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
@@ -17,7 +16,6 @@ import {
 import { populateProvedTransaction } from './proof-cache';
 import { TransactionStruct } from '@railgun-community/engine';
 import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
-import { BigNumber } from '@ethersproject/bignumber';
 import { reportAndSanitizeError } from '../../utils/error';
 
 export const populateProvedTransfer = async (
@@ -29,38 +27,34 @@ export const populateProvedTransfer = async (
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
-  gasDetailsSerialized: TransactionGasDetailsSerialized,
+  overallBatchMinGasPrice: Optional<bigint>,
+  gasDetails: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const { populatedTransaction, nullifiers } =
-      await populateProvedTransaction(
-        networkName,
-        ProofType.Transfer,
-        railgunWalletID,
-        showSenderAddressToRecipient,
-        memoText,
-        erc20AmountRecipients,
-        nftAmountRecipients,
-        undefined, // relayAdaptUnshieldERC20AmountRecipients
-        undefined, // relayAdaptUnshieldNFTAmounts
-        undefined, // relayAdaptShieldERC20Addresses
-        undefined, // relayAdaptShieldNFTs
-        undefined, // crossContractCallsSerialized
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        overallBatchMinGasPrice,
-        gasDetailsSerialized,
-      );
+    const { transaction, nullifiers } = await populateProvedTransaction(
+      networkName,
+      ProofType.Transfer,
+      railgunWalletID,
+      showSenderAddressToRecipient,
+      memoText,
+      erc20AmountRecipients,
+      nftAmountRecipients,
+      undefined, // relayAdaptUnshieldERC20AmountRecipients
+      undefined, // relayAdaptUnshieldNFTAmounts
+      undefined, // relayAdaptShieldERC20Addresses
+      undefined, // relayAdaptShieldNFTs
+      undefined, // crossContractCalls
+      relayerFeeERC20AmountRecipient,
+      sendWithPublicWallet,
+      overallBatchMinGasPrice,
+      gasDetails,
+    );
     return {
       nullifiers,
-      serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
+      transaction,
     };
   } catch (err) {
-    throw reportAndSanitizeError(
-      populateProvedTransfer.name,
-      err,
-    );
+    throw reportAndSanitizeError(populateProvedTransfer.name, err);
   }
 };
 
@@ -71,12 +65,12 @@ export const gasEstimateForUnprovenTransfer = async (
   memoText: Optional<string>,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  originalGasDetailsSerialized: TransactionGasDetailsSerialized,
+  originalGasDetails: TransactionGasDetails,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
-    const overallBatchMinGasPrice = BigNumber.from(0).toHexString();
+    const overallBatchMinGasPrice = 0n;
 
     const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
@@ -102,16 +96,13 @@ export const gasEstimateForUnprovenTransfer = async (
       networkName,
       railgunWalletID,
       erc20AmountRecipients,
-      originalGasDetailsSerialized,
+      originalGasDetails,
       feeTokenDetails,
       sendWithPublicWallet,
       false, // isCrossContractCall
     );
     return response;
   } catch (err) {
-    throw reportAndSanitizeError(
-      gasEstimateForUnprovenTransfer.name,
-      err,
-    );
+    throw reportAndSanitizeError(gasEstimateForUnprovenTransfer.name, err);
   }
 };

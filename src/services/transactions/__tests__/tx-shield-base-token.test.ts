@@ -1,16 +1,13 @@
-import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { BigNumber } from '@ethersproject/bignumber';
 import Sinon, { SinonStub } from 'sinon';
 import {
   NetworkName,
-  deserializeTransaction,
   EVMGasType,
-  TransactionGasDetailsSerialized,
-  decimalToHexString,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import {
+  closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../tests/setup.test';
@@ -25,12 +22,11 @@ import {
   gasEstimateForShieldBaseToken,
 } from '../tx-shield-base-token';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
-import { PopulatedTransaction } from '@ethersproject/contracts';
-import { randomHex, RelayAdaptContract } from '@railgun-community/engine';
+import { randomHex } from '@railgun-community/engine';
+import { FallbackProvider } from 'ethers';
 
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;
-let relayAdaptPopulateShieldBaseToken: SinonStub;
 let railgunAddress: string;
 
 const shieldPrivateKey = randomHex(32);
@@ -38,18 +34,18 @@ const shieldPrivateKey = randomHex(32);
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const gasDetailsSerialized: TransactionGasDetailsSerialized = {
+const gasDetails: TransactionGasDetails = {
   evmGasType: EVMGasType.Type2,
-  gasEstimateString: '0x00',
-  maxFeePerGasString: '0x1000',
-  maxPriorityFeePerGasString: '0x100',
+  gasEstimate: 1000n,
+  maxFeePerGas: BigInt('0x1000'),
+  maxPriorityFeePerGas: BigInt('0x100'),
 };
 
 const stubSuccess = () => {
   gasEstimateStub = Sinon.stub(
     FallbackProvider.prototype,
     'estimateGas',
-  ).resolves(BigNumber.from(decimalToHexString(200)));
+  ).resolves(200n);
 };
 
 const stubFailure = () => {
@@ -60,7 +56,8 @@ const stubFailure = () => {
 };
 
 describe('tx-shield-base-token', () => {
-  before(async () => {
+  before(async function run() {
+    this.timeout(5000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletInfo = await createRailgunWallet(
@@ -70,15 +67,13 @@ describe('tx-shield-base-token', () => {
     );
 
     railgunAddress = railgunWalletInfo.railgunAddress;
-    relayAdaptPopulateShieldBaseToken = Sinon.stub(
-      RelayAdaptContract.prototype,
-      'populateShieldBaseToken',
-    ).resolves({ data: '0x0123' } as PopulatedTransaction);
   });
   afterEach(() => {
     gasEstimateStub?.restore();
     sendTxStub?.restore();
-    relayAdaptPopulateShieldBaseToken?.restore();
+  });
+  after(async () => {
+    await closeTestEngine();
   });
 
   it('Should get gas estimate for valid shield base token', async () => {
@@ -90,7 +85,7 @@ describe('tx-shield-base-token', () => {
       MOCK_TOKEN_AMOUNTS[0],
       MOCK_ETH_WALLET_ADDRESS,
     );
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
+    expect(rsp.gasEstimate).to.equal(200n);
   });
 
   it('Should error on gas estimates for invalid shield base token', async () => {
@@ -121,21 +116,16 @@ describe('tx-shield-base-token', () => {
 
   it('Should send tx for valid shield base token', async () => {
     stubSuccess();
-    const rsp = await populateShieldBaseToken(
+    const { transaction } = await populateShieldBaseToken(
       NetworkName.Polygon,
       railgunAddress,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNTS[0],
-      gasDetailsSerialized,
+      gasDetails,
     );
-    const parsedTx = deserializeTransaction(
-      rsp.serializedTransaction ?? '',
-      2,
-      1,
-    );
-    expect(parsedTx).to.be.an('object');
-    expect(parsedTx.data).to.be.a('string');
-    expect(parsedTx.to).to.be.a('string');
+    expect(transaction).to.be.an('object');
+    expect(transaction.data).to.be.a('string');
+    expect(transaction.to).to.be.a('string');
   });
 
   it('Should error on send tx for invalid shield base token', async () => {
@@ -146,7 +136,7 @@ describe('tx-shield-base-token', () => {
         '123456789',
         shieldPrivateKey,
         MOCK_TOKEN_AMOUNTS[0],
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith('Invalid RAILGUN address.');
   });

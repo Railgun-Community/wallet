@@ -7,11 +7,9 @@ import {
   TokenType,
   formatToByteLength,
   ByteLength,
-  nToHex,
   TransactionHistoryUnshieldTokenAmount,
 } from '@railgun-community/engine';
 import {
-  TransactionHistorySerializedResponse,
   TransactionHistoryItem,
   RailgunERC20Amount,
   RailgunSendERC20Amount,
@@ -24,7 +22,6 @@ import {
   TransactionHistoryItemCategory,
 } from '@railgun-community/shared-models';
 import { walletForID } from '../core/engine';
-import { BigNumber } from '@ethersproject/bignumber';
 import { parseRailgunTokenAddress } from '../util/bytes';
 import { reportAndSanitizeError } from '../../../utils/error';
 
@@ -108,9 +105,7 @@ const transactionHistoryTokenAmountToRailgunERC20Amount = (
     tokenAddress: parseRailgunTokenAddress(
       transactionHistoryTokenAmount.tokenData.tokenAddress,
     ).toLowerCase(),
-    amountString: BigNumber.from(
-      transactionHistoryTokenAmount.amount,
-    ).toHexString(),
+    amount: transactionHistoryTokenAmount.amount,
   };
 };
 
@@ -123,11 +118,7 @@ const transactionHistoryNFTToRailgunNFTAmount = (
     ).toLowerCase(),
     nftTokenType: transactionHistoryNFT.tokenData.tokenType as 1 | 2,
     tokenSubID: transactionHistoryNFT.tokenData.tokenSubID,
-    amountString: nToHex(
-      transactionHistoryNFT.amount,
-      ByteLength.UINT_256,
-      true,
-    ),
+    amount: transactionHistoryNFT.amount,
   };
 };
 
@@ -241,16 +232,14 @@ export const getWalletTransactionHistory = async (
   chain: Chain,
   railgunWalletID: string,
   startingBlock: Optional<number>,
-): Promise<TransactionHistorySerializedResponse> => {
+): Promise<TransactionHistoryItem[]> => {
   try {
     const wallet = walletForID(railgunWalletID);
     const transactionHistory = await wallet.getTransactionHistory(
       chain,
       startingBlock,
     );
-    return {
-      items: serializeTransactionHistory(transactionHistory),
-    };
+    return serializeTransactionHistory(transactionHistory);
   } catch (err) {
     reportAndSanitizeError(getWalletTransactionHistory.name, err);
     throw new Error('Could not load RAILGUN wallet transaction history.');

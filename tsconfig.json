@@ -1,11 +1,11 @@
 {
   "env": {
-    "es6": true,
     "node": true
   },
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2020",
     "module": "commonjs",
+    "moduleResolution": "node",
     "declaration": true,
     "sourceMap": true,
     "inlineSources": true,
@@ -23,7 +23,6 @@
     "resolveJsonModule": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
     "types": ["node", "mocha"],
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },

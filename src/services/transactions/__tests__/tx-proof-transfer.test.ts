@@ -16,8 +16,8 @@ import {
   RailgunNFTAmountRecipient,
   RailgunERC20AmountRecipient,
 } from '@railgun-community/shared-models';
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
+  closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../tests/setup.test';
@@ -34,6 +34,7 @@ import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { getCachedProvedTransaction } from '../proof-cache';
 import { generateTransferProof } from '../tx-proof-transfer';
+import { ContractTransaction } from 'ethers';
 
 let railgunWallet: RailgunWallet;
 let railgunWalletAddress: string;
@@ -44,9 +45,9 @@ let nftAmountRecipients: RailgunNFTAmountRecipient[];
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MOCK_POPULATED_TX = {} as PopulatedTransaction;
+const MOCK_TRANSACTION = {} as ContractTransaction;
 
-const overallBatchMinGasPrice = '0x1000';
+const overallBatchMinGasPrice = BigInt('0x1000');
 
 describe.skip('tx-proofs', () => {
   before(async () => {
@@ -115,6 +116,9 @@ describe.skip('tx-proofs', () => {
         '17847544257240351011885349052582675772817264504940544227356428415831210506037',
       ),
     );
+    after(async () => {
+      await closeTestEngine();
+    });
 
     // const balances: Balances = {
     //   [tokenAddress]: {
@@ -185,7 +189,7 @@ describe.skip('tx-proofs', () => {
     );
     expect(getCachedProvedTransaction()).to.deep.equal({
       proofType: ProofType.Transfer,
-      populatedTransaction: MOCK_POPULATED_TX,
+      transaction: MOCK_TRANSACTION,
       railgunWalletID: railgunWallet.id,
       toWalletAddress: railgunWalletAddress,
       erc20AmountRecipients,

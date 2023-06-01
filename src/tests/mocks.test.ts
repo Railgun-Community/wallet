@@ -3,10 +3,10 @@ import {
   FeeTokenDetails,
   EVMGasType,
   RailgunERC20Amount,
-  TransactionGasDetailsSerialized,
   RailgunNFTAmountRecipient,
   NFTTokenType,
   RailgunNFTAmount,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import { BalancesUpdatedCallback } from '../services/railgun/wallets/balance-update';
 import { CommitmentCiphertext } from '@railgun-community/engine';
@@ -42,18 +42,18 @@ export const TEST_WALLET_SOURCE = 'test engine';
 export const MOCK_TOKEN_AMOUNTS_TOKEN_1_ONLY: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
-    amountString: '0x100',
+    amount: BigInt(0x100),
   },
 ];
 
 export const MOCK_TOKEN_AMOUNTS: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
-    amountString: '0x100',
+    amount: BigInt(0x100),
   },
   {
     tokenAddress: MOCK_TOKEN_ADDRESS_2,
-    amountString: '0x200',
+    amount: BigInt(0x200),
   },
 ];
 
@@ -62,13 +62,13 @@ export const MOCK_NFT_AMOUNTS: RailgunNFTAmount[] = [
     nftAddress: MOCK_NFT_ADDRESS,
     nftTokenType: NFTTokenType.ERC721,
     tokenSubID: '0x01',
-    amountString: '0x01',
+    amount: BigInt(0x01),
   },
   {
     nftAddress: MOCK_NFT_ADDRESS,
     nftTokenType: NFTTokenType.ERC1155,
     tokenSubID: '0x02',
-    amountString: '0x02',
+    amount: BigInt(0x02),
   },
 ];
 
@@ -138,20 +138,20 @@ export const MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD: RailgunNFTAmountRecipient[] =
 
 export const MOCK_TOKEN_FEE: RailgunERC20Amount = {
   tokenAddress: MOCK_TOKEN_ADDRESS,
-  amountString: '0x0300',
+  amount: BigInt(0x0300),
 };
 
 export const MOCK_FEE_TOKEN_DETAILS: FeeTokenDetails = {
   tokenAddress: MOCK_TOKEN_ADDRESS,
-  feePerUnitGas: '0x2000000000000000000', // 2x
+  feePerUnitGas: BigInt('0x2000000000000000000'), // 2x
 };
 
-export const MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2: TransactionGasDetailsSerialized =
+export const MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2: TransactionGasDetails =
   {
     evmGasType: EVMGasType.Type2,
-    gasEstimateString: '0x00',
-    maxFeePerGasString: '0x1234567890',
-    maxPriorityFeePerGasString: '0x123456',
+    gasEstimate: 0n,
+    maxFeePerGas: BigInt('0x1234567890'),
+    maxPriorityFeePerGas: BigInt('0x123456'),
   };
 
 export const MOCK_BALANCES_UPDATE_CALLBACK: BalancesUpdatedCallback = () => {
@@ -167,18 +167,18 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG: FallbackProviderJsonConfig = {
   providers: [
     {
       provider: 'https://rpc.ankr.com/polygon',
-      priority: 1,
-      weight: 1,
+      priority: 2,
+      weight: 2,
     },
     {
       provider: 'https://polygon-rpc.com',
       priority: 2,
-      weight: 1,
+      weight: 2,
     },
     {
       provider: 'https://rpc-mainnet.maticvigil.com',
       priority: 3,
-      weight: 1,
+      weight: 2,
     },
   ],
 };
@@ -188,25 +188,19 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI: FallbackProviderJsonConf
     chainId: 80001,
     providers: [
       {
-        provider:
-          'https://polygon-mumbai.gateway.pokt.network/v1/lb/627a4b6e18e53a003a6b6c26',
-        priority: 2,
-        weight: 1,
-      },
-      {
         provider: 'https://rpc-mumbai.maticvigil.com',
-        priority: 3,
-        weight: 1,
+        priority: 1,
+        weight: 2,
       },
       {
         provider: 'https://matic-mumbai.chainstacklabs.com',
         priority: 3,
-        weight: 1,
+        weight: 2,
       },
       {
         provider: 'https://rpc.ankr.com/polygon_mumbai',
         priority: 3,
-        weight: 1,
+        weight: 2,
       },
     ],
   };
@@ -218,18 +212,18 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI: FallbackProviderJsonConf
       {
         provider: 'https://goerli.blockpi.network/v1/rpc/public',
         priority: 2,
-        weight: 1,
+        weight: 2,
       },
       {
         provider:
           'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
         priority: 3,
-        weight: 1,
+        weight: 2,
       },
       {
         provider: 'https://rpc.ankr.com/eth_goerli',
         priority: 3,
-        weight: 1,
+        weight: 2,
       },
     ],
   };

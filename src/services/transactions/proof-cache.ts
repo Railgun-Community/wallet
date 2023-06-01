@@ -1,16 +1,18 @@
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   NetworkName,
   ProofType,
   RailgunNFTAmountRecipient,
   RailgunERC20Amount,
   RailgunERC20AmountRecipient,
-  TransactionGasDetailsSerialized,
   RailgunNFTAmount,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import { shouldSetOverallBatchMinGasPriceForNetwork } from '../../utils/gas-price';
-import { compareStringArrays } from '../../utils/utils';
-import { setGasDetailsForPopulatedTransaction } from './tx-gas-details';
+import {
+  compareContractTransactionArrays,
+  compareStringArrays,
+} from '../../utils/utils';
+import { setGasDetailsForTransaction } from './tx-gas-details';
 import {
   compareERC20AmountRecipients,
   compareERC20AmountRecipientArrays,
@@ -18,10 +20,11 @@ import {
   compareNFTAmountRecipientArrays,
   compareNFTAmountArrays,
 } from './tx-notes';
+import { ContractTransaction } from 'ethers';
 
 export type ProvedTransaction = {
   proofType: ProofType;
-  populatedTransaction: PopulatedTransaction;
+  transaction: ContractTransaction;
   railgunWalletID: string;
   showSenderAddressToRecipient: boolean;
   memoText: Optional<string>;
@@ -31,10 +34,10 @@ export type ProvedTransaction = {
   relayAdaptUnshieldNFTAmounts: Optional<RailgunNFTAmount[]>;
   relayAdaptShieldERC20Addresses: Optional<string[]>;
   relayAdaptShieldNFTs: Optional<RailgunNFTAmount[]>;
-  crossContractCallsSerialized: Optional<string[]>;
+  crossContractCalls: Optional<ContractTransaction[]>;
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>;
   sendWithPublicWallet: boolean;
-  overallBatchMinGasPrice: Optional<string>;
+  overallBatchMinGasPrice: Optional<bigint>;
   nullifiers: string[];
 };
 
@@ -52,13 +55,13 @@ export const populateProvedTransaction = async (
   relayAdaptUnshieldNFTAmounts: Optional<RailgunNFTAmount[]>,
   relayAdaptShieldERC20Addresses: Optional<string[]>,
   relayAdaptShieldNFTs: Optional<RailgunNFTAmount[]>,
-  crossContractCallsSerialized: Optional<string[]>,
+  crossContractCalls: Optional<ContractTransaction[]>,
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
-  gasDetailsSerialized: TransactionGasDetailsSerialized,
+  overallBatchMinGasPrice: Optional<bigint>,
+  gasDetails: TransactionGasDetails,
 ): Promise<{
-  populatedTransaction: PopulatedTransaction;
+  transaction: ContractTransaction;
   nullifiers: string[];
 }> => {
   try {
@@ -74,7 +77,7 @@ export const populateProvedTransaction = async (
       relayAdaptUnshieldNFTAmounts,
       relayAdaptShieldERC20Addresses,
       relayAdaptShieldNFTs,
-      crossContractCallsSerialized,
+      crossContractCalls,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
@@ -86,20 +89,20 @@ export const populateProvedTransaction = async (
     throw new Error(`Invalid proof for this transaction. ${err.message}`);
   }
 
-  const { populatedTransaction, nullifiers } = getCachedProvedTransaction();
+  const { transaction, nullifiers } = getCachedProvedTransaction();
 
-  setGasDetailsForPopulatedTransaction(
+  setGasDetailsForTransaction(
     networkName,
-    populatedTransaction,
-    gasDetailsSerialized,
+    transaction,
+    gasDetails,
     sendWithPublicWallet,
   );
 
-  return { populatedTransaction, nullifiers };
+  return { transaction, nullifiers };
 };
 
 export const setCachedProvedTransaction = (tx?: ProvedTransaction) => {
-  if (tx?.populatedTransaction?.from) {
+  if (tx?.transaction?.from) {
     throw new Error(`Cannot cache a transaction with a 'from' address.`);
   }
   cachedProvedTransaction = tx;
@@ -158,10 +161,10 @@ export const validateCachedProvedTransaction = (
   relayAdaptUnshieldNFTAmounts: Optional<RailgunNFTAmount[]>,
   relayAdaptShieldERC20Addresses: Optional<string[]>,
   relayAdaptShieldNFTs: Optional<RailgunNFTAmount[]>,
-  crossContractCallsSerialized: Optional<string[]>,
+  crossContractCalls: Optional<ContractTransaction[]>,
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
+  overallBatchMinGasPrice: Optional<bigint>,
 ): void => {
   if (!cachedProvedTransaction) {
     throw new Error('No proof found.');
@@ -229,12 +232,12 @@ export const validateCachedProvedTransaction = (
     throw new Error('Mismatch: relayAdaptShieldNFTs.');
   } else if (
     shouldValidateCrossContractCalls(proofType) &&
-    !compareStringArrays(
-      crossContractCallsSerialized,
-      cachedProvedTransaction.crossContractCallsSerialized,
+    !compareContractTransactionArrays(
+      crossContractCalls,
+      cachedProvedTransaction.crossContractCalls,
     )
   ) {
-    throw new Error('Mismatch: crossContractCallsSerialized.');
+    throw new Error('Mismatch: crossContractCalls.');
   } else if (
     !compareERC20AmountRecipients(
       cachedProvedTransaction.relayerFeeERC20AmountRecipient,

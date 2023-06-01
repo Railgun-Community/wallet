@@ -32,7 +32,7 @@ export const generateUnshieldProof = async (
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
+  overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: ProverProgressCallback,
 ): Promise<void> => {
   try {
@@ -54,10 +54,7 @@ export const generateUnshieldProof = async (
       overallBatchMinGasPrice,
       progressCallback,
     );
-    const populatedTransaction = await generateTransact(
-      transactions,
-      networkName,
-    );
+    const transaction = await generateTransact(transactions, networkName);
 
     const nullifiers = nullifiersForTransactions(transactions);
 
@@ -72,18 +69,15 @@ export const generateUnshieldProof = async (
       relayAdaptUnshieldNFTAmounts: undefined,
       relayAdaptShieldERC20Addresses: undefined,
       relayAdaptShieldNFTs: undefined,
-      crossContractCallsSerialized: undefined,
+      crossContractCalls: undefined,
       relayerFeeERC20AmountRecipient,
-      populatedTransaction,
+      transaction,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
       nullifiers,
     });
   } catch (err) {
-    throw reportAndSanitizeError(
-      generateUnshieldProof.name,
-      err,
-    );
+    throw reportAndSanitizeError(generateUnshieldProof.name, err);
   }
 };
 
@@ -95,7 +89,7 @@ export const generateUnshieldBaseTokenProof = async (
   wrappedERC20Amount: RailgunERC20Amount,
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  overallBatchMinGasPrice: Optional<string>,
+  overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: ProverProgressCallback,
 ): Promise<void> => {
   try {
@@ -175,7 +169,7 @@ export const generateUnshieldBaseTokenProof = async (
       progressCallback,
     );
 
-    const populatedTransaction = await generateUnshieldBaseToken(
+    const transaction = await generateUnshieldBaseToken(
       transactions,
       networkName,
       publicWalletAddress,
@@ -196,10 +190,10 @@ export const generateUnshieldBaseTokenProof = async (
       relayAdaptUnshieldNFTAmounts: undefined,
       relayAdaptShieldERC20Addresses: undefined,
       relayAdaptShieldNFTs: undefined,
-      crossContractCallsSerialized: undefined,
+      crossContractCalls: undefined,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
-      populatedTransaction,
+      transaction,
       overallBatchMinGasPrice,
       nullifiers,
     });

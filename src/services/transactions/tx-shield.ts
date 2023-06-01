@@ -1,13 +1,11 @@
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
   RailgunPopulateTransactionResponse,
   RailgunTransactionGasEstimateResponse,
-  TransactionGasDetailsSerialized,
   NetworkName,
-  serializeUnsignedTransaction,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
   NFTTokenType,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
 import {
   ShieldNote,
@@ -22,7 +20,7 @@ import {
 import {
   gasEstimateResponse,
   getGasEstimate,
-  setGasDetailsForPopulatedTransaction,
+  setGasDetailsForTransaction,
 } from './tx-gas-details';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import {
@@ -31,6 +29,7 @@ import {
 } from '../railgun';
 import { createNFTTokenDataFromRailgunNFTAmount } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
+import { ContractTransaction } from 'ethers';
 
 export const getShieldPrivateKeySignatureMessage = () => {
   return ShieldNote.getShieldPrivateKeySignatureMessage();
@@ -51,7 +50,7 @@ const generateERC20Shield = async (
   const shield = new ShieldNoteERC20(
     masterPublicKey,
     random,
-    BigInt(erc20AmountRecipient.amountString),
+    erc20AmountRecipient.amount,
     erc20AmountRecipient.tokenAddress,
   );
   return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
@@ -72,7 +71,7 @@ const generateNFTShield = async (
   const value =
     nftAmountRecipient.nftTokenType === NFTTokenType.ERC721
       ? ERC721_NOTE_VALUE
-      : BigInt(nftAmountRecipient.amountString);
+      : nftAmountRecipient.amount;
 
   const nftTokenData =
     createNFTTokenDataFromRailgunNFTAmount(nftAmountRecipient);
@@ -91,7 +90,7 @@ const generateShieldTransactions = async (
   shieldPrivateKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-): Promise<PopulatedTransaction> => {
+): Promise<ContractTransaction> => {
   try {
     const railgunSmartWalletContract =
       getRailgunSmartWalletContractForNetwork(networkName);
@@ -106,9 +105,10 @@ const generateShieldTransactions = async (
       ),
     ]);
 
-    const populatedTransaction =
-      await railgunSmartWalletContract.generateShield(shieldInputs);
-    return populatedTransaction;
+    const transaction = await railgunSmartWalletContract.generateShield(
+      shieldInputs,
+    );
+    return transaction;
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(
       generateShieldTransactions.name,
@@ -123,28 +123,28 @@ export const populateShield = async (
   shieldPrivateKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  gasDetailsSerialized?: TransactionGasDetailsSerialized,
+  gasDetails?: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const populatedTransaction = await generateShieldTransactions(
+    const transaction = await generateShieldTransactions(
       networkName,
       shieldPrivateKey,
       erc20AmountRecipients,
       nftAmountRecipients,
     );
 
-    if (gasDetailsSerialized) {
+    if (gasDetails) {
       const sendWithPublicWallet = true;
-      setGasDetailsForPopulatedTransaction(
+      setGasDetailsForTransaction(
         networkName,
-        populatedTransaction,
-        gasDetailsSerialized,
+        transaction,
+        gasDetails,
         sendWithPublicWallet,
       );
     }
 
     return {
-      serializedTransaction: serializeUnsignedTransaction(populatedTransaction),
+      transaction,
     };
   } catch (err) {
     throw reportAndSanitizeError(populateShield.name, err);
@@ -161,7 +161,7 @@ export const gasEstimateForShield = async (
   try {
     assertNotBlockedAddress(fromWalletAddress);
 
-    const populatedTransaction = await generateShieldTransactions(
+    const transaction = await generateShieldTransactions(
       networkName,
       shieldPrivateKey,
       erc20AmountRecipients,
@@ -173,7 +173,7 @@ export const gasEstimateForShield = async (
     return gasEstimateResponse(
       await getGasEstimate(
         networkName,
-        populatedTransaction,
+        transaction,
         fromWalletAddress,
         sendWithPublicWallet,
         false, // isCrossContractCall

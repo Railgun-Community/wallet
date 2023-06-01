@@ -1,4 +1,3 @@
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -20,6 +19,7 @@ import {
   setCachedProvedTransaction,
   validateCachedProvedTransaction,
 } from '../proof-cache';
+import { ContractTransaction } from 'ethers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -40,7 +40,9 @@ const relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient = {
   ...MOCK_TOKEN_FEE,
   recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
 };
-const crossContractCallsSerialized = ['0x4567'];
+const crossContractCalls: ContractTransaction[] = [
+  { to: '0x4567', data: '0x' },
+];
 const relayAdaptShieldERC20Addresses = ['0x123'];
 const relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[] = [MOCK_TOKEN_FEE];
 const relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[] = MOCK_NFT_AMOUNTS;
@@ -49,11 +51,11 @@ const relayAdaptShieldNFTs: RailgunNFTAmount[] = MOCK_NFT_AMOUNTS;
 const nullifiers = ['0x1234'];
 
 const sendWithPublicWallet = false;
-const overallBatchMinGasPrice = '0x1000';
+const overallBatchMinGasPrice = BigInt('0x1000');
 
 const setCached = (proofType: ProofType) => {
   setCachedProvedTransaction({
-    populatedTransaction: {} as PopulatedTransaction,
+    transaction: {} as ContractTransaction,
     proofType,
     showSenderAddressToRecipient,
     memoText,
@@ -64,7 +66,7 @@ const setCached = (proofType: ProofType) => {
     relayAdaptUnshieldNFTAmounts,
     relayAdaptShieldERC20Addresses,
     relayAdaptShieldNFTs,
-    crossContractCallsSerialized,
+    crossContractCalls,
     relayerFeeERC20AmountRecipient,
     sendWithPublicWallet: false,
     overallBatchMinGasPrice,
@@ -88,7 +90,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -111,7 +113,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -131,7 +133,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -151,7 +153,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -171,7 +173,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -195,7 +197,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -216,7 +218,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -234,7 +236,7 @@ describe('proof-cache', () => {
         [
           {
             tokenAddress: '0x765',
-            amountString: '100',
+            amount: 100n,
             recipientAddress: '0x123',
           },
         ],
@@ -243,7 +245,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -265,7 +267,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -285,13 +287,13 @@ describe('proof-cache', () => {
         [
           {
             tokenAddress: '0x765',
-            amountString: '100',
+            amount: 100n,
           },
         ],
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -312,7 +314,7 @@ describe('proof-cache', () => {
         [MOCK_NFT_AMOUNTS[0]],
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -333,7 +335,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         ['test'],
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -354,7 +356,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         [],
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -375,7 +377,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         [MOCK_NFT_AMOUNTS[0]],
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
@@ -396,12 +398,12 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        ['test'],
+        [{ to: 'test', data: '0x' }],
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
       ),
-    ).to.throw('Mismatch: crossContractCallsSerialized.');
+    ).to.throw('Mismatch: crossContractCalls.');
 
     expect(() =>
       validateCachedProvedTransaction(
@@ -416,10 +418,10 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         {
           tokenAddress: '0x765',
-          amountString: '100',
+          amount: 100n,
           recipientAddress: '0x1233',
         },
         sendWithPublicWallet,
@@ -440,7 +442,7 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         true, // sendWithPublicWallet
         overallBatchMinGasPrice,
@@ -460,10 +462,10 @@ describe('proof-cache', () => {
         relayAdaptUnshieldNFTAmounts,
         relayAdaptShieldERC20Addresses,
         relayAdaptShieldNFTs,
-        crossContractCallsSerialized,
+        crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
-        '0x2000',
+        BigInt('0x2000'),
       ),
     ).to.throw('Mismatch: overallBatchMinGasPrice.');
   });

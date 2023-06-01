@@ -12,8 +12,7 @@ import {
   TreeBalance,
   AddressData,
 } from '@railgun-community/engine';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { randomBytes } from '@ethersproject/random';
+import { randomBytes } from 'ethers';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
 

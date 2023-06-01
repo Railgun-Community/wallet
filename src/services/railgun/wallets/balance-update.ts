@@ -1,8 +1,5 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import {
   Chain,
-  ByteLength,
-  nToHex,
   AbstractWallet,
   TokenType,
   Balances,
@@ -43,11 +40,7 @@ const getSerializedERC20Balances = (
         tokenAddress: parseRailgunTokenAddress(
           balances[railgunBalanceAddress].tokenData.tokenAddress,
         ).toLowerCase(),
-        amountString: nToHex(
-          balances[railgunBalanceAddress].balance,
-          ByteLength.UINT_256,
-          true,
-        ),
+        amount: balances[railgunBalanceAddress].balance,
       };
       return erc20Balance;
     });
@@ -73,11 +66,7 @@ const getNFTBalances = (balances: Balances): RailgunNFTAmount[] => {
         ).toLowerCase(),
         nftTokenType: tokenData.tokenType as 1 | 2,
         tokenSubID: tokenData.tokenSubID,
-        amountString: nToHex(
-          balances[tokenHash].balance,
-          ByteLength.UINT_256,
-          true,
-        ),
+        amount: balances[tokenHash].balance,
       };
       return nftBalance;
     });
@@ -112,7 +101,7 @@ export const balanceForERC20Token = async (
   wallet: AbstractWallet,
   networkName: NetworkName,
   tokenAddress: string,
-): Promise<BigNumber> => {
+): Promise<bigint> => {
   const { chain } = NETWORK_CONFIG[networkName];
   const balances = await wallet.balances(chain);
   const tokenBalances = getSerializedERC20Balances(balances);
@@ -122,8 +111,7 @@ export const balanceForERC20Token = async (
       tokenBalance.tokenAddress.toLowerCase() === tokenAddress.toLowerCase(),
   );
   if (!matchingTokenBalance) {
-    return BigNumber.from(0);
+    return 0n;
   }
-
-  return BigNumber.from(matchingTokenBalance.amountString);
+  return matchingTokenBalance.amount;
 };

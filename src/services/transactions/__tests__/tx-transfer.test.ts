@@ -1,4 +1,3 @@
-import { FallbackProvider } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
@@ -12,16 +11,13 @@ import {
 import {
   RailgunERC20Amount,
   NetworkName,
-  deserializeTransaction,
   EVMGasType,
-  TransactionGasDetailsSerialized,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
-  decimalToHexString,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import { BigNumber } from '@ethersproject/bignumber';
-import { PopulatedTransaction } from '@ethersproject/contracts';
 import {
+  closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../tests/setup.test';
@@ -52,6 +48,7 @@ import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { fullWalletForID } from '../../railgun/core/engine';
 import { setCachedProvedTransaction } from '../proof-cache';
 import * as txNotes from '../tx-notes';
+import { ContractTransaction, FallbackProvider } from 'ethers';
 
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
@@ -71,20 +68,20 @@ const { expect } = chai;
 const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
   {
     tokenAddress: MOCK_TOKEN_ADDRESS,
-    amountString: '100',
+    amount: 100n,
   },
   {
     tokenAddress: MOCK_TOKEN_ADDRESS_2,
-    amountString: '300',
+    amount: 300n,
   },
 ];
 
-const overallBatchMinGasPrice = '0x1000';
+const overallBatchMinGasPrice = BigInt('0x1000');
 
-const gasDetailsSerialized: TransactionGasDetailsSerialized = {
+const gasDetails: TransactionGasDetails = {
   evmGasType: EVMGasType.Type1,
-  gasEstimateString: '0x00',
-  gasPriceString: overallBatchMinGasPrice,
+  gasEstimate: 1000n,
+  gasPrice: overallBatchMinGasPrice,
 };
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunERC20AmountRecipient[] =
@@ -115,7 +112,7 @@ const stubGasEstimateSuccess = () => {
   gasEstimateStub = Sinon.stub(
     FallbackProvider.prototype,
     'estimateGas',
-  ).resolves(BigNumber.from('200'));
+  ).resolves(BigInt('200'));
 };
 
 const stubGasEstimateFailure = () => {
@@ -134,7 +131,8 @@ const spyOnNFTNote = () => {
 };
 
 describe('tx-transfer', () => {
-  before(async () => {
+  before(async function run() {
+    this.timeout(5000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletInfo = await createRailgunWallet(
@@ -184,11 +182,11 @@ describe('tx-transfer', () => {
     railTransactStub = Sinon.stub(
       RailgunSmartWalletContract.prototype,
       'transact',
-    ).resolves({ data: '0x0123' } as PopulatedTransaction);
+    ).resolves({ data: '0x0123' } as ContractTransaction);
     relayAdaptPopulateUnshieldBaseToken = Sinon.stub(
       RelayAdaptContract.prototype,
       'populateUnshieldBaseToken',
-    ).resolves({ data: '0x0123' } as PopulatedTransaction);
+    ).resolves({ data: '0x0123' } as ContractTransaction);
   });
   afterEach(() => {
     gasEstimateStub?.restore();
@@ -196,11 +194,12 @@ describe('tx-transfer', () => {
     erc20NoteSpy?.restore();
     nftNoteSpy?.restore();
   });
-  after(() => {
+  after(async () => {
     railProveStub.restore();
     railDummyProveStub.restore();
     railTransactStub.restore();
     relayAdaptPopulateUnshieldBaseToken.restore();
+    await closeTestEngine();
   });
 
   // TRANSFER ERC20 - GAS ESTIMATE
@@ -221,18 +220,20 @@ describe('tx-transfer', () => {
     );
     expect(erc20NoteSpy.called).to.be.true;
     expect(erc20NoteSpy.args.length).to.equal(6); // Number of calls - 3 for each of 2 relayer fee iterations
-    expect(erc20NoteSpy.args[0][0].amountString).to.equal('0x00'); // original relayer fee
-    expect(erc20NoteSpy.args[1][0].amountString).to.equal('0x100'); // token1
-    expect(erc20NoteSpy.args[2][0].amountString).to.equal('0x200'); // token2
-    expect(erc20NoteSpy.args[3][0].amountString).to.equal('0x0275a61bf8737eb4'); // New estimated Relayer Fee
-    expect(erc20NoteSpy.args[4][0].amountString).to.equal('0x100'); // token1
-    expect(erc20NoteSpy.args[5][0].amountString).to.equal('0x200'); // token2
+    expect(erc20NoteSpy.args[0][0].amount).to.equal(BigInt('0x00')); // original relayer fee
+    expect(erc20NoteSpy.args[1][0].amount).to.equal(BigInt('0x100')); // token1
+    expect(erc20NoteSpy.args[2][0].amount).to.equal(BigInt('0x200')); // token2
+    expect(erc20NoteSpy.args[3][0].amount).to.equal(
+      BigInt('0x0275a61bf8737eb4'),
+    ); // New estimated Relayer Fee
+    expect(erc20NoteSpy.args[4][0].amount).to.equal(BigInt('0x100')); // token1
+    expect(erc20NoteSpy.args[5][0].amount).to.equal(BigInt('0x200')); // token2
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
       MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
     );
     // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
+    expect(rsp.gasEstimate).to.equal(7500n + 200n);
   }).timeout(10000);
 
   it('Should get gas estimates for valid erc20 transfer: public wallet', async () => {
@@ -251,11 +252,11 @@ describe('tx-transfer', () => {
     );
     expect(erc20NoteSpy.called).to.be.true;
     expect(erc20NoteSpy.args.length).to.equal(2); // Number of calls (without relayer fees)
-    expect(erc20NoteSpy.args[0][0].amountString).to.equal('0x100'); // token1
-    expect(erc20NoteSpy.args[1][0].amountString).to.equal('0x200'); // token2
+    expect(erc20NoteSpy.args[0][0].amount).to.equal(BigInt('0x100')); // token1
+    expect(erc20NoteSpy.args[1][0].amount).to.equal(BigInt('0x200')); // token2
     expect(rsp.relayerFeeCommitment).to.be.undefined;
     // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
+    expect(rsp.gasEstimate).to.equal(7500n + 200n);
   }).timeout(10000);
 
   it('Should error on gas estimates for invalid erc20 transfer', async () => {
@@ -319,7 +320,7 @@ describe('tx-transfer', () => {
       MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
     );
     // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
+    expect(rsp.gasEstimate).to.equal(7500n + 200n);
   }).timeout(10000);
 
   it('Should get gas estimates for valid NFT transfer: public wallet', async () => {
@@ -342,7 +343,7 @@ describe('tx-transfer', () => {
     expect(nftNoteSpy.args[1][0].tokenSubID).to.equal('0x02'); // nft2
     expect(rsp.relayerFeeCommitment).to.be.undefined;
     // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(7500 + 200));
+    expect(rsp.gasEstimate).to.equal(7500n + 200n);
   }).timeout(10000);
 
   it('Should error on gas estimates for invalid NFT transfer', async () => {
@@ -383,9 +384,7 @@ describe('tx-transfer', () => {
       () => {}, // progressCallback
     );
     expect(erc20NoteSpy.called).to.be.true;
-    expect(erc20NoteSpy.args[0][0].amountString).to.equal(
-      MOCK_TOKEN_FEE.amountString,
-    );
+    expect(erc20NoteSpy.args[0][0].amount).to.equal(MOCK_TOKEN_FEE.amount);
     expect(nftNoteSpy.called).to.be.true;
     expect(nftNoteSpy.args[0][0].nftAddress).to.equal(
       MOCK_NFT_AMOUNT_RECIPIENTS[0].nftAddress,
@@ -400,31 +399,23 @@ describe('tx-transfer', () => {
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
-      gasDetailsSerialized,
-    );
-    expect(populateResponse.serializedTransaction).to.equal(
-      '0x01cc8080821000808080820123c0',
+      gasDetails,
     );
     expect(populateResponse.nullifiers).to.deep.equal([
       '0x0000000000000000000000000000000000000000000000000000000000000001',
       '0x0000000000000000000000000000000000000000000000000000000000000002',
     ]);
 
-    const deserialized = deserializeTransaction(
-      populateResponse.serializedTransaction as string,
-      2,
-      1,
-    );
+    const { transaction } = populateResponse;
 
-    expect(deserialized.nonce).to.equal(2);
-    expect(deserialized.gasPrice?.toString()).to.equal('4096');
-    expect(deserialized.gasLimit).to.equal(undefined);
-    expect(deserialized.value?.toString()).to.equal('0');
-    expect(deserialized.data).to.equal('0x0123');
-    expect(deserialized.to).to.equal(null);
-    expect(deserialized.chainId).to.equal(1);
-    expect(deserialized.type).to.equal(1);
-    expect(Object.keys(deserialized).length).to.equal(8);
+    expect(transaction.nonce).to.equal(undefined);
+    expect(transaction.gasPrice?.toString()).to.equal('4096');
+    expect(transaction.gasLimit).to.equal(1200n);
+    expect(transaction.value?.toString()).to.equal(undefined);
+    expect(transaction.data).to.equal('0x0123');
+    expect(transaction.to).to.equal(undefined);
+    expect(transaction.chainId).to.equal(undefined);
+    expect(transaction.type).to.equal(1);
   });
 
   it('Should error on populate transfer tx for unproved transaction', async () => {
@@ -441,7 +432,7 @@ describe('tx-transfer', () => {
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith('Invalid proof for this transaction. No proof found.');
   });
@@ -472,7 +463,7 @@ describe('tx-transfer', () => {
         relayerFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
-        gasDetailsSerialized,
+        gasDetails,
       ),
     ).rejectedWith(
       'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',

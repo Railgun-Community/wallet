@@ -2,26 +2,22 @@ import {
   RailgunWallet,
   EngineEvent,
   WalletScannedEventData,
-  BytesData,
   AbstractWallet,
   WalletData,
   AddressData,
   RailgunEngine,
-  ByteLength,
   hexlify,
-  nToHex,
   hexStringToBytes,
 } from '@railgun-community/engine';
-import { getAddress } from '@ethersproject/address';
 import {
   RailgunWalletInfo,
-  RailgunWalletAddressDataSerialized,
   NetworkName,
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import { getEngine, walletForID } from '../core/engine';
 import { onBalancesUpdate } from './balance-update';
 import { reportAndSanitizeError } from '../../../utils/error';
+import { getAddress } from 'ethers';
 
 const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
   wallet.on(
@@ -170,7 +166,7 @@ export const unloadWalletByID = (railgunWalletID: string): void => {
 };
 
 export const getWalletMnemonic = async (
-  encryptionKey: BytesData,
+  encryptionKey: string,
   railgunWalletID: string,
 ) => {
   const { db } = getEngine();
@@ -197,21 +193,6 @@ export const getRailgunWalletPrivateViewingKey = (
 ): Uint8Array => {
   const wallet = walletForID(railgunWalletID);
   return wallet.getViewingKeyPair().privateKey;
-};
-
-export const serializeRailgunWalletAddressData = (
-  addressData: AddressData,
-): RailgunWalletAddressDataSerialized => {
-  const { viewingPublicKey, masterPublicKey } = addressData;
-  const viewingPublicKeySerialized = hexlify(viewingPublicKey);
-  const masterPublicKeySerialized = nToHex(
-    masterPublicKey,
-    ByteLength.UINT_256,
-  );
-  return {
-    viewingPublicKey: viewingPublicKeySerialized,
-    masterPublicKey: masterPublicKeySerialized,
-  };
 };
 
 export const signWithWalletViewingKey = async (

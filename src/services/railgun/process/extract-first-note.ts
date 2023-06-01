@@ -1,5 +1,3 @@
-import { CommitmentCiphertextStructOutput } from '@railgun-community/engine/dist/typechain-types/contracts/logic/RailgunLogic';
-import { TransactionRequest } from '@ethersproject/providers';
 import {
   ABIRailgunSmartWallet,
   ABIRelayAdapt,
@@ -14,6 +12,7 @@ import {
   TokenType,
   AddressData,
   CommitmentCiphertext,
+  CommitmentCiphertextStructOutput,
 } from '@railgun-community/engine';
 import { getEngine, walletForID } from '../core/engine';
 import { getRailgunWalletAddressData } from '../wallets';
@@ -22,12 +21,11 @@ import {
   Network,
   RailgunERC20Amount,
 } from '@railgun-community/shared-models';
-import { BigNumber } from '@ethersproject/bignumber';
-import { Contract } from '@ethersproject/contracts';
 import { getProviderForNetwork } from '../core/providers';
-import { sendErrorMessage, sendMessage } from '../../../utils';
+import { sendMessage } from '../../../utils';
 import { parseRailgunTokenAddress } from '../util';
 import { reportAndSanitizeError } from '../../../utils/error';
+import { Contract, ContractTransaction } from 'ethers';
 
 type BoundParams = {
   // ...
@@ -45,8 +43,6 @@ enum TransactionName {
   RelayAdapt = 'relay',
 }
 
-type ERC20AmountMap = MapType<BigNumber>;
-
 const getABIForTransaction = (transactionName: TransactionName): Array<any> => {
   switch (transactionName) {
     case TransactionName.RailgunSmartWallet:
@@ -59,9 +55,9 @@ const getABIForTransaction = (transactionName: TransactionName): Array<any> => {
 export const extractFirstNoteERC20AmountMapFromTransactionRequest = (
   railgunWalletID: string,
   network: Network,
-  transactionRequest: TransactionRequest,
+  transactionRequest: ContractTransaction,
   useRelayAdapt: boolean,
-): Promise<ERC20AmountMap> => {
+): Promise<MapType<bigint>> => {
   const transactionName = useRelayAdapt
     ? TransactionName.RelayAdapt
     : TransactionName.RailgunSmartWallet;
@@ -81,10 +77,10 @@ export const extractFirstNoteERC20AmountMapFromTransactionRequest = (
 const extractFirstNoteERC20AmountMap = async (
   railgunWalletID: string,
   network: Network,
-  transactionRequest: TransactionRequest,
+  transactionRequest: ContractTransaction,
   transactionName: TransactionName,
   contractAddress: string,
-): Promise<ERC20AmountMap> => {
+): Promise<MapType<bigint>> => {
   const abi = getABIForTransaction(transactionName);
 
   if (
@@ -103,6 +99,9 @@ const extractFirstNoteERC20AmountMap = async (
     data: (transactionRequest.data as string) ?? '',
     value: transactionRequest.value,
   });
+  if (!parsedTransaction) {
+    throw new Error('No transaction parsable from request');
+  }
   if (parsedTransaction.name !== transactionName) {
     throw new Error(`Contract method invalid: expected ${transactionName}`);
   }
@@ -113,7 +112,7 @@ const extractFirstNoteERC20AmountMap = async (
   const receivingRailgunAddressData =
     getRailgunWalletAddressData(railgunWalletAddress);
 
-  const erc20PaymentAmounts: MapType<BigNumber> = {};
+  const erc20PaymentAmounts: MapType<bigint> = {};
 
   // eslint-disable-next-line no-underscore-dangle
   const railgunTxs: TransactionData[] = parsedTransaction.args._transactions;
@@ -148,13 +147,12 @@ const extractFirstNoteERC20AmountMap = async (
         return;
       }
 
-      const { tokenAddress, amountString } = erc20PaymentAmount;
+      const { tokenAddress, amount } = erc20PaymentAmount;
 
       if (!erc20PaymentAmounts[tokenAddress]) {
-        erc20PaymentAmounts[tokenAddress] = BigNumber.from(0);
+        erc20PaymentAmounts[tokenAddress] = 0n;
       }
-      erc20PaymentAmounts[tokenAddress] =
-        erc20PaymentAmounts[tokenAddress].add(amountString);
+      erc20PaymentAmounts[tokenAddress] += amount;
     }),
   );
 
@@ -251,13 +249,10 @@ export const extractERC20AmountFromCommitmentCiphertext = async (
     tokenData.tokenAddress,
   ).toLowerCase();
 
-  const amountString = BigNumber.from(
-    decryptedReceiverNote.value.toString(),
-  ).toHexString();
-
+  const amount = decryptedReceiverNote.value;
   const erc20Amount: RailgunERC20Amount = {
     tokenAddress,
-    amountString,
+    amount,
   };
   return erc20Amount;
 };

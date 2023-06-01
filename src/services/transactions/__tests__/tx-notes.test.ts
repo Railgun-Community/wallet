@@ -20,6 +20,7 @@ import {
   TEST_WALLET_SOURCE,
 } from '../../../tests/mocks.test';
 import {
+  closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../tests/setup.test';
@@ -40,7 +41,7 @@ const padTo32BytesUnHex = (str: string) => {
 };
 
 const formatAmountString = (erc20Amount: RailgunERC20Amount) => {
-  return BigInt(erc20Amount.amountString);
+  return BigInt(erc20Amount.amount);
 };
 
 let railgunWalletID: string;
@@ -57,11 +58,14 @@ describe('tx-notes', () => {
     );
     railgunWalletID = railgunWalletInfo.id;
   });
+  after(async () => {
+    await closeTestEngine();
+  });
 
   it('Should test erc20 note creation', () => {
     const erc20AmountRecipient: RailgunERC20AmountRecipient = {
       tokenAddress: MOCK_TOKEN,
-      amountString: '0x100',
+      amount: BigInt(0x100),
       recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
     };
     const railgunWallet = fullWalletForID(railgunWalletID);
@@ -97,7 +101,7 @@ describe('tx-notes', () => {
   it('Should test NFT note creation', () => {
     const erc20AmountRecipient: RailgunERC20AmountRecipient = {
       tokenAddress: MOCK_TOKEN,
-      amountString: '0x100',
+      amount: BigInt(0x100),
       recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
     };
     const railgunWallet = fullWalletForID(railgunWalletID);
@@ -134,17 +138,17 @@ describe('tx-notes', () => {
     const erc20AmountRecipients1: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
-        amountString: '100',
+        amount: 100n,
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '2',
-        amountString: '200',
+        amount: BigInt(200),
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '3',
-        amountString: '300',
+        amount: 300n,
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
     ];
@@ -153,17 +157,17 @@ describe('tx-notes', () => {
     const erc20AmountRecipients2: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
-        amountString: '100',
+        amount: 100n,
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '2',
-        amountString: '200',
+        amount: BigInt(200),
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '3',
-        amountString: '300',
+        amount: 300n,
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
     ];
@@ -172,17 +176,17 @@ describe('tx-notes', () => {
     const erc20AmountRecipients3: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
-        amountString: '100',
+        amount: 100n,
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '3',
-        amountString: '200',
+        amount: BigInt(200),
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '5',
-        amountString: '300',
+        amount: 300n,
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
     ];
@@ -191,17 +195,17 @@ describe('tx-notes', () => {
     const erc20AmountRecipients4: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
-        amountString: '100',
+        amount: 100n,
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '2',
-        amountString: '300',
+        amount: 300n,
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '3',
-        amountString: '200',
+        amount: BigInt(200),
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
     ];
@@ -210,17 +214,17 @@ describe('tx-notes', () => {
     const erc20AmountRecipients5: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '1',
-        amountString: '100',
+        amount: 100n,
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '2',
-        amountString: '200',
+        amount: BigInt(200),
         recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
       },
       {
         tokenAddress: '3',
-        amountString: '300',
+        amount: 300n,
         recipientAddress: MOCK_ETH_WALLET_ADDRESS,
       },
     ];
@@ -255,31 +259,31 @@ describe('tx-notes', () => {
     const sameA: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '0x1234',
-        amountString: '100',
+        amount: 100n,
         recipientAddress: 'hello',
       },
       {
         tokenAddress: '0x1234',
-        amountString: '200',
+        amount: BigInt(200),
         recipientAddress: 'hello2',
       },
     ];
     const sameB: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '0x1234',
-        amountString: '200',
+        amount: BigInt(200),
         recipientAddress: 'hello2',
       },
       {
         tokenAddress: '0x1234',
-        amountString: '100',
+        amount: 100n,
         recipientAddress: 'hello',
       },
     ];
     const differentC: RailgunERC20AmountRecipient[] = [
       {
         tokenAddress: '0x1234',
-        amountString: '100',
+        amount: 100n,
         recipientAddress: 'hello',
       },
     ];

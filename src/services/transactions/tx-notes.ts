@@ -1,5 +1,4 @@
 import {
-  hexToBigInt,
   randomHex,
   OutputType,
   TransactNote,
@@ -23,12 +22,10 @@ export const erc20NoteFromERC20AmountRecipient = (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
 ): TransactNote => {
-  const random = randomHex(16);
-  const value = hexToBigInt(erc20AmountRecipient.amountString);
+  const { amount, recipientAddress } = erc20AmountRecipient;
 
-  const receiverAddressData = RailgunEngine.decodeAddress(
-    erc20AmountRecipient.recipientAddress,
-  );
+  const receiverAddressData = RailgunEngine.decodeAddress(recipientAddress);
+  const random = randomHex(16);
 
   const tokenData = getTokenDataERC20(erc20AmountRecipient.tokenAddress);
 
@@ -36,7 +33,7 @@ export const erc20NoteFromERC20AmountRecipient = (
     receiverAddressData,
     railgunWallet.addressKeys,
     random,
-    value,
+    amount,
     tokenData,
     railgunWallet.getViewingKeyPair(),
     showSenderAddressToRecipient,
@@ -51,13 +48,8 @@ export const nftNoteFromNFTAmountRecipient = (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
 ): TransactNote => {
-  const {
-    recipientAddress,
-    nftAddress,
-    nftTokenType,
-    tokenSubID,
-    amountString,
-  } = nftAmountRecipient;
+  const { recipientAddress, nftAddress, nftTokenType, tokenSubID, amount } =
+    nftAmountRecipient;
 
   const random = randomHex(16);
 
@@ -86,7 +78,7 @@ export const nftNoteFromNFTAmountRecipient = (
         railgunWallet.addressKeys,
         random,
         tokenData,
-        BigInt(amountString),
+        BigInt(amount),
         railgunWallet.getViewingKeyPair(),
         showSenderAddressToRecipient,
         memoText,
@@ -98,9 +90,7 @@ const compareERC20Amounts = (
   a: Optional<RailgunERC20Amount>,
   b: Optional<RailgunERC20Amount>,
 ) => {
-  return (
-    a?.tokenAddress === b?.tokenAddress && a?.amountString === b?.amountString
-  );
+  return a?.tokenAddress === b?.tokenAddress && a?.amount === b?.amount;
 };
 
 export const compareERC20AmountRecipients = (
@@ -130,7 +120,7 @@ export const compareERC20AmountArrays = (
     if (!found) {
       return false;
     }
-    if (found.amountString !== erc20Amount.amountString) {
+    if (found.amount !== erc20Amount.amount) {
       return false;
     }
   }
@@ -159,7 +149,7 @@ export const compareERC20AmountRecipientArrays = (
     if (!found) {
       return false;
     }
-    if (found.amountString !== erc20Amount.amountString) {
+    if (found.amount !== erc20Amount.amount) {
       return false;
     }
   }
@@ -191,7 +181,7 @@ export const compareNFTAmountArrays = (
     if (found.nftTokenType !== nftAmountRecipient.nftTokenType) {
       return false;
     }
-    if (found.amountString !== nftAmountRecipient.amountString) {
+    if (found.amount !== nftAmountRecipient.amount) {
       return false;
     }
   }
@@ -226,7 +216,7 @@ export const compareNFTAmountRecipientArrays = (
     if (found.recipientAddress !== nftAmountRecipient.recipientAddress) {
       return false;
     }
-    if (found.amountString !== nftAmountRecipient.amountString) {
+    if (found.amount !== nftAmountRecipient.amount) {
       return false;
     }
   }

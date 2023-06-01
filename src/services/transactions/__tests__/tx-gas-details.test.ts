@@ -1,17 +1,13 @@
-import { FallbackProvider, TransactionRequest } from '@ethersproject/providers';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub } from 'sinon';
 import {
   CommitmentSummary,
   createFallbackProviderFromJsonConfig,
-  decimalToHexString,
   EVMGasType,
   NetworkName,
-  TransactionGasDetailsSerialized,
+  TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import { PopulatedTransaction } from '@ethersproject/contracts';
-import { BigNumber } from '@ethersproject/bignumber';
 import {
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
@@ -19,9 +15,10 @@ import {
 import {
   gasEstimateResponse,
   getGasEstimate,
-  setGasDetailsForPopulatedTransaction,
+  setGasDetailsForTransaction,
 } from '../tx-gas-details';
 import { setProviderForNetwork } from '../../railgun';
+import { ContractTransaction, FallbackProvider } from 'ethers';
 
 let gasEstimateStub: SinonStub;
 
@@ -37,16 +34,16 @@ describe('tx-gas', () => {
     gasEstimateStub = Sinon.stub(
       FallbackProvider.prototype,
       'estimateGas',
-    ).resolves(BigNumber.from('200'));
+    ).resolves(BigInt('200'));
 
-    const populatedTransaction = {} as PopulatedTransaction;
+    const transaction = {} as ContractTransaction;
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     );
     setProviderForNetwork(NetworkName.Polygon, fallbackProvider);
     const gasEstimate = await getGasEstimate(
       NetworkName.Polygon,
-      populatedTransaction,
+      transaction,
       MOCK_ETH_WALLET_ADDRESS,
       true, // sendWithPublicWallet
       false, // isCrossContractCall
@@ -60,8 +57,7 @@ describe('tx-gas', () => {
     );
 
     expect(gasEstimateStub.callCount).to.equal(1);
-
-    expect(rsp.gasEstimateString).to.equal(decimalToHexString(200));
+    expect(rsp.gasEstimate).to.equal(200n);
   });
 
   it('Should pull gas estimate for basic transaction - self-signed', async () => {
@@ -69,10 +65,11 @@ describe('tx-gas', () => {
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     );
     setProviderForNetwork(NetworkName.Polygon, fallbackProvider);
-    const tx: TransactionRequest = {
-      chainId: 1,
+    const tx: ContractTransaction = {
+      chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,
-      value: BigNumber.from('100'),
+      value: BigInt('100'),
+      data: '0x',
     };
     const gasEstimate = await getGasEstimate(
       NetworkName.Polygon,
@@ -87,7 +84,7 @@ describe('tx-gas', () => {
       undefined, // relayerFeeCommitment
       isGasEstimateWithDummyProof,
     );
-    expect(rsp.gasEstimateString).to.not.be.undefined;
+    expect(rsp.gasEstimate).to.not.be.undefined;
   }).timeout(10000);
 
   it('Should pull gas estimate for basic transaction - relayer', async () => {
@@ -95,10 +92,11 @@ describe('tx-gas', () => {
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     );
     setProviderForNetwork(NetworkName.Polygon, fallbackProvider);
-    const tx: TransactionRequest = {
-      chainId: 1,
+    const tx: ContractTransaction = {
+      chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,
-      value: BigNumber.from('100'),
+      value: BigInt('100'),
+      data: '0x',
     };
     const gasEstimate = await getGasEstimate(
       NetworkName.Polygon,
@@ -113,80 +111,70 @@ describe('tx-gas', () => {
       {} as CommitmentSummary,
       isGasEstimateWithDummyProof,
     );
-    expect(rsp.gasEstimateString).to.not.be.undefined;
+    expect(rsp.gasEstimate).to.not.be.undefined;
   }).timeout(10000);
 
   it('Should set gas details for populated tx', () => {
-    const populatedTransaction = {} as PopulatedTransaction;
-    const gasDetailsSerializedType0: TransactionGasDetailsSerialized = {
+    const transaction = {} as ContractTransaction;
+    const gasDetailsType0: TransactionGasDetails = {
       evmGasType: EVMGasType.Type0,
-      gasEstimateString: decimalToHexString(100000),
-      gasPriceString: decimalToHexString(500),
+      gasEstimate: 100000n,
+      gasPrice: 500n,
     };
-    const gasDetailsSerializedType1: TransactionGasDetailsSerialized = {
+    const gasDetailsType1: TransactionGasDetails = {
       evmGasType: EVMGasType.Type1,
-      gasEstimateString: decimalToHexString(100000),
-      gasPriceString: decimalToHexString(500),
+      gasEstimate: 100000n,
+      gasPrice: 500n,
     };
-    const gasDetailsSerializedType2: TransactionGasDetailsSerialized = {
+    const gasDetailsType2: TransactionGasDetails = {
       evmGasType: EVMGasType.Type2,
-      gasEstimateString: decimalToHexString(120000),
-      maxFeePerGasString: decimalToHexString(10000),
-      maxPriorityFeePerGasString: decimalToHexString(500),
+      gasEstimate: 120000n,
+      maxFeePerGas: 10000n,
+      maxPriorityFeePerGas: 500n,
     };
     // Polygon - self-sign
-    setGasDetailsForPopulatedTransaction(
+    setGasDetailsForTransaction(
       NetworkName.Polygon,
-      populatedTransaction,
-      gasDetailsSerializedType2,
+      transaction,
+      gasDetailsType2,
       true, // sendWithPublicWallet
     );
-    expect(populatedTransaction.type).to.equal(2);
-    expect(populatedTransaction.gasLimit?.toHexString()).to.equal(
-      decimalToHexString(144000),
-    );
-    expect(populatedTransaction.gasPrice).to.be.undefined;
-    expect(populatedTransaction.maxFeePerGas?.toHexString()).to.equal(
-      decimalToHexString(10000),
-    );
-    expect(populatedTransaction.maxPriorityFeePerGas?.toHexString()).to.equal(
-      decimalToHexString(500),
-    );
+    expect(transaction.type).to.equal(2);
+    expect(transaction.gasLimit).to.equal(144000n);
+    expect(transaction.gasPrice).to.be.undefined;
+    expect(transaction.maxFeePerGas).to.equal(10000n);
+    expect(transaction.maxPriorityFeePerGas).to.equal(500n);
     // Polygon - Relayer
-    setGasDetailsForPopulatedTransaction(
+    setGasDetailsForTransaction(
       NetworkName.Polygon,
-      populatedTransaction,
-      gasDetailsSerializedType1,
+      transaction,
+      gasDetailsType1,
       false, // sendWithPublicWallet
     );
     // BNB - self-sign
-    setGasDetailsForPopulatedTransaction(
+    setGasDetailsForTransaction(
       NetworkName.BNBChain,
-      populatedTransaction,
-      gasDetailsSerializedType0,
+      transaction,
+      gasDetailsType0,
       true, // sendWithPublicWallet
     );
     // BNB - Relayer
-    setGasDetailsForPopulatedTransaction(
+    setGasDetailsForTransaction(
       NetworkName.BNBChain,
-      populatedTransaction,
-      gasDetailsSerializedType0,
+      transaction,
+      gasDetailsType0,
       false, // sendWithPublicWallet
     );
     expect(() =>
-      setGasDetailsForPopulatedTransaction(
+      setGasDetailsForTransaction(
         NetworkName.Polygon,
-        populatedTransaction,
-        gasDetailsSerializedType2, // mismatch
+        transaction,
+        gasDetailsType2, // mismatch
         true, // sendWithPublicWallet
       ),
     ).to.throw;
-    expect(populatedTransaction.type).to.equal(0);
-    expect(populatedTransaction.gasLimit?.toHexString()).to.equal(
-      decimalToHexString(120000),
-    );
-    expect(populatedTransaction.gasPrice?.toHexString()).to.equal(
-      decimalToHexString(500),
-    );
+    expect(transaction.type).to.equal(0);
+    expect(transaction.gasLimit).to.equal(120000n);
+    expect(transaction.gasPrice).to.equal(500n);
   });
 });

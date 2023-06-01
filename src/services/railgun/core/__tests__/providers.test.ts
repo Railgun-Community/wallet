@@ -8,7 +8,7 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
 } from '../../../../tests/mocks.test';
-import { initTestEngine } from '../../../../tests/setup.test';
+import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { walletForID } from '../engine';
 import {
   getMerkleTreeForNetwork,
@@ -29,17 +29,19 @@ describe('providers', () => {
   before(async () => {
     initTestEngine();
   });
+  after(async () => {
+    await closeTestEngine();
+  });
+
   it('Should load provider with json, pull fees, and check created objects', async () => {
-    const shouldDebug = true;
     const response = await loadProvider(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
       NetworkName.PolygonMumbai,
-      shouldDebug,
     );
     expect(response.feesSerialized).to.deep.equal({
-      shield: '0x19',
-      nft: '0x19',
-      unshield: '0x19',
+      shield: '25',
+      unshield: '25',
+      nft: '25',
     });
 
     expect(getProviderForNetwork(NetworkName.PolygonMumbai)).to.not.be
@@ -82,13 +84,20 @@ describe('providers', () => {
     expect(wallet.merkletrees[0][3]).to.be.undefined;
   }).timeout(20000);
 
-  it('Should fail with invalid json', async () => {
-    const shouldDebug = true;
+  it('Should fail with invalid chain ID', async () => {
     await expect(
       loadProvider(
-        {} as FallbackProviderJsonConfig,
+        { chainId: 55 } as FallbackProviderJsonConfig,
         NetworkName.BNBChain,
-        shouldDebug,
+      ),
+    ).rejectedWith('Invalid chain ID');
+  });
+
+  it('Should fail with invalid json', async () => {
+    await expect(
+      loadProvider(
+        { chainId: 56 } as FallbackProviderJsonConfig,
+        NetworkName.BNBChain,
       ),
     ).rejectedWith(
       'Invalid fallback provider config: Cannot read properties of undefined (reading map)',

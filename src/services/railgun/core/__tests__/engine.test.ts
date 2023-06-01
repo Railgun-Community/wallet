@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { initTestEngine } from '../../../../tests/setup.test';
+import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { stopRailgunEngine, getEngine } from '../engine';
 import { getProver } from '../prover';
 
@@ -10,6 +10,9 @@ const { expect } = chai;
 describe('engine', () => {
   beforeEach(() => {
     initTestEngine();
+  });
+  afterEach(async () => {
+    await closeTestEngine();
   });
 
   it('Should get active engine instance', () => {
