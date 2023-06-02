@@ -39,7 +39,7 @@ import { fullWalletForID } from '../railgun/core/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { reportAndSanitizeError } from '../../utils/error';
-import { ContractTransaction } from 'ethers';
+import { ContractTransaction, Log } from 'ethers';
 
 const createValidCrossContractCalls = (
   crossContractCalls: ContractTransaction[],
@@ -401,7 +401,7 @@ export const generateCrossContractCallsProof = async (
 };
 
 export const getRelayAdaptTransactionError = (
-  receiptLogs: TransactionReceiptLog[],
+  receiptLogs: TransactionReceiptLog[] | readonly Log[],
 ): Optional<string> => {
   try {
     const relayAdaptError =

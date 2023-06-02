@@ -3,6 +3,8 @@ import {
   AbstractWallet,
   TokenType,
   Balances,
+  EngineEvent,
+  WalletScannedEventData,
 } from '@railgun-community/engine';
 import {
   RailgunBalancesEvent,
@@ -13,6 +15,7 @@ import {
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
 import { parseRailgunTokenAddress } from '../util/bytes';
+import { walletForID } from '../core';
 
 export type BalancesUpdatedCallback = (
   balancesEvent: RailgunBalancesEvent,
@@ -114,4 +117,31 @@ export const balanceForERC20Token = async (
     return 0n;
   }
   return matchingTokenBalance.amount;
+};
+
+export const awaitWalletScan = (walletID: string, chain: Chain) => {
+  const wallet = walletForID(walletID);
+  return new Promise((resolve, reject) =>
+    wallet.once(
+      EngineEvent.WalletScanComplete,
+      ({ chain: returnedChain }: WalletScannedEventData) =>
+        returnedChain.type === chain.type && returnedChain.id === chain.id
+          ? resolve(returnedChain)
+          : reject(),
+    ),
+  );
+};
+
+export const awaitMultipleWalletScans = async (
+  walletID: string,
+  chain: Chain,
+  numScans: number,
+) => {
+  let i = 0;
+  while (i < numScans) {
+    // eslint-disable-next-line no-await-in-loop
+    await awaitWalletScan(walletID, chain);
+    i += 1;
+  }
+  return Promise.resolve();
 };
