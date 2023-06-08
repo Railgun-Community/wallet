@@ -7,8 +7,8 @@ import {
   AccumulatedEvents,
   promiseTimeout,
 } from '@railgun-community/engine';
+import { removeUndefineds } from '@railgun-community/shared-models';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { removeUndefineds } from '../../../utils/utils';
 
 const MAX_NUM_RETRIES = 2;
 
