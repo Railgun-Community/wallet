@@ -201,7 +201,7 @@ const formatCommitmentCiphertext = (
 };
 
 const bigIntStringToHex = (bigintString: string): string => {
-  return BigInt(bigintString).toString(16);
+  return `0x${BigInt(bigintString).toString(16)}`;
 };
 
 const formatLegacyGeneratedCommitment = (
