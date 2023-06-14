@@ -100,7 +100,7 @@ describe('providers', () => {
         NetworkName.BNBChain,
       ),
     ).rejectedWith(
-      'Invalid fallback provider config: Cannot read properties of undefined (reading map)',
+      'Invalid fallback provider config for chain 56: Cannot read properties of undefined (reading reduce)',
     );
   });
 });
