@@ -153,3 +153,26 @@ export const loadProvider = async (
     throw reportAndSanitizeError(loadProvider.name, err);
   }
 };
+
+export const pauseAllProviders = (excludeNetworkName?: NetworkName): void => {
+  Object.keys(providerMap).forEach(networkName => {
+    if (networkName === excludeNetworkName) {
+      return;
+    }
+    const provider = providerMap[networkName];
+    if (!provider.paused) {
+      provider.pause();
+    }
+  });
+};
+
+export const resumeIsolatedProviderForNetwork = (
+  networkName: NetworkName,
+): void => {
+  pauseAllProviders(
+    networkName, // excludeNetworkName
+  );
+  if (providerMap[networkName]?.paused) {
+    providerMap[networkName].resume();
+  }
+};
