@@ -2,9 +2,10 @@
 # yarn lockfile v1
 
 
-"@adraffy/ens-normalize@https://github.com/ricmoo/ens-normalize.js":
-  version "1.9.0"
-  resolved "https://github.com/ricmoo/ens-normalize.js#2d040533e57e4f25f9a7cc4715e219658ad454b5"
+"@adraffy/ens-normalize@1.9.2":
+  version "1.9.2"
+  resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.9.2.tgz#60111a5d9db45b2e5cbb6231b0bb8d97e8659316"
+  integrity sha512-0h+FrQDqe2Wn+IIGFkTCd4aAwTJ+7834Ek1COohCyV26AXhwQ7WQaz+4F/nLOeVl/3BtWHOHLPsq46V8YB46Eg==
 
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
@@ -2114,10 +2115,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.4.tgz#72f84f7d4d15a0deedb679860f07f59953dc21eb"
   integrity sha512-8F5S6nGAZ/xO3mgFegLtwB9dcEs1Hynn+h775or4dFhWNP+Eh6c8N2vrdlkIfLZ+lFIP798lELBrQC0mplXE7A==
 
-"@railgun-community/engine@5.0.5":
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.0.5.tgz#c03cbbfb2ab64ea3bf5025747a00578ae70adfa6"
-  integrity sha512-qIDpgSqeT1Jq3pvxGij33gAB76d6Lkcb6pjUpKZX/64vvkCZxpFd4NVFynZdgU92Ik0s6nmleyejteS/lK9b+w==
+"@railgun-community/engine@5.0.8":
+  version "5.0.8"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.0.8.tgz#d8bbff8af358c51cf3713dc156af1dd02916736d"
+  integrity sha512-XtsX0JpLp8wgxs2PC5opTW6tYBsnaEQfOSKQwDvASj4UNe3hUrC0mHfKVkS+7NZD/uOZic/UZRXW0dJVMHEsXQ==
   dependencies:
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.0"
@@ -2130,7 +2131,7 @@
     circomlibjs hsg88/circomlibjs#ffjavascrip.0.1.0
     encoding-down "^7.1.0"
     ethereum-cryptography "^2.0.0"
-    ethers "^6.4.0"
+    ethers "^6.6.0"
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
@@ -4480,12 +4481,12 @@ ethereumjs-util@^7.0.10, ethereumjs-util@^7.1.0, ethereumjs-util@^7.1.5:
     ethereum-cryptography "^0.1.3"
     rlp "^2.2.4"
 
-ethers@^6.4.0:
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.4.0.tgz#82c230a3a018a2627593d24ec4b9c20e9681c341"
-  integrity sha512-nksaMCwX+BOdV2NQ1/57OehSD2JtujbhrdC2+Fb9VpvBO0WO6h+WWwu3oMMw7aUiTa5lvQcWX1vl4aOy7Q3CTg==
+ethers@^6.6.0:
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.6.0.tgz#596e512cd91ef86b04f95f2e6be58a22ec4f2ce6"
+  integrity sha512-7D2U+n8eZYmh592VZqap9vBu50jN7YUDHqAmwBYTMntmUKC9RVgcqcFbd+3DTCOQ1jMyK6QHv1usbcfgiGaHOA==
   dependencies:
-    "@adraffy/ens-normalize" "https://github.com/ricmoo/ens-normalize.js"
+    "@adraffy/ens-normalize" "1.9.2"
     "@noble/hashes" "1.1.2"
     "@noble/secp256k1" "1.7.1"
     "@types/node" "18.15.13"

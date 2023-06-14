@@ -35,7 +35,7 @@
     "@graphql-mesh/types": "^0.91.14",
     "@graphql-mesh/utils": "^0.43.22",
     "@noble/ed25519": "^1.7.1",
-    "@railgun-community/engine": "5.0.5",
+    "@railgun-community/engine": "5.0.8",
     "@railgun-community/shared-models": "5.1.15",
     "@whatwg-node/fetch": "^0.8.4",
     "axios": "0.27.2",
@@ -43,10 +43,10 @@
     "graphql": "^16.6.0"
   },
   "peerDependencies": {
-    "ethers": "^6.4.0"
+    "ethers": "^6.6.0"
   },
   "devDependencies": {
-    "ethers": "^6.4.0",
+    "ethers": "^6.6.0",
     "@graphprotocol/client-cli": "^2.2.20",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
