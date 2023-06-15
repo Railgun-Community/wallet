@@ -96,7 +96,7 @@ const extractFirstNoteERC20AmountMap = async (
   const contract = new Contract(contractAddress, abi, provider);
 
   const parsedTransaction = contract.interface.parseTransaction({
-    data: (transactionRequest.data as string) ?? '',
+    data: (transactionRequest.data ) ?? '',
     value: transactionRequest.value,
   });
   if (!parsedTransaction) {

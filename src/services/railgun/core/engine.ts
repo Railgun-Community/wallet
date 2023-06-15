@@ -49,7 +49,7 @@ export const fullWalletForID = (id: string): RailgunWallet => {
   if (!(wallet instanceof RailgunWallet)) {
     throw new Error('Can not load View-Only wallet.');
   }
-  return wallet as RailgunWallet;
+  return wallet ;
 };
 
 export const viewOnlyWalletForID = (id: string): RailgunWallet => {

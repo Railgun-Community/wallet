@@ -10,6 +10,7 @@ module.exports = {
     'airbnb-base',
     'plugin:import/typescript',
     'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'prettier',
   ],
   globals: {
@@ -45,6 +46,8 @@ module.exports = {
     '@typescript-eslint/no-unsafe-member-access': 1,
     '@typescript-eslint/no-unsafe-assignment': 1,
     '@typescript-eslint/no-unsafe-argument': 1,
+    '@typescript-eslint/no-unsafe-return': 1,
+    '@typescript-eslint/require-await': 0,
     'import/order': 0,
     'consistent-return': 0,
     'prefer-destructuring': 0,

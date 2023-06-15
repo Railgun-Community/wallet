@@ -22,7 +22,10 @@ import { getAddress } from 'ethers';
 const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
   wallet.on(
     EngineEvent.WalletScanComplete,
-    ({ chain }: WalletScannedEventData) => onBalancesUpdate(wallet, chain),
+    ({ chain }: WalletScannedEventData) => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      onBalancesUpdate(wallet, chain);
+    },
   );
 };
 

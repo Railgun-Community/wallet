@@ -2832,7 +2832,7 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
     store: rootStore.child('cache'),
     pubsub,
     logger,
-  } as any);
+  } );
 
   const sources: MeshResolvedSource[] = [];
   const transforms: MeshTransform[] = [];

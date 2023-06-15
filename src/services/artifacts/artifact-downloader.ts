@@ -80,7 +80,7 @@ export class ArtifactDownloader {
       // Both will validate with the same hash.
       const dataFormatted: ArrayBuffer | Buffer | string =
         data instanceof ArrayBuffer || data instanceof Buffer
-          ? (data as ArrayBuffer | Buffer)
+          ? (data )
           : JSON.stringify(data);
 
       const decompressedData = ArtifactDownloader.getArtifactData(
@@ -142,10 +142,7 @@ export class ArtifactDownloader {
     path: string,
   ): Promise<string | Buffer | null> => {
     try {
-      const storedItem = (await this.artifactStore.get(path)) as
-        | string
-        | Buffer
-        | null;
+      const storedItem = (await this.artifactStore.get(path));
       return storedItem;
     } catch (err) {
       return null;

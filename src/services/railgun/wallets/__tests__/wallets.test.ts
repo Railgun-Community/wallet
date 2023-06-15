@@ -53,7 +53,7 @@ describe('wallets', () => {
   it('Should create view only wallet', async () => {
     const railgunWalletInfo = await createViewOnlyRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
-      await wallet.generateShareableViewingKey(),
+      wallet.generateShareableViewingKey(),
       undefined, // creationBlockNumbers
     );
     if (!railgunWalletInfo) {
@@ -64,8 +64,8 @@ describe('wallets', () => {
     expect(railgunWalletInfo.railgunAddress).to.equal(wallet.getAddress());
   });
 
-  it('Should get wallet address', async () => {
-    const addressAny = await getRailgunAddress(wallet.id);
+  it('Should get wallet address', () => {
+    const addressAny = getRailgunAddress(wallet.id);
     expect(addressAny).to.equal(
       '0zk1qykzjxctynyz4z43pukckpv43jyzhyvy0ehrd5wuc54l5enqf9qfrrv7j6fe3z53la7enqphqvxys9aqyp9xx0km95ehqslx8apmu8l7anc7emau4tvsultrkvd',
     );

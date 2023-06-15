@@ -39,6 +39,9 @@ export const compareContractTransactionArrays = (
       }
     }
   } catch (err) {
+    if (!(err instanceof Error)) {
+      throw err;
+    }
     sendErrorMessage(
       `Could not compare contract transaction arrays: ${err.message}`,
     );
