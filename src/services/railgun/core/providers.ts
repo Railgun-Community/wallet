@@ -11,17 +11,33 @@ import {
   Chain,
   RailgunSmartWalletContract,
   RelayAdaptContract,
+  PollingJsonRpcProvider,
+  createPollingJsonRpcProviderForListeners,
 } from '@railgun-community/engine';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { FallbackProvider } from 'ethers';
 
-const providerMap: MapType<FallbackProvider> = {};
+const fallbackProviderMap: MapType<FallbackProvider> = {};
+const pollingProviderMap: MapType<PollingJsonRpcProvider> = {};
+
 export const getProviderForNetwork = (
   networkName: NetworkName,
 ): FallbackProvider => {
-  const provider = providerMap[networkName];
+  const provider = fallbackProviderMap[networkName];
   if (!provider) {
     throw new Error(`Provider not yet loaded for network ${networkName}`);
+  }
+  return provider;
+};
+
+export const getPollingProviderForNetwork = (
+  networkName: NetworkName,
+): PollingJsonRpcProvider => {
+  const provider = pollingProviderMap[networkName];
+  if (!provider) {
+    throw new Error(
+      `Polling provider not yet loaded for network ${networkName}`,
+    );
   }
   return provider;
 };
@@ -30,7 +46,14 @@ export const setProviderForNetwork = (
   networkName: NetworkName,
   provider: FallbackProvider,
 ): void => {
-  providerMap[networkName] = provider;
+  fallbackProviderMap[networkName] = provider;
+};
+
+export const setPollingProviderForNetwork = (
+  networkName: NetworkName,
+  provider: PollingJsonRpcProvider,
+): void => {
+  pollingProviderMap[networkName] = provider;
 };
 
 export const getMerkleTreeForNetwork = (networkName: NetworkName) => {
@@ -81,8 +104,11 @@ const loadProviderForNetwork = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
-  const provider = createFallbackProviderFromJsonConfig(
+  const fallbackProvider = createFallbackProviderFromJsonConfig(
     fallbackProviderJsonConfig,
+  );
+  const pollingProvider = await createPollingJsonRpcProviderForListeners(
+    fallbackProvider,
   );
 
   const network = NETWORK_CONFIG[networkName];
@@ -105,11 +131,13 @@ const loadProviderForNetwork = async (
     chain,
     proxyContract,
     relayAdaptContract,
-    provider,
+    fallbackProvider,
+    pollingProvider,
     deploymentBlock ?? 0,
   );
 
-  setProviderForNetwork(networkName, provider);
+  setProviderForNetwork(networkName, fallbackProvider);
+  setPollingProviderForNetwork(networkName, pollingProvider);
 
   // NOTE: This is an async call, but we need not await.
   // Let Engine scan events in the background.
@@ -117,12 +145,16 @@ const loadProviderForNetwork = async (
   engine.scanHistory(chain);
 };
 
+/**
+ * Note: The first provider listed in your fallback provider config is used as a polling provider
+ * for new RAILGUN events (balance updates).
+ */
 export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
 ): Promise<LoadProviderResponse> => {
   try {
-    delete providerMap[networkName];
+    delete fallbackProviderMap[networkName];
 
     const { chain } = NETWORK_CONFIG[networkName];
     if (fallbackProviderJsonConfig.chainId !== chain.id) {
@@ -155,13 +187,17 @@ export const loadProvider = async (
 };
 
 export const pauseAllProviders = (excludeNetworkName?: NetworkName): void => {
-  Object.keys(providerMap).forEach(networkName => {
+  Object.keys(fallbackProviderMap).forEach(networkName => {
     if (networkName === excludeNetworkName) {
       return;
     }
-    const provider = providerMap[networkName];
-    if (!provider.paused) {
+    const provider = fallbackProviderMap[networkName];
+    if (!provider?.paused) {
       provider.pause();
+    }
+    const pollingProvider = pollingProviderMap[networkName];
+    if (!pollingProvider?.paused) {
+      pollingProvider.pause();
     }
   });
 };
@@ -172,7 +208,10 @@ export const resumeIsolatedProviderForNetwork = (
   pauseAllProviders(
     networkName, // excludeNetworkName
   );
-  if (providerMap[networkName]?.paused) {
-    providerMap[networkName].resume();
+  if (fallbackProviderMap[networkName]?.paused) {
+    fallbackProviderMap[networkName].resume();
+  }
+  if (pollingProviderMap[networkName]?.paused) {
+    pollingProviderMap[networkName].resume();
   }
 };

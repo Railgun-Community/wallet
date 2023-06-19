@@ -15,7 +15,11 @@ import {
   TransactNote,
   ViewingKeyPair,
 } from '@railgun-community/engine';
-import { getProviderForNetwork, loadProvider } from '../../core/providers';
+import {
+  getPollingProviderForNetwork,
+  getProviderForNetwork,
+  loadProvider,
+} from '../../core/providers';
 import { extractFirstNoteERC20AmountMapFromTransactionRequest } from '../extract-first-note';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -146,7 +150,8 @@ describe('extract-first-note', () => {
       GOERLI_NETWORK.name,
     );
 
-    const provider = getProviderForNetwork(GOERLI_NETWORK.name);
+    const fallbackProvider = getProviderForNetwork(GOERLI_NETWORK.name);
+    const pollingProvider = getPollingProviderForNetwork(GOERLI_NETWORK.name);
 
     const {
       proxyContract: ropstenProxyContractAddress,
@@ -155,12 +160,13 @@ describe('extract-first-note', () => {
 
     proxyContract = new RailgunSmartWalletContract(
       ropstenProxyContractAddress,
-      provider,
+      fallbackProvider,
+      pollingProvider,
       GOERLI_NETWORK.chain,
     );
     relayAdaptContract = new RelayAdaptContract(
       ropstenRelayAdaptContractAddress,
-      provider,
+      fallbackProvider,
     );
 
     const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));
