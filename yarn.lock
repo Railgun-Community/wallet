@@ -2115,10 +2115,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.4.tgz#72f84f7d4d15a0deedb679860f07f59953dc21eb"
   integrity sha512-8F5S6nGAZ/xO3mgFegLtwB9dcEs1Hynn+h775or4dFhWNP+Eh6c8N2vrdlkIfLZ+lFIP798lELBrQC0mplXE7A==
 
-"@railgun-community/engine@5.1.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.1.0.tgz#5ee1d83a524b323bc0b230915930b9c930cb9c1a"
-  integrity sha512-GZEW8yIPe1KCgIUrQOC+YCLABgsd6J6YL3bVV2WwvEposEIDLZk5xeSINtr2KMvNY4Be7rsT1+GHjlWJLnfRjg==
+"@railgun-community/engine@5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.1.1.tgz#5df5e98fd85775387aa23a573a493089869459db"
+  integrity sha512-Zv2ShWogmOPLgBxAPqSyoCxOkJ/AFoBqJiHWu2kxyPAStO0jklBWUjmk7PisIAZraWhLQRd9t0mYQSN718M9JA==
   dependencies:
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.0"
@@ -2135,10 +2135,10 @@
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
-"@railgun-community/shared-models@5.2.0":
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.2.0.tgz#d2d4fa42c7697b999b10d626cafde18e774fca27"
-  integrity sha512-nobiNoG2xOFGQfh0Ee5S2ovbX2TUARrMFL6r0oldRtyMwqSVbP9iWy9rDBWwewiGg9QPXzCoOOMAR2snDYtV7g==
+"@railgun-community/shared-models@5.2.1":
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.2.1.tgz#d4b98e7eac000e8f2b3e7526e7904d61c474a9c5"
+  integrity sha512-taraQAbemKQT6tI0lF010KcDeq9m6bbyIJzMQ1+QiVLO9Ss9hKM0NblNr0gFxIhjA5dB+cmJPg2giU6w8MeBaw==
 
 "@repeaterjs/repeater@3.0.4", "@repeaterjs/repeater@^3.0.4":
   version "3.0.4"
@@ -4481,7 +4481,7 @@ ethereumjs-util@^7.0.10, ethereumjs-util@^7.1.0, ethereumjs-util@^7.1.5:
     ethereum-cryptography "^0.1.3"
     rlp "^2.2.4"
 
-ethers@^6.6.0:
+ethers@6.6.0, ethers@^6.6.0:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.6.0.tgz#596e512cd91ef86b04f95f2e6be58a22ec4f2ce6"
   integrity sha512-7D2U+n8eZYmh592VZqap9vBu50jN7YUDHqAmwBYTMntmUKC9RVgcqcFbd+3DTCOQ1jMyK6QHv1usbcfgiGaHOA==
