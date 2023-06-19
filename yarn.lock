@@ -2135,10 +2135,12 @@
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
-"@railgun-community/shared-models@5.1.16":
-  version "5.1.16"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.1.16.tgz#cfb010f066ee7e22fa3fb72dca4f84abdf186f11"
-  integrity sha512-zgR3GyWG9R/hntHKq8mUlCsA1TIjuuxfhjM5dKnHhzHBmhxnWGZSy+m9pDsur/447OIgw8uOHkwxaxH/o7CKmQ==
+"@railgun-community/shared-models@5.2.0-patched":
+  version "5.2.0-patched"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.2.0-patched.tgz#eb13cac03fe50ed19247f5e8a86beb8f912db2a8"
+  integrity sha512-JAt9DOtjWguSd1b2+SQ5FyBjDXWRvJbNiEnFE18xGIFaId4wHj6YG8B837wMq96iMsuhRcdDRRnLU2WarrOFQQ==
+  dependencies:
+    ethers "npm:@therealjmj/ethers@6.6.0-patched-2"
 
 "@repeaterjs/repeater@3.0.4", "@repeaterjs/repeater@^3.0.4":
   version "3.0.4"
@@ -4485,6 +4487,19 @@ ethers@^6.6.0:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.6.0.tgz#596e512cd91ef86b04f95f2e6be58a22ec4f2ce6"
   integrity sha512-7D2U+n8eZYmh592VZqap9vBu50jN7YUDHqAmwBYTMntmUKC9RVgcqcFbd+3DTCOQ1jMyK6QHv1usbcfgiGaHOA==
+  dependencies:
+    "@adraffy/ens-normalize" "1.9.2"
+    "@noble/hashes" "1.1.2"
+    "@noble/secp256k1" "1.7.1"
+    "@types/node" "18.15.13"
+    aes-js "4.0.0-beta.5"
+    tslib "2.4.0"
+    ws "8.5.0"
+
+"ethers@npm:@therealjmj/ethers@6.6.0-patched-2":
+  version "6.6.0-patched-2"
+  resolved "https://registry.yarnpkg.com/@therealjmj/ethers/-/ethers-6.6.0-patched-2.tgz#68afe597144f0eae4745e2fe7fff9ae520553271"
+  integrity sha512-MJ1MKjHLOLsk5zNwkBQh5Bh0S3Q0SK4MMxPefeyOt+5bGMO8Cv0sNDpPxmXgknHXzX2m3A94nHdyLz8q7I3ChA==
   dependencies:
     "@adraffy/ens-normalize" "1.9.2"
     "@noble/hashes" "1.1.2"

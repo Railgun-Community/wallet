@@ -105,7 +105,7 @@ const loadProviderForNetwork = async (
     chain,
     proxyContract,
     relayAdaptContract,
-    provider,
+    provider as any, // TODO: ethers-patch fix
     deploymentBlock ?? 0,
   );
 

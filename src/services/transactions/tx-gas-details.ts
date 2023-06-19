@@ -59,7 +59,7 @@ const estimateGas = (
   if (isCrossContractCall) {
     // Includes custom error handler for relay-adapt transactions.
     return RelayAdaptContract.estimateGasWithErrorHandler(
-      provider,
+      provider as any, // TODO: ethers-patch fix
       transaction,
     );
   }

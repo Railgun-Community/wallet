@@ -404,8 +404,9 @@ export const getRelayAdaptTransactionError = (
   receiptLogs: TransactionReceiptLog[] | readonly Log[],
 ): Optional<string> => {
   try {
-    const relayAdaptError =
-      RelayAdaptContract.getRelayAdaptCallError(receiptLogs);
+    const relayAdaptError = RelayAdaptContract.getRelayAdaptCallError(
+      receiptLogs as any, // TODO: ethers-patch fix
+    );
     if (relayAdaptError) {
       sendErrorMessage(relayAdaptError);
       return relayAdaptError;
