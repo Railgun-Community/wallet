@@ -155,12 +155,12 @@ describe('extract-first-note', () => {
 
     proxyContract = new RailgunSmartWalletContract(
       ropstenProxyContractAddress,
-      provider,
+      provider as any, // TODO: ethers-patch fix
       GOERLI_NETWORK.chain,
     );
     relayAdaptContract = new RelayAdaptContract(
       ropstenRelayAdaptContractAddress,
-      provider,
+      provider as any, // TODO: ethers-patch fix
     );
 
     const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));
