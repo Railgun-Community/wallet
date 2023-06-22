@@ -15,6 +15,7 @@ import {
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
   TransactionGasDetails,
+  isDefined,
 } from '@railgun-community/shared-models';
 import {
   closeTestEngine,
@@ -140,7 +141,7 @@ describe('tx-transfer', () => {
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!railgunWalletInfo) {
+    if (!isDefined(railgunWalletInfo)) {
       throw new Error('Expected railgunWalletInfo');
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
@@ -150,7 +151,7 @@ describe('tx-transfer', () => {
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!relayerWalletInfo) {
+    if (!isDefined(relayerWalletInfo)) {
       throw new Error('Expected relayerWalletInfo');
     }
 

@@ -8,7 +8,10 @@ import {
   getTokenDataERC20,
 } from '@railgun-community/engine';
 import Sinon, { SinonStub } from 'sinon';
-import { RailgunBalancesEvent } from '@railgun-community/shared-models';
+import {
+  RailgunBalancesEvent,
+  isDefined,
+} from '@railgun-community/shared-models';
 import {
   onBalancesUpdate,
   setOnBalanceUpdateCallback,
@@ -38,7 +41,7 @@ describe('balance-update', () => {
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!railgunWalletInfo) {
+    if (!isDefined(railgunWalletInfo)) {
       throw new Error('Expected railgunWalletInfo');
     }
     wallet = fullWalletForID(railgunWalletInfo.id);

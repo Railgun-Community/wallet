@@ -6,6 +6,7 @@ import {
   RailgunERC20AmountRecipient,
   RailgunNFTAmount,
   TransactionGasDetails,
+  isDefined,
 } from '@railgun-community/shared-models';
 import { shouldSetOverallBatchMinGasPriceForNetwork } from '../../utils/gas-price';
 import {
@@ -102,7 +103,7 @@ export const populateProvedTransaction = async (
 };
 
 export const setCachedProvedTransaction = (tx?: ProvedTransaction) => {
-  if (tx?.transaction?.from) {
+  if (isDefined(tx?.transaction?.from)) {
     throw new Error(`Cannot cache a transaction with a 'from' address.`);
   }
   cachedProvedTransaction = tx;

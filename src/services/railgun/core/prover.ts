@@ -5,10 +5,11 @@ import {
   Prover,
 } from '@railgun-community/engine';
 import { getEngine } from './engine';
+import { isDefined } from '@railgun-community/shared-models';
 
 export const getProver = (): Prover => {
   const engine = getEngine();
-  if (!engine) {
+  if (!isDefined(engine)) {
     throw new Error(
       'RAILGUN Engine not yet init. Please reload your app or try again.',
     );

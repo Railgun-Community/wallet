@@ -10,6 +10,7 @@ import {
   RailgunNFTAmountRecipient,
   RailgunNFTAmount,
   TransactionGasDetails,
+  isDefined,
 } from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
@@ -406,7 +407,7 @@ export const getRelayAdaptTransactionError = (
   try {
     const relayAdaptError =
       RelayAdaptContract.getRelayAdaptCallError(receiptLogs);
-    if (relayAdaptError) {
+    if (isDefined(relayAdaptError)) {
       sendErrorMessage(relayAdaptError);
       return relayAdaptError;
     }

@@ -25,6 +25,7 @@ import {
   RailgunUnshieldERC20Amount,
   TransactionHistoryItem,
   TransactionHistoryItemCategory,
+  isDefined,
 } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
@@ -206,7 +207,7 @@ describe('transaction-history', () => {
       MOCK_MNEMONIC_2,
       { [NetworkName.Ethereum]: 0, [NetworkName.Polygon]: 2 }, // creationBlockNumbers
     );
-    if (!railgunWalletInfo) {
+    if (!isDefined(railgunWalletInfo)) {
       throw new Error(`Could not create wallet`);
     }
     wallet = fullWalletForID(railgunWalletInfo.id);

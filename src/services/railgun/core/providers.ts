@@ -4,6 +4,7 @@ import {
   NetworkName,
   NETWORK_CONFIG,
   LoadProviderResponse,
+  isDefined,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
 import { getEngine } from './engine';
@@ -24,7 +25,7 @@ export const getProviderForNetwork = (
   networkName: NetworkName,
 ): FallbackProvider => {
   const provider = fallbackProviderMap[networkName];
-  if (!provider) {
+  if (!isDefined(provider)) {
     throw new Error(`Provider not yet loaded for network ${networkName}`);
   }
   return provider;
@@ -34,7 +35,7 @@ export const getPollingProviderForNetwork = (
   networkName: NetworkName,
 ): PollingJsonRpcProvider => {
   const provider = pollingProviderMap[networkName];
-  if (!provider) {
+  if (!isDefined(provider)) {
     throw new Error(
       `Polling provider not yet loaded for network ${networkName}`,
     );
@@ -60,7 +61,7 @@ export const getMerkleTreeForNetwork = (networkName: NetworkName) => {
   const network = NETWORK_CONFIG[networkName];
   const { chain } = network;
   const merkleTree = getEngine().merkletrees[chain.type][chain.id];
-  if (!merkleTree) {
+  if (!isDefined(merkleTree)) {
     throw new Error(
       `MerkleTree not yet loaded for network ${network.publicName}`,
     );
@@ -75,7 +76,7 @@ export const getRailgunSmartWalletContractForNetwork = (
   const { chain } = network;
   const railgunSmartWalletContract =
     getEngine().railgunSmartWalletContracts[chain.type][chain.id];
-  if (!railgunSmartWalletContract) {
+  if (!isDefined(railgunSmartWalletContract)) {
     throw new Error(
       `RailgunSmartWallet contract not yet loaded for network ${network.publicName}`,
     );
@@ -90,7 +91,7 @@ export const getRelayAdaptContractForNetwork = (
   const { chain } = network;
   const relayAdaptContract =
     getEngine().relayAdaptContracts[chain.type][chain.id];
-  if (!relayAdaptContract) {
+  if (!isDefined(relayAdaptContract)) {
     throw new Error(
       `Relay Adapt contract not yet loaded for network ${network.publicName}`,
     );

@@ -1,6 +1,7 @@
 import {
   Artifact,
   ArtifactName,
+  isDefined,
   promiseTimeout,
 } from '@railgun-community/shared-models';
 import axios, { ResponseType } from 'axios';
@@ -43,13 +44,13 @@ export class ArtifactDownloader {
       ),
     );
 
-    if (!vkeyPath) {
+    if (!isDefined(vkeyPath)) {
       throw new Error('Could not download vkey artifact.');
     }
-    if (!zkeyPath) {
+    if (!isDefined(zkeyPath)) {
       throw new Error('Could not download zkey artifact.');
     }
-    if (!wasmOrDatPath) {
+    if (!isDefined(wasmOrDatPath)) {
       throw new Error(
         this.useNativeArtifacts
           ? 'Could not download dat artifact.'
@@ -80,7 +81,7 @@ export class ArtifactDownloader {
       // Both will validate with the same hash.
       const dataFormatted: ArrayBuffer | Buffer | string =
         data instanceof ArrayBuffer || data instanceof Buffer
-          ? (data )
+          ? data
           : JSON.stringify(data);
 
       const decompressedData = ArtifactDownloader.getArtifactData(
@@ -142,7 +143,7 @@ export class ArtifactDownloader {
     path: string,
   ): Promise<string | Buffer | null> => {
     try {
-      const storedItem = (await this.artifactStore.get(path));
+      const storedItem = await this.artifactStore.get(path);
       return storedItem;
     } catch (err) {
       return null;

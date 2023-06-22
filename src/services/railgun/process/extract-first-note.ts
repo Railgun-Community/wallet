@@ -20,6 +20,7 @@ import {
   Chain,
   Network,
   RailgunERC20Amount,
+  isDefined,
 } from '@railgun-community/shared-models';
 import { getProviderForNetwork } from '../core/providers';
 import { sendMessage } from '../../../utils';
@@ -150,7 +151,7 @@ const extractFirstNoteERC20AmountMap = async (
       const commitmentCiphertextStructOutput =
         boundParams.commitmentCiphertext[index];
       const commitmentHash: string = commitments[index];
-      if (!commitmentCiphertextStructOutput) {
+      if (!isDefined(commitmentCiphertextStructOutput)) {
         sendMessage('no ciphertext found for commitment at index 0');
         return;
       }

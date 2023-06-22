@@ -1,4 +1,4 @@
-import { ArtifactName } from '@railgun-community/shared-models';
+import { ArtifactName, isDefined } from '@railgun-community/shared-models';
 import { createHash } from 'crypto';
 import { sendErrorMessage } from '../../utils/logger';
 import ARTIFACT_V2_HASHES from './json/artifact-v2-hashes.json';
@@ -14,7 +14,7 @@ const getExpectedArtifactHash = (
 ): string => {
   const hashes = ARTIFACT_V2_HASHES as ArtifactHashesJson;
   const variantHashes = hashes[artifactVariantString];
-  if (!variantHashes) {
+  if (!isDefined(variantHashes)) {
     throw new Error(
       `No hashes for variant ${artifactName}: ${artifactVariantString}`,
     );
