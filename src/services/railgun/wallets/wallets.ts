@@ -168,6 +168,17 @@ export const unloadWalletByID = (railgunWalletID: string): void => {
   }
 };
 
+export const deleteWalletByID = async (
+  railgunWalletID: string,
+): Promise<void> => {
+  try {
+    const engine = getEngine();
+    await engine.deleteWallet(railgunWalletID);
+  } catch (err) {
+    throw new Error('Could not delete RAILGUN wallet.');
+  }
+};
+
 export const getWalletMnemonic = async (
   encryptionKey: string,
   railgunWalletID: string,
