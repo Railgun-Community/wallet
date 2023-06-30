@@ -25,7 +25,7 @@ import { getProviderForNetwork } from '../core/providers';
 import { sendMessage } from '../../../utils';
 import { parseRailgunTokenAddress } from '../util';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { Contract, ContractTransaction } from 'ethers';
+import { Contract, ContractTransaction, Result } from 'ethers';
 
 type BoundParams = {
   // ...
@@ -74,6 +74,28 @@ export const extractFirstNoteERC20AmountMapFromTransactionRequest = (
   );
 };
 
+const recursivelyDecodeResult = (result: Result): any => {
+  if (typeof result !== 'object') {
+    // End (primitive) value
+    return result;
+  }
+  try {
+    const obj = result.toObject();
+    if ('_' in obj) {
+      throw new Error('Decode as array, not object');
+    }
+    Object.keys(obj).forEach(key => {
+      obj[key] = recursivelyDecodeResult(obj[key]);
+    });
+    return obj;
+  } catch (err) {
+    // Result is array.
+    return result
+      .toArray()
+      .map(item => recursivelyDecodeResult(item as Result));
+  }
+};
+
 const extractFirstNoteERC20AmountMap = async (
   railgunWalletID: string,
   network: Network,
@@ -96,7 +118,7 @@ const extractFirstNoteERC20AmountMap = async (
   const contract = new Contract(contractAddress, abi, provider);
 
   const parsedTransaction = contract.interface.parseTransaction({
-    data: (transactionRequest.data ) ?? '',
+    data: transactionRequest.data ?? '',
     value: transactionRequest.value,
   });
   if (!parsedTransaction) {
@@ -105,6 +127,8 @@ const extractFirstNoteERC20AmountMap = async (
   if (parsedTransaction.name !== transactionName) {
     throw new Error(`Contract method invalid: expected ${transactionName}`);
   }
+
+  const args = recursivelyDecodeResult(parsedTransaction.args);
 
   const railgunWallet = walletForID(railgunWalletID);
   const railgunWalletAddress = railgunWallet.getAddress();
@@ -115,7 +139,7 @@ const extractFirstNoteERC20AmountMap = async (
   const erc20PaymentAmounts: MapType<bigint> = {};
 
   // eslint-disable-next-line no-underscore-dangle
-  const railgunTxs: TransactionData[] = parsedTransaction.args._transactions;
+  const railgunTxs: TransactionData[] = args._transactions;
 
   await Promise.all(
     railgunTxs.map(async (railgunTx: TransactionData) => {
