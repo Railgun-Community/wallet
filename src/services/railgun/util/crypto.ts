@@ -12,7 +12,7 @@ import {
 } from '@railgun-community/engine';
 import { EncryptDataWithSharedKeyResponse } from '@railgun-community/shared-models';
 import { getRandomBytes } from './bytes';
-import crypto from 'crypto';
+import { pbkdf2 as _pbkdf2 } from 'ethereum-cryptography/pbkdf2.js';
 
 export const verifyRelayerSignature = (
   signature: string | Uint8Array,
@@ -66,15 +66,12 @@ export const pbkdf2 = async (
   const keyLength = 32; // Bytes
   const digest = 'sha256';
 
-  const key: Buffer = await new Promise(resolve =>
-    crypto.pbkdf2(
-      secretFormatted,
-      saltFormatted,
-      iterations,
-      keyLength,
-      digest,
-      (_err: Error | null, derivedKey: Buffer) => resolve(derivedKey),
-    ),
+  const key: Uint8Array = await _pbkdf2(
+    secretFormatted,
+    saltFormatted,
+    iterations,
+    keyLength,
+    digest,
   );
   return hexlify(key);
 };

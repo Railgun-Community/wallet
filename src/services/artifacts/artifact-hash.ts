@@ -1,7 +1,8 @@
 import { ArtifactName, isDefined } from '@railgun-community/shared-models';
-import { createHash } from 'crypto';
+import { sha256 } from 'ethereum-cryptography/sha256.js';
 import { sendErrorMessage } from '../../utils/logger';
 import ARTIFACT_V2_HASHES from './json/artifact-v2-hashes.json';
+import { hexStringToBytes, hexlify } from '@railgun-community/engine';
 
 type ArtifactHashesJson = Record<
   string,
@@ -39,7 +40,10 @@ export const validateArtifactDownload = async (
   if (artifactName === ArtifactName.VKEY) {
     return true;
   }
-  const hash = createHash('sha256').update(data).digest('hex');
+  const dataBytes = Buffer.isBuffer(data)
+    ? new Uint8Array(data.buffer)
+    : hexStringToBytes(data);
+  const hash = hexlify(sha256(dataBytes));
   const expectedHash = getExpectedArtifactHash(
     artifactName,
     artifactVariantString,
