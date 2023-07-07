@@ -154,7 +154,7 @@ const loadProviderForNetwork = async (
 export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
-  pollingInterval: number,
+  pollingInterval = 15000,
 ): Promise<LoadProviderResponse> => {
   try {
     delete fallbackProviderMap[networkName];
