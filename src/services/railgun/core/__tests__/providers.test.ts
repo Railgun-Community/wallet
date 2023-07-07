@@ -37,6 +37,7 @@ describe('providers', () => {
     const response = await loadProvider(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
       NetworkName.PolygonMumbai,
+      10000, // pollingInterval
     );
     expect(response.feesSerialized).to.deep.equal({
       shield: '25',
@@ -89,6 +90,7 @@ describe('providers', () => {
       loadProvider(
         { chainId: 55 } as FallbackProviderJsonConfig,
         NetworkName.BNBChain,
+        10000, // pollingInterval
       ),
     ).rejectedWith('Invalid chain ID');
   });
@@ -98,6 +100,7 @@ describe('providers', () => {
       loadProvider(
         { chainId: 56 } as FallbackProviderJsonConfig,
         NetworkName.BNBChain,
+        10000, // pollingInterval
       ),
     ).rejectedWith(
       'Invalid fallback provider config for chain 56: Cannot read properties of undefined (reading reduce)',

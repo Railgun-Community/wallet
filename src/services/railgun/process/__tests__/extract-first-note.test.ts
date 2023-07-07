@@ -128,167 +128,166 @@ const createGoerliRelayAdaptUnshieldTransactions = async (
   );
 };
 
-describe
-  .only('extract-first-note', () => {
-    before(async function run() {
-      this.timeout(10000);
+describe('extract-first-note', () => {
+  before(async function run() {
+    this.timeout(10000);
 
-      initTestEngine();
-      engine = getEngine();
+    initTestEngine();
+    engine = getEngine();
 
-      const railgunWalletInfo = await createRailgunWallet(
-        MOCK_DB_ENCRYPTION_KEY,
-        MOCK_MNEMONIC_1,
-        undefined,
-      );
-      if (!railgunWalletInfo) {
-        throw new Error('No railgun wallet created');
-      }
-      railgunWallet = fullWalletForID(railgunWalletInfo.id);
+    const railgunWalletInfo = await createRailgunWallet(
+      MOCK_DB_ENCRYPTION_KEY,
+      MOCK_MNEMONIC_1,
+      undefined,
+    );
+    if (!railgunWalletInfo) {
+      throw new Error('No railgun wallet created');
+    }
+    railgunWallet = fullWalletForID(railgunWalletInfo.id);
 
-      await loadProvider(
-        MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
-        GOERLI_NETWORK.name,
-      );
+    await loadProvider(
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
+      GOERLI_NETWORK.name,
+      10000, // pollingInterval
+    );
 
-      const fallbackProvider = getProviderForNetwork(GOERLI_NETWORK.name);
-      const pollingProvider = getPollingProviderForNetwork(GOERLI_NETWORK.name);
+    const fallbackProvider = getProviderForNetwork(GOERLI_NETWORK.name);
+    const pollingProvider = getPollingProviderForNetwork(GOERLI_NETWORK.name);
 
-      const {
-        proxyContract: ropstenProxyContractAddress,
-        relayAdaptContract: ropstenRelayAdaptContractAddress,
-      } = GOERLI_NETWORK;
+    const {
+      proxyContract: ropstenProxyContractAddress,
+      relayAdaptContract: ropstenRelayAdaptContractAddress,
+    } = GOERLI_NETWORK;
 
-      proxyContract = new RailgunSmartWalletContract(
-        ropstenProxyContractAddress,
-        fallbackProvider,
-        pollingProvider,
-        GOERLI_NETWORK.chain,
-      );
-      relayAdaptContract = new RelayAdaptContract(
-        ropstenRelayAdaptContractAddress,
-        fallbackProvider,
-      );
+    proxyContract = new RailgunSmartWalletContract(
+      ropstenProxyContractAddress,
+      fallbackProvider,
+      pollingProvider,
+      GOERLI_NETWORK.chain,
+    );
+    relayAdaptContract = new RelayAdaptContract(
+      ropstenRelayAdaptContractAddress,
+      fallbackProvider,
+    );
 
-      const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));
-      await createEngineWalletBalancesStub(
-        railgunWallet.addressKeys,
-        tokenAddressHexlify,
-        TREE,
-      );
-      createEngineVerifyProofStub();
-    });
-    after(async () => {
-      restoreEngineStubs();
-      await closeTestEngine();
-    });
+    const tokenAddressHexlify = hexlify(padToLength(MOCK_TOKEN_ADDRESS, 32));
+    await createEngineWalletBalancesStub(
+      railgunWallet.addressKeys,
+      tokenAddressHexlify,
+      TREE,
+    );
+    createEngineVerifyProofStub();
+  });
+  after(async () => {
+    restoreEngineStubs();
+    await closeTestEngine();
+  });
 
-    it('Should extract fee correctly - transfer', async () => {
-      const fee = BigInt('1000');
-      const senderAddressData = RailgunEngine.decodeAddress(
-        '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+  it('Should extract fee correctly - transfer', async () => {
+    const fee = BigInt('1000');
+    const senderAddressData = RailgunEngine.decodeAddress(
+      '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+    );
+    const transactions = await createGoerliTransferTransactions(
+      railgunWallet.addressKeys,
+      senderAddressData,
+      fee,
+      MOCK_TOKEN_ADDRESS,
+    );
+    const transaction = await proxyContract.transact(transactions);
+    const firstNoteERC20AmountMap =
+      await extractFirstNoteERC20AmountMapFromTransactionRequest(
+        railgunWallet.id,
+        NETWORK_CONFIG[NetworkName.EthereumGoerli],
+        transaction,
+        false, // useRelayAdapt
       );
-      const transactions = await createGoerliTransferTransactions(
-        railgunWallet.addressKeys,
-        senderAddressData,
-        fee,
-        MOCK_TOKEN_ADDRESS,
-      );
-      const transaction = await proxyContract.transact(transactions);
-      const firstNoteERC20AmountMap =
-        await extractFirstNoteERC20AmountMapFromTransactionRequest(
-          railgunWallet.id,
-          NETWORK_CONFIG[NetworkName.EthereumGoerli],
-          transaction,
-          false, // useRelayAdapt
-        );
-      expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(1);
-      expect(
-        firstNoteERC20AmountMap[MOCK_TOKEN_ADDRESS.toLowerCase()],
-      ).to.equal(1000n);
-    }).timeout(60000);
+    expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(1);
+    expect(firstNoteERC20AmountMap[MOCK_TOKEN_ADDRESS.toLowerCase()]).to.equal(
+      1000n,
+    );
+  }).timeout(60000);
 
-    it('Should fail for incorrect receiver address - transfer', async () => {
-      const fee = BigInt('1000');
-      const receiverAddressData = RailgunEngine.decodeAddress(
-        '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
+  it('Should fail for incorrect receiver address - transfer', async () => {
+    const fee = BigInt('1000');
+    const receiverAddressData = RailgunEngine.decodeAddress(
+      '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
+    );
+    const senderAddressData = RailgunEngine.decodeAddress(
+      '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+    );
+    const transactions = await createGoerliTransferTransactions(
+      receiverAddressData,
+      senderAddressData,
+      fee,
+      MOCK_TOKEN_ADDRESS,
+    );
+    const transaction = await proxyContract.transact(transactions);
+    const firstNoteERC20AmountMap =
+      await extractFirstNoteERC20AmountMapFromTransactionRequest(
+        railgunWallet.id,
+        NETWORK_CONFIG[NetworkName.EthereumGoerli],
+        transaction,
+        false, // useRelayAdapt
       );
-      const senderAddressData = RailgunEngine.decodeAddress(
-        '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
-      );
-      const transactions = await createGoerliTransferTransactions(
-        receiverAddressData,
-        senderAddressData,
-        fee,
-        MOCK_TOKEN_ADDRESS,
-      );
-      const transaction = await proxyContract.transact(transactions);
-      const firstNoteERC20AmountMap =
-        await extractFirstNoteERC20AmountMapFromTransactionRequest(
-          railgunWallet.id,
-          NETWORK_CONFIG[NetworkName.EthereumGoerli],
-          transaction,
-          false, // useRelayAdapt
-        );
-      expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(0);
-    }).timeout(60000);
+    expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(0);
+  }).timeout(60000);
 
-    it('Should extract fee correctly - relay adapt', async () => {
-      const fee = BigInt('1000');
-      const senderAddressData = RailgunEngine.decodeAddress(
-        '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+  it('Should extract fee correctly - relay adapt', async () => {
+    const fee = BigInt('1000');
+    const senderAddressData = RailgunEngine.decodeAddress(
+      '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+    );
+    const transactions = await createGoerliRelayAdaptUnshieldTransactions(
+      railgunWallet.addressKeys,
+      senderAddressData,
+      fee,
+      MOCK_TOKEN_ADDRESS,
+    );
+    const transaction = await relayAdaptContract.populateUnshieldBaseToken(
+      transactions,
+      MOCK_ETH_WALLET_ADDRESS,
+      RANDOM_RELAY_ADAPT,
+    );
+    const firstNoteERC20AmountMap =
+      await extractFirstNoteERC20AmountMapFromTransactionRequest(
+        railgunWallet.id,
+        GOERLI_NETWORK,
+        transaction,
+        true, // useRelayAdapt
       );
-      const transactions = await createGoerliRelayAdaptUnshieldTransactions(
-        railgunWallet.addressKeys,
-        senderAddressData,
-        fee,
-        MOCK_TOKEN_ADDRESS,
-      );
-      const transaction = await relayAdaptContract.populateUnshieldBaseToken(
-        transactions,
-        MOCK_ETH_WALLET_ADDRESS,
-        RANDOM_RELAY_ADAPT,
-      );
-      const firstNoteERC20AmountMap =
-        await extractFirstNoteERC20AmountMapFromTransactionRequest(
-          railgunWallet.id,
-          GOERLI_NETWORK,
-          transaction,
-          true, // useRelayAdapt
-        );
-      expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(1);
-      expect(
-        firstNoteERC20AmountMap[MOCK_TOKEN_ADDRESS.toLowerCase()],
-      ).to.equal(1000n);
-    }).timeout(60000);
+    expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(1);
+    expect(firstNoteERC20AmountMap[MOCK_TOKEN_ADDRESS.toLowerCase()]).to.equal(
+      1000n,
+    );
+  }).timeout(60000);
 
-    it('Should fail for incorrect receiver address - relay adapt', async () => {
-      const fee = BigInt('1000');
-      const receiverAddressData = RailgunEngine.decodeAddress(
-        '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
+  it('Should fail for incorrect receiver address - relay adapt', async () => {
+    const fee = BigInt('1000');
+    const receiverAddressData = RailgunEngine.decodeAddress(
+      '0zk1q8hxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kfrv7j6fe3z53llhxknrs97q8pjxaagwthzc0df99rzmhl2xnlxmgv9akv32sua0kg0zpzts',
+    );
+    const senderAddressData = RailgunEngine.decodeAddress(
+      '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
+    );
+    const transactions = await createGoerliRelayAdaptUnshieldTransactions(
+      receiverAddressData,
+      senderAddressData,
+      fee,
+      MOCK_TOKEN_ADDRESS,
+    );
+    const transaction = await relayAdaptContract.populateUnshieldBaseToken(
+      transactions,
+      MOCK_ETH_WALLET_ADDRESS,
+      RANDOM_RELAY_ADAPT,
+    );
+    const firstNoteERC20AmountMap =
+      await extractFirstNoteERC20AmountMapFromTransactionRequest(
+        railgunWallet.id,
+        NETWORK_CONFIG[NetworkName.EthereumGoerli],
+        transaction,
+        true, // useRelayAdapt
       );
-      const senderAddressData = RailgunEngine.decodeAddress(
-        '0zk1qy00025qjn7vw0mvu4egcxlkjv3nkemeat92qdlh3lzl4rpzxv9f8rv7j6fe3z53ll2adx8kn0lj0ucjkz4xxyax8l9mpqjgrf9z3zjvlvqr4qxgznrpqugcjt8',
-      );
-      const transactions = await createGoerliRelayAdaptUnshieldTransactions(
-        receiverAddressData,
-        senderAddressData,
-        fee,
-        MOCK_TOKEN_ADDRESS,
-      );
-      const transaction = await relayAdaptContract.populateUnshieldBaseToken(
-        transactions,
-        MOCK_ETH_WALLET_ADDRESS,
-        RANDOM_RELAY_ADAPT,
-      );
-      const firstNoteERC20AmountMap =
-        await extractFirstNoteERC20AmountMapFromTransactionRequest(
-          railgunWallet.id,
-          NETWORK_CONFIG[NetworkName.EthereumGoerli],
-          transaction,
-          true, // useRelayAdapt
-        );
-      expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(0);
-    }).timeout(60000);
-  })
-  .timeout(120000);
+    expect(Object.keys(firstNoteERC20AmountMap).length).to.equal(0);
+  }).timeout(60000);
+}).timeout(120000);

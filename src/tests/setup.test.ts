@@ -77,7 +77,11 @@ export const initTestEngine = (useNativeArtifacts = false) => {
 
 export const initTestEngineNetwork = async () => {
   // Don't wait for async. It will try to load historical events, which takes a while.
-  return loadProvider(MOCK_FALLBACK_PROVIDER_JSON_CONFIG, NetworkName.Polygon);
+  return loadProvider(
+    MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
+    NetworkName.Polygon,
+    10000, // pollingInterval
+  );
 };
 
 export const closeTestEngine = async () => {

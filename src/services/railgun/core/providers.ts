@@ -102,6 +102,7 @@ const loadProviderForNetwork = async (
   chain: Chain,
   networkName: NetworkName,
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
+  pollingInterval: number,
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
   const fallbackProvider = createFallbackProviderFromJsonConfig(
@@ -109,6 +110,7 @@ const loadProviderForNetwork = async (
   );
   const pollingProvider = await createPollingJsonRpcProviderForListeners(
     fallbackProvider,
+    pollingInterval,
   );
 
   const network = NETWORK_CONFIG[networkName];
@@ -152,6 +154,7 @@ const loadProviderForNetwork = async (
 export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
+  pollingInterval: number,
 ): Promise<LoadProviderResponse> => {
   try {
     delete fallbackProviderMap[networkName];
@@ -165,6 +168,7 @@ export const loadProvider = async (
       chain,
       networkName,
       fallbackProviderJsonConfig,
+      pollingInterval,
     );
 
     const railgunSmartWalletContract =
