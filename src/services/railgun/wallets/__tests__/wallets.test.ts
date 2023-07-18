@@ -25,7 +25,7 @@ import {
   initTestEngineNetwork,
 } from '../../../../tests/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
-import { NetworkName } from '@railgun-community/shared-models';
+import { NetworkName, isDefined } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -41,7 +41,7 @@ describe('wallets', () => {
       MOCK_MNEMONIC_2,
       { [NetworkName.Ethereum]: 0, [NetworkName.Polygon]: 2 }, // creationBlockNumbers
     );
-    if (!railgunWalletInfo) {
+    if (!isDefined(railgunWalletInfo)) {
       throw new Error(`Could not create wallet`);
     }
     wallet = fullWalletForID(railgunWalletInfo.id);
@@ -56,7 +56,7 @@ describe('wallets', () => {
       wallet.generateShareableViewingKey(),
       undefined, // creationBlockNumbers
     );
-    if (!railgunWalletInfo) {
+    if (!isDefined(railgunWalletInfo)) {
       throw new Error('Could not create view-only wallet');
     }
     const viewOnlyWallet = viewOnlyWalletForID(railgunWalletInfo.id);

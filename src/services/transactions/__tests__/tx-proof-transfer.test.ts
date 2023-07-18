@@ -15,6 +15,7 @@ import {
   ProofType,
   RailgunNFTAmountRecipient,
   RailgunERC20AmountRecipient,
+  isDefined,
 } from '@railgun-community/shared-models';
 import {
   closeTestEngine,
@@ -58,7 +59,7 @@ describe.skip('tx-proofs', () => {
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!railgunWalletInfo) {
+    if (!isDefined(railgunWalletInfo)) {
       throw new Error('Expected railgunWalletInfo');
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
@@ -79,7 +80,7 @@ describe.skip('tx-proofs', () => {
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!relayerWalletInfo) {
+    if (!isDefined(relayerWalletInfo)) {
       throw new Error('Expected relayerWalletInfo');
     }
     const relayerRailgunAddress = relayerWalletInfo.railgunAddress;

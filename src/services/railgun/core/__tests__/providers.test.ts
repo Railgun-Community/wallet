@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {
   NetworkName,
   FallbackProviderJsonConfig,
+  isDefined,
 } from '@railgun-community/shared-models';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -76,7 +77,7 @@ describe('providers', () => {
       MOCK_MNEMONIC_PROVIDERS_ONLY,
       undefined, // creationBlockNumbers
     );
-    if (!railgunWalletInfo) {
+    if (!isDefined(railgunWalletInfo)) {
       throw new Error('Expected railgunWalletInfo.');
     }
     const wallet = walletForID(railgunWalletInfo.id);

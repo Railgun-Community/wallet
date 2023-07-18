@@ -1,5 +1,9 @@
 import { AccumulatedEvents, Chain } from '@railgun-community/engine';
-import { NetworkName, networkForChain } from '@railgun-community/shared-models';
+import {
+  NetworkName,
+  isDefined,
+  networkForChain,
+} from '@railgun-community/shared-models';
 import { EMPTY_EVENTS } from './empty-events';
 import { getMeshOptions, getSdk } from './graphql';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
@@ -103,7 +107,7 @@ const createGraphCommitmentBatches = (
   const graphCommitmentMap: MapType<GraphCommitmentBatch> = {};
   for (const commitment of flattenedCommitments) {
     const startPosition = commitment.batchStartTreePosition;
-    if (graphCommitmentMap[startPosition]) {
+    if (isDefined(graphCommitmentMap[startPosition])) {
       graphCommitmentMap[startPosition].commitments.push(commitment);
     } else {
       graphCommitmentMap[commitment.batchStartTreePosition] = {
@@ -172,7 +176,7 @@ const sortByTreeNumberAndStartPosition = (
 const getBuiltGraphClient = async (
   networkName: NetworkName,
 ): Promise<MeshInstance> => {
-  if (meshes[networkName]) {
+  if (isDefined(meshes[networkName])) {
     return meshes[networkName];
   }
   const sourceName = sourceNameForNetwork(networkName);

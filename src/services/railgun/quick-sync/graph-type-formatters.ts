@@ -34,6 +34,7 @@ import {
   Token as GraphToken,
 } from './graphql';
 import { getAddress } from 'ethers';
+import { isDefined } from '@railgun-community/shared-models';
 
 export type GraphCommitment =
   | GraphLegacyEncryptedCommitment
@@ -246,9 +247,9 @@ const formatShieldCommitment = (
     blockNumber: Number(commitment.blockNumber),
     encryptedBundle: commitment.encryptedBundle as [string, string, string],
     shieldKey: commitment.shieldKey,
-    fee: commitment.fee ? commitment.fee.toString() : undefined,
+    fee: isDefined(commitment.fee) ? commitment.fee.toString() : undefined,
   };
-  if (!shieldCommitment.fee) {
+  if (!isDefined(shieldCommitment.fee)) {
     delete shieldCommitment.fee;
   }
   return shieldCommitment;

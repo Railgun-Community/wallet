@@ -59,6 +59,7 @@ module.exports = {
     'no-warning-comments': 1,
     '@typescript-eslint/no-duplicate-enum-values': 1,
     'no-only-tests/no-only-tests': 1,
+    '@typescript-eslint/strict-boolean-expressions': 2,
   },
   overrides: [
     {

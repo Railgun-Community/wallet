@@ -31,7 +31,11 @@ import {
   createEngineVerifyProofStub,
   restoreEngineStubs,
 } from '../../../../tests/stubs/engine-stubs.test';
-import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
+import {
+  NetworkName,
+  NETWORK_CONFIG,
+  isDefined,
+} from '@railgun-community/shared-models';
 import { createRailgunWallet } from '../../wallets';
 import { fullWalletForID, getEngine } from '../../core/engine';
 import chai from 'chai';
@@ -140,7 +144,7 @@ describe('extract-first-note', () => {
       MOCK_MNEMONIC_1,
       undefined,
     );
-    if (!railgunWalletInfo) {
+    if (!isDefined(railgunWalletInfo)) {
       throw new Error('No railgun wallet created');
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);

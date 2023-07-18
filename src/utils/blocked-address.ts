@@ -1,7 +1,10 @@
-import { OFAC_TORNADO_CASH_SANCTIONS_LIST_ETH_ADDRESS } from '@railgun-community/shared-models';
+import {
+  OFAC_TORNADO_CASH_SANCTIONS_LIST_ETH_ADDRESS,
+  isDefined,
+} from '@railgun-community/shared-models';
 
 export const isBlockedAddress = (address?: string): boolean => {
-  if (!address) {
+  if (!isDefined(address)) {
     return false;
   }
   if (

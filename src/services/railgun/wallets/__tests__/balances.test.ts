@@ -13,7 +13,7 @@ import {
   rescanFullMerkletreesAndWallets,
   scanUpdatesForMerkletreeAndWallets,
 } from '../balances';
-import { Chain, ChainType } from '@railgun-community/shared-models';
+import { Chain, ChainType, isDefined } from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -32,7 +32,7 @@ describe('balances', () => {
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!railgunWalletInfo) {
+    if (!isDefined(railgunWalletInfo)) {
       return;
     }
     knownWalletID = railgunWalletInfo.id;
