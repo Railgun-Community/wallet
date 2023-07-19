@@ -2773,8 +2773,8 @@ const importFn: ImportFn = <T>(moduleId: string) => {
       : moduleId
   )
     .split('\\')
-    .join('/')
-    .replace(`${baseDir  }/`, '');
+    .join('/');
+    // .replace(`${baseDir}/`, ''); // MODIFIED
   switch (relativeModuleId) {
     case '.graphclient/sources/goerli/introspectionSchema':
       return import('./.graphclient/sources/goerli/introspectionSchema') as T;
