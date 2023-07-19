@@ -103,8 +103,8 @@ describe('artifact-downloader', () => {
     const cached = artifactCache['8x2'];
     expect(cached?.vkey).to.not.be.undefined;
     expect(cached?.zkey).to.not.be.undefined;
-    expect(cached?.wasm).to.be.undefined;
-    expect(cached?.dat).to.not.be.undefined;
+    expect(cached?.wasm).to.not.be.undefined;
+    expect(cached?.dat).to.be.undefined;
   }).timeout(30000);
 
   it('Should download artifacts - native', async () => {
