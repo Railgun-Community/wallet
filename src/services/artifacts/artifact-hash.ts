@@ -37,17 +37,25 @@ const getExpectedArtifactHash = (
   return hash;
 };
 
+const getDataBytes = (data: Uint8Array | Buffer | string): Uint8Array => {
+  if (data instanceof Uint8Array) {
+    return data;
+  }
+  if (Buffer.isBuffer(data)) {
+    return data.buffer as Uint8Array;
+  }
+  return hexStringToBytes(data);
+};
+
 export const validateArtifactDownload = async (
-  data: Buffer | string,
+  data: Uint8Array | Buffer | string,
   artifactName: ArtifactName,
   artifactVariantString: string,
 ): Promise<boolean> => {
   if (artifactName === ArtifactName.VKEY) {
     return true;
   }
-  const dataBytes = Buffer.isBuffer(data)
-    ? new Uint8Array(data.buffer)
-    : hexStringToBytes(data);
+  const dataBytes = getDataBytes(data);
   const hash = isReactNative
     ? hexlify(sha256(dataBytes))
     : createHash('sha256').update(dataBytes).digest('hex');

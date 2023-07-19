@@ -9,7 +9,7 @@ import {
   verifyED25519,
   EncryptedData,
   ViewingKeyPair,
-  isReactNative
+  isReactNative,
 } from '@railgun-community/engine';
 import { EncryptDataWithSharedKeyResponse } from '@railgun-community/shared-models';
 import { getRandomBytes } from './bytes';
