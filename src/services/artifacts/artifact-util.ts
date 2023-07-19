@@ -59,8 +59,8 @@ export const getArtifactDownloadsPaths = (
   };
 };
 
-export const decompressArtifact = (arrayBuffer: ArrayBuffer): Buffer => {
-  const decompress = brotliDecompress as (input: Buffer) => Buffer;
+export const decompressArtifact = (arrayBuffer: ArrayBuffer): Uint8Array => {
+  const decompress = brotliDecompress as (input: Uint8Array) => Uint8Array;
   return decompress(Buffer.from(arrayBuffer));
 };
 
