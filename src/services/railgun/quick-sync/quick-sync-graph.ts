@@ -3,6 +3,7 @@ import {
   NetworkName,
   isDefined,
   networkForChain,
+  removeUndefineds,
 } from '@railgun-community/shared-models';
 import { EMPTY_EVENTS } from './empty-events';
 import { getMeshOptions, getSdk } from './graphql';
@@ -107,8 +108,9 @@ const createGraphCommitmentBatches = (
   const graphCommitmentMap: MapType<GraphCommitmentBatch> = {};
   for (const commitment of flattenedCommitments) {
     const startPosition = commitment.batchStartTreePosition;
-    if (isDefined(graphCommitmentMap[startPosition])) {
-      graphCommitmentMap[startPosition].commitments.push(commitment);
+    const existingBatch = graphCommitmentMap[startPosition];
+    if (isDefined(existingBatch)) {
+      existingBatch.commitments.push(commitment);
     } else {
       graphCommitmentMap[commitment.batchStartTreePosition] = {
         commitments: [commitment],
@@ -119,7 +121,7 @@ const createGraphCommitmentBatches = (
       };
     }
   }
-  return Object.values(graphCommitmentMap);
+  return removeUndefineds(Object.values(graphCommitmentMap));
 };
 
 const autoPaginatingQuery = async <ReturnType extends { blockNumber: string }>(
@@ -176,8 +178,9 @@ const sortByTreeNumberAndStartPosition = (
 const getBuiltGraphClient = async (
   networkName: NetworkName,
 ): Promise<MeshInstance> => {
-  if (isDefined(meshes[networkName])) {
-    return meshes[networkName];
+  const meshForNetwork = meshes[networkName];
+  if (isDefined(meshForNetwork)) {
+    return meshForNetwork;
   }
   const sourceName = sourceNameForNetwork(networkName);
   const meshOptions = await getMeshOptions();

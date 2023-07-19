@@ -40,8 +40,9 @@ export const getArtifacts = async (inputs: PublicInputs): Promise<Artifact> => {
   );
 
   // Use artifact in cache if available.
-  if (isDefined(artifactCache[artifactVariantString])) {
-    return artifactCache[artifactVariantString];
+  const cachedArtifact = artifactCache[artifactVariantString];
+  if (isDefined(cachedArtifact)) {
+    return cachedArtifact;
   }
 
   const downloader = new ArtifactDownloader(artifactStore, useNativeArtifacts);

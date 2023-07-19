@@ -174,10 +174,10 @@ const extractFirstNoteERC20AmountMap = async (
 
       const { tokenAddress, amount } = erc20PaymentAmount;
 
-      if (!erc20PaymentAmounts[tokenAddress]) {
+      if (!isDefined(erc20PaymentAmounts[tokenAddress])) {
         erc20PaymentAmounts[tokenAddress] = 0n;
       }
-      erc20PaymentAmounts[tokenAddress] += amount;
+      (erc20PaymentAmounts[tokenAddress] as bigint) += amount;
     }),
   );
 

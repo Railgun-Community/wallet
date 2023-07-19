@@ -1,3 +1,4 @@
+/// <reference types="../../../types/global" />
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Artifact, ArtifactName } from '@railgun-community/shared-models';
@@ -99,11 +100,11 @@ describe('artifact-downloader', () => {
     expect(artifacts.wasm).to.not.be.undefined;
     expect(artifacts.dat).to.be.undefined;
 
-    const cached: Artifact = artifactCache['8x2'];
-    expect(cached.vkey).to.not.be.undefined;
-    expect(cached.zkey).to.not.be.undefined;
-    expect(cached.wasm).to.not.be.undefined;
-    expect(cached.dat).to.be.undefined;
+    const cached = artifactCache['8x2'];
+    expect(cached?.vkey).to.not.be.undefined;
+    expect(cached?.zkey).to.not.be.undefined;
+    expect(cached?.wasm).to.be.undefined;
+    expect(cached?.dat).to.not.be.undefined;
   }).timeout(30000);
 
   it('Should download artifacts - native', async () => {
@@ -135,11 +136,11 @@ describe('artifact-downloader', () => {
     expect(artifacts.wasm).to.be.undefined;
     expect(artifacts.dat).to.not.be.undefined;
 
-    const cached: Artifact = artifactCache['6x3'];
-    expect(cached.vkey).to.not.be.undefined;
-    expect(cached.zkey).to.not.be.undefined;
-    expect(cached.wasm).to.be.undefined;
-    expect(cached.dat).to.not.be.undefined;
+    const cached = artifactCache['6x3'];
+    expect(cached?.vkey).to.not.be.undefined;
+    expect(cached?.zkey).to.not.be.undefined;
+    expect(cached?.wasm).to.be.undefined;
+    expect(cached?.dat).to.not.be.undefined;
   }).timeout(30000);
 
   // Skipped because we don't want to run this on every build.

@@ -197,11 +197,11 @@ export const pauseAllProviders = (excludeNetworkName?: NetworkName): void => {
       return;
     }
     const provider = fallbackProviderMap[networkName];
-    if (!provider?.paused) {
+    if (isDefined(provider) && !provider.paused) {
       provider.pause();
     }
     const pollingProvider = pollingProviderMap[networkName];
-    if (!pollingProvider?.paused) {
+    if (isDefined(pollingProvider) && !pollingProvider.paused) {
       pollingProvider.pause();
     }
   });
@@ -213,10 +213,18 @@ export const resumeIsolatedProviderForNetwork = (
   pauseAllProviders(
     networkName, // excludeNetworkName
   );
-  if (fallbackProviderMap[networkName]?.paused) {
-    fallbackProviderMap[networkName].resume();
+  const fallbackProviderForNetwork = fallbackProviderMap[networkName];
+  if (
+    isDefined(fallbackProviderForNetwork) &&
+    fallbackProviderForNetwork.paused
+  ) {
+    fallbackProviderForNetwork.resume();
   }
-  if (pollingProviderMap[networkName]?.paused) {
-    pollingProviderMap[networkName].resume();
+  const pollingProviderForNetwork = pollingProviderMap[networkName];
+  if (
+    isDefined(pollingProviderForNetwork) &&
+    pollingProviderForNetwork.paused
+  ) {
+    pollingProviderForNetwork.resume();
   }
 };

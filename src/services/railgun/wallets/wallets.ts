@@ -13,6 +13,7 @@ import {
   RailgunWalletInfo,
   NetworkName,
   NETWORK_CONFIG,
+  isDefined,
 } from '@railgun-community/shared-models';
 import { getEngine, walletForID } from '../core/engine';
 import { onBalancesUpdate } from './balance-update';
@@ -283,10 +284,14 @@ const formatCreationBlockNumbers = (
   for (const networkName of networksNames) {
     const network = NETWORK_CONFIG[networkName];
 
-    formattedCreationBlockNumbers[network.chain.type] ??= [];
+    const blockNumber = creationBlockNumbers[networkName];
+    if (!isDefined(blockNumber)) {
+      continue;
+    }
 
+    formattedCreationBlockNumbers[network.chain.type] ??= [];
     formattedCreationBlockNumbers[network.chain.type][network.chain.id] =
-      creationBlockNumbers[networkName];
+      blockNumber;
   }
 
   return formattedCreationBlockNumbers;
