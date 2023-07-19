@@ -115,7 +115,7 @@ export class ArtifactDownloader {
   private static getArtifactData = (
     data: string | ArrayBuffer,
     artifactName: ArtifactName,
-  ): string | Buffer => {
+  ): string | Uint8Array => {
     switch (artifactName) {
       case ArtifactName.VKEY:
         return data as string;
