@@ -31,6 +31,22 @@ function patchCipherBase() {
   );
 }
 
+function warnIfNoGetRandomValues() {
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.join(cwd, 'package.json'), 'utf8'),
+  );
+  if ('react-native-get-random-values' in packageJson['dependencies']) return;
+  throw new Error(
+    'react-native-get-random-values is missing. It seems like you are ' +
+      'installing @railgun-community/wallet in a React Native project. ' +
+      'This requires the peer dependency react-native-get-random-values. ' +
+      '\n' +
+      'Please add it to your package.json dependencies and run npm install ' +
+      '(or yarn) again.',
+  );
+}
+
 if (isReactNativeProject) {
   patchCipherBase();
+  warnIfNoGetRandomValues();
 }
