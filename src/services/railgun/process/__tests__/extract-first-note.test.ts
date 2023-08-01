@@ -17,7 +17,7 @@ import {
 } from '@railgun-community/engine';
 import {
   getPollingProviderForNetwork,
-  getProviderForNetwork,
+  getFallbackProviderForNetwork,
   loadProvider,
 } from '../../core/providers';
 import { extractFirstNoteERC20AmountMapFromTransactionRequest } from '../extract-first-note';
@@ -155,7 +155,7 @@ describe('extract-first-note', () => {
       10000, // pollingInterval
     );
 
-    const fallbackProvider = getProviderForNetwork(GOERLI_NETWORK.name);
+    const fallbackProvider = getFallbackProviderForNetwork(GOERLI_NETWORK.name);
     const pollingProvider = getPollingProviderForNetwork(GOERLI_NETWORK.name);
 
     const {

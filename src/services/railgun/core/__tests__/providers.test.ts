@@ -13,7 +13,7 @@ import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { walletForID } from '../engine';
 import {
   getMerkleTreeForNetwork,
-  getProviderForNetwork,
+  getFallbackProviderForNetwork,
   loadProvider,
   getRelayAdaptContractForNetwork,
   getRailgunSmartWalletContractForNetwork,
@@ -46,10 +46,11 @@ describe('providers', () => {
       nft: '25',
     });
 
-    expect(getProviderForNetwork(NetworkName.PolygonMumbai)).to.not.be
+    expect(getFallbackProviderForNetwork(NetworkName.PolygonMumbai)).to.not.be
       .undefined;
-    expect(() => getProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED))
-      .to.throw;
+    expect(() =>
+      getFallbackProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
+    ).to.throw;
 
     expect(getMerkleTreeForNetwork(NetworkName.PolygonMumbai)).to.not.be
       .undefined;

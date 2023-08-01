@@ -17,7 +17,7 @@ import {
   getGasEstimate,
   setGasDetailsForTransaction,
 } from '../tx-gas-details';
-import { setProviderForNetwork } from '../../railgun';
+import { setFallbackProviderForNetwork } from '../../railgun';
 import { ContractTransaction, FallbackProvider } from 'ethers';
 
 let gasEstimateStub: SinonStub;
@@ -40,7 +40,7 @@ describe('tx-gas', () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     );
-    setProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
     const gasEstimate = await getGasEstimate(
       NetworkName.Polygon,
       transaction,
@@ -64,7 +64,7 @@ describe('tx-gas', () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     );
-    setProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
     const tx: ContractTransaction = {
       chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,
@@ -91,7 +91,7 @@ describe('tx-gas', () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     );
-    setProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
     const tx: ContractTransaction = {
       chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,

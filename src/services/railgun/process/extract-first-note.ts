@@ -22,7 +22,7 @@ import {
   RailgunERC20Amount,
   isDefined,
 } from '@railgun-community/shared-models';
-import { getProviderForNetwork } from '../core/providers';
+import { getFallbackProviderForNetwork } from '../core/providers';
 import { sendMessage } from '../../../utils';
 import { parseRailgunTokenAddress } from '../util';
 import { reportAndSanitizeError } from '../../../utils/error';
@@ -115,7 +115,7 @@ const extractFirstNoteERC20AmountMap = async (
     );
   }
 
-  const provider = getProviderForNetwork(network.name);
+  const provider = getFallbackProviderForNetwork(network.name);
   const contract = new Contract(contractAddress, abi, provider);
 
   const parsedTransaction = contract.interface.parseTransaction({
