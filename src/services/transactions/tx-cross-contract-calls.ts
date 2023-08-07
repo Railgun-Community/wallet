@@ -174,6 +174,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
   originalGasDetails: TransactionGasDetails,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
+  minGasLimit: Optional<bigint>,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     const wallet = fullWalletForID(railgunWalletID);
@@ -210,6 +211,9 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
         relayAdaptShieldNFTsTokenData,
       );
 
+    const minimumGasLimit =
+      minGasLimit ?? MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT;
+
     const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
@@ -236,6 +240,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           relayAdaptParamsRandom,
           true, // isGasEstimate
           !sendWithPublicWallet, // isRelayerTransaction
+          minimumGasLimit,
         );
         // Remove gasLimit, we'll set to the minimum below.
         // TODO: Remove after callbacks upgrade.
@@ -281,6 +286,7 @@ export const generateCrossContractCallsProof = async (
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
+  minGasLimit: Optional<bigint>,
   progressCallback: ProverProgressCallback,
 ): Promise<void> => {
   try {
@@ -333,6 +339,9 @@ export const generateCrossContractCallsProof = async (
         relayAdaptShieldNFTsTokenData,
       );
 
+    const minimumGasLimit =
+      minGasLimit ?? MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT;
+
     const isRelayerTransaction = !sendWithPublicWallet;
     const relayAdaptParamsRandom = randomHex(31);
     const relayAdaptParams =
@@ -342,6 +351,7 @@ export const generateCrossContractCallsProof = async (
         relayShieldRequests,
         relayAdaptParamsRandom,
         isRelayerTransaction,
+        minimumGasLimit,
       );
     const relayAdaptID: AdaptID = {
       contract: relayAdaptContract.address,
@@ -375,6 +385,7 @@ export const generateCrossContractCallsProof = async (
       relayAdaptParamsRandom,
       false, // isGasEstimate
       isRelayerTransaction,
+      minGasLimit,
     );
     delete transaction.from;
 

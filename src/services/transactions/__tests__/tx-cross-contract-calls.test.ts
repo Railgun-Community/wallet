@@ -7,6 +7,7 @@ import {
   TransactionBatch,
   RelayAdaptContract,
   getTokenDataERC20,
+  MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT,
 } from '@railgun-community/engine';
 import {
   RailgunERC20Amount,
@@ -106,6 +107,8 @@ const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
 ];
 
 const overallBatchMinGasPrice = BigInt('0x1000');
+
+const minGasLimit = MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT;
 
 const gasDetails: TransactionGasDetails = {
   evmGasType: EVMGasType.Type1,
@@ -213,6 +216,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
+      minGasLimit,
     );
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
@@ -305,6 +309,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
       MOCK_FEE_TOKEN_DETAILS,
       true, // sendWithPublicWallet
+      minGasLimit,
     );
 
     expect(rsp.relayerFeeCommitment).to.be.undefined;
@@ -363,6 +368,7 @@ describe('tx-cross-contract-calls', () => {
         MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
         MOCK_FEE_TOKEN_DETAILS,
         false, // sendWithPublicWallet
+        minGasLimit,
       ),
     ).rejectedWith(`Cross-contract calls require to and data fields.`);
   });
@@ -382,6 +388,7 @@ describe('tx-cross-contract-calls', () => {
         MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
         MOCK_FEE_TOKEN_DETAILS,
         false, // sendWithPublicWallet
+        minGasLimit,
       ),
     ).rejectedWith(
       'RelayAdapt multicall failed at index UNKNOWN with error: test rejection - gas estimate',
@@ -406,6 +413,7 @@ describe('tx-cross-contract-calls', () => {
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
+      minGasLimit,
       () => {}, // progressCallback
     );
     expect(addUnshieldDataSpy.called).to.be.true;
@@ -560,6 +568,7 @@ describe('tx-cross-contract-calls', () => {
       relayerFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
+      minGasLimit,
       () => {}, // progressCallback
     );
     await expect(
