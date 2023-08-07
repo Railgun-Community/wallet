@@ -259,9 +259,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
     // TODO: Remove this after callbacks upgrade.
     // If gas estimate is under the cross-contract-minimum, replace it with the minimum.
     if (response.gasEstimate) {
-      const minimum = MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT;
-      if (response.gasEstimate < minimum) {
-        response.gasEstimate = minimum;
+      if (response.gasEstimate < minimumGasLimit) {
+        response.gasEstimate = minimumGasLimit;
       }
     }
 
@@ -385,7 +384,7 @@ export const generateCrossContractCallsProof = async (
       relayAdaptParamsRandom,
       false, // isGasEstimate
       isRelayerTransaction,
-      minGasLimit,
+      minimumGasLimit,
     );
     delete transaction.from;
 
