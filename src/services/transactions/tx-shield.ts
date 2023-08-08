@@ -35,11 +35,11 @@ export const getShieldPrivateKeySignatureMessage = () => {
   return ShieldNote.getShieldPrivateKeySignatureMessage();
 };
 
-const generateERC20Shield = async (
+const generateERC20ShieldRequests = async (
   erc20AmountRecipient: RailgunERC20AmountRecipient,
   random: string,
   shieldPrivateKey: string,
-) => {
+): Promise<ShieldRequestStruct> => {
   const railgunAddress = erc20AmountRecipient.recipientAddress;
 
   assertValidRailgunAddress(railgunAddress);
@@ -56,11 +56,11 @@ const generateERC20Shield = async (
   return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
 };
 
-const generateNFTShield = async (
+const generateNFTShieldRequests = async (
   nftAmountRecipient: RailgunNFTAmountRecipient,
   random: string,
   shieldPrivateKey: string,
-) => {
+): Promise<ShieldRequestStruct> => {
   const railgunAddress = nftAmountRecipient.recipientAddress;
 
   assertValidRailgunAddress(railgunAddress);
@@ -85,7 +85,7 @@ const generateNFTShield = async (
   return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
 };
 
-const generateShieldTransactions = async (
+export const generateShieldTransactions = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
@@ -98,10 +98,14 @@ const generateShieldTransactions = async (
 
     const shieldInputs: ShieldRequestStruct[] = await Promise.all([
       ...erc20AmountRecipients.map(erc20AmountRecipient =>
-        generateERC20Shield(erc20AmountRecipient, random, shieldPrivateKey),
+        generateERC20ShieldRequests(
+          erc20AmountRecipient,
+          random,
+          shieldPrivateKey,
+        ),
       ),
       ...nftAmountRecipients.map(nftAmountRecipient =>
-        generateNFTShield(nftAmountRecipient, random, shieldPrivateKey),
+        generateNFTShieldRequests(nftAmountRecipient, random, shieldPrivateKey),
       ),
     ]);
 
