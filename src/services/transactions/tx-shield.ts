@@ -85,7 +85,7 @@ const generateNFTShieldRequests = async (
   return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
 };
 
-export const generateShieldTransactions = async (
+export const generateShieldTransaction = async (
   networkName: NetworkName,
   shieldPrivateKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
@@ -115,7 +115,7 @@ export const generateShieldTransactions = async (
     return transaction;
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(
-      generateShieldTransactions.name,
+      generateShieldTransaction.name,
       err,
     );
     throw sanitizedError;
@@ -130,7 +130,7 @@ export const populateShield = async (
   gasDetails?: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const transaction = await generateShieldTransactions(
+    const transaction = await generateShieldTransaction(
       networkName,
       shieldPrivateKey,
       erc20AmountRecipients,
@@ -165,7 +165,7 @@ export const gasEstimateForShield = async (
   try {
     assertNotBlockedAddress(fromWalletAddress);
 
-    const transaction = await generateShieldTransactions(
+    const transaction = await generateShieldTransaction(
       networkName,
       shieldPrivateKey,
       erc20AmountRecipients,
