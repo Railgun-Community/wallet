@@ -603,4 +603,13 @@ describe('tx-cross-contract-calls', () => {
     );
     expect(transactionError).to.equal('ds-math-sub-underflow');
   });
+
+  it('Should parse relay adapt revert data from railgun cookbook', () => {
+    const transactionError = parseRelayAdaptReturnValue(
+      `0x5c0dee5d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000002d52656c617941646170743a205265667573696e6720746f2063616c6c205261696c67756e20636f6e747261637400000000000000000000000000000000000000`,
+    );
+    expect(transactionError).to.equal(
+      'RelayAdapt: Refusing to call Railgun contract',
+    );
+  });
 });
