@@ -7,6 +7,7 @@ import {
   RailgunERC20AmountRecipient,
   NetworkName,
   RailgunNFTAmount,
+  RailgunERC20Recipient,
 } from '@railgun-community/shared-models';
 import {
   MOCK_NFT_AMOUNTS,
@@ -43,10 +44,13 @@ const relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient = {
 const crossContractCalls: ContractTransaction[] = [
   { to: '0x4567', data: '0x' },
 ];
-const relayAdaptShieldERC20Addresses = ['0x123'];
+const relayAdaptShieldERC20Recipients: RailgunERC20Recipient[] = [
+  { tokenAddress: '0x123', recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS },
+];
 const relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[] = [MOCK_TOKEN_FEE];
 const relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[] = MOCK_NFT_AMOUNTS;
-const relayAdaptShieldNFTs: RailgunNFTAmount[] = MOCK_NFT_AMOUNTS;
+const relayAdaptShieldNFTRecipients: RailgunNFTAmountRecipient[] =
+  MOCK_NFT_AMOUNT_RECIPIENTS;
 
 const nullifiers = ['0x1234'];
 
@@ -64,8 +68,8 @@ const setCached = (proofType: ProofType) => {
     nftAmountRecipients,
     relayAdaptUnshieldERC20Amounts,
     relayAdaptUnshieldNFTAmounts,
-    relayAdaptShieldERC20Addresses,
-    relayAdaptShieldNFTs,
+    relayAdaptShieldERC20Recipients,
+    relayAdaptShieldNFTRecipients,
     crossContractCalls,
     relayerFeeERC20AmountRecipient,
     sendWithPublicWallet: false,
@@ -88,8 +92,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -111,8 +115,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -131,8 +135,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -151,8 +155,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -171,8 +175,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -195,8 +199,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -216,8 +220,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -243,8 +247,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -265,8 +269,8 @@ describe('proof-cache', () => {
         [MOCK_NFT_AMOUNT_RECIPIENTS[0]],
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -291,8 +295,8 @@ describe('proof-cache', () => {
           },
         ],
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -312,8 +316,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         [MOCK_NFT_AMOUNTS[0]],
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -333,14 +337,19 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        ['test'],
-        relayAdaptShieldNFTs,
+        [
+          {
+            tokenAddress: 'test',
+            recipientAddress: MOCK_RAILGUN_WALLET_ADDRESS,
+          },
+        ],
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
       ),
-    ).to.throw('Mismatch: relayAdaptShieldERC20Addresses.');
+    ).to.throw('Mismatch: relayAdaptShieldERC20Recipients.');
 
     expect(() =>
       validateCachedProvedTransaction(
@@ -355,13 +364,13 @@ describe('proof-cache', () => {
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
         [],
-        relayAdaptShieldNFTs,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
       ),
-    ).to.throw('Mismatch: relayAdaptShieldERC20Addresses.');
+    ).to.throw('Mismatch: relayAdaptShieldERC20Recipients.');
 
     expect(() =>
       validateCachedProvedTransaction(
@@ -375,14 +384,14 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
+        relayAdaptShieldERC20Recipients,
         [MOCK_NFT_AMOUNTS[0]],
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
       ),
-    ).to.throw('Mismatch: relayAdaptShieldNFTs.');
+    ).to.throw('Mismatch: relayAdaptShieldNFTRecipients.');
 
     expect(() =>
       validateCachedProvedTransaction(
@@ -396,8 +405,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         [{ to: 'test', data: '0x' }],
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,
@@ -416,8 +425,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         {
           tokenAddress: '0x765',
@@ -440,8 +449,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         true, // sendWithPublicWallet
@@ -460,8 +469,8 @@ describe('proof-cache', () => {
         nftAmountRecipients,
         relayAdaptUnshieldERC20Amounts,
         relayAdaptUnshieldNFTAmounts,
-        relayAdaptShieldERC20Addresses,
-        relayAdaptShieldNFTs,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
         crossContractCalls,
         relayerFeeERC20AmountRecipient,
         sendWithPublicWallet,

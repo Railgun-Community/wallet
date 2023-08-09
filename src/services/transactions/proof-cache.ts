@@ -7,12 +7,10 @@ import {
   RailgunNFTAmount,
   TransactionGasDetails,
   isDefined,
+  RailgunERC20Recipient,
 } from '@railgun-community/shared-models';
 import { shouldSetOverallBatchMinGasPriceForNetwork } from '../../utils/gas-price';
-import {
-  compareContractTransactionArrays,
-  compareStringArrays,
-} from '../../utils/utils';
+import { compareContractTransactionArrays } from '../../utils/utils';
 import { setGasDetailsForTransaction } from './tx-gas-details';
 import {
   compareERC20AmountRecipients,
@@ -20,6 +18,7 @@ import {
   compareERC20AmountArrays,
   compareNFTAmountRecipientArrays,
   compareNFTAmountArrays,
+  compareERC20RecipientArrays,
 } from './tx-notes';
 import { ContractTransaction } from 'ethers';
 
@@ -33,8 +32,8 @@ export type ProvedTransaction = {
   nftAmountRecipients: RailgunNFTAmountRecipient[];
   relayAdaptUnshieldERC20Amounts: Optional<RailgunERC20Amount[]>;
   relayAdaptUnshieldNFTAmounts: Optional<RailgunNFTAmount[]>;
-  relayAdaptShieldERC20Addresses: Optional<string[]>;
-  relayAdaptShieldNFTs: Optional<RailgunNFTAmount[]>;
+  relayAdaptShieldERC20Recipients: Optional<RailgunERC20Recipient[]>;
+  relayAdaptShieldNFTRecipients: Optional<RailgunNFTAmount[]>;
   crossContractCalls: Optional<ContractTransaction[]>;
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>;
   sendWithPublicWallet: boolean;
@@ -54,8 +53,8 @@ export const populateProvedTransaction = async (
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayAdaptUnshieldERC20Amounts: Optional<RailgunERC20Amount[]>,
   relayAdaptUnshieldNFTAmounts: Optional<RailgunNFTAmount[]>,
-  relayAdaptShieldERC20Addresses: Optional<string[]>,
-  relayAdaptShieldNFTs: Optional<RailgunNFTAmount[]>,
+  relayAdaptShieldERC20Recipients: Optional<RailgunERC20Recipient[]>,
+  relayAdaptShieldNFTRecipients: Optional<RailgunNFTAmount[]>,
   crossContractCalls: Optional<ContractTransaction[]>,
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
@@ -76,8 +75,8 @@ export const populateProvedTransaction = async (
       nftAmountRecipients,
       relayAdaptUnshieldERC20Amounts,
       relayAdaptUnshieldNFTAmounts,
-      relayAdaptShieldERC20Addresses,
-      relayAdaptShieldNFTs,
+      relayAdaptShieldERC20Recipients,
+      relayAdaptShieldNFTRecipients,
       crossContractCalls,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
@@ -160,8 +159,8 @@ export const validateCachedProvedTransaction = (
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayAdaptUnshieldERC20Amounts: Optional<RailgunERC20Amount[]>,
   relayAdaptUnshieldNFTAmounts: Optional<RailgunNFTAmount[]>,
-  relayAdaptShieldERC20Addresses: Optional<string[]>,
-  relayAdaptShieldNFTs: Optional<RailgunNFTAmount[]>,
+  relayAdaptShieldERC20Recipients: Optional<RailgunERC20Recipient[]>,
+  relayAdaptShieldNFTRecipients: Optional<RailgunNFTAmount[]>,
   crossContractCalls: Optional<ContractTransaction[]>,
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
@@ -217,20 +216,20 @@ export const validateCachedProvedTransaction = (
     throw new Error('Mismatch: relayAdaptUnshieldNFTAmounts.');
   } else if (
     shouldValidateRelayAdaptAmounts(proofType) &&
-    !compareStringArrays(
-      relayAdaptShieldERC20Addresses,
-      cachedProvedTransaction.relayAdaptShieldERC20Addresses,
+    !compareERC20RecipientArrays(
+      relayAdaptShieldERC20Recipients,
+      cachedProvedTransaction.relayAdaptShieldERC20Recipients,
     )
   ) {
-    throw new Error('Mismatch: relayAdaptShieldERC20Addresses.');
+    throw new Error('Mismatch: relayAdaptShieldERC20Recipients.');
   } else if (
     shouldValidateRelayAdaptAmounts(proofType) &&
     !compareNFTAmountArrays(
-      relayAdaptShieldNFTs,
-      cachedProvedTransaction.relayAdaptShieldNFTs,
+      relayAdaptShieldNFTRecipients,
+      cachedProvedTransaction.relayAdaptShieldNFTRecipients,
     )
   ) {
-    throw new Error('Mismatch: relayAdaptShieldNFTs.');
+    throw new Error('Mismatch: relayAdaptShieldNFTRecipients.');
   } else if (
     shouldValidateCrossContractCalls(proofType) &&
     !compareContractTransactionArrays(

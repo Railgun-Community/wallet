@@ -41,8 +41,8 @@ export const populateProvedUnshield = async (
       nftAmountRecipients,
       undefined, // relayAdaptUnshieldERC20AmountRecipients
       undefined, // relayAdaptUnshieldNFTAmounts
-      undefined, // relayAdaptShieldERC20Addresses
-      undefined, // relayAdaptShieldNFTs
+      undefined, // relayAdaptShieldERC20Recipients
+      undefined, // relayAdaptShieldNFTRecipients
       undefined, // crossContractCalls
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
@@ -92,8 +92,8 @@ export const populateProvedUnshieldBaseToken = async (
       nftAmountRecipients,
       relayAdaptUnshieldERC20Amounts,
       undefined, // relayAdaptUnshieldNFTAmounts
-      undefined, // relayAdaptShieldERC20Addresses
-      undefined, // relayAdaptShieldNFTs
+      undefined, // relayAdaptShieldERC20Recipients
+      undefined, // relayAdaptShieldNFTRecipients
       undefined, // crossContractCalls
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,

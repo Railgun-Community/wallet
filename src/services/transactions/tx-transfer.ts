@@ -41,8 +41,8 @@ export const populateProvedTransfer = async (
       nftAmountRecipients,
       undefined, // relayAdaptUnshieldERC20AmountRecipients
       undefined, // relayAdaptUnshieldNFTAmounts
-      undefined, // relayAdaptShieldERC20Addresses
-      undefined, // relayAdaptShieldNFTs
+      undefined, // relayAdaptShieldERC20Recipients
+      undefined, // relayAdaptShieldNFTRecipients
       undefined, // crossContractCalls
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
