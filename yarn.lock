@@ -2115,10 +2115,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@5.2.5":
-  version "5.2.5"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.2.5.tgz#ee26c9593edba9cccaf7330cac73ccec6294ee1e"
-  integrity sha512-6Y6TzDuv8MwKy5VTXEBO6SSFO7Nb03YDgi7PXbO2jHsA14XNPT6cN2Ozj4lm4nONQbGhoVQ4DzvMewWcg5qCqw==
+"@railgun-community/engine@5.2.6":
+  version "5.2.6"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.2.6.tgz#d7901b6047a4920a604e65fb61e08e2f0f5324f6"
+  integrity sha512-+v4bIo8Iob5ux/BHBdStw/9kyXFvtfHZmXaCLLE3GMHSoRtcYMd/8WkS0a1TjKL5X/68YwGjgtbxN+eoFnNiMw==
   dependencies:
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.0"
@@ -2132,15 +2132,15 @@
     circomlibjs hsg88/circomlibjs#ffjavascrip.0.1.0
     encoding-down "^7.1.0"
     ethereum-cryptography "^2.0.0"
-    ethers "github:Railgun-Community/ethers.js#v6.7.4"
+    ethers "github:Railgun-Community/ethers.js#v6.7.5"
     fast-text-encoding "^1.0.6"
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
-"@railgun-community/shared-models@5.3.3":
-  version "5.3.3"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.3.3.tgz#42fdc743a4a522ed64281e3f035e402925035169"
-  integrity sha512-quhoqa6CqIYlEMV9pWXUZpREJQ8HVrIllcbfyXkjmDtjhEiEsjNBwvNfaFlaPSoNnpDn+y6RM6l4/eMOSCW7Yw==
+"@railgun-community/shared-models@5.3.4":
+  version "5.3.4"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.3.4.tgz#9c876a1f57b8dc0f99c181537af4df5165bb9450"
+  integrity sha512-4BkOXwIaOGoSp/Qok8oAlAdSMtWPnd4eWk8CLw321wn6jPmOBxJZ8zxCmT8FFOhOu+C3SSXti6TQigy/8XUl3w==
 
 "@repeaterjs/repeater@3.0.4", "@repeaterjs/repeater@^3.0.4":
   version "3.0.4"
@@ -4498,7 +4498,7 @@ ethereumjs-util@^7.0.10, ethereumjs-util@^7.1.0, ethereumjs-util@^7.1.5:
     ethereum-cryptography "^0.1.3"
     rlp "^2.2.4"
 
-"ethers@github:Railgun-Community/ethers.js#v6.7.4":
+"ethers@github:Railgun-Community/ethers.js#v6.7.5":
   version "6.7.5"
   resolved "https://codeload.github.com/Railgun-Community/ethers.js/tar.gz/1c5f6181ca4edfbe84e5afecb7cd9addc2284b1c"
   dependencies:
