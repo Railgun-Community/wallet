@@ -1,4 +1,4 @@
-[![Node.js CI Actions Status](https://github.com/Railgun-Community/wallet/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/wallet/actions)
+[![Unit Tests](https://github.com/Railgun-Community/wallet/actions/workflows/unit-tests.yml/badge.svg?branch=main)](https://github.com/Railgun-Community/wallet/actions)
 
 # RAILGUN Wallet SDK
 
