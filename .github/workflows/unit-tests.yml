@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 13,23 * * *'
+    - cron: '30 12,22 * * *'
 
 jobs:
   unit-tests:
@@ -26,20 +26,3 @@ jobs:
         shell: bash
         run: # Try yarn test 3 times before failing
           r=3;while ! yarn test ; do ((--r))||exit;sleep 1;done
-
-  fail-report:
-    if: ${{ failure() && github.event_name == 'schedule' }}
-    needs: unit-tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get repository name
-        run: echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
-      - name: Send Telegram message with fail report
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.CI_TELEGRAM_TO }}
-          token: ${{ secrets.CI_TELEGRAM_TOKEN }}
-          format: markdown
-          message: |
-            ❌ **${{ env.REPOSITORY_NAME }}**
-            [${{ github.workflow }} failed](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for commit "[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{github.sha}})" (${{github.actor}})
