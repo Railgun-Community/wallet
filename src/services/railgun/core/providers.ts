@@ -223,6 +223,15 @@ export const loadProvider = async (
   }
 };
 
+export const unloadProvider = async (
+  networkName: NetworkName,
+): Promise<void> => {
+  await fallbackProviderMap[networkName]?.destroy();
+  pollingProviderMap[networkName]?.destroy();
+  delete fallbackProviderMap[networkName];
+  delete pollingProviderMap[networkName];
+};
+
 export const pauseAllPollingProviders = (
   excludeNetworkName?: NetworkName,
 ): void => {
