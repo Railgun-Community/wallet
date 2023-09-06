@@ -20,8 +20,8 @@ export const getAllShields = async (
 
   return shieldCommitments.map(commitment => {
     const shieldData: ShieldData = {
-      txid: commitment.txid,
-      hash: commitment.hash,
+      txid: `0x${commitment.txid}`,
+      hash: `0x${commitment.hash}`,
       timestamp: commitment.timestamp,
     };
     return shieldData;
