@@ -5,6 +5,7 @@ export type ShieldData = {
   txid: string;
   hash: string;
   timestamp: Optional<number>;
+  blockNumber: number;
 };
 
 export const getAllShields = async (
@@ -23,6 +24,7 @@ export const getAllShields = async (
       txid: `0x${commitment.txid}`,
       hash: `0x${commitment.hash}`,
       timestamp: commitment.timestamp,
+      blockNumber: commitment.blockNumber,
     };
     return shieldData;
   });
