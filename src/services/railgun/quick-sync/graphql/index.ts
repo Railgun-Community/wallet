@@ -8,9 +8,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable import/no-duplicates */
 /* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+/* eslint-disable import/newline-after-import */
+/* eslint-disable prefer-template */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 // @ts-nocheck
 
+// @ts-nocheck
 import {
   GraphQLResolveInfo,
   SelectionSetNode,
@@ -19,34 +25,38 @@ import {
   GraphQLScalarTypeConfig,
 } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-import { gql , PubSub , DefaultLogger , printWithCache } from '@graphql-mesh/utils';
+import { gql } from '@graphql-mesh/utils';
 
 import type { GetMeshOptions } from '@graphql-mesh/runtime';
 import type { YamlConfig } from '@graphql-mesh/types';
+import { PubSub } from '@graphql-mesh/utils';
+import { DefaultLogger } from '@graphql-mesh/utils';
 import MeshCache from '@graphql-mesh/cache-localforage';
 import { fetch as fetchFn } from '@whatwg-node/fetch';
 
-import { MeshResolvedSource ,
+import { MeshResolvedSource } from '@graphql-mesh/runtime';
+import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
+import GraphqlHandler from '@graphql-mesh/graphql';
+import StitchingMerger from '@graphql-mesh/merger-stitching';
+import { printWithCache } from '@graphql-mesh/utils';
+import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
+import {
   getMesh,
   ExecuteMeshFn,
   SubscribeMeshFn,
   MeshContext as BaseMeshContext,
   MeshInstance,
 } from '@graphql-mesh/runtime';
-import { MeshTransform, MeshPlugin , ImportFn } from '@graphql-mesh/types';
-import GraphqlHandler from '@graphql-mesh/graphql';
-import StitchingMerger from '@graphql-mesh/merger-stitching';
-import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
+import { ImportFn } from '@graphql-mesh/types';
 import type { BscTypes } from './.graphclient/sources/bsc/types';
+import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
+import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
 import type { GoerliTypes } from './.graphclient/sources/goerli/types';
 import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
-import type { MaticTypes } from './.graphclient/sources/matic/types';
-import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
 import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
-import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
-
+import type { MaticTypes } from './.graphclient/sources/matic/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -72,6 +82,7 @@ export type Scalars = {
   BigDecimal: string; // MODIFIED
   BigInt: string; // MODIFIED
   Bytes: string; // MODIFIED
+  Int8: number; // MODIFIED
 };
 
 export type Query = {
@@ -1922,6 +1933,7 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  Int8: ResolverTypeWrapper<Scalars['Int8']>;
   LegacyCommitmentCiphertext: ResolverTypeWrapper<LegacyCommitmentCiphertext>;
   LegacyCommitmentCiphertext_filter: LegacyCommitmentCiphertext_filter;
   LegacyCommitmentCiphertext_orderBy: LegacyCommitmentCiphertext_orderBy;
@@ -1979,6 +1991,7 @@ export type ResolversParentTypes = ResolversObject<{
   Float: Scalars['Float'];
   ID: Scalars['ID'];
   Int: Scalars['Int'];
+  Int8: Scalars['Int8'];
   LegacyCommitmentCiphertext: LegacyCommitmentCiphertext;
   LegacyCommitmentCiphertext_filter: LegacyCommitmentCiphertext_filter;
   LegacyEncryptedCommitment: LegacyEncryptedCommitment;
@@ -2517,6 +2530,11 @@ export type CommitmentPreimageResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export interface Int8ScalarConfig
+  extends GraphQLScalarTypeConfig<ResolversTypes['Int8'], any> {
+  name: 'Int8';
+}
+
 export type LegacyCommitmentCiphertextResolvers<
   ContextType = MeshContext,
   ParentType extends ResolversParentTypes['LegacyCommitmentCiphertext'] = ResolversParentTypes['LegacyCommitmentCiphertext'],
@@ -2734,6 +2752,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
   Commitment?: CommitmentResolvers<ContextType>;
   CommitmentCiphertext?: CommitmentCiphertextResolvers<ContextType>;
   CommitmentPreimage?: CommitmentPreimageResolvers<ContextType>;
+  Int8?: GraphQLScalarType;
   LegacyCommitmentCiphertext?: LegacyCommitmentCiphertextResolvers<ContextType>;
   LegacyEncryptedCommitment?: LegacyEncryptedCommitmentResolvers<ContextType>;
   LegacyGeneratedCommitment?: LegacyGeneratedCommitmentResolvers<ContextType>;
@@ -2752,13 +2771,13 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
   derivedFrom?: derivedFromDirectiveResolver<any, any, ContextType>;
 }>;
 
-export type MeshContext = GoerliTypes.Context &
+export type MeshContext = EthereumTypes.Context &
   ArbitrumGoerliTypes.Context &
   MumbaiTypes.Context &
-  EthereumTypes.Context &
-  MaticTypes.Context &
-  BscTypes.Context &
+  GoerliTypes.Context &
   ArbitrumOneTypes.Context &
+  BscTypes.Context &
+  MaticTypes.Context &
   BaseMeshContext;
 
 const baseDir = pathModule.join(
@@ -2773,11 +2792,11 @@ const importFn: ImportFn = <T>(moduleId: string) => {
       : moduleId
   )
     .split('\\')
-    .join('/');
-    // .replace(`${baseDir}/`, ''); // MODIFIED
+    .join('/')
+    .replace(baseDir + '/', '');
   switch (relativeModuleId) {
-    case '.graphclient/sources/goerli/introspectionSchema':
-      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
+    case '.graphclient/sources/ethereum/introspectionSchema':
+      return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
 
     case '.graphclient/sources/arbitrum-goerli/introspectionSchema':
       return import(
@@ -2787,19 +2806,19 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     case '.graphclient/sources/mumbai/introspectionSchema':
       return import('./.graphclient/sources/mumbai/introspectionSchema') as T;
 
-    case '.graphclient/sources/ethereum/introspectionSchema':
-      return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
-
-    case '.graphclient/sources/matic/introspectionSchema':
-      return import('./.graphclient/sources/matic/introspectionSchema') as T;
-
-    case '.graphclient/sources/bsc/introspectionSchema':
-      return import('./.graphclient/sources/bsc/introspectionSchema') as T;
+    case '.graphclient/sources/goerli/introspectionSchema':
+      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
 
     case '.graphclient/sources/arbitrum-one/introspectionSchema':
       return import(
         './.graphclient/sources/arbitrum-one/introspectionSchema'
       ) as T;
+
+    case '.graphclient/sources/bsc/introspectionSchema':
+      return import('./.graphclient/sources/bsc/introspectionSchema') as T;
+
+    case '.graphclient/sources/matic/introspectionSchema':
+      return import('./.graphclient/sources/matic/introspectionSchema') as T;
 
     default:
       return Promise.reject(
@@ -2832,7 +2851,7 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
     store: rootStore.child('cache'),
     pubsub,
     logger,
-  } );
+  } as any);
 
   const sources: MeshResolvedSource[] = [];
   const transforms: MeshTransform[] = [];

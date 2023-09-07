@@ -368,6 +368,12 @@ enum Commitment_orderBy {
   hash
 }
 
+"""
+8 bytes signed integer
+
+"""
+scalar Int8
+
 type LegacyCommitmentCiphertext {
   id: Bytes!
   ciphertext: Ciphertext!

@@ -30,4 +30,4 @@ sources:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum-goerli
 
 documents:
-  - ./src/services/railgun/quick-sync/graphql/quick-sync-query.graphql
+  - ./quick-sync-query.graphql
