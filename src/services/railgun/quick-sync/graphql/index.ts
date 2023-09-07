@@ -14,7 +14,6 @@
 /* eslint-disable import/newline-after-import */
 /* eslint-disable prefer-template */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-// @ts-nocheck
 
 // @ts-nocheck
 import {

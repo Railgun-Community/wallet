@@ -1,0 +1,13 @@
+# .graphclientrc.yml
+sources:
+  - name: txs-ethereum
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/ekrembal/railgun-transactions-ethereum
+  - name: txs-goerli
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/ekrembal/railgun-transactions-goerli
+
+documents:
+  - ./railgun-transaction-query.graphql

@@ -15,6 +15,7 @@ import {
   formatGraphNullifierEvents,
   formatGraphUnshieldEvents,
 } from './graph-type-formatters';
+import { removeDuplicatesByID } from '../util/graph-util';
 
 const meshes: MapType<MeshInstance> = {};
 
@@ -147,15 +148,6 @@ const autoPaginatingQuery = async <ReturnType extends { blockNumber: string }>(
   return totalResults;
 };
 
-const removeDuplicatesByID = <T extends { id: string }>(array: T[]): T[] => {
-  const seen = new Set();
-  return array.filter((item: T) => {
-    const duplicate = seen.has(item.id);
-    seen.add(item.id);
-    return !duplicate;
-  });
-};
-
 const sortByTreeNumberAndStartPosition = (
   a: GraphCommitmentBatch,
   b: GraphCommitmentBatch,
@@ -196,6 +188,7 @@ const getBuiltGraphClient = async (
   const mesh = await getMesh(meshOptions);
   meshes[networkName] = mesh;
   const id = mesh.pubsub.subscribe('destroy', () => {
+    meshes[networkName] = undefined;
     mesh.pubsub.unsubscribe(id);
   });
   return mesh;
