@@ -49,8 +49,8 @@ import {
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { TxsGoerliTypes } from './.graphclient/sources/txs-goerli/types';
 import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
+import type { TxsGoerliTypes } from './.graphclient/sources/txs-goerli/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -897,8 +897,8 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
   derivedFrom?: derivedFromDirectiveResolver<any, any, ContextType>;
 }>;
 
-export type MeshContext = TxsGoerliTypes.Context &
-  TxsEthereumTypes.Context &
+export type MeshContext = TxsEthereumTypes.Context &
+  TxsGoerliTypes.Context &
   BaseMeshContext;
 
 const baseDir = pathModule.join(
@@ -916,14 +916,14 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     .join('/')
     .replace(baseDir + '/', '');
   switch (relativeModuleId) {
-    case '.graphclient/sources/txs-goerli/introspectionSchema':
-      return import(
-        './.graphclient/sources/txs-goerli/introspectionSchema'
-      ) as T;
-
     case '.graphclient/sources/txs-ethereum/introspectionSchema':
       return import(
         './.graphclient/sources/txs-ethereum/introspectionSchema'
+      ) as T;
+
+    case '.graphclient/sources/txs-goerli/introspectionSchema':
+      return import(
+        './.graphclient/sources/txs-goerli/introspectionSchema'
       ) as T;
 
     default:

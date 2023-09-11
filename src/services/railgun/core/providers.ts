@@ -57,16 +57,16 @@ export const setPollingProviderForNetwork = (
   pollingProviderMap[networkName] = provider;
 };
 
-export const getMerkleTreeForNetwork = (networkName: NetworkName) => {
+export const getUTXOMerkletreeForNetwork = (networkName: NetworkName) => {
   const network = NETWORK_CONFIG[networkName];
   const { chain } = network;
-  const merkleTree = getEngine().merkletrees[chain.type][chain.id];
-  if (!isDefined(merkleTree)) {
+  const utxoMerkletree = getEngine().utxoMerkletrees[chain.type][chain.id];
+  if (!isDefined(utxoMerkletree)) {
     throw new Error(
       `MerkleTree not yet loaded for network ${network.publicName}`,
     );
   }
-  return merkleTree;
+  return utxoMerkletree;
 };
 
 export const getRailgunSmartWalletContractForNetwork = (
@@ -174,10 +174,12 @@ const loadProviderForNetwork = async (
     deploymentBlock ?? 0,
   );
 
-  // NOTE: This is an async call, but we need not await.
+  // NOTE: These are async calls, but we need not await.
   // Let Engine scan events in the background.
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   engine.scanHistory(chain);
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  engine.startSyncRailgunTransactionsPoller(chain);
 };
 
 /**

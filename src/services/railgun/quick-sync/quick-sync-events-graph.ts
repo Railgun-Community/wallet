@@ -46,7 +46,7 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
-export const quickSyncGraph = async (
+export const quickSyncEventsGraph = async (
   chain: Chain,
   startingBlock: number,
 ): Promise<AccumulatedEvents> => {

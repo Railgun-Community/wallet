@@ -12,7 +12,7 @@ import {
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { walletForID } from '../engine';
 import {
-  getMerkleTreeForNetwork,
+  getUTXOMerkletreeForNetwork,
   getFallbackProviderForNetwork,
   loadProvider,
   getRelayAdaptContractForNetwork,
@@ -52,10 +52,10 @@ describe('providers', () => {
       getFallbackProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
     ).to.throw;
 
-    expect(getMerkleTreeForNetwork(NetworkName.PolygonMumbai)).to.not.be
+    expect(getUTXOMerkletreeForNetwork(NetworkName.PolygonMumbai)).to.not.be
       .undefined;
     expect(() =>
-      getMerkleTreeForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
+      getUTXOMerkletreeForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
     ).to.throw;
 
     expect(getRailgunSmartWalletContractForNetwork(NetworkName.PolygonMumbai))
@@ -82,9 +82,9 @@ describe('providers', () => {
       throw new Error('Expected railgunWalletInfo.');
     }
     const wallet = walletForID(railgunWalletInfo.id);
-    expect(wallet.merkletrees[0][80001]).to.not.be.undefined;
-    expect(wallet.merkletrees[0][1]).to.be.undefined;
-    expect(wallet.merkletrees[0][3]).to.be.undefined;
+    expect(wallet.utxoMerkletrees[0][80001]).to.not.be.undefined;
+    expect(wallet.utxoMerkletrees[0][1]).to.be.undefined;
+    expect(wallet.utxoMerkletrees[0][3]).to.be.undefined;
   }).timeout(20000);
 
   it('Should fail with invalid chain ID', async () => {

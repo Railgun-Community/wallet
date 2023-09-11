@@ -1,4 +1,4 @@
-import { Chain } from '@railgun-community/engine';
+import { Chain, RailgunTransaction } from '@railgun-community/engine';
 import {
   NetworkName,
   isDefined,
@@ -6,10 +6,7 @@ import {
 } from '@railgun-community/shared-models';
 import { PoiMessageHashesQuery, getMeshOptions, getSdk } from './graphql';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
-import {
-  RailgunTransaction,
-  formatRailgunTransactions,
-} from './railgun-tx-graph-type-formatters';
+import { formatRailgunTransactions } from './railgun-tx-graph-type-formatters';
 import { removeDuplicatesByID } from '../util/graph-util';
 
 type GraphRailgunTransactions = PoiMessageHashesQuery['transactionInterfaces'];
@@ -38,9 +35,9 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
-export const syncPOIRailgunTxsFromSubgraph = async (
+export const quickSyncRailgunTransactions = async (
   chain: Chain,
-  startingID: Optional<string>,
+  latestGraphID: Optional<string>,
 ): Promise<RailgunTransaction[]> => {
   const network = networkForChain(chain);
   if (!network || network.poiEnabled !== true) {
@@ -57,7 +54,7 @@ export const syncPOIRailgunTxsFromSubgraph = async (
             idLow: id,
           })
         ).transactionInterfaces,
-      startingID ?? '0x00',
+      latestGraphID ?? '0x00',
     );
 
   const filteredRailgunTransactions: GraphRailgunTransactions =

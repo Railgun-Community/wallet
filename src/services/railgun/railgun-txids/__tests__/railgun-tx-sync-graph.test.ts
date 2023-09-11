@@ -2,7 +2,7 @@ import { Chain } from '@railgun-community/engine';
 import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { syncPOIRailgunTxsFromSubgraph } from '../railgun-tx-sync-graph';
+import { quickSyncRailgunTransactions } from '../railgun-tx-sync-graph';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -12,7 +12,7 @@ const ETH_GOERLI_CHAIN: Chain =
 
 describe('railgun-tx-sync-graph', () => {
   it('Should pull railgun txs subgraph query - Goerli', async () => {
-    const railgunTxs = await syncPOIRailgunTxsFromSubgraph(
+    const railgunTxs = await quickSyncRailgunTransactions(
       ETH_GOERLI_CHAIN,
       undefined,
     );

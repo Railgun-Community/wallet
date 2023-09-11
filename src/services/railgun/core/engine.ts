@@ -20,7 +20,9 @@ import {
 } from './artifacts';
 import { ArtifactStore } from '../../artifacts/artifact-store';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { quickSyncGraph } from '../quick-sync/quick-sync-graph';
+import { quickSyncEventsGraph } from '../quick-sync/quick-sync-events-graph';
+import { quickSyncRailgunTransactions } from '../railgun-txids/railgun-tx-sync-graph';
+import { validateRailgunTxidMerkleroot } from '../railgun-txids/validate-railgun-txid-merkleroot';
 
 let engine: Optional<RailgunEngine>;
 
@@ -49,7 +51,7 @@ export const fullWalletForID = (id: string): RailgunWallet => {
   if (!(wallet instanceof RailgunWallet)) {
     throw new Error('Can not load View-Only wallet.');
   }
-  return wallet ;
+  return wallet;
 };
 
 export const viewOnlyWalletForID = (id: string): RailgunWallet => {
@@ -133,7 +135,9 @@ export const startRailgunEngine = (
       walletSource,
       db,
       artifactGetterDownloadJustInTime,
-      quickSyncGraph,
+      quickSyncEventsGraph,
+      quickSyncRailgunTransactions,
+      validateRailgunTxidMerkleroot,
       shouldDebug ? createEngineDebugger() : undefined,
       skipMerkletreeScans,
     );

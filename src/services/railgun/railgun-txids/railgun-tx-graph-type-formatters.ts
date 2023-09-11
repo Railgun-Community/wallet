@@ -1,13 +1,7 @@
+import { RailgunTransaction } from '@railgun-community/engine';
 import { PoiMessageHashesQuery } from './graphql';
 
 type GraphRailgunTransactions = PoiMessageHashesQuery['transactionInterfaces'];
-
-export type RailgunTransaction = {
-  graphID: string;
-  commitments: string[];
-  nullifiers: string[];
-  boundParamsHash: string;
-};
 
 export const formatRailgunTransactions = (
   txs: GraphRailgunTransactions,
