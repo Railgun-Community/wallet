@@ -178,8 +178,11 @@ const loadProviderForNetwork = async (
   // Let Engine scan events in the background.
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   engine.scanHistory(chain);
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  engine.startSyncRailgunTransactionsPoller(chain);
+
+  if (NETWORK_CONFIG[networkName].poiEnabled === true) {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    engine.startSyncRailgunTransactionsPoller(chain);
+  }
 };
 
 /**
