@@ -40,3 +40,12 @@ export const getLatestRailgunTxidData = async (
   const chain = NETWORK_CONFIG[networkName].chain;
   return getEngine().getLatestRailgunTxidData(chain);
 };
+
+export const getRailgunTxidMerkleroot = async (
+  networkName: NetworkName,
+  tree: number,
+  index: number,
+) => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  return getEngine().getHistoricalRailgunTxidMerkleroot(chain, tree, index);
+};

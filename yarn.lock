@@ -2115,10 +2115,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@5.3.4":
-  version "5.3.4"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.3.4.tgz#09901a072025e5f2696b467b9c7ff30427bc45b1"
-  integrity sha512-oidgBg/CDWGtND+5xYUGO0dzc5cI7M1t5hAuiKZhZbdp7jQFvijM3Rx5zwtUMxC240SA9DKzG3LIcoUTKmva4w==
+"@railgun-community/engine@5.3.5":
+  version "5.3.5"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.3.5.tgz#10e16457534f3ffb3025144e7305bee0c0cff90c"
+  integrity sha512-xVr18llAU7SRZsoG8KHr4iCQQh6q1rc+GP8yJniuGLKUrsc5fuYMBOY6zLWXjUjg+/KmgXdg5A2JLQ4on0rWDQ==
   dependencies:
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.0"
