@@ -23,6 +23,7 @@ import { reportAndSanitizeError } from '../../../utils/error';
 import { quickSyncEventsGraph } from '../quick-sync/quick-sync-events-graph';
 import { quickSyncRailgunTransactions } from '../railgun-txids/railgun-tx-sync-graph';
 import { validateRailgunTxidMerkleroot } from '../railgun-txids/validate-railgun-txid-merkleroot';
+import { getLatestValidatedRailgunTxid } from '../../poi-node/poi-node-railgun-txid';
 
 let engine: Optional<RailgunEngine>;
 
@@ -131,6 +132,9 @@ export const startRailgunEngine = (
 ): void => {
   if (engine) return;
   try {
+    setArtifactStore(artifactStore);
+    setUseNativeArtifacts(useNativeArtifacts);
+
     engine = new RailgunEngine(
       walletSource,
       db,
@@ -138,11 +142,10 @@ export const startRailgunEngine = (
       quickSyncEventsGraph,
       quickSyncRailgunTransactions,
       validateRailgunTxidMerkleroot,
+      getLatestValidatedRailgunTxid,
       shouldDebug ? createEngineDebugger() : undefined,
       skipMerkletreeScans,
     );
-    setArtifactStore(artifactStore);
-    setUseNativeArtifacts(useNativeArtifacts);
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngine.name, err);
   }

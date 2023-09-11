@@ -30,3 +30,13 @@ export const resetRailgunTxidsAfterTxidIndex = async (
   const chain = NETWORK_CONFIG[networkName].chain;
   return getEngine().resetRailgunTxidsAfterTxidIndex(chain, txidIndex);
 };
+
+export const getLatestRailgunTxidData = async (
+  networkName: NetworkName,
+): Promise<{
+  txidIndex: number;
+  merkleroot: string;
+}> => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  return getEngine().getLatestRailgunTxidData(chain);
+};
