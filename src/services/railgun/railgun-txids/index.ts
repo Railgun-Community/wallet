@@ -1,1 +1,1 @@
-export * from './reset-railgun-txids';
+export * from './railgun-txid-merkletrees';
