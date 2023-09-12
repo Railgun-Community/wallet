@@ -120,6 +120,7 @@ export const setOnMerkletreeScanCallback = (
  * @param artifactStore - Persistent store for downloading large artifact files. See Wallet SDK Developer Guide for platform implementations.
  * @param useNativeArtifacts - Whether to download native C++ or web-assembly artifacts. TRUE for mobile. FALSE for nodejs and browser.
  * @param skipMerkletreeScans - Whether to skip merkletree syncs and private balance scans. Only set to TRUE in shield-only applications that don't load private wallets or balances.
+ * @param isPOINode - Run the Engine as a POI node with full Railgun TXID merkletrees. Set this to false for all wallet implementations.
  * @returns
  */
 export const startRailgunEngine = (
@@ -129,6 +130,7 @@ export const startRailgunEngine = (
   artifactStore: ArtifactStore,
   useNativeArtifacts: boolean,
   skipMerkletreeScans: boolean,
+  isPOINode: boolean,
 ): void => {
   if (engine) return;
   try {
@@ -145,6 +147,7 @@ export const startRailgunEngine = (
       getLatestValidatedRailgunTxid,
       shouldDebug ? createEngineDebugger() : undefined,
       skipMerkletreeScans,
+      isPOINode,
     );
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngine.name, err);
