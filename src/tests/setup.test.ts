@@ -65,6 +65,7 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     testArtifactStore,
     useNativeArtifacts,
     false, // skipMerkletreeScans
+    false,
   );
 
   // TODO: Clear listeners when test engine is reset.
