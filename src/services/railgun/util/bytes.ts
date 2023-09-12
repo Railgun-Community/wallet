@@ -8,6 +8,7 @@ import {
   hexStringToBytes,
   nToHex,
   hexToBigInt,
+  numberify,
 } from '@railgun-community/engine';
 
 export const parseRailgunTokenAddress = (tokenAddress: string): string => {
@@ -25,6 +26,7 @@ export const bytesToHex = (bytes: Uint8Array): string => {
 export {
   nToHex,
   hexToBigInt,
+  numberify,
   hexlify,
   fromUTF8String,
   toUTF8String,
