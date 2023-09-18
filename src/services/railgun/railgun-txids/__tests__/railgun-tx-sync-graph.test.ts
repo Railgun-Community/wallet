@@ -7,10 +7,20 @@ import { quickSyncRailgunTransactions } from '../railgun-tx-sync-graph';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
+const ETH_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Ethereum].chain;
+
 const ETH_GOERLI_CHAIN: Chain =
   NETWORK_CONFIG[NetworkName.EthereumGoerli].chain;
 
 describe('railgun-tx-sync-graph', () => {
+  // Skip until POI enabled for ETH
+  it.skip('Should pull railgun txs subgraph query - Ethereum', async () => {
+    const railgunTxs = await quickSyncRailgunTransactions(ETH_CHAIN, undefined);
+
+    expect(railgunTxs).to.be.an('array');
+    expect(railgunTxs.length).to.be.greaterThan(1000);
+  }).timeout(20000);
+
   it('Should pull railgun txs subgraph query - Goerli', async () => {
     const railgunTxs = await quickSyncRailgunTransactions(
       ETH_GOERLI_CHAIN,

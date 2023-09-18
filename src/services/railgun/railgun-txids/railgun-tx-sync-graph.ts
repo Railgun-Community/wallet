@@ -1,6 +1,7 @@
 import { Chain, RailgunTransaction } from '@railgun-community/engine';
 import {
   NetworkName,
+  POINetworkStatus,
   isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
@@ -40,7 +41,7 @@ export const quickSyncRailgunTransactions = async (
   latestGraphID: Optional<string>,
 ): Promise<RailgunTransaction[]> => {
   const network = networkForChain(chain);
-  if (!network || network.poiEnabled !== true) {
+  if (!network || !isDefined(network.poi)) {
     return [];
   }
 

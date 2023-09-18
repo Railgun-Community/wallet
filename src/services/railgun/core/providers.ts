@@ -179,7 +179,7 @@ const loadProviderForNetwork = async (
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   engine.scanHistory(chain);
 
-  if (NETWORK_CONFIG[networkName].poiEnabled === true) {
+  if (isDefined(NETWORK_CONFIG[networkName].poi)) {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     engine.startSyncRailgunTransactionsPoller(chain);
   }
