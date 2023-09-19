@@ -219,6 +219,8 @@ const formatLegacyGeneratedCommitment = (
       formatTo16Bytes(commitment.encryptedRandom[1], false),
     ] as [string, string],
     blockNumber: Number(commitment.blockNumber),
+    utxoTree: commitment.treeNumber,
+    utxoStartingIndex: commitment.treePosition,
   };
 };
 
@@ -232,6 +234,8 @@ const formatLegacyEncryptedCommitment = (
     hash: formatTo32Bytes(bigIntStringToHex(commitment.hash), false),
     ciphertext: formatLegacyCommitmentCiphertext(commitment.legacyCiphertext),
     blockNumber: Number(commitment.blockNumber),
+    utxoTree: commitment.treeNumber,
+    utxoStartingIndex: commitment.treePosition,
   };
 };
 
@@ -248,6 +252,8 @@ const formatShieldCommitment = (
     encryptedBundle: commitment.encryptedBundle as [string, string, string],
     shieldKey: commitment.shieldKey,
     fee: isDefined(commitment.fee) ? commitment.fee.toString() : undefined,
+    utxoTree: commitment.treeNumber,
+    utxoStartingIndex: commitment.treePosition,
   };
   if (!isDefined(shieldCommitment.fee)) {
     delete shieldCommitment.fee;
@@ -265,5 +271,7 @@ const formatTransactCommitment = (
     hash: formatTo32Bytes(bigIntStringToHex(commitment.hash), false),
     ciphertext: formatCommitmentCiphertext(commitment.ciphertext),
     blockNumber: Number(commitment.blockNumber),
+    utxoTree: commitment.treeNumber,
+    utxoStartingIndex: commitment.treePosition,
   };
 };

@@ -1,7 +1,6 @@
 import { Chain, RailgunTransaction } from '@railgun-community/engine';
 import {
   NetworkName,
-  POINetworkStatus,
   isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';

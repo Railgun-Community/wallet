@@ -3,9 +3,12 @@ import { getEngine } from './engine';
 
 export type ShieldData = {
   txid: string;
-  hash: string;
+  commitmentHash: string;
+  npk: string;
   timestamp: Optional<number>;
   blockNumber: number;
+  utxoTree: number;
+  utxoIndex: number;
 };
 
 export const getAllShields = async (
@@ -22,7 +25,10 @@ export const getAllShields = async (
   return shieldCommitments.map(commitment => {
     const shieldData: ShieldData = {
       txid: `0x${commitment.txid}`,
-      hash: `0x${commitment.hash}`,
+      commitmentHash: `0x${commitment.hash}`,
+      npk: commitment.preImage.npk,
+      utxoTree: commitment.utxoTree,
+      utxoIndex: commitment.utxoStartingIndex,
       timestamp: commitment.timestamp,
       blockNumber: commitment.blockNumber,
     };
