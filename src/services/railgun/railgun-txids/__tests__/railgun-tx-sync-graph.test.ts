@@ -1,4 +1,4 @@
-import { Chain } from '@railgun-community/engine';
+import { Chain, RailgunTransaction } from '@railgun-community/engine';
 import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -22,7 +22,7 @@ describe('railgun-tx-sync-graph', () => {
   }).timeout(20000);
 
   it('Should pull railgun txs subgraph query - Goerli', async () => {
-    const railgunTxs = await quickSyncRailgunTransactions(
+    const railgunTxs: RailgunTransaction[] = await quickSyncRailgunTransactions(
       ETH_GOERLI_CHAIN,
       undefined,
     );
@@ -44,5 +44,6 @@ describe('railgun-tx-sync-graph', () => {
     expect(railgunTxs[0].boundParamsHash).to.equal(
       '0x0241df5c3ddca93c4bc340a10f628c7dff4acb0657469836836a2e824a4a000b',
     );
+    expect(railgunTxs[0].blockNumber).to.equal(7826407);
   }).timeout(20000);
 });

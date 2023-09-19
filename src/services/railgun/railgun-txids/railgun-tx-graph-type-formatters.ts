@@ -12,8 +12,7 @@ export const formatRailgunTransactions = (
       commitments: tx.commitments,
       nullifiers: tx.nullifiers,
       boundParamsHash: tx.boundParamsHash,
-      blockNumber: 0, // TODO: Set actual block number
-      // blockNumber: tx.blockNumber, // TODO: Set block number
+      blockNumber: Number(tx.blockNumber),
     };
   });
 };

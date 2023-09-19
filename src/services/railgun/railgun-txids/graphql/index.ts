@@ -80,30 +80,12 @@ export type Scalars = {
 };
 
 export type Query = {
-  transactCall?: Maybe<TransactCall>;
-  transactCalls: Array<TransactCall>;
   transaction?: Maybe<Transaction>;
   transactions: Array<Transaction>;
   transactionInterface?: Maybe<TransactionInterface>;
   transactionInterfaces: Array<TransactionInterface>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
-};
-
-export type QuerytransactCallArgs = {
-  id: Scalars['ID'];
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-export type QuerytransactCallsArgs = {
-  skip?: InputMaybe<Scalars['Int']>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<TransactCall_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<TransactCall_filter>;
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
 };
 
 export type QuerytransactionArgs = {
@@ -143,30 +125,12 @@ export type Query_metaArgs = {
 };
 
 export type Subscription = {
-  transactCall?: Maybe<TransactCall>;
-  transactCalls: Array<TransactCall>;
   transaction?: Maybe<Transaction>;
   transactions: Array<Transaction>;
   transactionInterface?: Maybe<TransactionInterface>;
   transactionInterfaces: Array<TransactionInterface>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
-};
-
-export type SubscriptiontransactCallArgs = {
-  id: Scalars['ID'];
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-export type SubscriptiontransactCallsArgs = {
-  skip?: InputMaybe<Scalars['Int']>;
-  first?: InputMaybe<Scalars['Int']>;
-  orderBy?: InputMaybe<TransactCall_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<TransactCall_filter>;
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
 };
 
 export type SubscriptiontransactionArgs = {
@@ -218,64 +182,9 @@ export type Block_height = {
 /** Defines the order direction, either ascending or descending */
 export type OrderDirection = 'asc' | 'desc';
 
-export type TransactCall = {
-  id: Scalars['Bytes'];
-  blockNumber: Scalars['BigInt'];
-  blockTimestamp: Scalars['BigInt'];
-  transactionHash: Scalars['Bytes'];
-};
-
-export type TransactCall_filter = {
-  id?: InputMaybe<Scalars['Bytes']>;
-  id_not?: InputMaybe<Scalars['Bytes']>;
-  id_gt?: InputMaybe<Scalars['Bytes']>;
-  id_lt?: InputMaybe<Scalars['Bytes']>;
-  id_gte?: InputMaybe<Scalars['Bytes']>;
-  id_lte?: InputMaybe<Scalars['Bytes']>;
-  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  id_contains?: InputMaybe<Scalars['Bytes']>;
-  id_not_contains?: InputMaybe<Scalars['Bytes']>;
-  blockNumber?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_not?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_lt?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_lte?: InputMaybe<Scalars['BigInt']>;
-  blockNumber_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  blockTimestamp?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_not?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_gt?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_lt?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_gte?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
-  blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  transactionHash?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_not?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_gt?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_lt?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_gte?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_lte?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  transactionHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
-  transactionHash_contains?: InputMaybe<Scalars['Bytes']>;
-  transactionHash_not_contains?: InputMaybe<Scalars['Bytes']>;
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  and?: InputMaybe<Array<InputMaybe<TransactCall_filter>>>;
-  or?: InputMaybe<Array<InputMaybe<TransactCall_filter>>>;
-};
-
-export type TransactCall_orderBy =
-  | 'id'
-  | 'blockNumber'
-  | 'blockTimestamp'
-  | 'transactionHash';
-
 export type Transaction = TransactionInterface & {
   id: Scalars['Bytes'];
+  blockNumber: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   merkleRoot: Scalars['Bytes'];
   nullifiers: Array<Scalars['Bytes']>;
@@ -285,6 +194,7 @@ export type Transaction = TransactionInterface & {
 
 export type TransactionInterface = {
   id: Scalars['Bytes'];
+  blockNumber: Scalars['BigInt'];
   transactionHash: Scalars['Bytes'];
   merkleRoot: Scalars['Bytes'];
   nullifiers: Array<Scalars['Bytes']>;
@@ -303,6 +213,14 @@ export type TransactionInterface_filter = {
   id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
   id_contains?: InputMaybe<Scalars['Bytes']>;
   id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  blockNumber?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_not?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_lt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_lte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   transactionHash?: InputMaybe<Scalars['Bytes']>;
   transactionHash_not?: InputMaybe<Scalars['Bytes']>;
   transactionHash_gt?: InputMaybe<Scalars['Bytes']>;
@@ -353,6 +271,7 @@ export type TransactionInterface_filter = {
 
 export type TransactionInterface_orderBy =
   | 'id'
+  | 'blockNumber'
   | 'transactionHash'
   | 'merkleRoot'
   | 'nullifiers'
@@ -370,6 +289,14 @@ export type Transaction_filter = {
   id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
   id_contains?: InputMaybe<Scalars['Bytes']>;
   id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  blockNumber?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_not?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_lt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_lte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   transactionHash?: InputMaybe<Scalars['Bytes']>;
   transactionHash_not?: InputMaybe<Scalars['Bytes']>;
   transactionHash_gt?: InputMaybe<Scalars['Bytes']>;
@@ -420,6 +347,7 @@ export type Transaction_filter = {
 
 export type Transaction_orderBy =
   | 'id'
+  | 'blockNumber'
   | 'transactionHash'
   | 'merkleRoot'
   | 'nullifiers'
@@ -595,9 +523,6 @@ export type ResolversTypes = ResolversObject<{
   Int8: ResolverTypeWrapper<Scalars['Int8']>;
   OrderDirection: OrderDirection;
   String: ResolverTypeWrapper<Scalars['String']>;
-  TransactCall: ResolverTypeWrapper<TransactCall>;
-  TransactCall_filter: TransactCall_filter;
-  TransactCall_orderBy: TransactCall_orderBy;
   Transaction: ResolverTypeWrapper<Transaction>;
   TransactionInterface: ResolversTypes['Transaction'];
   TransactionInterface_filter: TransactionInterface_filter;
@@ -624,8 +549,6 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int'];
   Int8: Scalars['Int8'];
   String: Scalars['String'];
-  TransactCall: TransactCall;
-  TransactCall_filter: TransactCall_filter;
   Transaction: Transaction;
   TransactionInterface: ResolversParentTypes['Transaction'];
   TransactionInterface_filter: TransactionInterface_filter;
@@ -669,18 +592,6 @@ export type QueryResolvers<
   ContextType = MeshContext,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
 > = ResolversObject<{
-  transactCall?: Resolver<
-    Maybe<ResolversTypes['TransactCall']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerytransactCallArgs, 'id' | 'subgraphError'>
-  >;
-  transactCalls?: Resolver<
-    Array<ResolversTypes['TransactCall']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerytransactCallsArgs, 'skip' | 'first' | 'subgraphError'>
-  >;
   transaction?: Resolver<
     Maybe<ResolversTypes['Transaction']>,
     ParentType,
@@ -720,23 +631,6 @@ export type SubscriptionResolvers<
   ContextType = MeshContext,
   ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription'],
 > = ResolversObject<{
-  transactCall?: SubscriptionResolver<
-    Maybe<ResolversTypes['TransactCall']>,
-    'transactCall',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptiontransactCallArgs, 'id' | 'subgraphError'>
-  >;
-  transactCalls?: SubscriptionResolver<
-    Array<ResolversTypes['TransactCall']>,
-    'transactCalls',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptiontransactCallsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
   transaction?: SubscriptionResolver<
     Maybe<ResolversTypes['Transaction']>,
     'transaction',
@@ -800,22 +694,12 @@ export interface Int8ScalarConfig
   name: 'Int8';
 }
 
-export type TransactCallResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['TransactCall'] = ResolversParentTypes['TransactCall'],
-> = ResolversObject<{
-  id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export type TransactionResolvers<
   ContextType = MeshContext,
   ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction'],
 > = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   merkleRoot?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   nullifiers?: Resolver<
@@ -838,6 +722,7 @@ export type TransactionInterfaceResolvers<
 > = ResolversObject<{
   __resolveType: TypeResolveFn<'Transaction', ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   merkleRoot?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   nullifiers?: Resolver<
@@ -884,7 +769,6 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
   BigInt?: GraphQLScalarType;
   Bytes?: GraphQLScalarType;
   Int8?: GraphQLScalarType;
-  TransactCall?: TransactCallResolvers<ContextType>;
   Transaction?: TransactionResolvers<ContextType>;
   TransactionInterface?: TransactionInterfaceResolvers<ContextType>;
   _Block_?: _Block_Resolvers<ContextType>;
@@ -1089,6 +973,7 @@ export type PoiMessageHashesQuery = {
       | 'commitments'
       | 'transactionHash'
       | 'boundParamsHash'
+      | 'blockNumber'
     >
   >;
 };
@@ -1101,6 +986,7 @@ export const PoiMessageHashesDocument = gql`
       commitments
       transactionHash
       boundParamsHash
+      blockNumber
     }
   }
 ` as unknown as DocumentNode<
