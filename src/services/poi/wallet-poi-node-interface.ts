@@ -7,6 +7,7 @@ import {
   POIEngineProofInputsWithListPOIData,
   createDummyMerkleProof,
   POINodeInterface,
+  RailgunEngine,
 } from '@railgun-community/engine';
 import { POINodeRequest } from './poi-node-request';
 import {
@@ -16,15 +17,17 @@ import {
   networkForChain,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../utils';
-// eslint-disable-next-line import/no-cycle
-import { getEngine } from '../railgun/core/engine';
 
 export class WalletPOINodeInterface extends POINodeInterface {
   private poiNodeRequest: POINodeRequest;
 
-  constructor(poiNodeURL: string) {
+  // Prevents a circular dependency
+  private engine: RailgunEngine;
+
+  constructor(poiNodeURL: string, engine: RailgunEngine) {
     super();
     this.poiNodeRequest = new POINodeRequest(poiNodeURL);
+    this.engine = engine;
   }
 
   private static poiStatusToTXOPOIStatus = (
@@ -125,7 +128,7 @@ export class WalletPOINodeInterface extends POINodeInterface {
       );
     };
 
-    const { proof } = await getEngine().prover.provePOI(
+    const { proof } = await this.engine.prover.provePOI(
       finalProofInputs,
       progressCallback,
     );

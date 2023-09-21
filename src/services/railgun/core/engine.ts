@@ -28,7 +28,6 @@ import { quickSyncEventsGraph } from '../quick-sync/quick-sync-events-graph';
 import { quickSyncRailgunTransactions } from '../railgun-txids/railgun-tx-sync-graph';
 import { WalletPOIRequester } from '../../poi/wallet-poi-requester';
 import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
-// eslint-disable-next-line import/no-cycle
 import { WalletPOI } from '../../poi/wallet-poi';
 
 let engine: Optional<RailgunEngine>;
@@ -174,10 +173,6 @@ export const startRailgunEngine = (
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(useNativeArtifacts);
 
-    if (isDefined(poiNodeURL)) {
-      WalletPOI.init(poiNodeURL, customPOILists ?? []);
-    }
-
     engine = new RailgunEngine(
       walletSource,
       db,
@@ -190,6 +185,10 @@ export const startRailgunEngine = (
       skipMerkletreeScans,
       isPOINode,
     );
+
+    if (isDefined(poiNodeURL)) {
+      WalletPOI.init(poiNodeURL, customPOILists ?? [], engine);
+    }
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngine.name, err);
   }

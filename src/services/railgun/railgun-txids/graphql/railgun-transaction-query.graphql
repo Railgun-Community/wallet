@@ -8,3 +8,10 @@ query PoiMessageHashes($idLow: Bytes = "0x00") {
     blockNumber
   }
 }
+
+# # TODO
+# query IsUnshield($txid: Bytes) {
+#   transactionInterfaces(where: { transactionHash: $txid }) {
+#     isUnshield
+#   }
+# }
