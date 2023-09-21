@@ -11,6 +11,8 @@ import {
   getTokenDataERC20,
   TreeBalance,
   AddressData,
+  CommitmentType,
+  ZERO_32_BYTE_VALUE,
 } from '@railgun-community/engine';
 import { randomBytes } from 'ethers';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -54,6 +56,11 @@ const getMockBalanceData = async (
           OutputType.Transfer,
           undefined, // memoText
         ),
+        creationRailgunTxid: undefined,
+        creationPOIs: undefined,
+        blindedCommitment: undefined,
+        commitmentType: CommitmentType.TransactCommitment,
+        nullifier: ZERO_32_BYTE_VALUE,
       },
     ],
   };
@@ -98,7 +105,9 @@ export const createEngineWalletTreeBalancesStub = async (
 };
 
 export const createEngineVerifyProofStub = () => {
-  verifyProofStub = sinon.stub(Prover.prototype, 'verify').resolves(true);
+  verifyProofStub = sinon
+    .stub(Prover.prototype, 'verifyRailgunProof')
+    .resolves(true);
 };
 
 export const restoreEngineStubs = () => {

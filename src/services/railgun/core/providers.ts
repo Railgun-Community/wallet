@@ -17,6 +17,7 @@ import {
 } from '@railgun-community/engine';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { FallbackProvider } from 'ethers';
+import { WalletPOI } from '../../poi/wallet-poi';
 
 const fallbackProviderMap: MapType<FallbackProvider> = {};
 const pollingProviderMap: MapType<PollingJsonRpcProvider> = {};
@@ -197,9 +198,14 @@ export const loadProvider = async (
   try {
     delete fallbackProviderMap[networkName];
 
-    const { chain } = NETWORK_CONFIG[networkName];
+    const { chain, poi } = NETWORK_CONFIG[networkName];
     if (fallbackProviderJsonConfig.chainId !== chain.id) {
       throw new Error('Invalid chain ID');
+    }
+    if (isDefined(poi) && !WalletPOI.started) {
+      throw new Error(
+        'This network requires Proof Of Innocence. Pass "poiNodeURL" to startRailgunEngine to initialize POI before loading this provider.',
+      );
     }
 
     await loadProviderForNetwork(

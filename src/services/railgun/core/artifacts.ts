@@ -1,4 +1,4 @@
-import { ArtifactGetter, PublicInputs } from '@railgun-community/engine';
+import { ArtifactGetter, PublicInputsRailgun } from '@railgun-community/engine';
 import {
   Artifact,
   assertArtifactExists,
@@ -20,7 +20,9 @@ export const setUseNativeArtifacts = (useNative: boolean) => {
   useNativeArtifacts = useNative;
 };
 
-export const getArtifacts = async (inputs: PublicInputs): Promise<Artifact> => {
+export const getArtifacts = async (
+  inputs: PublicInputsRailgun,
+): Promise<Artifact> => {
   const nullifiers = inputs.nullifiers.length;
   const commitments = inputs.commitmentsOut.length;
   assertArtifactExists(nullifiers, commitments);

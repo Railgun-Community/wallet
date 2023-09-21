@@ -10,7 +10,7 @@ import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { createRailgunWallet } from '../wallets';
 import {
   refreshRailgunBalances,
-  rescanFullMerkletreesAndWallets,
+  rescanFullUTXOMerkletreesAndWallets,
   scanUpdatesForMerkletreeAndWallets,
 } from '../balances';
 import { Chain, ChainType, isDefined } from '@railgun-community/shared-models';
@@ -53,7 +53,7 @@ describe('balances', () => {
 
     engineFullScanStub = Sinon.stub(
       RailgunEngine.prototype,
-      'fullRescanMerkletreesAndWallets',
+      'fullRescanUTXOMerkletreesAndWallets',
     ).resolves();
   });
   afterEach(() => {
@@ -102,7 +102,7 @@ describe('balances', () => {
 
   it('Should run full rescan of merkletree and wallets', async () => {
     const chain: Chain = { type: ChainType.EVM, id: 1 };
-    const response = await rescanFullMerkletreesAndWallets(chain);
+    const response = await rescanFullUTXOMerkletreesAndWallets(chain);
     expect(response).to.be.undefined;
     expect(engineFullScanStub.calledOnce).to.be.true;
   });

@@ -10,7 +10,7 @@ import {
   artifactCache,
   setUseNativeArtifacts,
 } from '../../railgun/core/artifacts';
-import { PublicInputs } from '@railgun-community/engine';
+import { PublicInputsRailgun } from '@railgun-community/engine';
 import { getArtifactVariantString } from '../artifact-util';
 
 chai.use(chaiAsPromised);
@@ -27,7 +27,7 @@ describe('artifact-downloader', () => {
 
     clearArtifactCache();
 
-    const inputs11By2: PublicInputs = {
+    const inputs11By2: PublicInputsRailgun = {
       nullifiers: [
         BigInt(1),
         BigInt(1),
@@ -59,7 +59,7 @@ describe('artifact-downloader', () => {
     overrideArtifact(artifactVariantString2by2, mockArtifact);
 
     // Pre-set in test.
-    const inputs2By2: PublicInputs = {
+    const inputs2By2: PublicInputsRailgun = {
       nullifiers: [BigInt(1), BigInt(2)],
       merkleRoot: BigInt(0),
       boundParamsHash: BigInt(0),
@@ -75,7 +75,7 @@ describe('artifact-downloader', () => {
     clearArtifactCache();
 
     // Requires download.
-    const inputs: PublicInputs = {
+    const inputs: PublicInputsRailgun = {
       nullifiers: [
         BigInt(1),
         BigInt(1),
@@ -113,7 +113,7 @@ describe('artifact-downloader', () => {
     clearArtifactCache();
 
     // Requires download.
-    const inputs: PublicInputs = {
+    const inputs: PublicInputsRailgun = {
       nullifiers: [
         BigInt(1),
         BigInt(1),
@@ -157,7 +157,7 @@ describe('artifact-downloader', () => {
 
         // console.log(`NATIVE: ${i}x${j}...`);
 
-        const inputs: PublicInputs = {
+        const inputs: PublicInputsRailgun = {
           nullifiers: new Array<bigint>(i),
           merkleRoot: BigInt(0),
           boundParamsHash: BigInt(0),
@@ -187,7 +187,7 @@ describe('artifact-downloader', () => {
 
         // console.log(`NODEJS: ${i}x${j}...`);
 
-        const inputs: PublicInputs = {
+        const inputs: PublicInputsRailgun = {
           nullifiers: new Array<bigint>(i),
           merkleRoot: BigInt(0),
           boundParamsHash: BigInt(0),

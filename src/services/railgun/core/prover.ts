@@ -1,6 +1,6 @@
 import {
-  FormattedCircuitInputs,
-  Groth16,
+  FormattedCircuitInputsRailgun,
+  SnarkJSGroth16,
   Proof,
   Prover,
 } from '@railgun-community/engine';
@@ -17,4 +17,4 @@ export const getProver = (): Prover => {
   return engine.prover;
 };
 
-export { FormattedCircuitInputs, Proof, Groth16 };
+export { FormattedCircuitInputsRailgun, Proof, SnarkJSGroth16 };

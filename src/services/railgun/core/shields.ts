@@ -28,7 +28,7 @@ export const getAllShields = async (
       commitmentHash: `0x${commitment.hash}`,
       npk: commitment.preImage.npk,
       utxoTree: commitment.utxoTree,
-      utxoIndex: commitment.utxoStartingIndex,
+      utxoIndex: commitment.utxoIndex,
       timestamp: commitment.timestamp,
       blockNumber: commitment.blockNumber,
     };

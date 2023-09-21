@@ -16,6 +16,21 @@ export const validateRailgunTxidMerkleroot = (
   );
 };
 
+export const validateRailgunTxidOccurredBeforeBlockNumber = (
+  networkName: NetworkName,
+  tree: number,
+  index: number,
+  blockNumber: number,
+): Promise<boolean> => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  return getEngine().validateRailgunTxidOccurredBeforeBlockNumber(
+    chain,
+    tree,
+    index,
+    blockNumber,
+  );
+};
+
 export const fullResetRailgunTxidMerkletrees = async (
   networkName: NetworkName,
 ) => {

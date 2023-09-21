@@ -65,7 +65,8 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     testArtifactStore,
     useNativeArtifacts,
     false, // skipMerkletreeScans
-    false,
+    false, // isPOINode
+    'fake', // poiNodeURL
   );
 
   // TODO: Clear listeners when test engine is reset.

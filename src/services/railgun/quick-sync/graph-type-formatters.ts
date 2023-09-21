@@ -72,6 +72,7 @@ export const formatGraphNullifierEvents = (
       nullifier: formatTo32Bytes(nullifier.nullifier, false),
       treeNumber: nullifier.treeNumber,
       blockNumber: Number(nullifier.blockNumber),
+      spentRailgunTxid: undefined,
     };
   });
 };
@@ -220,7 +221,7 @@ const formatLegacyGeneratedCommitment = (
     ] as [string, string],
     blockNumber: Number(commitment.blockNumber),
     utxoTree: commitment.treeNumber,
-    utxoStartingIndex: commitment.treePosition,
+    utxoIndex: commitment.treePosition,
   };
 };
 
@@ -235,7 +236,8 @@ const formatLegacyEncryptedCommitment = (
     ciphertext: formatLegacyCommitmentCiphertext(commitment.legacyCiphertext),
     blockNumber: Number(commitment.blockNumber),
     utxoTree: commitment.treeNumber,
-    utxoStartingIndex: commitment.treePosition,
+    utxoIndex: commitment.treePosition,
+    creationRailgunTxid: undefined,
   };
 };
 
@@ -253,7 +255,7 @@ const formatShieldCommitment = (
     shieldKey: commitment.shieldKey,
     fee: isDefined(commitment.fee) ? commitment.fee.toString() : undefined,
     utxoTree: commitment.treeNumber,
-    utxoStartingIndex: commitment.treePosition,
+    utxoIndex: commitment.treePosition,
   };
   if (!isDefined(shieldCommitment.fee)) {
     delete shieldCommitment.fee;
@@ -272,6 +274,7 @@ const formatTransactCommitment = (
     ciphertext: formatCommitmentCiphertext(commitment.ciphertext),
     blockNumber: Number(commitment.blockNumber),
     utxoTree: commitment.treeNumber,
-    utxoStartingIndex: commitment.treePosition,
+    utxoIndex: commitment.treePosition,
+    creationRailgunTxid: undefined,
   };
 };

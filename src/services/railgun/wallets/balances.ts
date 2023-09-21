@@ -44,17 +44,26 @@ export const scanUpdatesForMerkletreeAndWallets = async (
   }
 };
 
-export const rescanFullMerkletreesAndWallets = async (
+export const rescanFullUTXOMerkletreesAndWallets = async (
   chain: Chain,
 ): Promise<void> => {
   try {
     const engine = getEngine();
-    await engine.fullRescanMerkletreesAndWallets(chain);
+    await engine.fullRescanUTXOMerkletreesAndWallets(chain);
 
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
     // which calls `onBalancesUpdate` (balance-update.ts).
   } catch (err) {
-    throw reportAndSanitizeError(rescanFullMerkletreesAndWallets.name, err);
+    throw reportAndSanitizeError(rescanFullUTXOMerkletreesAndWallets.name, err);
+  }
+};
+
+export const resetFullTXIDMerkletrees = async (chain: Chain): Promise<void> => {
+  try {
+    const engine = getEngine();
+    await engine.fullResetRailgunTxidMerkletrees(chain);
+  } catch (err) {
+    throw reportAndSanitizeError(resetFullTXIDMerkletrees.name, err);
   }
 };
 
