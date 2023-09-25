@@ -43,7 +43,7 @@ export const refreshReceivePOIsForWallet = (
 ): Promise<void> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   const wallet = walletForID(walletID);
-  return wallet.refreshCreationPOIsAllTXOs(chain, railgunTxid);
+  return wallet.refreshReceivePOIsAllTXOs(chain, railgunTxid);
 };
 
 export const refreshSpentPOIsForWallet = (
