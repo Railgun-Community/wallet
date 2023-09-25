@@ -37,4 +37,25 @@ export const generatePOIForWalletAndRailgunTxid = (
   );
 };
 
-export { TXOsReceivedPOIStatusInfo, TXOsSpentPOIStatusInfo, POIsPerList };
+export const refreshReceivePOIsForWallet = (
+  networkName: NetworkName,
+  walletID: string,
+  railgunTxid?: string,
+) => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  const wallet = walletForID(walletID);
+  return wallet.refreshCreationPOIsAllTXOs(chain, railgunTxid);
+};
+
+export const refreshSpentPOIsForWallet = (
+  networkName: NetworkName,
+  walletID: string,
+  railgunTxid?: string,
+) => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  const wallet = walletForID(walletID);
+  return wallet.refreshSpentPOIsAllSentCommitmentsAndUnshieldEvents(
+    chain,
+    railgunTxid,
+  );
+};
