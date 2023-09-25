@@ -46,8 +46,9 @@ export const getEngine = (): RailgunEngine => {
 };
 
 export const walletForID = (id: string): AbstractWallet => {
-  const wallet = engine?.wallets[id];
-  if (!wallet) {
+  const engine = getEngine();
+  const wallet = engine.wallets[id];
+  if (!isDefined(wallet)) {
     throw new Error('No RAILGUN wallet for ID');
   }
   return wallet;

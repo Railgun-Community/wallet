@@ -2,7 +2,7 @@ import {
   TXOsReceivedPOIStatusInfo,
   TXOsSpentPOIStatusInfo,
 } from '@railgun-community/engine';
-import { walletForID } from '../railgun';
+import { walletForID } from '../railgun/core';
 import { NETWORK_CONFIG, NetworkName } from '@railgun-community/shared-models';
 
 export const getTXOsReceivedPOIStatusInfoForWallet = (
