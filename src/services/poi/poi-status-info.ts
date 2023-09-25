@@ -24,4 +24,17 @@ export const getTXOsSpentPOIStatusInfoForWallet = (
   return wallet.getTXOsSpentPOIStatusInfo(chain);
 };
 
+export const generatePOIForWalletAndRailgunTxid = (
+  networkName: NetworkName,
+  walletID: string,
+  railgunTxid: string,
+): Promise<void> => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  const wallet = walletForID(walletID);
+  return wallet.generatePOIsAllSentCommitmentsAndUnshieldEvents(
+    chain,
+    railgunTxid,
+  );
+};
+
 export { TXOsReceivedPOIStatusInfo, TXOsSpentPOIStatusInfo, POIsPerList };
