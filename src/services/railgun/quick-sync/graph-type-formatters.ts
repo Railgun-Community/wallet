@@ -92,6 +92,9 @@ export const formatGraphUnshieldEvents = (
       amount: bigIntStringToHex(unshield.amount),
       fee: bigIntStringToHex(unshield.fee),
       blockNumber: Number(unshield.blockNumber),
+      railgunTxid: undefined,
+      poisPerList: undefined,
+      blindedCommitment: undefined,
     };
   });
 };
@@ -237,7 +240,7 @@ const formatLegacyEncryptedCommitment = (
     blockNumber: Number(commitment.blockNumber),
     utxoTree: commitment.treeNumber,
     utxoIndex: commitment.treePosition,
-    creationRailgunTxid: undefined,
+    railgunTxid: undefined,
   };
 };
 
@@ -275,6 +278,6 @@ const formatTransactCommitment = (
     blockNumber: Number(commitment.blockNumber),
     utxoTree: commitment.treeNumber,
     utxoIndex: commitment.treePosition,
-    creationRailgunTxid: undefined,
+    railgunTxid: undefined,
   };
 };

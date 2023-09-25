@@ -69,7 +69,6 @@ let proxyContract: RailgunSmartWalletContract;
 let relayAdaptContract: RelayAdaptContract;
 let railgunWallet: RailgunWallet;
 
-const RANDOM_TRANSACT = randomHex(16);
 const RANDOM_RELAY_ADAPT = randomHex(31);
 const MOCK_TOKEN_ADDRESS = getMockToken().address;
 
@@ -89,7 +88,6 @@ const createGoerliTransferTransactions = async (
     TransactNote.createTransfer(
       receiverAddressData,
       senderAddressData,
-      RANDOM_TRANSACT,
       fee,
       getTokenDataERC20(tokenAddress),
       await mockViewingKeys(),
@@ -116,7 +114,6 @@ const createGoerliRelayAdaptUnshieldTransactions = async (
     TransactNote.createTransfer(
       receiverAddressData,
       senderAddressData,
-      RANDOM_TRANSACT,
       fee,
       getTokenDataERC20(tokenAddress),
       await mockViewingKeys(),

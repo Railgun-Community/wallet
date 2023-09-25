@@ -1,4 +1,9 @@
 {
+  "poi": {
+    "zkey": "e6b73d3b3cfe7c3869aa3fedb3784c00913beba1b64b61631c04b4dbc1b4b797",
+    "wasm": "8f80bcda0e0fb9356e7c9dc127e7f32a6d6cd4652da72bae078f6202273ac449",
+    "dat": "dat-todo"
+  },
   "10x1": {
     "zkey": "f4a6dd3c59690d14d808b9bbe9a182b5a30df3828aadf28dfaaa129faecf2837",
     "wasm": "13624c30f0ff503d638ad5cf42813cf2c305921e0d4dc709923db532b6cc5ed9",

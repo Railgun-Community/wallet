@@ -11,7 +11,10 @@ import {
   setUseNativeArtifacts,
 } from '../../railgun/core/artifacts';
 import { PublicInputsRailgun } from '@railgun-community/engine';
-import { getArtifactVariantString } from '../artifact-util';
+import {
+  ARTIFACT_VARIANT_STRING_POI,
+  getArtifactVariantString,
+} from '../artifact-util';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -68,6 +71,44 @@ describe('artifact-downloader', () => {
     await expect(artifactGetterDownloadJustInTime.getArtifacts(inputs2By2)).to
       .be.fulfilled;
   });
+
+  it('Should get artifacts from cache - poi', async () => {
+    setUseNativeArtifacts(false);
+
+    clearArtifactCache();
+
+    const mockArtifact: Artifact = {
+      [ArtifactName.ZKEY]: Buffer.from('123'),
+      [ArtifactName.WASM]: Buffer.from('456'),
+      [ArtifactName.DAT]: undefined,
+      [ArtifactName.VKEY]: { data: '789' },
+    };
+    overrideArtifact(ARTIFACT_VARIANT_STRING_POI, mockArtifact);
+
+    await expect(artifactGetterDownloadJustInTime.getArtifactsPOI()).to.be
+      .fulfilled;
+  });
+
+  it('Should download artifacts - poi snarkjs', async () => {
+    setUseNativeArtifacts(false);
+
+    clearArtifactCache();
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const artifacts: Artifact =
+      await artifactGetterDownloadJustInTime.getArtifactsPOI();
+
+    expect(artifacts.vkey).to.not.be.undefined;
+    expect(artifacts.zkey).to.not.be.undefined;
+    expect(artifacts.wasm).to.not.be.undefined;
+    expect(artifacts.dat).to.be.undefined;
+
+    const cached = artifactCache.poi;
+    expect(cached?.vkey).to.not.be.undefined;
+    expect(cached?.zkey).to.not.be.undefined;
+    expect(cached?.wasm).to.not.be.undefined;
+    expect(cached?.dat).to.be.undefined;
+  }).timeout(30000);
 
   it('Should download artifacts - snarkjs', async () => {
     setUseNativeArtifacts(false);

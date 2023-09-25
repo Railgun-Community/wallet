@@ -48,7 +48,7 @@ const getMockBalanceData = async (
         note: TransactNote.createTransfer(
           addressData, // receiver
           addressData, // sender
-          '12345678901234561234567890123456', // random
+          // '12345678901234561234567890123456', // random
           BigInt('1000000000000000000000'), // value
           tokenData, // tokenData
           senderViewingKeys,
@@ -56,11 +56,11 @@ const getMockBalanceData = async (
           OutputType.Transfer,
           undefined, // memoText
         ),
-        creationRailgunTxid: undefined,
-        creationPOIs: undefined,
-        blindedCommitment: undefined,
         commitmentType: CommitmentType.TransactCommitment,
         nullifier: ZERO_32_BYTE_VALUE,
+        railgunTxid: undefined,
+        creationPOIs: undefined,
+        blindedCommitment: undefined,
       },
     ],
   };

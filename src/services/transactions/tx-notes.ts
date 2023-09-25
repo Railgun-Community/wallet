@@ -1,5 +1,4 @@
 import {
-  randomHex,
   OutputType,
   TransactNote,
   RailgunWallet,
@@ -26,14 +25,12 @@ export const erc20NoteFromERC20AmountRecipient = (
   const { amount, recipientAddress } = erc20AmountRecipient;
 
   const receiverAddressData = RailgunEngine.decodeAddress(recipientAddress);
-  const random = randomHex(16);
 
   const tokenData = getTokenDataERC20(erc20AmountRecipient.tokenAddress);
 
   return TransactNote.createTransfer(
     receiverAddressData,
     railgunWallet.addressKeys,
-    random,
     amount,
     tokenData,
     railgunWallet.getViewingKeyPair(),
@@ -52,8 +49,6 @@ export const nftNoteFromNFTAmountRecipient = (
   const { recipientAddress, nftAddress, nftTokenType, tokenSubID, amount } =
     nftAmountRecipient;
 
-  const random = randomHex(16);
-
   const receiverAddressData = RailgunEngine.decodeAddress(recipientAddress);
 
   const tokenData = getTokenDataNFT(
@@ -67,7 +62,6 @@ export const nftNoteFromNFTAmountRecipient = (
       return TransactNote.createERC721Transfer(
         receiverAddressData,
         railgunWallet.addressKeys,
-        random,
         tokenData,
         railgunWallet.getViewingKeyPair(),
         showSenderAddressToRecipient,
@@ -77,7 +71,6 @@ export const nftNoteFromNFTAmountRecipient = (
       return TransactNote.createERC1155Transfer(
         receiverAddressData,
         railgunWallet.addressKeys,
-        random,
         tokenData,
         BigInt(amount),
         railgunWallet.getViewingKeyPair(),

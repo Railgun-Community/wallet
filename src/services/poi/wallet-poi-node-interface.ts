@@ -47,6 +47,23 @@ export class WalletPOINodeInterface extends POINodeInterface {
     }
   };
 
+  private static getPOISettings(chain: Chain) {
+    const network = networkForChain(chain);
+    if (!network) {
+      throw new Error(`No network found`);
+    }
+    const networkPOISettings = network.poi;
+    if (!networkPOISettings) {
+      throw new Error(`No POI settings found`);
+    }
+    return networkPOISettings;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  isActive(chain: Chain): boolean {
+    return WalletPOINodeInterface.getPOISettings(chain) != null;
+  }
+
   async getPOIsPerList(
     chain: Chain,
     listKeys: string[],
@@ -77,15 +94,7 @@ export class WalletPOINodeInterface extends POINodeInterface {
     proofInputs: POIEngineProofInputs,
     railgunTransactionBlockNumber: number,
   ): Promise<MerkleProof[]> {
-    const network = networkForChain(chain);
-    if (!network) {
-      throw new Error(`No network found`);
-    }
-    const networkPOISettings = network.poi;
-    if (!networkPOISettings) {
-      throw new Error(`No POI settings found`);
-    }
-    const { launchBlock } = networkPOISettings;
+    const { launchBlock } = WalletPOINodeInterface.getPOISettings(chain);
 
     if (railgunTransactionBlockNumber < launchBlock) {
       return proofInputs.blindedCommitmentsIn.map(createDummyMerkleProof);
@@ -102,6 +111,7 @@ export class WalletPOINodeInterface extends POINodeInterface {
     chain: Chain,
     listKey: string,
     proofInputs: POIEngineProofInputs,
+    blindedCommitmentsOut: string[],
     txidMerklerootIndex: number,
     railgunTransactionBlockNumber: number,
   ): Promise<void> {
@@ -130,6 +140,7 @@ export class WalletPOINodeInterface extends POINodeInterface {
 
     const { proof } = await this.engine.prover.provePOI(
       finalProofInputs,
+      blindedCommitmentsOut,
       progressCallback,
     );
 
@@ -138,7 +149,7 @@ export class WalletPOINodeInterface extends POINodeInterface {
       poiMerkleroots: poiMerkleProofs.map(merkleProof => merkleProof.root),
       txidMerkleroot: proofInputs.anyRailgunTxidMerklerootAfterTransaction,
       txidMerklerootIndex,
-      blindedCommitmentOutputs: proofInputs.blindedCommitmentsOut,
+      blindedCommitmentOutputs: blindedCommitmentsOut,
     };
 
     return this.poiNodeRequest.submitPOI(chain, listKey, transactProofData);

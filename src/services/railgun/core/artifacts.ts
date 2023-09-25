@@ -6,7 +6,10 @@ import {
 } from '@railgun-community/shared-models';
 import { ArtifactDownloader } from '../../artifacts/artifact-downloader';
 import { ArtifactStore } from '../../artifacts/artifact-store';
-import { getArtifactVariantString } from '../../artifacts/artifact-util';
+import {
+  ARTIFACT_VARIANT_STRING_POI,
+  getArtifactVariantString,
+} from '../../artifacts/artifact-util';
 
 let artifactStore: ArtifactStore;
 let useNativeArtifacts: boolean;
@@ -41,6 +44,12 @@ export const getArtifacts = async (
     commitments,
   );
 
+  return downloadAndCacheArtifact(artifactVariantString);
+};
+
+const downloadAndCacheArtifact = async (
+  artifactVariantString: string,
+): Promise<Artifact> => {
   // Use artifact in cache if available.
   const cachedArtifact = artifactCache[artifactVariantString];
   if (isDefined(cachedArtifact)) {
@@ -69,9 +78,14 @@ export const getArtifacts = async (
   return downloadedArtifacts;
 };
 
+const getArtifactsPOI = () => {
+  return downloadAndCacheArtifact(ARTIFACT_VARIANT_STRING_POI);
+};
+
 export const artifactGetterDownloadJustInTime: ArtifactGetter = {
   assertArtifactExists,
   getArtifacts,
+  getArtifactsPOI,
 };
 
 export const overrideArtifact = (

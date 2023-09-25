@@ -9,6 +9,11 @@ const IPFS_GATEWAY = 'https://ipfs-lb.com';
 const MASTER_IPFS_HASH_ARTIFACTS =
   'QmeBrG7pii1qTqsn7rusvDiqXopHPjCT9gR4PsmW7wXqZq';
 
+const IPFS_HASH_ARTIFACTS_POI =
+  'QmZwaGDYTvymL5xDL4SwBkmjiZVs2rqQaxWhtcYoDouQiN';
+
+export const ARTIFACT_VARIANT_STRING_POI = 'poi';
+
 export const artifactDownloadsDir = (artifactVariantString: string) => {
   return `artifacts-v2.1/${artifactVariantString}`;
 };
@@ -81,10 +86,30 @@ const getArtifactIPFSFilepath = (
   throw new Error('Invalid artifact.');
 };
 
+const getArtifactIPFSFilepathPOI = (artifactName: ArtifactName) => {
+  switch (artifactName) {
+    case ArtifactName.ZKEY:
+      return `zkey.br`;
+    case ArtifactName.WASM:
+      return `wasm.br`;
+    case ArtifactName.VKEY:
+      return `vkey.json`;
+    case ArtifactName.DAT:
+      return `dat.br`;
+  }
+  throw new Error('Invalid artifact.');
+};
+
 export const getArtifactUrl = (
   artifactName: ArtifactName,
   artifactVariantString: string,
 ) => {
+  if (artifactVariantString === ARTIFACT_VARIANT_STRING_POI) {
+    return `${IPFS_GATEWAY}/ipfs/${IPFS_HASH_ARTIFACTS_POI}/${getArtifactIPFSFilepathPOI(
+      artifactName,
+    )}`;
+  }
+
   const artifactFilepath = getArtifactIPFSFilepath(
     artifactName,
     artifactVariantString,
