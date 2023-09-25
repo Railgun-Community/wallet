@@ -1,7 +1,6 @@
 import {
   TXOsReceivedPOIStatusInfo,
   TXOsSpentPOIStatusInfo,
-  POIsPerList,
 } from '@railgun-community/engine';
 import { walletForID } from '../railgun';
 import { NETWORK_CONFIG, NetworkName } from '@railgun-community/shared-models';
@@ -41,7 +40,7 @@ export const refreshReceivePOIsForWallet = (
   networkName: NetworkName,
   walletID: string,
   railgunTxid?: string,
-) => {
+): Promise<void> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   const wallet = walletForID(walletID);
   return wallet.refreshCreationPOIsAllTXOs(chain, railgunTxid);
@@ -51,7 +50,7 @@ export const refreshSpentPOIsForWallet = (
   networkName: NetworkName,
   walletID: string,
   railgunTxid?: string,
-) => {
+): Promise<void> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   const wallet = walletForID(walletID);
   return wallet.refreshSpentPOIsAllSentCommitmentsAndUnshieldEvents(
