@@ -121,9 +121,11 @@ export const setOnMerkletreeScanCallback = (
 const getPOITxidMerklerootValidator = (
   poiNodeURL?: string,
 ): MerklerootValidator => {
-  // TODO: Replace this temp tester
-  // const poiRequester = new WalletPOIRequester(poiNodeURL);
-  const poiRequester = new TempTestWalletPOIRequester();
+  const poiRequester = isDefined(poiNodeURL)
+    ? new WalletPOIRequester(poiNodeURL)
+    : // TODO: Remove this temp tester
+      new TempTestWalletPOIRequester();
+
   const txidMerklerootValidator: MerklerootValidator = (
     chain,
     tree,
@@ -137,9 +139,11 @@ const getPOITxidMerklerootValidator = (
 const getPOILatestValidatedRailgunTxid = (
   poiNodeURL?: string,
 ): GetLatestValidatedRailgunTxid => {
-  // TODO: Replace this temp tester
-  // const poiRequester = new WalletPOIRequester(poiNodeURL);
-  const poiRequester = new TempTestWalletPOIRequester();
+  const poiRequester = isDefined(poiNodeURL)
+    ? new WalletPOIRequester(poiNodeURL)
+    : // TODO: Remove this temp tester
+      new TempTestWalletPOIRequester();
+
   const getLatestValidatedRailgunTxid: GetLatestValidatedRailgunTxid = chain =>
     poiRequester.getLatestValidatedRailgunTxid(chain);
   return getLatestValidatedRailgunTxid;
@@ -186,9 +190,7 @@ export const startRailgunEngine = (
       isPOINode,
     );
 
-    if (isDefined(poiNodeURL)) {
-      WalletPOI.init(poiNodeURL, customPOILists ?? [], engine);
-    }
+    WalletPOI.init(poiNodeURL, customPOILists ?? [], engine);
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngine.name, err);
   }
