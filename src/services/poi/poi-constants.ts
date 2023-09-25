@@ -1,3 +1,5 @@
-import { POIList } from '@railgun-community/engine';
+import { POIList, POIListType } from '@railgun-community/engine';
 
-export const POI_REQUIRED_LISTS: POIList[] = [];
+export const POI_REQUIRED_LISTS: POIList[] = [
+  { key: 'test', type: POIListType.Gather },
+];

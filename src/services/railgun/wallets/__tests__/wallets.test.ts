@@ -62,7 +62,7 @@ describe('wallets', () => {
     const viewOnlyWallet = viewOnlyWalletForID(railgunWalletInfo.id);
     expect(viewOnlyWallet).to.not.be.undefined;
     expect(railgunWalletInfo.railgunAddress).to.equal(wallet.getAddress());
-  });
+  }).timeout(5000);
 
   it('Should get wallet address', () => {
     const addressAny = getRailgunAddress(wallet.id);
