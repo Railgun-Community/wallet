@@ -29,6 +29,7 @@ import { quickSyncRailgunTransactions } from '../railgun-txids/railgun-tx-sync-g
 import { WalletPOIRequester } from '../../poi/wallet-poi-requester';
 import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
 import { WalletPOI } from '../../poi/wallet-poi';
+import { TempTestWalletPOIRequester } from '../../poi/temp-test-wallet-poi-requester';
 
 let engine: Optional<RailgunEngine>;
 
@@ -120,28 +121,27 @@ export const setOnMerkletreeScanCallback = (
 const getPOITxidMerklerootValidator = (
   poiNodeURL?: string,
 ): MerklerootValidator => {
-  const poiNodeRequest = new WalletPOIRequester(poiNodeURL);
+  // TODO: Replace this temp tester
+  // const poiRequester = new WalletPOIRequester(poiNodeURL);
+  const poiRequester = new TempTestWalletPOIRequester();
   const txidMerklerootValidator: MerklerootValidator = (
     chain,
     tree,
     index,
     merkleroot,
   ) =>
-    poiNodeRequest.validateRailgunTxidMerkleroot(
-      chain,
-      tree,
-      index,
-      merkleroot,
-    );
+    poiRequester.validateRailgunTxidMerkleroot(chain, tree, index, merkleroot);
   return txidMerklerootValidator;
 };
 
 const getPOILatestValidatedRailgunTxid = (
   poiNodeURL?: string,
 ): GetLatestValidatedRailgunTxid => {
-  const poiNodeRequest = new WalletPOIRequester(poiNodeURL);
+  // TODO: Replace this temp tester
+  // const poiRequester = new WalletPOIRequester(poiNodeURL);
+  const poiRequester = new TempTestWalletPOIRequester();
   const getLatestValidatedRailgunTxid: GetLatestValidatedRailgunTxid = chain =>
-    poiNodeRequest.getLatestValidatedRailgunTxid(chain);
+    poiRequester.getLatestValidatedRailgunTxid(chain);
   return getLatestValidatedRailgunTxid;
 };
 
