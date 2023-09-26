@@ -170,10 +170,6 @@ export const MOCK_BALANCES_UPDATE_CALLBACK: BalancesUpdatedCallback = () => {
   // noop
 };
 
-export const MOCK_HISTORY_SCAN_CALLBACK = () => {
-  // noop
-};
-
 export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG: FallbackProviderJsonConfig = {
   chainId: 137,
   providers: [

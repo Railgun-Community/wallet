@@ -2,7 +2,12 @@
 /* eslint-disable no-console */
 import LevelDOWN from 'leveldown';
 import fs from 'fs';
-import { NetworkName } from '@railgun-community/shared-models';
+import {
+  MerkletreeScanStatus,
+  MerkletreeScanUpdateEvent,
+  NetworkName,
+  poll,
+} from '@railgun-community/shared-models';
 import {
   setOnMerkletreeScanCallback,
   startRailgunEngine,
@@ -11,7 +16,6 @@ import {
 import {
   MOCK_BALANCES_UPDATE_CALLBACK,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
-  MOCK_HISTORY_SCAN_CALLBACK,
   TEST_WALLET_SOURCE,
 } from './mocks.test';
 import { loadProvider } from '../services/railgun/core/providers';
@@ -56,6 +60,18 @@ const testArtifactStore = new ArtifactStore(
   fileExists,
 );
 
+let currentMerkletreeScanStatus: Optional<MerkletreeScanStatus>;
+
+export const merkletreeHistoryScanCallback = (
+  scanData: MerkletreeScanUpdateEvent,
+): void => {
+  currentMerkletreeScanStatus = scanData.scanStatus;
+};
+
+export const clearMerkletreeScanStatus = () => {
+  currentMerkletreeScanStatus = undefined;
+};
+
 export const initTestEngine = (useNativeArtifacts = false) => {
   const shouldDebug = false;
   startRailgunEngine(
@@ -66,12 +82,11 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     useNativeArtifacts,
     false, // skipMerkletreeScans
     false, // isPOINode
-    'fake', // poiNodeURL
+    undefined, // poiNodeURL
   );
 
-  // TODO: Clear listeners when test engine is reset.
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);
-  setOnMerkletreeScanCallback(MOCK_HISTORY_SCAN_CALLBACK);
+  setOnMerkletreeScanCallback(merkletreeHistoryScanCallback);
 };
 
 export const initTestEngineNetwork = async () => {
@@ -85,4 +100,18 @@ export const initTestEngineNetwork = async () => {
 
 export const closeTestEngine = async () => {
   await stopRailgunEngine();
+
+  clearMerkletreeScanStatus();
+};
+
+export const pollUntilMerkletreeScanned = async () => {
+  const status = await poll(
+    async () => currentMerkletreeScanStatus,
+    status => status === MerkletreeScanStatus.Complete,
+    50,
+    30000 / 50, // 30 sec.
+  );
+  if (status !== MerkletreeScanStatus.Complete) {
+    throw new Error(`Merkletree scan should be completed - timed out`);
+  }
 };
