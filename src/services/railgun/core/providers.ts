@@ -202,7 +202,8 @@ export const loadProvider = async (
     if (fallbackProviderJsonConfig.chainId !== chain.id) {
       throw new Error('Invalid chain ID');
     }
-    if (isDefined(poi) && !WalletPOI.started) {
+    const engine = getEngine();
+    if (!engine.isPOINode && isDefined(poi) && !WalletPOI.started) {
       throw new Error(
         'This network requires Proof Of Innocence. Pass "poiNodeURL" to startRailgunEngine to initialize POI before loading this provider.',
       );
