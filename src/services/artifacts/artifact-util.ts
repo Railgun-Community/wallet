@@ -12,7 +12,7 @@ const MASTER_IPFS_HASH_ARTIFACTS =
 const IPFS_HASH_ARTIFACTS_POI =
   'Qmaxi749eTU3QSjXJxRNuL9QCRyqAGTmWtZFBe4XTS6eEw';
 
-export const ARTIFACT_VARIANT_STRING_POI = 'poi';
+export const ARTIFACT_VARIANT_STRING_POI_PREFIX = 'POI';
 
 export const artifactDownloadsDir = (artifactVariantString: string) => {
   return `artifacts-v2.1/${artifactVariantString}`;
@@ -23,6 +23,13 @@ export const getArtifactVariantString = (
   commitments: number,
 ) => {
   return `${nullifiers}x${commitments}`;
+};
+
+export const getArtifactVariantStringPOI = (
+  maxInputs: number,
+  maxOutputs: number,
+) => {
+  return `${ARTIFACT_VARIANT_STRING_POI_PREFIX}_${maxInputs}x${maxOutputs}`;
 };
 
 export const artifactDownloadsPath = (
@@ -104,10 +111,14 @@ export const getArtifactUrl = (
   artifactName: ArtifactName,
   artifactVariantString: string,
 ) => {
-  if (artifactVariantString === ARTIFACT_VARIANT_STRING_POI) {
-    return `${IPFS_GATEWAY}/ipfs/${IPFS_HASH_ARTIFACTS_POI}/${getArtifactIPFSFilepathPOI(
-      artifactName,
-    )}`;
+  if (artifactVariantString.startsWith(ARTIFACT_VARIANT_STRING_POI_PREFIX)) {
+    if (artifactVariantString === getArtifactVariantStringPOI(13, 13)) {
+      // TODO: Add variant for MINI.
+      return `${IPFS_GATEWAY}/ipfs/${IPFS_HASH_ARTIFACTS_POI}/${getArtifactIPFSFilepathPOI(
+        artifactName,
+      )}`;
+    }
+    throw new Error(`Invalid POI artifact: ${artifactVariantString}.`);
   }
 
   const artifactFilepath = getArtifactIPFSFilepath(

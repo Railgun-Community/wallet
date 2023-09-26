@@ -81,7 +81,6 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     testArtifactStore,
     useNativeArtifacts,
     false, // skipMerkletreeScans
-    false, // isPOINode
     undefined, // poiNodeURL
   );
 

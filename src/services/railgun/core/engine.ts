@@ -158,8 +158,8 @@ const getPOILatestValidatedRailgunTxid = (
  * @param artifactStore - Persistent store for downloading large artifact files. See Wallet SDK Developer Guide for platform implementations.
  * @param useNativeArtifacts - Whether to download native C++ or web-assembly artifacts. TRUE for mobile. FALSE for nodejs and browser.
  * @param skipMerkletreeScans - Whether to skip merkletree syncs and private balance scans. Only set to TRUE in shield-only applications that don't load private wallets or balances.
- * @param isPOINode - Run the Engine as a POI node with full Railgun TXID merkletrees. Set this to false for all wallet implementations.
  * @param poiNodeURL - POI aggregator node URL.
+ * @param customPOILists - POI lists to use for additional wallet protections after default lists.
  * @returns
  */
 export const startRailgunEngine = (
@@ -169,16 +169,17 @@ export const startRailgunEngine = (
   artifactStore: ArtifactStore,
   useNativeArtifacts: boolean,
   skipMerkletreeScans: boolean,
-  isPOINode: boolean,
   poiNodeURL?: string,
   customPOILists?: POIList[],
 ): void => {
-  if (engine) return;
+  if (engine) {
+    return;
+  }
   try {
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(useNativeArtifacts);
 
-    engine = new RailgunEngine(
+    engine = RailgunEngine.initForWallet(
       walletSource,
       db,
       artifactGetterDownloadJustInTime,
@@ -188,12 +189,35 @@ export const startRailgunEngine = (
       getPOILatestValidatedRailgunTxid(poiNodeURL),
       shouldDebug ? createEngineDebugger() : undefined,
       skipMerkletreeScans,
-      isPOINode,
     );
 
     WalletPOI.init(poiNodeURL, customPOILists ?? [], engine);
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngine.name, err);
+  }
+};
+
+export const startRailgunEngineForPOINode = (
+  db: AbstractLevelDOWN,
+  shouldDebug: boolean,
+  artifactStore: ArtifactStore,
+): void => {
+  if (engine) {
+    return;
+  }
+  try {
+    setArtifactStore(artifactStore);
+    setUseNativeArtifacts(false);
+
+    engine = RailgunEngine.initForPOINode(
+      db,
+      artifactGetterDownloadJustInTime,
+      quickSyncEventsGraph,
+      quickSyncRailgunTransactions,
+      shouldDebug ? createEngineDebugger() : undefined,
+    );
+  } catch (err) {
+    throw reportAndSanitizeError(startRailgunEngineForPOINode.name, err);
   }
 };
 

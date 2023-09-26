@@ -11,10 +11,7 @@ import {
   setUseNativeArtifacts,
 } from '../../railgun/core/artifacts';
 import { PublicInputsRailgun } from '@railgun-community/engine';
-import {
-  ARTIFACT_VARIANT_STRING_POI,
-  getArtifactVariantString,
-} from '../artifact-util';
+import { getArtifactVariantString } from '../artifact-util';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -77,15 +74,19 @@ describe('artifact-downloader', () => {
 
     clearArtifactCache();
 
+    await expect(
+      artifactGetterDownloadJustInTime.getArtifactsPOI(13, 12),
+    ).to.be.rejectedWith('Invalid POI artifact: POI_13x12.');
+
     const mockArtifact: Artifact = {
       [ArtifactName.ZKEY]: Buffer.from('123'),
       [ArtifactName.WASM]: Buffer.from('456'),
       [ArtifactName.DAT]: undefined,
       [ArtifactName.VKEY]: { data: '789' },
     };
-    overrideArtifact(ARTIFACT_VARIANT_STRING_POI, mockArtifact);
+    overrideArtifact('POI_13x13', mockArtifact);
 
-    await expect(artifactGetterDownloadJustInTime.getArtifactsPOI()).to.be
+    await expect(artifactGetterDownloadJustInTime.getArtifactsPOI(13, 13)).to.be
       .fulfilled;
   });
 
@@ -96,14 +97,14 @@ describe('artifact-downloader', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const artifacts: Artifact =
-      await artifactGetterDownloadJustInTime.getArtifactsPOI();
+      await artifactGetterDownloadJustInTime.getArtifactsPOI(13, 13);
 
     expect(artifacts.vkey).to.not.be.undefined;
     expect(artifacts.zkey).to.not.be.undefined;
     expect(artifacts.wasm).to.not.be.undefined;
     expect(artifacts.dat).to.be.undefined;
 
-    const cached = artifactCache.poi;
+    const cached = artifactCache.POI_13x13;
     expect(cached?.vkey).to.not.be.undefined;
     expect(cached?.zkey).to.not.be.undefined;
     expect(cached?.wasm).to.not.be.undefined;
@@ -117,14 +118,14 @@ describe('artifact-downloader', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const artifacts: Artifact =
-      await artifactGetterDownloadJustInTime.getArtifactsPOI();
+      await artifactGetterDownloadJustInTime.getArtifactsPOI(13, 13);
 
     expect(artifacts.vkey).to.not.be.undefined;
     expect(artifacts.zkey).to.not.be.undefined;
     expect(artifacts.wasm).to.be.undefined;
     expect(artifacts.dat).to.not.be.undefined;
 
-    const cached = artifactCache.poi;
+    const cached = artifactCache.POI_13x13;
     expect(cached?.vkey).to.not.be.undefined;
     expect(cached?.zkey).to.not.be.undefined;
     expect(cached?.wasm).to.be.undefined;
