@@ -110,6 +110,27 @@ describe('artifact-downloader', () => {
     expect(cached?.dat).to.be.undefined;
   }).timeout(30000);
 
+  it('Should download artifacts - poi native', async () => {
+    setUseNativeArtifacts(true);
+
+    clearArtifactCache();
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const artifacts: Artifact =
+      await artifactGetterDownloadJustInTime.getArtifactsPOI();
+
+    expect(artifacts.vkey).to.not.be.undefined;
+    expect(artifacts.zkey).to.not.be.undefined;
+    expect(artifacts.wasm).to.be.undefined;
+    expect(artifacts.dat).to.not.be.undefined;
+
+    const cached = artifactCache.poi;
+    expect(cached?.vkey).to.not.be.undefined;
+    expect(cached?.zkey).to.not.be.undefined;
+    expect(cached?.wasm).to.be.undefined;
+    expect(cached?.dat).to.not.be.undefined;
+  }).timeout(30000);
+
   it('Should download artifacts - snarkjs', async () => {
     setUseNativeArtifacts(false);
 
