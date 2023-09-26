@@ -10,7 +10,7 @@ const MASTER_IPFS_HASH_ARTIFACTS =
   'QmeBrG7pii1qTqsn7rusvDiqXopHPjCT9gR4PsmW7wXqZq';
 
 const IPFS_HASH_ARTIFACTS_POI =
-  'Qmar1231jzJzQ6xwAbxtFquSMM6kvx4xJ25cqotoPGbZCX';
+  'Qmaxi749eTU3QSjXJxRNuL9QCRyqAGTmWtZFBe4XTS6eEw';
 
 export const ARTIFACT_VARIANT_STRING_POI = 'poi';
 
