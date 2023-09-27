@@ -145,6 +145,7 @@ export type Transaction = TransactionInterface & {
   nullifiers: Array<Scalars['Bytes']>;
   commitments: Array<Scalars['Bytes']>;
   boundParamsHash: Scalars['Bytes'];
+  isUnshield: Scalars['Boolean'];
 };
 
 export type TransactionInterface = {
@@ -155,6 +156,7 @@ export type TransactionInterface = {
   nullifiers: Array<Scalars['Bytes']>;
   commitments: Array<Scalars['Bytes']>;
   boundParamsHash: Scalars['Bytes'];
+  isUnshield: Scalars['Boolean'];
 };
 
 export type TransactionInterface_filter = {
@@ -218,6 +220,10 @@ export type TransactionInterface_filter = {
   boundParamsHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
   boundParamsHash_contains?: InputMaybe<Scalars['Bytes']>;
   boundParamsHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  isUnshield?: InputMaybe<Scalars['Boolean']>;
+  isUnshield_not?: InputMaybe<Scalars['Boolean']>;
+  isUnshield_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  isUnshield_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<TransactionInterface_filter>>>;
@@ -231,7 +237,8 @@ export type TransactionInterface_orderBy =
   | 'merkleRoot'
   | 'nullifiers'
   | 'commitments'
-  | 'boundParamsHash';
+  | 'boundParamsHash'
+  | 'isUnshield';
 
 export type Transaction_filter = {
   id?: InputMaybe<Scalars['Bytes']>;
@@ -294,6 +301,10 @@ export type Transaction_filter = {
   boundParamsHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
   boundParamsHash_contains?: InputMaybe<Scalars['Bytes']>;
   boundParamsHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  isUnshield?: InputMaybe<Scalars['Boolean']>;
+  isUnshield_not?: InputMaybe<Scalars['Boolean']>;
+  isUnshield_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  isUnshield_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Transaction_filter>>>;
@@ -307,7 +318,8 @@ export type Transaction_orderBy =
   | 'merkleRoot'
   | 'nullifiers'
   | 'commitments'
-  | 'boundParamsHash';
+  | 'boundParamsHash'
+  | 'isUnshield';
 
 export type _Block_ = {
   /** The hash of the block */

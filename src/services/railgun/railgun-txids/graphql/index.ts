@@ -2,7 +2,7 @@
  * TO UPDATE:
  * 1. Find all places that are "MODIFIED", move them into the new built index.ts (in .graphclient)
  * 2. add these comments (including eslint disables)
- * 3. move the modified index file to quick-sync/graphql/
+ * 3. move the modified index file to quick-sync/graphql/ (NOTE: MAKE SURE TO DRAG AND DROP IN VSCODE SO THE SOURCE LOCATIONS CHANGE!)
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -14,6 +14,8 @@
 /* eslint-disable import/newline-after-import */
 /* eslint-disable prefer-template */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+
+// @ts-nocheck
 
 // @ts-nocheck
 import {
@@ -73,10 +75,10 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  BigDecimal: string; // MODIFIED
-  BigInt: string; // MODIFIED
-  Bytes: string; // MODIFIED
-  Int8: number; // MODIFIED
+  BigDecimal: any;
+  BigInt: any;
+  Bytes: any;
+  Int8: any;
 };
 
 export type Query = {
@@ -190,6 +192,7 @@ export type Transaction = TransactionInterface & {
   nullifiers: Array<Scalars['Bytes']>;
   commitments: Array<Scalars['Bytes']>;
   boundParamsHash: Scalars['Bytes'];
+  isUnshield: Scalars['Boolean'];
 };
 
 export type TransactionInterface = {
@@ -200,6 +203,7 @@ export type TransactionInterface = {
   nullifiers: Array<Scalars['Bytes']>;
   commitments: Array<Scalars['Bytes']>;
   boundParamsHash: Scalars['Bytes'];
+  isUnshield: Scalars['Boolean'];
 };
 
 export type TransactionInterface_filter = {
@@ -263,6 +267,10 @@ export type TransactionInterface_filter = {
   boundParamsHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
   boundParamsHash_contains?: InputMaybe<Scalars['Bytes']>;
   boundParamsHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  isUnshield?: InputMaybe<Scalars['Boolean']>;
+  isUnshield_not?: InputMaybe<Scalars['Boolean']>;
+  isUnshield_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  isUnshield_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<TransactionInterface_filter>>>;
@@ -276,7 +284,8 @@ export type TransactionInterface_orderBy =
   | 'merkleRoot'
   | 'nullifiers'
   | 'commitments'
-  | 'boundParamsHash';
+  | 'boundParamsHash'
+  | 'isUnshield';
 
 export type Transaction_filter = {
   id?: InputMaybe<Scalars['Bytes']>;
@@ -339,6 +348,10 @@ export type Transaction_filter = {
   boundParamsHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
   boundParamsHash_contains?: InputMaybe<Scalars['Bytes']>;
   boundParamsHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  isUnshield?: InputMaybe<Scalars['Boolean']>;
+  isUnshield_not?: InputMaybe<Scalars['Boolean']>;
+  isUnshield_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  isUnshield_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Transaction_filter>>>;
@@ -352,7 +365,8 @@ export type Transaction_orderBy =
   | 'merkleRoot'
   | 'nullifiers'
   | 'commitments'
-  | 'boundParamsHash';
+  | 'boundParamsHash'
+  | 'isUnshield';
 
 export type _Block_ = {
   /** The hash of the block */
@@ -713,6 +727,7 @@ export type TransactionResolvers<
     ContextType
   >;
   boundParamsHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  isUnshield?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -736,6 +751,7 @@ export type TransactionInterfaceResolvers<
     ContextType
   >;
   boundParamsHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  isUnshield?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 }>;
 
 export type _Block_Resolvers<
@@ -781,8 +797,8 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
   derivedFrom?: derivedFromDirectiveResolver<any, any, ContextType>;
 }>;
 
-export type MeshContext = TxsEthereumTypes.Context &
-  TxsGoerliTypes.Context &
+export type MeshContext = TxsGoerliTypes.Context &
+  TxsEthereumTypes.Context &
   BaseMeshContext;
 
 const baseDir = pathModule.join(
@@ -800,14 +816,14 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     .join('/')
     .replace(baseDir + '/', '');
   switch (relativeModuleId) {
-    case '.graphclient/sources/txs-ethereum/introspectionSchema':
-      return import(
-        './.graphclient/sources/txs-ethereum/introspectionSchema'
-      ) as T;
-
     case '.graphclient/sources/txs-goerli/introspectionSchema':
       return import(
         './.graphclient/sources/txs-goerli/introspectionSchema'
+      ) as T;
+
+    case '.graphclient/sources/txs-ethereum/introspectionSchema':
+      return import(
+        './.graphclient/sources/txs-ethereum/introspectionSchema'
       ) as T;
 
     default:
@@ -906,11 +922,18 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
     get documents() {
       return [
         {
-          document: PoiMessageHashesDocument,
+          document: GetRailgunTransactionsAfterGraphIdDocument,
           get rawSDL() {
-            return printWithCache(PoiMessageHashesDocument);
+            return printWithCache(GetRailgunTransactionsAfterGraphIdDocument);
           },
-          location: 'PoiMessageHashesDocument.graphql',
+          location: 'GetRailgunTransactionsAfterGraphIdDocument.graphql',
+        },
+        {
+          document: GetUnshieldRailgunTransactionsByTxidDocument,
+          get rawSDL() {
+            return printWithCache(GetUnshieldRailgunTransactionsByTxidDocument);
+          },
+          location: 'GetUnshieldRailgunTransactionsByTxidDocument.graphql',
         },
       ];
     },
@@ -960,11 +983,11 @@ export function getBuiltGraphSDK<TGlobalContext = any, TOperationContext = any>(
     sdkRequester$.then(sdkRequester => sdkRequester(...args)),
   );
 }
-export type PoiMessageHashesQueryVariables = Exact<{
+export type GetRailgunTransactionsAfterGraphIDQueryVariables = Exact<{
   idLow?: InputMaybe<Scalars['Bytes']>;
 }>;
 
-export type PoiMessageHashesQuery = {
+export type GetRailgunTransactionsAfterGraphIDQuery = {
   transactionInterfaces: Array<
     Pick<
       Transaction,
@@ -978,8 +1001,18 @@ export type PoiMessageHashesQuery = {
   >;
 };
 
-export const PoiMessageHashesDocument = gql`
-  query PoiMessageHashes($idLow: Bytes = "0x00") {
+export type GetUnshieldRailgunTransactionsByTxidQueryVariables = Exact<{
+  txid?: InputMaybe<Scalars['Bytes']>;
+}>;
+
+export type GetUnshieldRailgunTransactionsByTxidQuery = {
+  transactionInterfaces: Array<
+    Pick<Transaction, 'nullifiers' | 'commitments' | 'boundParamsHash'>
+  >;
+};
+
+export const GetRailgunTransactionsAfterGraphIDDocument = gql`
+  query GetRailgunTransactionsAfterGraphID($idLow: Bytes = "0x00") {
     transactionInterfaces(orderBy: id, first: 1000, where: { id_gt: $idLow }) {
       id
       nullifiers
@@ -990,8 +1023,20 @@ export const PoiMessageHashesDocument = gql`
     }
   }
 ` as unknown as DocumentNode<
-  PoiMessageHashesQuery,
-  PoiMessageHashesQueryVariables
+  GetRailgunTransactionsAfterGraphIDQuery,
+  GetRailgunTransactionsAfterGraphIDQueryVariables
+>;
+export const GetUnshieldRailgunTransactionsByTxidDocument = gql`
+  query GetUnshieldRailgunTransactionsByTxid($txid: Bytes) {
+    transactionInterfaces(where: { transactionHash: $txid, isUnshield: true }) {
+      nullifiers
+      commitments
+      boundParamsHash
+    }
+  }
+` as unknown as DocumentNode<
+  GetUnshieldRailgunTransactionsByTxidQuery,
+  GetUnshieldRailgunTransactionsByTxidQueryVariables
 >;
 
 export type Requester<C = {}, E = unknown> = <R, V>(
@@ -1001,15 +1046,31 @@ export type Requester<C = {}, E = unknown> = <R, V>(
 ) => Promise<R> | AsyncIterable<R>;
 export function getSdk<C, E>(requester: Requester<C, E>) {
   return {
-    PoiMessageHashes(
-      variables?: PoiMessageHashesQueryVariables,
+    GetRailgunTransactionsAfterGraphID(
+      variables?: GetRailgunTransactionsAfterGraphIDQueryVariables,
       options?: C,
-    ): Promise<PoiMessageHashesQuery> {
-      return requester<PoiMessageHashesQuery, PoiMessageHashesQueryVariables>(
-        PoiMessageHashesDocument,
+    ): Promise<GetRailgunTransactionsAfterGraphIDQuery> {
+      return requester<
+        GetRailgunTransactionsAfterGraphIDQuery,
+        GetRailgunTransactionsAfterGraphIDQueryVariables
+      >(
+        GetRailgunTransactionsAfterGraphIDDocument,
         variables,
         options,
-      ) as Promise<PoiMessageHashesQuery>;
+      ) as Promise<GetRailgunTransactionsAfterGraphIDQuery>;
+    },
+    GetUnshieldRailgunTransactionsByTxid(
+      variables?: GetUnshieldRailgunTransactionsByTxidQueryVariables,
+      options?: C,
+    ): Promise<GetUnshieldRailgunTransactionsByTxidQuery> {
+      return requester<
+        GetUnshieldRailgunTransactionsByTxidQuery,
+        GetUnshieldRailgunTransactionsByTxidQueryVariables
+      >(
+        GetUnshieldRailgunTransactionsByTxidDocument,
+        variables,
+        options,
+      ) as Promise<GetUnshieldRailgunTransactionsByTxidQuery>;
     },
   };
 }

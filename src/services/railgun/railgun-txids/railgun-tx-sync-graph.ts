@@ -1,15 +1,21 @@
-import { Chain, RailgunTransaction } from '@railgun-community/engine';
+import {
+  Chain,
+  RailgunTransaction,
+  getRailgunTransactionIDHex,
+} from '@railgun-community/engine';
 import {
   NetworkName,
   isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
-import { PoiMessageHashesQuery, getMeshOptions, getSdk } from './graphql';
+import { getMeshOptions, getSdk } from './graphql';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
-import { formatRailgunTransactions } from './railgun-tx-graph-type-formatters';
+import {
+  GraphRailgunTransactions,
+  formatRailgunTransactions,
+} from './railgun-tx-graph-type-formatters';
 import { removeDuplicatesByID } from '../util/graph-util';
-
-type GraphRailgunTransactions = PoiMessageHashesQuery['transactionInterfaces'];
+import GraphQLHandler from '@graphql-mesh/graphql';
 
 const meshes: MapType<MeshInstance> = {};
 
@@ -35,6 +41,27 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
+export const getUnshieldRailgunTransactionIDs = async (
+  chain: Chain,
+  txid: string,
+): Promise<string[]> => {
+  const network = networkForChain(chain);
+  if (!network) {
+    return [];
+  }
+
+  const sdk = getBuiltGraphSDK(network.name);
+
+  const transactions = (
+    await sdk.GetUnshieldRailgunTransactionsByTxid({ txid })
+  ).transactionInterfaces;
+
+  const unshieldRailgunTxids: string[] = transactions.map(
+    getRailgunTransactionIDHex,
+  );
+  return unshieldRailgunTxids;
+};
+
 export const quickSyncRailgunTransactions = async (
   chain: Chain,
   latestGraphID: Optional<string>,
@@ -50,7 +77,7 @@ export const quickSyncRailgunTransactions = async (
     await autoPaginatingQuery(
       async (id: string) =>
         (
-          await sdk.PoiMessageHashes({
+          await sdk.GetRailgunTransactionsAfterGraphID({
             idLow: id,
           })
         ).transactionInterfaces,

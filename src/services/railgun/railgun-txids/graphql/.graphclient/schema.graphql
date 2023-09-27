@@ -162,6 +162,7 @@ type Transaction implements TransactionInterface {
   nullifiers: [Bytes!]!
   commitments: [Bytes!]!
   boundParamsHash: Bytes!
+  isUnshield: Boolean!
 }
 
 interface TransactionInterface {
@@ -172,6 +173,7 @@ interface TransactionInterface {
   nullifiers: [Bytes!]!
   commitments: [Bytes!]!
   boundParamsHash: Bytes!
+  isUnshield: Boolean!
 }
 
 input TransactionInterface_filter {
@@ -235,6 +237,10 @@ input TransactionInterface_filter {
   boundParamsHash_not_in: [Bytes!]
   boundParamsHash_contains: Bytes
   boundParamsHash_not_contains: Bytes
+  isUnshield: Boolean
+  isUnshield_not: Boolean
+  isUnshield_in: [Boolean!]
+  isUnshield_not_in: [Boolean!]
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
   and: [TransactionInterface_filter]
@@ -249,6 +255,7 @@ enum TransactionInterface_orderBy {
   nullifiers
   commitments
   boundParamsHash
+  isUnshield
 }
 
 input Transaction_filter {
@@ -312,6 +319,10 @@ input Transaction_filter {
   boundParamsHash_not_in: [Bytes!]
   boundParamsHash_contains: Bytes
   boundParamsHash_not_contains: Bytes
+  isUnshield: Boolean
+  isUnshield_not: Boolean
+  isUnshield_in: [Boolean!]
+  isUnshield_not_in: [Boolean!]
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
   and: [Transaction_filter]
@@ -326,6 +337,7 @@ enum Transaction_orderBy {
   nullifiers
   commitments
   boundParamsHash
+  isUnshield
 }
 
 type _Block_ {
