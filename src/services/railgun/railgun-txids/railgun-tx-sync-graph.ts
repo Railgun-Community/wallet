@@ -133,13 +133,20 @@ const getBuiltGraphClient = async (
     );
   }
   meshOptions.sources = [filteredSources[0]];
-  const mesh = await getMesh(meshOptions);
-  meshes[networkName] = mesh;
-  const id = mesh.pubsub.subscribe('destroy', () => {
-    meshes[networkName] = undefined;
-    mesh.pubsub.unsubscribe(id);
-  });
-  return mesh;
+
+  try {
+    const mesh = await getMesh(meshOptions);
+    meshes[networkName] = mesh;
+    const id = mesh.pubsub.subscribe('destroy', () => {
+      meshes[networkName] = undefined;
+      mesh.pubsub.unsubscribe(id);
+    });
+    return mesh;
+  } catch (err) {
+    throw new Error(
+      `ERROR getting mesh - if error includes "can't generate schema," make sure to check the filepaths for source schema imports in the built index file: ${err.message}`,
+    );
+  }
 };
 
 const getBuiltGraphSDK = <TGlobalContext, TOperationContext>(
