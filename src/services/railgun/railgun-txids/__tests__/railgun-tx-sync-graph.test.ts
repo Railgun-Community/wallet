@@ -4,7 +4,6 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   getUnshieldRailgunTransactionIDs,
-  // getUnshieldRailgunTransactionIDs,
   quickSyncRailgunTransactions,
 } from '../railgun-tx-sync-graph';
 

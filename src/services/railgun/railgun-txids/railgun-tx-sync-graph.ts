@@ -15,7 +15,6 @@ import {
   formatRailgunTransactions,
 } from './railgun-tx-graph-type-formatters';
 import { removeDuplicatesByID } from '../util/graph-util';
-import GraphQLHandler from '@graphql-mesh/graphql';
 
 const meshes: MapType<MeshInstance> = {};
 
