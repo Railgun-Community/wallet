@@ -151,8 +151,13 @@ const loadProviderForNetwork = async (
   );
 
   const network = NETWORK_CONFIG[networkName];
-  const { proxyContract, relayAdaptContract, deploymentBlock, publicName } =
-    network;
+  const {
+    proxyContract,
+    relayAdaptContract,
+    deploymentBlock,
+    publicName,
+    poi,
+  } = network;
   if (!proxyContract) {
     throw new Error(`Could not find Proxy contract for network: ${publicName}`);
   }
@@ -163,6 +168,11 @@ const loadProviderForNetwork = async (
   }
 
   const engine = getEngine();
+  if (!engine.isPOINode && isDefined(poi) && !WalletPOI.started) {
+    throw new Error(
+      'This network requires Proof Of Innocence. Pass "poiNodeURL" to startRailgunEngine to initialize POI before loading this provider.',
+    );
+  }
 
   // This function will set up the contracts for this chain.
   // Throws if provider does not respond.
@@ -173,6 +183,7 @@ const loadProviderForNetwork = async (
     fallbackProvider,
     pollingProvider,
     deploymentBlock ?? 0,
+    poi?.launchBlock,
   );
 
   // NOTE: These are async calls, but we need not await.
@@ -198,15 +209,9 @@ export const loadProvider = async (
   try {
     delete fallbackProviderMap[networkName];
 
-    const { chain, poi } = NETWORK_CONFIG[networkName];
+    const { chain } = NETWORK_CONFIG[networkName];
     if (fallbackProviderJsonConfig.chainId !== chain.id) {
       throw new Error('Invalid chain ID');
-    }
-    const engine = getEngine();
-    if (!engine.isPOINode && isDefined(poi) && !WalletPOI.started) {
-      throw new Error(
-        'This network requires Proof Of Innocence. Pass "poiNodeURL" to startRailgunEngine to initialize POI before loading this provider.',
-      );
     }
 
     await loadProviderForNetwork(
