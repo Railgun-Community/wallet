@@ -2,24 +2,24 @@ import {
   Chain,
   RailgunTransaction,
   getRailgunTransactionIDHex,
+  getBlindedCommitmentForUnshield,
 } from '@railgun-community/engine';
 import {
   NetworkName,
   isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
-import { getMeshOptions, getSdk } from './graphql';
+import {
+  getMeshOptions,
+  getSdk,
+  GetUnshieldRailgunTransactionsByTxidQuery,
+} from './graphql';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
   GraphRailgunTransactions,
   formatRailgunTransactions,
 } from './railgun-tx-graph-type-formatters';
 import { removeDuplicatesByID } from '../util/graph-util';
-
-export type RailgunTransactionCommitmentsAndID = {
-  railgunTxid: string;
-  commitments: string[];
-};
 
 const meshes: MapType<MeshInstance> = {};
 
@@ -45,10 +45,11 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
-export const getUnshieldRailgunTransactionCommitmentsAndIDs = async (
+export const getUnshieldRailgunTransactionBlindedCommitmentGroups = async (
   chain: Chain,
   txid: string,
-): Promise<RailgunTransactionCommitmentsAndID[]> => {
+  toAddress: string,
+): Promise<string[][]> => {
   const network = networkForChain(chain);
   if (!network) {
     return [];
@@ -56,17 +57,26 @@ export const getUnshieldRailgunTransactionCommitmentsAndIDs = async (
 
   const sdk = getBuiltGraphSDK(network.name);
 
-  const transactions = (
-    await sdk.GetUnshieldRailgunTransactionsByTxid({ txid })
-  ).transactionInterfaces;
+  const transactions: GetUnshieldRailgunTransactionsByTxidQuery['transactionInterfaces'] =
+    (await sdk.GetUnshieldRailgunTransactionsByTxid({ txid }))
+      .transactionInterfaces;
 
-  const unshieldRailgunTransactionCommitmentsAndIDs: RailgunTransactionCommitmentsAndID[] =
-    transactions.map(transaction => ({
-      railgunTxid: getRailgunTransactionIDHex(transaction),
-      commitments: transaction.commitments,
-    }));
+  const unshieldRailgunTransactionBlindedCommitmentGroups: string[][] =
+    transactions.map(transaction => {
+      const railgunTxid = getRailgunTransactionIDHex(transaction);
+      const blindedCommitments: string[] = transaction.commitments.map(
+        commitment => {
+          return getBlindedCommitmentForUnshield(
+            commitment,
+            toAddress,
+            railgunTxid,
+          );
+        },
+      );
+      return blindedCommitments;
+    });
 
-  return unshieldRailgunTransactionCommitmentsAndIDs;
+  return unshieldRailgunTransactionBlindedCommitmentGroups;
 };
 
 export const quickSyncRailgunTransactions = async (
