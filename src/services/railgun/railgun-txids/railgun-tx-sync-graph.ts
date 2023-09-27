@@ -16,6 +16,11 @@ import {
 } from './railgun-tx-graph-type-formatters';
 import { removeDuplicatesByID } from '../util/graph-util';
 
+export type RailgunTransactionCommitmentsAndID = {
+  railgunTxid: string;
+  commitments: string[];
+};
+
 const meshes: MapType<MeshInstance> = {};
 
 // 1.5 full trees of commitments
@@ -40,10 +45,10 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
-export const getUnshieldRailgunTransactionIDs = async (
+export const getUnshieldRailgunTransactionCommitmentsAndIDs = async (
   chain: Chain,
   txid: string,
-): Promise<string[]> => {
+): Promise<RailgunTransactionCommitmentsAndID[]> => {
   const network = networkForChain(chain);
   if (!network) {
     return [];
@@ -55,10 +60,13 @@ export const getUnshieldRailgunTransactionIDs = async (
     await sdk.GetUnshieldRailgunTransactionsByTxid({ txid })
   ).transactionInterfaces;
 
-  const unshieldRailgunTxids: string[] = transactions.map(
-    getRailgunTransactionIDHex,
-  );
-  return unshieldRailgunTxids;
+  const unshieldRailgunTransactionCommitmentsAndIDs: RailgunTransactionCommitmentsAndID[] =
+    transactions.map(transaction => ({
+      railgunTxid: getRailgunTransactionIDHex(transaction),
+      commitments: transaction.commitments,
+    }));
+
+  return unshieldRailgunTransactionCommitmentsAndIDs;
 };
 
 export const quickSyncRailgunTransactions = async (
