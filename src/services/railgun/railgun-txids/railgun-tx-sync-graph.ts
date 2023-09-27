@@ -162,6 +162,7 @@ const getBuiltGraphClient = async (
     return mesh;
   } catch (err) {
     throw new Error(
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       `ERROR getting mesh - if error includes "can't generate schema," make sure to check the filepaths for source schema imports in the built index file: ${err.message}`,
     );
   }
