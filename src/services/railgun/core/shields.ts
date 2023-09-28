@@ -26,7 +26,7 @@ export const getAllShields = async (
     const shieldData: ShieldData = {
       txid: `0x${commitment.txid}`,
       commitmentHash: `0x${commitment.hash}`,
-      npk: commitment.preImage.npk,
+      npk: `0x${commitment.preImage.npk}`,
       utxoTree: commitment.utxoTree,
       utxoIndex: commitment.utxoIndex,
       timestamp: commitment.timestamp,
