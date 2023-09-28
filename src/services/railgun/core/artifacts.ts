@@ -7,7 +7,6 @@ import {
 import { ArtifactDownloader } from '../../artifacts/artifact-downloader';
 import { ArtifactStore } from '../../artifacts/artifact-store';
 import {
-  ARTIFACT_VARIANT_STRING_POI_PREFIX,
   getArtifactVariantString,
   getArtifactVariantStringPOI,
 } from '../../artifacts/artifact-util';
