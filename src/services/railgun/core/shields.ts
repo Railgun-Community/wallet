@@ -35,7 +35,7 @@ export const getAllShields = async (
   return shieldsForEachTxidVersion.flat();
 };
 
-const getShieldsForTXIDVersion = async (
+export const getShieldsForTXIDVersion = async (
   txidVersion: TXIDVersion,
   networkName: NetworkName,
   startingBlock: number,
