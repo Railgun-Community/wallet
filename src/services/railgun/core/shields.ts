@@ -14,7 +14,6 @@ export type ShieldData = {
   blockNumber: number;
   utxoTree: number;
   utxoIndex: number;
-  txidVersion: TXIDVersion;
 };
 
 export const getAllShields = async (
@@ -57,7 +56,6 @@ export const getShieldsForTXIDVersion = async (
       utxoIndex: commitment.utxoIndex,
       timestamp: commitment.timestamp,
       blockNumber: commitment.blockNumber,
-      txidVersion,
     };
     return shieldData;
   });
