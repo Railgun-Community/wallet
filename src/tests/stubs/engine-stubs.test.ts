@@ -71,9 +71,11 @@ export const createEngineWalletBalancesStub = async (
   tokenAddress: string,
   tree: number,
 ) => {
-  balancesStub = sinon.stub(RailgunWallet.prototype, 'balances').resolves({
-    [tokenAddress]: await getMockBalanceData(addressData, tokenAddress, tree),
-  });
+  balancesStub = sinon
+    .stub(RailgunWallet.prototype, 'getTokenBalancesByTxidVersion')
+    .resolves({
+      [tokenAddress]: await getMockBalanceData(addressData, tokenAddress, tree),
+    });
 };
 
 export const createAbstractWalletBalancesStub = async (
@@ -81,9 +83,11 @@ export const createAbstractWalletBalancesStub = async (
   tokenAddress: string,
   tree: number,
 ) => {
-  balancesStub = sinon.stub(AbstractWallet.prototype, 'balances').resolves({
-    [tokenAddress]: await getMockBalanceData(addressData, tokenAddress, tree),
-  });
+  balancesStub = sinon
+    .stub(AbstractWallet.prototype, 'getTokenBalancesByTxidVersion')
+    .resolves({
+      [tokenAddress]: await getMockBalanceData(addressData, tokenAddress, tree),
+    });
 };
 
 export const createEngineWalletTreeBalancesStub = async (
@@ -96,7 +100,7 @@ export const createEngineWalletTreeBalancesStub = async (
     ByteLength.UINT_256,
   );
   treeBalancesStub = sinon
-    .stub(RailgunWallet.prototype, 'balancesByTree')
+    .stub(RailgunWallet.prototype, 'getTotalBalancesByTreeNumber')
     .resolves({
       [formattedTokenAddress]: [
         await getMockBalanceData(addressData, tokenAddress, tree),

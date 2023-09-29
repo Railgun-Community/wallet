@@ -4,7 +4,7 @@ import { GetRailgunTransactionsAfterGraphIDQuery } from './graphql';
 export type GraphRailgunTransactions =
   GetRailgunTransactionsAfterGraphIDQuery['transactionInterfaces'];
 
-export const formatRailgunTransactions = (
+export const formatRailgunTransactionsV2 = (
   txs: GraphRailgunTransactions,
 ): RailgunTransaction[] => {
   return txs.map(tx => {
@@ -14,6 +14,8 @@ export const formatRailgunTransactions = (
       nullifiers: tx.nullifiers,
       boundParamsHash: tx.boundParamsHash,
       blockNumber: Number(tx.blockNumber),
+      utxoTreeIn: undefined, // V3 will need this param
+      globalStartPositionOut: undefined, // V3 will need this param
     };
   });
 };

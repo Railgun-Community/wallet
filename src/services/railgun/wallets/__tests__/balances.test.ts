@@ -13,10 +13,17 @@ import {
   rescanFullUTXOMerkletreesAndWallets,
   scanUpdatesForMerkletreeAndWallets,
 } from '../balances';
-import { Chain, ChainType, isDefined } from '@railgun-community/shared-models';
+import {
+  Chain,
+  ChainType,
+  TXIDVersion,
+  isDefined,
+} from '@railgun-community/shared-models';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 let walletScanStub: SinonStub;
 let walletFullScanStub: SinonStub;
@@ -74,6 +81,7 @@ describe('balances', () => {
     const fullRescan = false;
     const chain: Chain = { type: ChainType.EVM, id: 1 };
     const response = await refreshRailgunBalances(
+      txidVersion,
       chain,
       knownWalletID,
       fullRescan,
@@ -87,7 +95,7 @@ describe('balances', () => {
     const fullRescan = false;
     const chain: Chain = { type: ChainType.EVM, id: 1 };
     await expect(
-      refreshRailgunBalances(chain, 'unknown', fullRescan),
+      refreshRailgunBalances(txidVersion, chain, 'unknown', fullRescan),
     ).rejectedWith('No RAILGUN wallet for ID');
     expect(walletScanStub.notCalled).to.be.true;
     expect(engineScanStub.notCalled).to.be.true;

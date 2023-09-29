@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   RailgunWallet,
-  Balances,
+  TokenBalances,
   Chain,
   ChainType,
   getTokenDataERC20,
@@ -10,6 +10,7 @@ import {
 import Sinon, { SinonStub } from 'sinon';
 import {
   RailgunBalancesEvent,
+  TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
 import {
@@ -29,6 +30,8 @@ const { expect } = chai;
 
 const MOCK_TOKEN_ADDRESS = '0x012536';
 
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+
 let wallet: RailgunWallet;
 
 let walletBalanceStub: SinonStub;
@@ -47,7 +50,7 @@ describe('balance-update', () => {
     wallet = fullWalletForID(railgunWalletInfo.id);
     const tokenAddress = MOCK_TOKEN_ADDRESS.replace('0x', '');
     const tokenData = getTokenDataERC20(tokenAddress);
-    const balances: Balances = {
+    const balances: TokenBalances = {
       [tokenAddress]: {
         balance: BigInt(10),
         utxos: [],
@@ -56,7 +59,7 @@ describe('balance-update', () => {
     };
     walletBalanceStub = Sinon.stub(
       RailgunWallet.prototype,
-      'balances',
+      'getTokenBalancesByTxidVersion',
     ).resolves(balances);
   });
   afterEach(() => {
@@ -70,7 +73,7 @@ describe('balance-update', () => {
   it('Should not pull balances without callback', async () => {
     setOnBalanceUpdateCallback(undefined);
     const chain: Chain = { type: ChainType.EVM, id: 1 };
-    await expect(onBalancesUpdate(wallet, chain)).to.be.fulfilled;
+    await expect(onBalancesUpdate(txidVersion, wallet, chain)).to.be.fulfilled;
     expect(walletBalanceStub.notCalled).to.be.true;
   });
 
@@ -81,7 +84,7 @@ describe('balance-update', () => {
     };
     setOnBalanceUpdateCallback(callback);
     const chain: Chain = { type: ChainType.EVM, id: 69 };
-    await expect(onBalancesUpdate(wallet, chain)).to.be.fulfilled;
+    await expect(onBalancesUpdate(txidVersion, wallet, chain)).to.be.fulfilled;
     expect(walletBalanceStub.calledOnce).to.be.true;
     expect(formattedBalances.chain).to.deep.equal(chain);
     expect(formattedBalances.erc20Amounts.length).to.equal(1);

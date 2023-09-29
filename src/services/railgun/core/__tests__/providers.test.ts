@@ -4,6 +4,8 @@ import {
   NetworkName,
   FallbackProviderJsonConfig,
   isDefined,
+  TXIDVersion,
+  NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -17,6 +19,7 @@ import {
   loadProvider,
   getRelayAdaptContractForNetwork,
   getRailgunSmartWalletContractForNetwork,
+  getTXIDMerkletreeForNetwork,
 } from '../providers';
 import { createRailgunWallet } from '../../wallets/wallets';
 
@@ -25,6 +28,8 @@ const { expect } = chai;
 
 const MOCK_MNEMONIC_PROVIDERS_ONLY =
   'pause crystal tornado alcohol genre cement fade large song like bag where';
+
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 describe('providers', () => {
   before(async () => {
@@ -52,10 +57,22 @@ describe('providers', () => {
       getFallbackProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
     ).to.throw;
 
-    expect(getUTXOMerkletreeForNetwork(NetworkName.PolygonMumbai)).to.not.be
-      .undefined;
+    expect(getUTXOMerkletreeForNetwork(txidVersion, NetworkName.PolygonMumbai))
+      .to.not.be.undefined;
     expect(() =>
-      getUTXOMerkletreeForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
+      getUTXOMerkletreeForNetwork(
+        txidVersion,
+        NetworkName.EthereumRopsten_DEPRECATED,
+      ),
+    ).to.throw;
+
+    expect(getTXIDMerkletreeForNetwork(txidVersion, NetworkName.PolygonMumbai))
+      .to.not.be.undefined;
+    expect(() =>
+      getTXIDMerkletreeForNetwork(
+        txidVersion,
+        NetworkName.EthereumRopsten_DEPRECATED,
+      ),
     ).to.throw;
 
     expect(getRailgunSmartWalletContractForNetwork(NetworkName.PolygonMumbai))
@@ -82,9 +99,12 @@ describe('providers', () => {
       throw new Error('Expected railgunWalletInfo.');
     }
     const wallet = walletForID(railgunWalletInfo.id);
-    expect(wallet.utxoMerkletrees[0][80001]).to.not.be.undefined;
-    expect(wallet.utxoMerkletrees[0][1]).to.be.undefined;
-    expect(wallet.utxoMerkletrees[0][3]).to.be.undefined;
+    expect(
+      wallet.getUTXOMerkletree(
+        txidVersion,
+        NETWORK_CONFIG[NetworkName.PolygonMumbai].chain,
+      ),
+    ).to.not.be.undefined;
   }).timeout(20000);
 
   it('Should fail with invalid chain ID', async () => {

@@ -1,52 +1,33 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import {
-  Chain,
   BlindedCommitmentData,
-  POIsPerList,
-  TXOPOIListStatus,
+  Chain,
   POIEngineProofInputs,
   POIEngineProofInputsWithListPOIData,
-  createDummyMerkleProof,
   POINodeInterface,
+  POIsPerList,
   RailgunEngine,
+  TXOPOIListStatus,
+  createDummyMerkleProof,
 } from '@railgun-community/engine';
-import { POINodeRequest } from './poi-node-request';
 import {
   MerkleProof,
-  POIStatus,
   TXIDVersion,
-  TransactProofData,
   networkForChain,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../utils';
 
-export class WalletPOINodeInterface extends POINodeInterface {
-  private poiNodeRequest: POINodeRequest;
+export const MOCK_LIST_KEY = 'test_list';
 
+export class TestWalletPOINodeInterface extends POINodeInterface {
   // Prevents a circular dependency
   private engine: RailgunEngine;
 
-  constructor(poiNodeURL: string, engine: RailgunEngine) {
+  constructor(engine: RailgunEngine) {
     super();
-    this.poiNodeRequest = new POINodeRequest(poiNodeURL);
     this.engine = engine;
   }
-
-  private static poiStatusToTXOPOIStatus = (
-    poiStatus: POIStatus,
-  ): TXOPOIListStatus => {
-    switch (poiStatus) {
-      case POIStatus.Valid:
-        return TXOPOIListStatus.Valid;
-      case POIStatus.ShieldPending:
-        return TXOPOIListStatus.ShieldPending;
-      case POIStatus.ShieldBlocked:
-        return TXOPOIListStatus.ShieldBlocked;
-      case POIStatus.TransactProofSubmitted:
-        return TXOPOIListStatus.TransactProofSubmitted;
-      case POIStatus.Missing:
-        return TXOPOIListStatus.Missing;
-    }
-  };
 
   private static getPOISettings(chain: Chain) {
     const network = networkForChain(chain);
@@ -62,56 +43,45 @@ export class WalletPOINodeInterface extends POINodeInterface {
 
   // eslint-disable-next-line class-methods-use-this
   isActive(chain: Chain): boolean {
-    return WalletPOINodeInterface.getPOISettings(chain) != null;
+    return TestWalletPOINodeInterface.getPOISettings(chain) != null;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async getPOIsPerList(
     txidVersion: TXIDVersion,
-    chain: Chain,
+    _chain: Chain,
     listKeys: string[],
     blindedCommitmentDatas: BlindedCommitmentData[],
   ): Promise<{ [blindedCommitment: string]: POIsPerList }> {
-    const poisPerList = await this.poiNodeRequest.getPOIsPerList(
-      txidVersion,
-      chain,
-      listKeys,
-      blindedCommitmentDatas,
-    );
-
-    const poisPerListConverted: { [blindedCommitment: string]: POIsPerList } =
-      {};
-    for (const blindedCommitment of Object.keys(poisPerList)) {
-      poisPerListConverted[blindedCommitment] = {};
-      for (const listKey of Object.keys(poisPerList[blindedCommitment])) {
-        const poiStatus = poisPerList[blindedCommitment][listKey];
-        poisPerListConverted[blindedCommitment][listKey] =
-          WalletPOINodeInterface.poiStatusToTXOPOIStatus(poiStatus);
-      }
-    }
-    return poisPerListConverted;
+    const allMissing: { [blindedCommitment: string]: POIsPerList } = {};
+    blindedCommitmentDatas.forEach(blindedCommitmentData => {
+      allMissing[blindedCommitmentData.blindedCommitment] ??= {};
+      listKeys.forEach(listKey => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        allMissing[blindedCommitmentData.blindedCommitment][listKey] =
+          TXOPOIListStatus.Missing;
+      });
+    });
+    return allMissing;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private async getPOIMerkleProofs(
-    txidVersion: TXIDVersion,
     chain: Chain,
     listKey: string,
     proofInputs: POIEngineProofInputs,
     railgunTransactionBlockNumber: number,
   ): Promise<MerkleProof[]> {
-    const { launchBlock } = WalletPOINodeInterface.getPOISettings(chain);
+    const { launchBlock } = TestWalletPOINodeInterface.getPOISettings(chain);
 
     if (railgunTransactionBlockNumber < launchBlock) {
       return proofInputs.blindedCommitmentsIn.map(createDummyMerkleProof);
     }
 
-    return this.poiNodeRequest.getPOIMerkleProofs(
-      txidVersion,
-      chain,
-      listKey,
-      proofInputs.blindedCommitmentsIn,
-    );
+    throw new Error('Could not get merkle proofs - no POI node');
   }
 
+  // eslint-disable-next-line class-methods-use-this
   async generateAndSubmitPOI(
     txidVersion: TXIDVersion,
     chain: Chain,
@@ -122,7 +92,6 @@ export class WalletPOINodeInterface extends POINodeInterface {
     railgunTransactionBlockNumber: number,
   ): Promise<void> {
     const poiMerkleProofs = await this.getPOIMerkleProofs(
-      txidVersion,
       chain,
       listKey,
       proofInputs,
@@ -151,19 +120,6 @@ export class WalletPOINodeInterface extends POINodeInterface {
       progressCallback,
     );
 
-    const transactProofData: TransactProofData = {
-      snarkProof: proof,
-      poiMerkleroots: poiMerkleProofs.map(merkleProof => merkleProof.root),
-      txidMerkleroot: proofInputs.anyRailgunTxidMerklerootAfterTransaction,
-      txidMerklerootIndex,
-      blindedCommitmentOutputs: blindedCommitmentsOut,
-    };
-
-    return this.poiNodeRequest.submitPOI(
-      txidVersion,
-      chain,
-      listKey,
-      transactProofData,
-    );
+    throw new Error('Could not submit POI - no POI node');
   }
 }

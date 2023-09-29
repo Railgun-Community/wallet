@@ -1,6 +1,7 @@
 import { AccumulatedEvents, Chain } from '@railgun-community/engine';
 import {
   NetworkName,
+  TXIDVersion,
   isDefined,
   networkForChain,
   removeUndefineds,
@@ -46,7 +47,8 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
-export const quickSyncEventsGraph = async (
+export const quickSyncEventsGraphV2 = async (
+  txidVersion: TXIDVersion,
   chain: Chain,
   startingBlock: number,
 ): Promise<AccumulatedEvents> => {
@@ -54,6 +56,12 @@ export const quickSyncEventsGraph = async (
   if (!network || !network.shouldQuickSync) {
     // Return empty logs, Engine will default to full scan.
     return EMPTY_EVENTS;
+  }
+
+  if (txidVersion !== TXIDVersion.V2_PoseidonMerkle) {
+    throw new Error(
+      'Only TXIDVersion.V2_PoseidonMerkle is supported by subgraph',
+    );
   }
 
   const sdk = getBuiltGraphSDK(network.name);

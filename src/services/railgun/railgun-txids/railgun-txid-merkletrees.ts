@@ -1,7 +1,12 @@
-import { NETWORK_CONFIG, NetworkName } from '@railgun-community/shared-models';
+import {
+  NETWORK_CONFIG,
+  NetworkName,
+  TXIDVersion,
+} from '@railgun-community/shared-models';
 import { getEngine } from '../core';
 
 export const validateRailgunTxidMerkleroot = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   tree: number,
   index: number,
@@ -9,6 +14,7 @@ export const validateRailgunTxidMerkleroot = (
 ): Promise<boolean> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   return getEngine().validateHistoricalRailgunTxidMerkleroot(
+    txidVersion,
     chain,
     tree,
     index,
@@ -17,6 +23,7 @@ export const validateRailgunTxidMerkleroot = (
 };
 
 export const validateRailgunTxidOccurredBeforeBlockNumber = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   tree: number,
   index: number,
@@ -24,6 +31,7 @@ export const validateRailgunTxidOccurredBeforeBlockNumber = (
 ): Promise<boolean> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   return getEngine().validateRailgunTxidOccurredBeforeBlockNumber(
+    txidVersion,
     chain,
     tree,
     index,
@@ -31,36 +39,46 @@ export const validateRailgunTxidOccurredBeforeBlockNumber = (
   );
 };
 
-export const fullResetRailgunTxidMerkletrees = async (
-  networkName: NetworkName,
-) => {
+export const fullResetTXIDMerkletrees = async (networkName: NetworkName) => {
   const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().fullResetRailgunTxidMerkletrees(chain);
+  return getEngine().fullResetTXIDMerkletrees(chain);
 };
 
 export const resetRailgunTxidsAfterTxidIndex = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   txidIndex: number,
 ): Promise<void> => {
   const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().resetRailgunTxidsAfterTxidIndex(chain, txidIndex);
+  return getEngine().resetRailgunTxidsAfterTxidIndex(
+    txidVersion,
+    chain,
+    txidIndex,
+  );
 };
 
 export const getLatestRailgunTxidData = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
 ): Promise<{
   txidIndex: number;
   merkleroot: string;
 }> => {
   const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().getLatestRailgunTxidData(chain);
+  return getEngine().getLatestRailgunTxidData(txidVersion, chain);
 };
 
 export const getRailgunTxidMerkleroot = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   tree: number,
   index: number,
 ) => {
   const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().getHistoricalRailgunTxidMerkleroot(chain, tree, index);
+  return getEngine().getHistoricalRailgunTxidMerkleroot(
+    txidVersion,
+    chain,
+    tree,
+    index,
+  );
 };

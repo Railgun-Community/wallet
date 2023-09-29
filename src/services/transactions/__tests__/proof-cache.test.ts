@@ -8,6 +8,7 @@ import {
   NetworkName,
   RailgunNFTAmount,
   RailgunERC20Recipient,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   MOCK_NFT_AMOUNTS,
@@ -26,6 +27,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const networkName = NetworkName.BNBChain;
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 const railgunWalletID = '123';
 const showSenderAddressToRecipient = true;
 const memoText = 'Some memo';
@@ -59,8 +61,9 @@ const overallBatchMinGasPrice = BigInt('0x1000');
 
 const setCached = (proofType: ProofType) => {
   setCachedProvedTransaction({
-    transaction: {} as ContractTransaction,
     proofType,
+    txidVersion,
+    transaction: {} as ContractTransaction,
     showSenderAddressToRecipient,
     memoText,
     railgunWalletID,
@@ -83,6 +86,7 @@ describe('proof-cache', () => {
     setCachedProvedTransaction(undefined);
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.CrossContractCalls,
         railgunWalletID,
@@ -106,6 +110,7 @@ describe('proof-cache', () => {
     // Same same
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.CrossContractCalls,
         railgunWalletID,
@@ -126,6 +131,29 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        'something else' as any,
+        networkName,
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
+        crossContractCalls,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+      ),
+    ).to.throw('Mismatch: txidVersion.');
+
+    expect(() =>
+      validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.Unshield,
         railgunWalletID,
@@ -146,6 +174,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.Transfer,
         railgunWalletID,
@@ -166,6 +195,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.CrossContractCalls,
         '987',
@@ -190,6 +220,7 @@ describe('proof-cache', () => {
     // Requires ProofType.Transfer
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.Transfer,
         railgunWalletID,
@@ -211,6 +242,7 @@ describe('proof-cache', () => {
     // Requires ProofType.Transfer
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.Transfer,
         railgunWalletID,
@@ -232,6 +264,7 @@ describe('proof-cache', () => {
     // Requires ProofType.Transfer
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.Transfer,
         railgunWalletID,
@@ -260,6 +293,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.CrossContractCalls,
         railgunWalletID,
@@ -281,6 +315,7 @@ describe('proof-cache', () => {
     // Note: requires ProofType.CrossContractCalls
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.CrossContractCalls,
         railgunWalletID,
@@ -307,6 +342,7 @@ describe('proof-cache', () => {
     // Note: requires ProofType.CrossContractCalls
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.CrossContractCalls,
         railgunWalletID,
@@ -327,6 +363,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
         ProofType.CrossContractCalls,
@@ -353,6 +390,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
         ProofType.CrossContractCalls,
@@ -374,6 +412,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
         ProofType.CrossContractCalls,
@@ -395,6 +434,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         // proofType (ProofType.Transfer) will not validate relayAdaptUnshieldERC20Amounts.. requires ProofType.CrossContractCalls
         ProofType.CrossContractCalls,
@@ -416,6 +456,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.CrossContractCalls,
         railgunWalletID,
@@ -440,6 +481,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.CrossContractCalls,
         railgunWalletID,
@@ -460,6 +502,7 @@ describe('proof-cache', () => {
 
     expect(() =>
       validateCachedProvedTransaction(
+        txidVersion,
         networkName,
         ProofType.CrossContractCalls,
         railgunWalletID,

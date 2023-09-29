@@ -4,6 +4,7 @@ import {
   ProofType,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
@@ -25,6 +26,7 @@ import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contra
 import { reportAndSanitizeError } from '../../utils/error';
 
 export const generateUnshieldProof = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
@@ -42,6 +44,7 @@ export const generateUnshieldProof = async (
       ProofType.Unshield,
       networkName,
       railgunWalletID,
+      txidVersion,
       encryptionKey,
       false, // showSenderAddressToRecipient
       undefined, // memoText
@@ -60,6 +63,7 @@ export const generateUnshieldProof = async (
 
     setCachedProvedTransaction({
       proofType: ProofType.Unshield,
+      txidVersion,
       railgunWalletID,
       showSenderAddressToRecipient: false,
       memoText: undefined,
@@ -82,6 +86,7 @@ export const generateUnshieldProof = async (
 };
 
 export const generateUnshieldBaseTokenProof = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   publicWalletAddress: string,
   railgunWalletID: string,
@@ -126,6 +131,7 @@ export const generateUnshieldBaseTokenProof = async (
       ProofType.UnshieldBaseToken,
       networkName,
       railgunWalletID,
+      txidVersion,
       encryptionKey,
       false, // showSenderAddressToRecipient
       undefined, // memoText
@@ -156,6 +162,7 @@ export const generateUnshieldBaseTokenProof = async (
       ProofType.UnshieldBaseToken,
       networkName,
       railgunWalletID,
+      txidVersion,
       encryptionKey,
       showSenderAddressToRecipient,
       memoText,
@@ -181,6 +188,7 @@ export const generateUnshieldBaseTokenProof = async (
 
     setCachedProvedTransaction({
       proofType: ProofType.UnshieldBaseToken,
+      txidVersion,
       railgunWalletID,
       showSenderAddressToRecipient,
       memoText,

@@ -1,6 +1,6 @@
 import { Chain } from '@railgun-community/engine';
 import { POINodeRequest } from './poi-node-request';
-import { isDefined } from '@railgun-community/shared-models';
+import { TXIDVersion, isDefined } from '@railgun-community/shared-models';
 
 export class WalletPOIRequester {
   private poiNodeRequest: Optional<POINodeRequest>;
@@ -12,6 +12,7 @@ export class WalletPOIRequester {
   }
 
   async validateRailgunTxidMerkleroot(
+    txidVersion: TXIDVersion,
     chain: Chain,
     tree: number,
     index: number,
@@ -21,6 +22,7 @@ export class WalletPOIRequester {
       return false;
     }
     return this.poiNodeRequest.validateRailgunTxidMerkleroot(
+      txidVersion,
       chain,
       tree,
       index,
@@ -29,12 +31,14 @@ export class WalletPOIRequester {
   }
 
   async getLatestValidatedRailgunTxid(
+    txidVersion: TXIDVersion,
     chain: Chain,
   ): Promise<{ txidIndex: Optional<number>; merkleroot: Optional<string> }> {
     if (!this.poiNodeRequest) {
       return { txidIndex: undefined, merkleroot: undefined };
     }
     const txidStatus = await this.poiNodeRequest.getLatestValidatedRailgunTxid(
+      txidVersion,
       chain,
     );
     return {

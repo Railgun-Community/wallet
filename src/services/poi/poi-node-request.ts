@@ -9,6 +9,8 @@ import {
   BlindedCommitmentData,
   POIsPerListMap,
   ValidatedRailgunTxidStatus,
+  TXIDVersion,
+  GetLatestValidatedRailgunTxidParams,
 } from '@railgun-community/shared-models';
 import axios, { AxiosError } from 'axios';
 import { sendErrorMessage } from '../../utils';
@@ -24,22 +26,22 @@ export class POINodeRequest {
     return `${this.nodeURL}/${route}`;
   };
 
-  private static async getRequest<ResponseData>(
-    url: string,
-  ): Promise<ResponseData> {
-    try {
-      const { data }: { data: ResponseData } = await axios.get(url);
-      return data;
-    } catch (err) {
-      if (!(err instanceof AxiosError)) {
-        throw err;
-      }
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      const errMessage = `${err.message}: ${err.response?.data}`;
-      sendErrorMessage(`POI REQUEST ERROR ${url} - ${errMessage}`);
-      throw new Error(errMessage);
-    }
-  }
+  // private static async getRequest<ResponseData>(
+  //   url: string,
+  // ): Promise<ResponseData> {
+  //   try {
+  //     const { data }: { data: ResponseData } = await axios.get(url);
+  //     return data;
+  //   } catch (err) {
+  //     if (!(err instanceof AxiosError)) {
+  //       throw err;
+  //     }
+  //     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  //     const errMessage = `${err.message}: ${err.response?.data}`;
+  //     sendErrorMessage(`POI REQUEST ERROR ${url} - ${errMessage}`);
+  //     throw new Error(errMessage);
+  //   }
+  // }
 
   private static async postRequest<Params, ResponseData>(
     url: string,
@@ -60,6 +62,7 @@ export class POINodeRequest {
   }
 
   validateRailgunTxidMerkleroot = async (
+    txidVersion: TXIDVersion,
     chain: Chain,
     tree: number,
     index: number,
@@ -71,6 +74,7 @@ export class POINodeRequest {
       ValidateTxidMerklerootParams,
       boolean
     >(url, {
+      txidVersion,
       tree,
       index,
       merkleroot,
@@ -79,17 +83,20 @@ export class POINodeRequest {
   };
 
   getLatestValidatedRailgunTxid = async (
+    txidVersion: TXIDVersion,
     chain: Chain,
   ): Promise<ValidatedRailgunTxidStatus> => {
     const route = `validated-txid/${chain.type}/${chain.id}`;
     const url = this.getNodeRouteURL(route);
-    const status = await POINodeRequest.getRequest<ValidatedRailgunTxidStatus>(
-      url,
-    );
+    const status = await POINodeRequest.postRequest<
+      GetLatestValidatedRailgunTxidParams,
+      ValidatedRailgunTxidStatus
+    >(url, { txidVersion });
     return status;
   };
 
   getPOIsPerList = async (
+    txidVersion: TXIDVersion,
     chain: Chain,
     listKeys: string[],
     blindedCommitmentDatas: BlindedCommitmentData[],
@@ -101,6 +108,7 @@ export class POINodeRequest {
       GetPOIsPerListParams,
       POIsPerListMap
     >(url, {
+      txidVersion,
       listKeys,
       blindedCommitmentDatas,
     });
@@ -108,6 +116,7 @@ export class POINodeRequest {
   };
 
   getPOIMerkleProofs = async (
+    txidVersion: TXIDVersion,
     chain: Chain,
     listKey: string,
     blindedCommitments: string[],
@@ -119,6 +128,7 @@ export class POINodeRequest {
       GetMerkleProofsParams,
       MerkleProof[]
     >(url, {
+      txidVersion,
       listKey,
       blindedCommitments,
     });
@@ -126,6 +136,7 @@ export class POINodeRequest {
   };
 
   submitPOI = async (
+    txidVersion: TXIDVersion,
     chain: Chain,
     listKey: string,
     transactProofData: TransactProofData,
@@ -134,6 +145,7 @@ export class POINodeRequest {
     const url = this.getNodeRouteURL(route);
 
     await POINodeRequest.postRequest<SubmitTransactProofParams, void>(url, {
+      txidVersion,
       listKey,
       transactProofData,
     });

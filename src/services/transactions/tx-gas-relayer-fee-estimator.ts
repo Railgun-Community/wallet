@@ -8,6 +8,7 @@ import {
   calculateMaximumGas,
   RailgunERC20AmountRecipient,
   CommitmentSummary,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   DUMMY_FROM_ADDRESS,
@@ -54,6 +55,7 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
   generateTransaction: (
     serializedTransactions: TransactionStruct[],
   ) => Promise<ContractTransaction>,
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
@@ -108,6 +110,7 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
 
   // Get private balance of matching token.
   const balanceForRelayerFeeERC20 = await balanceForERC20Token(
+    txidVersion,
     wallet,
     networkName,
     feeTokenDetails.tokenAddress,

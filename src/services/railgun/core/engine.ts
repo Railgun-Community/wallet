@@ -24,11 +24,12 @@ import {
 } from './artifacts';
 import { ArtifactStore } from '../../artifacts/artifact-store';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { quickSyncEventsGraph } from '../quick-sync/quick-sync-events-graph';
+import { quickSyncEventsGraphV2 } from '../quick-sync/quick-sync-events-graph';
 import { quickSyncRailgunTransactions } from '../railgun-txids/railgun-tx-sync-graph';
 import { WalletPOIRequester } from '../../poi/wallet-poi-requester';
 import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
 import { WalletPOI } from '../../poi/wallet-poi';
+import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
 
 let engine: Optional<RailgunEngine>;
 
@@ -118,29 +119,6 @@ export const setOnMerkletreeScanCallback = (
   );
 };
 
-const getPOITxidMerklerootValidator = (
-  poiNodeURL?: string,
-): MerklerootValidator => {
-  const poiRequester = new WalletPOIRequester(poiNodeURL);
-  const txidMerklerootValidator: MerklerootValidator = (
-    chain,
-    tree,
-    index,
-    merkleroot,
-  ) =>
-    poiRequester.validateRailgunTxidMerkleroot(chain, tree, index, merkleroot);
-  return txidMerklerootValidator;
-};
-
-const getPOILatestValidatedRailgunTxid = (
-  poiNodeURL?: string,
-): GetLatestValidatedRailgunTxid => {
-  const poiRequester = new WalletPOIRequester(poiNodeURL);
-  const getLatestValidatedRailgunTxid: GetLatestValidatedRailgunTxid = chain =>
-    poiRequester.getLatestValidatedRailgunTxid(chain);
-  return getLatestValidatedRailgunTxid;
-};
-
 /**
  *
  * @param walletSource - Name for your wallet implementation. Encrypted and viewable in private transaction history. Maximum of 16 characters, lowercase.
@@ -174,16 +152,17 @@ export const startRailgunEngine = (
       walletSource,
       db,
       artifactGetterDownloadJustInTime,
-      quickSyncEventsGraph,
+      quickSyncEventsGraphV2,
       quickSyncRailgunTransactions,
-      getPOITxidMerklerootValidator(poiNodeURL),
-      getPOILatestValidatedRailgunTxid(poiNodeURL),
+      WalletPOI.getPOITxidMerklerootValidator(poiNodeURL),
+      WalletPOI.getPOILatestValidatedRailgunTxid(poiNodeURL),
       shouldDebug ? createEngineDebugger() : undefined,
       skipMerkletreeScans,
     );
 
     if (isDefined(poiNodeURL)) {
-      WalletPOI.init(poiNodeURL, customPOILists ?? [], engine);
+      const poiNodeInterface = new WalletPOINodeInterface(poiNodeURL, engine);
+      WalletPOI.init(poiNodeInterface, customPOILists ?? []);
     }
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngine.name, err);
@@ -205,7 +184,7 @@ export const startRailgunEngineForPOINode = (
     engine = RailgunEngine.initForPOINode(
       db,
       artifactGetterDownloadJustInTime,
-      quickSyncEventsGraph,
+      quickSyncEventsGraphV2,
       quickSyncRailgunTransactions,
       shouldDebug ? createEngineDebugger() : undefined,
     );

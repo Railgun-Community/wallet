@@ -1,3 +1,4 @@
+/// <reference types="../types/global" />
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
 import LevelDOWN from 'leveldown';
@@ -9,6 +10,7 @@ import {
   poll,
 } from '@railgun-community/shared-models';
 import {
+  getEngine,
   setOnMerkletreeScanCallback,
   startRailgunEngine,
   stopRailgunEngine,
@@ -21,6 +23,11 @@ import {
 import { loadProvider } from '../services/railgun/core/providers';
 import { ArtifactStore } from '../services/artifacts/artifact-store';
 import { setOnBalanceUpdateCallback } from '../services/railgun/wallets/balance-update';
+import { WalletPOI } from '../services/poi/wallet-poi';
+import { TestWalletPOIRequester } from './poi/test-wallet-poi-requester.test';
+import { TestWalletPOINodeInterface } from './poi/test-wallet-poi-node-interface.test';
+import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
+import { GetLatestValidatedRailgunTxid } from '@railgun-community/engine';
 
 const ENGINE_TEST_DB = 'test.db';
 const db = new LevelDOWN(ENGINE_TEST_DB);
@@ -73,6 +80,30 @@ export const clearMerkletreeScanStatus = () => {
 };
 
 export const initTestEngine = (useNativeArtifacts = false) => {
+  // SETUP TEST WALLET POI REQUESTER
+  const testPOIRequester = new TestWalletPOIRequester();
+  const txidMerklerootValidator: MerklerootValidator = (
+    txidVersion,
+    chain,
+    tree,
+    index,
+    merkleroot,
+  ) =>
+    testPOIRequester.validateRailgunTxidMerkleroot(
+      txidVersion,
+      chain,
+      tree,
+      index,
+      merkleroot,
+    );
+  WalletPOI.getPOITxidMerklerootValidator = () => txidMerklerootValidator;
+  const getLatestValidatedRailgunTxid: GetLatestValidatedRailgunTxid = (
+    txidVersion,
+    chain,
+  ) => testPOIRequester.getLatestValidatedRailgunTxid(txidVersion, chain);
+  WalletPOI.getPOILatestValidatedRailgunTxid = () =>
+    getLatestValidatedRailgunTxid;
+
   const shouldDebug = false;
   startRailgunEngine(
     TEST_WALLET_SOURCE,
@@ -83,6 +114,10 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     false, // skipMerkletreeScans
     undefined, // poiNodeURL
   );
+
+  const engine = getEngine();
+  const testPOINodeInterface = new TestWalletPOINodeInterface(engine);
+  WalletPOI.init(testPOINodeInterface, []);
 
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);
   setOnMerkletreeScanCallback(merkletreeHistoryScanCallback);

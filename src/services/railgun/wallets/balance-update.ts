@@ -2,9 +2,9 @@ import {
   Chain,
   AbstractWallet,
   TokenType,
-  Balances,
   EngineEvent,
   WalletScannedEventData,
+  TokenBalances,
 } from '@railgun-community/engine';
 import {
   RailgunBalancesEvent,
@@ -12,6 +12,7 @@ import {
   RailgunERC20Amount,
   NetworkName,
   NETWORK_CONFIG,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
 import { parseRailgunTokenAddress } from '../util/bytes';
@@ -30,7 +31,7 @@ export const setOnBalanceUpdateCallback = (
 };
 
 const getSerializedERC20Balances = (
-  balances: Balances,
+  balances: TokenBalances,
 ): RailgunERC20Amount[] => {
   const tokenHashes = Object.keys(balances);
 
@@ -49,7 +50,7 @@ const getSerializedERC20Balances = (
     });
 };
 
-const getNFTBalances = (balances: Balances): RailgunNFTAmount[] => {
+const getNFTBalances = (balances: TokenBalances): RailgunNFTAmount[] => {
   const tokenHashes = Object.keys(balances);
 
   return tokenHashes
@@ -76,6 +77,7 @@ const getNFTBalances = (balances: Balances): RailgunNFTAmount[] => {
 };
 
 export const onBalancesUpdate = async (
+  txidVersion: TXIDVersion,
   wallet: AbstractWallet,
   chain: Chain,
 ): Promise<void> => {
@@ -86,11 +88,15 @@ export const onBalancesUpdate = async (
     return;
   }
 
-  const balances = await wallet.balances(chain);
-  const erc20Amounts = getSerializedERC20Balances(balances);
-  const nftAmounts = getNFTBalances(balances);
+  const tokenBalances = await wallet.getTokenBalancesByTxidVersion(
+    txidVersion,
+    chain,
+  );
+  const erc20Amounts = getSerializedERC20Balances(tokenBalances);
+  const nftAmounts = getNFTBalances(tokenBalances);
 
   const balancesEvent: RailgunBalancesEvent = {
+    txidVersion,
     chain,
     erc20Amounts,
     nftAmounts,
@@ -101,12 +107,16 @@ export const onBalancesUpdate = async (
 };
 
 export const balanceForERC20Token = async (
+  txidVersion: TXIDVersion,
   wallet: AbstractWallet,
   networkName: NetworkName,
   tokenAddress: string,
 ): Promise<bigint> => {
   const { chain } = NETWORK_CONFIG[networkName];
-  const balances = await wallet.balances(chain);
+  const balances = await wallet.getTokenBalancesByTxidVersion(
+    txidVersion,
+    chain,
+  );
   const tokenBalances = getSerializedERC20Balances(balances);
 
   const matchingTokenBalance: Optional<RailgunERC20Amount> = tokenBalances.find(

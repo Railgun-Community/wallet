@@ -16,6 +16,7 @@ import {
   RailgunNFTAmountRecipient,
   TransactionGasDetails,
   isDefined,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   closeTestEngine,
@@ -65,6 +66,8 @@ let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
   {
@@ -209,6 +212,7 @@ describe('tx-transfer', () => {
     stubGasEstimateSuccess();
     spyOnERC20Note();
     const rsp = await gasEstimateForUnprovenTransfer(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -241,6 +245,7 @@ describe('tx-transfer', () => {
     stubGasEstimateSuccess();
     spyOnERC20Note();
     const rsp = await gasEstimateForUnprovenTransfer(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -264,6 +269,7 @@ describe('tx-transfer', () => {
     stubGasEstimateSuccess();
     await expect(
       gasEstimateForUnprovenTransfer(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,
@@ -281,6 +287,7 @@ describe('tx-transfer', () => {
     stubGasEstimateFailure();
     await expect(
       gasEstimateForUnprovenTransfer(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,
@@ -300,6 +307,7 @@ describe('tx-transfer', () => {
     stubGasEstimateSuccess();
     spyOnNFTNote();
     const rsp = await gasEstimateForUnprovenTransfer(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -328,6 +336,7 @@ describe('tx-transfer', () => {
     stubGasEstimateSuccess();
     spyOnNFTNote();
     const rsp = await gasEstimateForUnprovenTransfer(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -351,6 +360,7 @@ describe('tx-transfer', () => {
     stubGasEstimateSuccess();
     await expect(
       gasEstimateForUnprovenTransfer(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,
@@ -372,6 +382,7 @@ describe('tx-transfer', () => {
     spyOnERC20Note();
     spyOnNFTNote();
     await generateTransferProof(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -391,6 +402,7 @@ describe('tx-transfer', () => {
       MOCK_NFT_AMOUNT_RECIPIENTS[0].nftAddress,
     );
     const populateResponse = await populateProvedTransfer(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       true, // showSenderAddressToRecipient
@@ -424,6 +436,7 @@ describe('tx-transfer', () => {
     setCachedProvedTransaction(undefined);
     await expect(
       populateProvedTransfer(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         false, // showSenderAddressToRecipient
@@ -441,6 +454,7 @@ describe('tx-transfer', () => {
   it('Should error on populate transfer tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
     await generateTransferProof(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -455,6 +469,7 @@ describe('tx-transfer', () => {
     );
     await expect(
       populateProvedTransfer(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         true, // showSenderAddressToRecipient

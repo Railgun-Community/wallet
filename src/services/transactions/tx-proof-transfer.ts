@@ -3,6 +3,7 @@ import {
   ProofType,
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   generateProofTransactions,
@@ -14,6 +15,7 @@ import { ProverProgressCallback } from '@railgun-community/engine';
 import { reportAndSanitizeError } from '../../utils/error';
 
 export const generateTransferProof = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
@@ -33,6 +35,7 @@ export const generateTransferProof = async (
       ProofType.Transfer,
       networkName,
       railgunWalletID,
+      txidVersion,
       encryptionKey,
       showSenderAddressToRecipient,
       memoText,
@@ -51,6 +54,7 @@ export const generateTransferProof = async (
 
     setCachedProvedTransaction({
       proofType: ProofType.Transfer,
+      txidVersion,
       railgunWalletID,
       showSenderAddressToRecipient,
       memoText,

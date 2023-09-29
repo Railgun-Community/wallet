@@ -12,6 +12,7 @@ import {
   TransactionGasDetails,
   isDefined,
   RailgunERC20Recipient,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
@@ -126,6 +127,7 @@ const createRelayAdaptShieldNFTRecipients = (
 };
 
 export const populateProvedCrossContractCalls = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[],
@@ -140,6 +142,7 @@ export const populateProvedCrossContractCalls = async (
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     const { transaction, nullifiers } = await populateProvedTransaction(
+      txidVersion,
       networkName,
       ProofType.CrossContractCalls,
       railgunWalletID,
@@ -169,6 +172,7 @@ export const populateProvedCrossContractCalls = async (
 };
 
 export const gasEstimateForUnprovenCrossContractCalls = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
@@ -220,6 +224,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           ProofType.CrossContractCalls,
           networkName,
           railgunWalletID,
+          txidVersion,
           encryptionKey,
           false, // showSenderAddressToRecipient
           undefined, // memoText
@@ -247,6 +252,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
         delete transaction.gasLimit;
         return transaction;
       },
+      txidVersion,
       networkName,
       railgunWalletID,
       relayAdaptUnshieldERC20AmountRecipients,
@@ -274,6 +280,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
 };
 
 export const generateCrossContractCallsProof = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
@@ -312,6 +319,7 @@ export const generateCrossContractCallsProof = async (
       ProofType.CrossContractCalls,
       networkName,
       railgunWalletID,
+      txidVersion,
       encryptionKey,
       false, // showSenderAddressToRecipient
       undefined, // memoText
@@ -356,6 +364,7 @@ export const generateCrossContractCallsProof = async (
       ProofType.CrossContractCalls,
       networkName,
       railgunWalletID,
+      txidVersion,
       encryptionKey,
       false, // showSenderAddressToRecipient
       undefined, // memoText
@@ -384,6 +393,7 @@ export const generateCrossContractCallsProof = async (
 
     setCachedProvedTransaction({
       proofType: ProofType.CrossContractCalls,
+      txidVersion,
       railgunWalletID,
       showSenderAddressToRecipient: false,
       memoText: undefined,

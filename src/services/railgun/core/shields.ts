@@ -1,5 +1,10 @@
-import { NETWORK_CONFIG, NetworkName } from '@railgun-community/shared-models';
+import {
+  NETWORK_CONFIG,
+  NetworkName,
+  TXIDVersion,
+} from '@railgun-community/shared-models';
 import { getEngine } from './engine';
+import { ACTIVE_TXID_VERSIONS } from '@railgun-community/engine';
 
 export type ShieldData = {
   txid: string;
@@ -9,15 +14,36 @@ export type ShieldData = {
   blockNumber: number;
   utxoTree: number;
   utxoIndex: number;
+  txidVersion: TXIDVersion;
 };
 
 export const getAllShields = async (
   networkName: NetworkName,
   startingBlock: number,
-) => {
+): Promise<ShieldData[]> => {
+  const shieldsForEachTxidVersion = await Promise.all(
+    ACTIVE_TXID_VERSIONS.map(async txidVersion => {
+      const shields = await getShieldsForTXIDVersion(
+        txidVersion,
+        networkName,
+        startingBlock,
+      );
+
+      return shields;
+    }),
+  );
+  return shieldsForEachTxidVersion.flat();
+};
+
+const getShieldsForTXIDVersion = async (
+  txidVersion: TXIDVersion,
+  networkName: NetworkName,
+  startingBlock: number,
+): Promise<ShieldData[]> => {
   const engine = getEngine();
   const { chain } = NETWORK_CONFIG[networkName];
   const shieldCommitments = await engine.getAllShieldCommitments(
+    txidVersion,
     chain,
     startingBlock,
   );
@@ -31,6 +57,7 @@ export const getAllShields = async (
       utxoIndex: commitment.utxoIndex,
       timestamp: commitment.timestamp,
       blockNumber: commitment.blockNumber,
+      txidVersion,
     };
     return shieldData;
   });

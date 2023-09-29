@@ -3,27 +3,34 @@ import {
   TXOsSpentPOIStatusInfo,
 } from '@railgun-community/engine';
 import { walletForID } from '../railgun/core';
-import { NETWORK_CONFIG, NetworkName } from '@railgun-community/shared-models';
+import {
+  NETWORK_CONFIG,
+  NetworkName,
+  TXIDVersion,
+} from '@railgun-community/shared-models';
 
 export const getTXOsReceivedPOIStatusInfoForWallet = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   walletID: string,
 ): Promise<TXOsReceivedPOIStatusInfo[]> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   const wallet = walletForID(walletID);
-  return wallet.getTXOsReceivedPOIStatusInfo(chain);
+  return wallet.getTXOsReceivedPOIStatusInfo(txidVersion, chain);
 };
 
 export const getTXOsSpentPOIStatusInfoForWallet = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   walletID: string,
 ): Promise<TXOsSpentPOIStatusInfo[]> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   const wallet = walletForID(walletID);
-  return wallet.getTXOsSpentPOIStatusInfo(chain);
+  return wallet.getTXOsSpentPOIStatusInfo(txidVersion, chain);
 };
 
 export const generatePOIForWalletAndRailgunTxid = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   walletID: string,
   railgunTxid: string,
@@ -32,21 +39,24 @@ export const generatePOIForWalletAndRailgunTxid = (
   const wallet = walletForID(walletID);
   return wallet.generatePOIsAllSentCommitmentsAndUnshieldEvents(
     chain,
+    txidVersion,
     railgunTxid,
   );
 };
 
 export const refreshReceivePOIsForWallet = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   walletID: string,
   railgunTxid?: string,
 ): Promise<void> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   const wallet = walletForID(walletID);
-  return wallet.refreshReceivePOIsAllTXOs(chain, railgunTxid);
+  return wallet.refreshReceivePOIsAllTXOs(txidVersion, chain, railgunTxid);
 };
 
 export const refreshSpentPOIsForWallet = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   walletID: string,
   railgunTxid?: string,
@@ -54,6 +64,7 @@ export const refreshSpentPOIsForWallet = (
   const chain = NETWORK_CONFIG[networkName].chain;
   const wallet = walletForID(walletID);
   return wallet.refreshSpentPOIsAllSentCommitmentsAndUnshieldEvents(
+    txidVersion,
     chain,
     railgunTxid,
   );

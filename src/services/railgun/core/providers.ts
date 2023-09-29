@@ -5,6 +5,7 @@ import {
   NETWORK_CONFIG,
   LoadProviderResponse,
   isDefined,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
 import { getEngine } from './engine';
@@ -58,16 +59,34 @@ export const setPollingProviderForNetwork = (
   pollingProviderMap[networkName] = provider;
 };
 
-export const getUTXOMerkletreeForNetwork = (networkName: NetworkName) => {
+export const getUTXOMerkletreeForNetwork = (
+  txidVersion: TXIDVersion,
+  networkName: NetworkName,
+) => {
   const network = NETWORK_CONFIG[networkName];
   const { chain } = network;
-  const utxoMerkletree = getEngine().utxoMerkletrees[chain.type][chain.id];
+  const utxoMerkletree = getEngine().getUTXOMerkletree(txidVersion, chain);
   if (!isDefined(utxoMerkletree)) {
     throw new Error(
       `MerkleTree not yet loaded for network ${network.publicName}`,
     );
   }
   return utxoMerkletree;
+};
+
+export const getTXIDMerkletreeForNetwork = (
+  txidVersion: TXIDVersion,
+  networkName: NetworkName,
+) => {
+  const network = NETWORK_CONFIG[networkName];
+  const { chain } = network;
+  const txidMerkletree = getEngine().getTXIDMerkletree(txidVersion, chain);
+  if (!isDefined(txidMerkletree)) {
+    throw new Error(
+      `MerkleTree not yet loaded for network ${network.publicName}`,
+    );
+  }
+  return txidMerkletree;
 };
 
 export const getRailgunSmartWalletContractForNetwork = (
@@ -154,7 +173,7 @@ const loadProviderForNetwork = async (
   const {
     proxyContract,
     relayAdaptContract,
-    deploymentBlock,
+    deploymentBlock: deploymentBlockV2,
     publicName,
     poi,
   } = network;
@@ -174,6 +193,10 @@ const loadProviderForNetwork = async (
     );
   }
 
+  const deploymentBlocks: Record<TXIDVersion, number> = {
+    [TXIDVersion.V2_PoseidonMerkle]: deploymentBlockV2 ?? 0,
+  };
+
   // This function will set up the contracts for this chain.
   // Throws if provider does not respond.
   await engine.loadNetwork(
@@ -182,7 +205,7 @@ const loadProviderForNetwork = async (
     relayAdaptContract,
     fallbackProvider,
     pollingProvider,
-    deploymentBlock ?? 0,
+    deploymentBlocks,
     poi?.launchBlock,
   );
 

@@ -1,9 +1,13 @@
 import { Chain } from '@railgun-community/engine';
-import { RailgunBalanceRefreshTrigger } from '@railgun-community/shared-models';
+import {
+  RailgunBalanceRefreshTrigger,
+  TXIDVersion,
+} from '@railgun-community/shared-models';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { getEngine, walletForID } from '../core/engine';
 
 export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
+  txidVersion: TXIDVersion,
   chain: Chain,
   railgunWalletID: string,
   fullRescan: boolean,
@@ -12,9 +16,9 @@ export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
   try {
     const wallet = walletForID(railgunWalletID);
     if (fullRescan) {
-      await wallet.fullRescanBalances(chain, progressCallback);
+      await wallet.fullRescanBalances(txidVersion, chain, progressCallback);
     } else {
-      await wallet.scanBalances(chain, progressCallback);
+      await wallet.scanBalances(txidVersion, chain, progressCallback);
     }
 
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
@@ -61,16 +65,17 @@ export const rescanFullUTXOMerkletreesAndWallets = async (
 export const resetFullTXIDMerkletrees = async (chain: Chain): Promise<void> => {
   try {
     const engine = getEngine();
-    await engine.fullResetRailgunTxidMerkletrees(chain);
+    await engine.fullResetTXIDMerkletrees(chain);
   } catch (err) {
     throw reportAndSanitizeError(resetFullTXIDMerkletrees.name, err);
   }
 };
 
 export const fullRescanBalancesAllWallets = async (
+  txidVersion: TXIDVersion,
   chain: Chain,
   progressCallback?: (progress: number) => void,
 ): Promise<void> => {
   const engine = getEngine();
-  await engine.scanAllWallets(chain, progressCallback);
+  await engine.scanAllWallets(txidVersion, chain, progressCallback);
 };

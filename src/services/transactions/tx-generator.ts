@@ -18,6 +18,7 @@ import {
   ProofType,
   RailgunNFTAmountRecipient,
   NFTTokenType,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { fullWalletForID, walletForID } from '../railgun/core/engine';
 import {
@@ -41,6 +42,7 @@ export const generateProofTransactions = async (
   proofType: ProofType,
   networkName: NetworkName,
   railgunWalletID: string,
+  txidVersion: TXIDVersion,
   encryptionKey: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
@@ -60,6 +62,7 @@ export const generateProofTransactions = async (
     erc20AmountRecipients,
     nftAmountRecipients,
     railgunWallet,
+    txidVersion,
     encryptionKey,
     showSenderAddressToRecipient,
     memoText,
@@ -94,6 +97,7 @@ export const generateDummyProofTransactions = async (
   proofType: ProofType,
   networkName: NetworkName,
   railgunWalletID: string,
+  txidVersion: TXIDVersion,
   encryptionKey: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
@@ -124,6 +128,7 @@ export const generateDummyProofTransactions = async (
     proofType,
     networkName,
     railgunWalletID,
+    txidVersion,
     encryptionKey,
     showSenderAddressToRecipient,
     memoText,
@@ -186,6 +191,7 @@ const transactionsFromERC20Amounts = async (
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   railgunWallet: RailgunWallet,
+  txidVersion: TXIDVersion,
   encryptionKey: string,
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
@@ -258,6 +264,7 @@ const transactionsFromERC20Amounts = async (
   const txBatches = await generateAllProofs(
     transactionBatch,
     railgunWallet,
+    txidVersion,
     encryptionKey,
     useDummyProof,
     progressCallback,
@@ -419,6 +426,7 @@ const addTransactionOutputsUnshieldNFT = (
 const generateAllProofs = (
   transactionBatch: TransactionBatch,
   railgunWallet: RailgunWallet,
+  txidVersion: TXIDVersion,
   encryptionKey: string,
   useDummyProof: boolean,
   progressCallback: ProverProgressCallback,
@@ -428,11 +436,13 @@ const generateAllProofs = (
     ? transactionBatch.generateDummyTransactions(
         prover,
         railgunWallet,
+        txidVersion,
         encryptionKey,
       )
     : transactionBatch.generateTransactions(
         prover,
         railgunWallet,
+        txidVersion,
         encryptionKey,
         progressCallback,
       );

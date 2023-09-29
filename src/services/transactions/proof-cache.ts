@@ -8,6 +8,7 @@ import {
   TransactionGasDetails,
   isDefined,
   RailgunERC20Recipient,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { shouldSetOverallBatchMinGasPriceForNetwork } from '../../utils/gas-price';
 import { compareContractTransactionArrays } from '../../utils/utils';
@@ -24,6 +25,7 @@ import { ContractTransaction } from 'ethers';
 
 export type ProvedTransaction = {
   proofType: ProofType;
+  txidVersion: TXIDVersion;
   transaction: ContractTransaction;
   railgunWalletID: string;
   showSenderAddressToRecipient: boolean;
@@ -44,6 +46,7 @@ export type ProvedTransaction = {
 let cachedProvedTransaction: Optional<ProvedTransaction>;
 
 export const populateProvedTransaction = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   proofType: ProofType,
   railgunWalletID: string,
@@ -66,6 +69,7 @@ export const populateProvedTransaction = async (
 }> => {
   try {
     validateCachedProvedTransaction(
+      txidVersion,
       networkName,
       proofType,
       railgunWalletID,
@@ -150,6 +154,7 @@ const shouldValidateCrossContractCalls = (proofType: ProofType) => {
 };
 
 export const validateCachedProvedTransaction = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   proofType: ProofType,
   railgunWalletID: string,
@@ -168,6 +173,8 @@ export const validateCachedProvedTransaction = (
 ): void => {
   if (!cachedProvedTransaction) {
     throw new Error('No proof found.');
+  } else if (cachedProvedTransaction.txidVersion !== txidVersion) {
+    throw new Error('Mismatch: txidVersion.');
   } else if (cachedProvedTransaction.proofType !== proofType) {
     throw new Error('Mismatch: proofType.');
   } else if (cachedProvedTransaction.railgunWalletID !== railgunWalletID) {

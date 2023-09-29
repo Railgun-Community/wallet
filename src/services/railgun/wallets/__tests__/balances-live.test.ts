@@ -16,6 +16,7 @@ import {
   Chain,
   NETWORK_CONFIG,
   NetworkName,
+  TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
 import { loadProvider } from '../../core/providers';
@@ -25,6 +26,8 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 let railgunWalletID: string;
+
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 const networkName = NetworkName.EthereumGoerli;
 const chain: Chain = NETWORK_CONFIG[networkName].chain;
@@ -61,10 +64,18 @@ describe('balances-live', () => {
 
   it('Should run live balance fetch, transaction history scan, and POI status info scan', async () => {
     const fullRescan = false;
-    await refreshRailgunBalances(chain, railgunWalletID, fullRescan);
+    await refreshRailgunBalances(
+      txidVersion,
+      chain,
+      railgunWalletID,
+      fullRescan,
+    );
 
     const wallet = walletForID(railgunWalletID);
-    const balances = await wallet.balances(chain);
+    const balances = await wallet.getTokenBalancesByTxidVersion(
+      txidVersion,
+      chain,
+    );
     expect(Object.keys(balances).length).to.be.greaterThanOrEqual(1);
 
     const transactionHistory = await wallet.getTransactionHistory(
@@ -73,7 +84,10 @@ describe('balances-live', () => {
     );
     expect(transactionHistory.length).to.be.greaterThanOrEqual(2);
 
-    const poiStatusReceived = await wallet.getTXOsReceivedPOIStatusInfo(chain);
+    const poiStatusReceived = await wallet.getTXOsReceivedPOIStatusInfo(
+      txidVersion,
+      chain,
+    );
     expect(poiStatusReceived.length).to.be.greaterThanOrEqual(2);
     expect(poiStatusReceived[0].railgunTxid).to.not.equal('Missing');
 

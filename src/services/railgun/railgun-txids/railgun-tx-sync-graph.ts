@@ -1,7 +1,7 @@
 import {
   Chain,
   RailgunTransaction,
-  getRailgunTransactionIDHex,
+  getRailgunTransactionIDHexV2,
   getBlindedCommitmentForUnshield,
 } from '@railgun-community/engine';
 import {
@@ -17,7 +17,7 @@ import {
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
   GraphRailgunTransactions,
-  formatRailgunTransactions,
+  formatRailgunTransactionsV2,
 } from './railgun-tx-graph-type-formatters';
 import { removeDuplicatesByID } from '../util/graph-util';
 
@@ -45,6 +45,7 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
+// NOTE: THIS WILL NEED TO CHANGE FOR V3, TO USE UNSHIELD BLINDED COMMITMENTS.
 export const getUnshieldRailgunTransactionBlindedCommitmentGroups = async (
   chain: Chain,
   txid: string,
@@ -63,13 +64,13 @@ export const getUnshieldRailgunTransactionBlindedCommitmentGroups = async (
 
   const unshieldRailgunTransactionBlindedCommitmentGroups: string[][] =
     transactions.map(transaction => {
-      const railgunTxid = getRailgunTransactionIDHex(transaction);
+      const railgunTxidV2 = getRailgunTransactionIDHexV2(transaction);
       const blindedCommitments: string[] = transaction.commitments.map(
         commitment => {
           return getBlindedCommitmentForUnshield(
             commitment,
             toAddress,
-            railgunTxid,
+            railgunTxidV2,
           );
         },
       );
@@ -105,7 +106,7 @@ export const quickSyncRailgunTransactions = async (
     removeDuplicatesByID(railgunTransactions);
 
   const formattedRailgunTransactions: RailgunTransaction[] =
-    formatRailgunTransactions(filteredRailgunTransactions);
+    formatRailgunTransactionsV2(filteredRailgunTransactions);
 
   return formattedRailgunTransactions;
 };

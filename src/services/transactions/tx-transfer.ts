@@ -8,6 +8,7 @@ import {
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
   TransactionGasDetails,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
@@ -19,6 +20,7 @@ import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relay
 import { reportAndSanitizeError } from '../../utils/error';
 
 export const populateProvedTransfer = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   showSenderAddressToRecipient: boolean,
@@ -32,6 +34,7 @@ export const populateProvedTransfer = async (
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     const { transaction, nullifiers } = await populateProvedTransaction(
+      txidVersion,
       networkName,
       ProofType.Transfer,
       railgunWalletID,
@@ -59,6 +62,7 @@ export const populateProvedTransfer = async (
 };
 
 export const gasEstimateForUnprovenTransfer = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
@@ -78,6 +82,7 @@ export const gasEstimateForUnprovenTransfer = async (
           ProofType.Transfer,
           networkName,
           railgunWalletID,
+          txidVersion,
           encryptionKey,
           false, // showSenderAddressToRecipient - doesn't matter for gas estimate.
           memoText,
@@ -93,6 +98,7 @@ export const gasEstimateForUnprovenTransfer = async (
           networkName,
           true, // useDummyProof
         ),
+      txidVersion,
       networkName,
       railgunWalletID,
       erc20AmountRecipients,

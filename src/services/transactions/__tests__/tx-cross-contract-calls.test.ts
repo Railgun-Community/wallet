@@ -17,6 +17,7 @@ import {
   RailgunERC20AmountRecipient,
   TransactionGasDetails,
   isDefined,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   closeTestEngine,
@@ -70,6 +71,8 @@ const polygonRelayAdaptContract =
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 const mockERC20TokenData0 = getTokenDataERC20(
   MOCK_TOKEN_AMOUNTS[0].tokenAddress,
@@ -207,6 +210,7 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -300,6 +304,7 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -359,6 +364,7 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     await expect(
       gasEstimateForUnprovenCrossContractCalls(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,
@@ -379,6 +385,7 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateFailure();
     await expect(
       gasEstimateForUnprovenCrossContractCalls(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         MOCK_DB_ENCRYPTION_KEY,
@@ -404,6 +411,7 @@ describe('tx-cross-contract-calls', () => {
     setCachedProvedTransaction(undefined);
     spyOnSetUnshield();
     await generateCrossContractCallsProof(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -486,6 +494,7 @@ describe('tx-cross-contract-calls', () => {
       ], // actual proof - nft 1
     ]);
     const populateResponse = await populateProvedCrossContractCalls(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS,
@@ -519,6 +528,7 @@ describe('tx-cross-contract-calls', () => {
     stubGasEstimateSuccess();
     await expect(
       populateProvedCrossContractCalls(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         MOCK_TOKEN_AMOUNTS_DIFFERENT,
@@ -541,6 +551,7 @@ describe('tx-cross-contract-calls', () => {
     setCachedProvedTransaction(undefined);
     await expect(
       populateProvedCrossContractCalls(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         MOCK_TOKEN_AMOUNTS,
@@ -559,6 +570,7 @@ describe('tx-cross-contract-calls', () => {
   it('Should error on populate cross contract calls tx when params changed (invalid cached proof)', async () => {
     stubGasEstimateSuccess();
     await generateCrossContractCallsProof(
+      txidVersion,
       NetworkName.Polygon,
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
@@ -575,6 +587,7 @@ describe('tx-cross-contract-calls', () => {
     );
     await expect(
       populateProvedCrossContractCalls(
+        txidVersion,
         NetworkName.Polygon,
         railgunWallet.id,
         MOCK_TOKEN_AMOUNTS_DIFFERENT,

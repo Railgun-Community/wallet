@@ -8,6 +8,7 @@ import {
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
   TransactionGasDetails,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   generateDummyProofTransactions,
@@ -21,6 +22,7 @@ import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contra
 import { reportAndSanitizeError } from '../../utils/error';
 
 export const populateProvedUnshield = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
@@ -32,6 +34,7 @@ export const populateProvedUnshield = async (
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     const { transaction, nullifiers } = await populateProvedTransaction(
+      txidVersion,
       networkName,
       ProofType.Unshield,
       railgunWalletID,
@@ -59,6 +62,7 @@ export const populateProvedUnshield = async (
 };
 
 export const populateProvedUnshieldBaseToken = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   publicWalletAddress: string,
   railgunWalletID: string,
@@ -83,6 +87,7 @@ export const populateProvedUnshieldBaseToken = async (
     const nftAmountRecipients: RailgunNFTAmountRecipient[] = [];
 
     const { transaction, nullifiers } = await populateProvedTransaction(
+      txidVersion,
       networkName,
       ProofType.UnshieldBaseToken,
       railgunWalletID,
@@ -110,6 +115,7 @@ export const populateProvedUnshieldBaseToken = async (
 };
 
 export const gasEstimateForUnprovenUnshield = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   railgunWalletID: string,
   encryptionKey: string,
@@ -128,6 +134,7 @@ export const gasEstimateForUnprovenUnshield = async (
           ProofType.Unshield,
           networkName,
           railgunWalletID,
+          txidVersion,
           encryptionKey,
           false, // showSenderAddressToRecipient
           undefined, // memoText
@@ -143,6 +150,7 @@ export const gasEstimateForUnprovenUnshield = async (
           networkName,
           true, // useDummyProof
         ),
+      txidVersion,
       networkName,
       railgunWalletID,
       erc20AmountRecipients,
@@ -158,6 +166,7 @@ export const gasEstimateForUnprovenUnshield = async (
 };
 
 export const gasEstimateForUnprovenUnshieldBaseToken = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   publicWalletAddress: string,
   railgunWalletID: string,
@@ -184,6 +193,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           ProofType.UnshieldBaseToken,
           networkName,
           railgunWalletID,
+          txidVersion,
           encryptionKey,
           false, // showSenderAddressToRecipient
           undefined, // memoText
@@ -203,6 +213,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           true, // useDummyProof
         );
       },
+      txidVersion,
       networkName,
       railgunWalletID,
       relayAdaptUnshieldERC20AmountRecipients,

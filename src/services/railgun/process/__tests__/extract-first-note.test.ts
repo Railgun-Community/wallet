@@ -35,6 +35,7 @@ import {
   NetworkName,
   NETWORK_CONFIG,
   isDefined,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { createRailgunWallet } from '../../wallets';
 import { fullWalletForID, getEngine } from '../../core/engine';
@@ -45,6 +46,8 @@ import { randomBytes } from 'ethers';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 const mockViewingKeys = async () => {
   const privateViewingKey = randomBytes(32);
@@ -99,6 +102,7 @@ const createGoerliTransferTransactions = async (
   return transaction.generateDummyTransactions(
     engine.prover,
     railgunWallet,
+    txidVersion,
     MOCK_DB_ENCRYPTION_KEY,
   );
 };
@@ -125,6 +129,7 @@ const createGoerliRelayAdaptUnshieldTransactions = async (
   return transaction.generateDummyTransactions(
     engine.prover,
     railgunWallet,
+    txidVersion,
     MOCK_DB_ENCRYPTION_KEY,
   );
 };
