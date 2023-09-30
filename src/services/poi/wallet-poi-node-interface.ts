@@ -128,9 +128,10 @@ export class WalletPOINodeInterface extends POINodeInterface {
       proofInputs,
       railgunTransactionBlockNumber,
     );
+    const poiMerkleroots = poiMerkleProofs.map(merkleProof => merkleProof.root);
     const finalProofInputs: POIEngineProofInputsWithListPOIData = {
       ...proofInputs,
-      poiMerkleroots: poiMerkleProofs.map(merkleProof => merkleProof.root),
+      poiMerkleroots,
       poiInMerkleProofIndices: poiMerkleProofs.map(
         merkleProof => merkleProof.indices,
       ),
@@ -153,7 +154,7 @@ export class WalletPOINodeInterface extends POINodeInterface {
 
     const transactProofData: TransactProofData = {
       snarkProof: proof,
-      poiMerkleroots: poiMerkleProofs.map(merkleProof => merkleProof.root),
+      poiMerkleroots,
       txidMerkleroot: proofInputs.anyRailgunTxidMerklerootAfterTransaction,
       txidMerklerootIndex,
       blindedCommitmentOutputs: blindedCommitmentsOut,
