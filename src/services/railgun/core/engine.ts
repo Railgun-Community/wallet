@@ -9,7 +9,6 @@ import {
   MerkletreeHistoryScanUpdateData,
   POIList,
   POIListType,
-  GetLatestValidatedRailgunTxid,
 } from '@railgun-community/engine';
 import {
   MerkletreeScanUpdateEvent,
@@ -25,9 +24,7 @@ import {
 import { ArtifactStore } from '../../artifacts/artifact-store';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { quickSyncEventsGraphV2 } from '../quick-sync/quick-sync-events-graph';
-import { quickSyncRailgunTransactions } from '../railgun-txids/railgun-tx-sync-graph';
-import { WalletPOIRequester } from '../../poi/wallet-poi-requester';
-import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
+import { quickSyncRailgunTransactions } from '../railgun-txids/railgun-txid-sync-graph';
 import { WalletPOI } from '../../poi/wallet-poi';
 import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
 

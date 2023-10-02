@@ -89,10 +89,17 @@ describe('balances-live', () => {
       chain,
     );
     expect(poiStatusReceived.length).to.be.greaterThanOrEqual(2);
-    expect(poiStatusReceived[0].railgunTxid).to.not.equal('Missing');
+    expect(poiStatusReceived[0].strings.blindedCommitment).to.not.equal(
+      'Missing',
+    );
 
-    // const poiStatusSpent = await wallet.getTXOsSpentPOIStatusInfo(chain);
+    // const poiStatusSpent = await wallet.getTXOsSpentPOIStatusInfo(
+    //   txidVersion,
+    //   chain,
+    // );
     // expect(poiStatusSpent.length).to.be.greaterThanOrEqual(1);
-    // expect(poiStatusSpent[0].railgunTransactionInfo).to.not.equal('Not found');
+    // expect(poiStatusSpent[0].strings.railgunTransactionInfo).to.not.equal(
+    //   'Not found',
+    // );
   }).timeout(30000);
 });

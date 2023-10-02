@@ -1,2 +1,2 @@
 export * from './railgun-txid-merkletrees';
-export * from './railgun-tx-sync-graph';
+export * from './railgun-txid-sync-graph';

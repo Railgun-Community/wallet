@@ -1,7 +1,7 @@
 import {
   Chain,
   RailgunTransaction,
-  getRailgunTransactionIDHexV2,
+  getRailgunTransactionIDHex,
   getBlindedCommitmentForUnshield,
 } from '@railgun-community/engine';
 import {
@@ -17,8 +17,8 @@ import {
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
   GraphRailgunTransactions,
-  formatRailgunTransactionsV2,
-} from './railgun-tx-graph-type-formatters';
+  formatRailgunTransactions,
+} from './railgun-txid-graph-type-formatters';
 import { removeDuplicatesByID } from '../util/graph-util';
 
 const meshes: MapType<MeshInstance> = {};
@@ -45,7 +45,6 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
-// NOTE: THIS WILL NEED TO CHANGE FOR V3, TO USE UNSHIELD BLINDED COMMITMENTS.
 export const getUnshieldRailgunTransactionBlindedCommitmentGroups = async (
   chain: Chain,
   txid: string,
@@ -58,19 +57,18 @@ export const getUnshieldRailgunTransactionBlindedCommitmentGroups = async (
 
   const sdk = getBuiltGraphSDK(network.name);
 
-  const transactions: GetUnshieldRailgunTransactionsByTxidQuery['transactionInterfaces'] =
-    (await sdk.GetUnshieldRailgunTransactionsByTxid({ txid }))
-      .transactionInterfaces;
+  const transactions: GetUnshieldRailgunTransactionsByTxidQuery['transactions'] =
+    (await sdk.GetUnshieldRailgunTransactionsByTxid({ txid })).transactions;
 
   const unshieldRailgunTransactionBlindedCommitmentGroups: string[][] =
     transactions.map(transaction => {
-      const railgunTxidV2 = getRailgunTransactionIDHexV2(transaction);
+      const railgunTxid = getRailgunTransactionIDHex(transaction);
       const blindedCommitments: string[] = transaction.commitments.map(
         commitment => {
           return getBlindedCommitmentForUnshield(
             commitment,
             toAddress,
-            railgunTxidV2,
+            railgunTxid,
           );
         },
       );
@@ -98,7 +96,7 @@ export const quickSyncRailgunTransactions = async (
           await sdk.GetRailgunTransactionsAfterGraphID({
             idLow: id,
           })
-        ).transactionInterfaces,
+        ).transactions,
       latestGraphID ?? '0x00',
     );
 
@@ -106,7 +104,7 @@ export const quickSyncRailgunTransactions = async (
     removeDuplicatesByID(railgunTransactions);
 
   const formattedRailgunTransactions: RailgunTransaction[] =
-    formatRailgunTransactionsV2(filteredRailgunTransactions);
+    formatRailgunTransactions(filteredRailgunTransactions);
 
   return formattedRailgunTransactions;
 };

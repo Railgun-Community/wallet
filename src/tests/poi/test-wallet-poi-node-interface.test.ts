@@ -3,20 +3,17 @@
 import {
   BlindedCommitmentData,
   Chain,
-  POIEngineProofInputs,
-  POIEngineProofInputsWithListPOIData,
   POINodeInterface,
   POIsPerList,
   RailgunEngine,
   TXOPOIListStatus,
-  createDummyMerkleProof,
 } from '@railgun-community/engine';
 import {
   MerkleProof,
+  SnarkProof,
   TXIDVersion,
   networkForChain,
 } from '@railgun-community/shared-models';
-import { sendMessage } from '../../utils';
 
 export const MOCK_LIST_KEY = 'test_list';
 
@@ -66,60 +63,26 @@ export class TestWalletPOINodeInterface extends POINodeInterface {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private async getPOIMerkleProofs(
+  async getPOIMerkleProofs(
+    txidVersion: TXIDVersion,
     chain: Chain,
     listKey: string,
-    proofInputs: POIEngineProofInputs,
-    railgunTransactionBlockNumber: number,
+    blindedCommitments: string[],
   ): Promise<MerkleProof[]> {
-    const { launchBlock } = TestWalletPOINodeInterface.getPOISettings(chain);
-
-    if (railgunTransactionBlockNumber < launchBlock) {
-      return proofInputs.blindedCommitmentsIn.map(createDummyMerkleProof);
-    }
-
     throw new Error('Could not get merkle proofs - no POI node');
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async generateAndSubmitPOI(
+  async submitPOI(
     txidVersion: TXIDVersion,
     chain: Chain,
     listKey: string,
-    proofInputs: POIEngineProofInputs,
-    blindedCommitmentsOut: string[],
+    snarkProof: SnarkProof,
+    poiMerkleroots: string[],
+    txidMerkleroot: string,
     txidMerklerootIndex: number,
-    railgunTransactionBlockNumber: number,
+    blindedCommitmentsOut: string[],
   ): Promise<void> {
-    const poiMerkleProofs = await this.getPOIMerkleProofs(
-      chain,
-      listKey,
-      proofInputs,
-      railgunTransactionBlockNumber,
-    );
-    const finalProofInputs: POIEngineProofInputsWithListPOIData = {
-      ...proofInputs,
-      poiMerkleroots: poiMerkleProofs.map(merkleProof => merkleProof.root),
-      poiInMerkleProofIndices: poiMerkleProofs.map(
-        merkleProof => merkleProof.indices,
-      ),
-      poiInMerkleProofPathElements: poiMerkleProofs.map(
-        merkleProof => merkleProof.elements,
-      ),
-    };
-
-    const progressCallback = (progress: number) => {
-      sendMessage(
-        `Generating POI proof for ${listKey}... ${Math.round(progress * 100)}%`,
-      );
-    };
-
-    const { proof } = await this.engine.prover.provePOI(
-      finalProofInputs,
-      blindedCommitmentsOut,
-      progressCallback,
-    );
-
     throw new Error('Could not submit POI - no POI node');
   }
 }

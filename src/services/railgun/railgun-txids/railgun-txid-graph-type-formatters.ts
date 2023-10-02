@@ -2,9 +2,9 @@ import { RailgunTransaction } from '@railgun-community/engine';
 import { GetRailgunTransactionsAfterGraphIDQuery } from './graphql';
 
 export type GraphRailgunTransactions =
-  GetRailgunTransactionsAfterGraphIDQuery['transactionInterfaces'];
+  GetRailgunTransactionsAfterGraphIDQuery['transactions'];
 
-export const formatRailgunTransactionsV2 = (
+export const formatRailgunTransactions = (
   txs: GraphRailgunTransactions,
 ): RailgunTransaction[] => {
   return txs.map(tx => {
@@ -14,8 +14,9 @@ export const formatRailgunTransactionsV2 = (
       nullifiers: tx.nullifiers,
       boundParamsHash: tx.boundParamsHash,
       blockNumber: Number(tx.blockNumber),
-      utxoTreeIn: undefined, // V3 will need this param
-      globalStartPositionOut: undefined, // V3 will need this param
+      utxoTreeIn: Number(tx.utxoTreeIn),
+      utxoTreeOut: Number(tx.utxoTreeOut),
+      utxoBatchStartPositionOut: Number(tx.utxoBatchStartPositionOut),
     };
   });
 };

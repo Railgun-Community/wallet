@@ -6,7 +6,7 @@ import { MOCK_ETH_WALLET_ADDRESS } from '../../../../tests/mocks.test';
 import {
   getUnshieldRailgunTransactionBlindedCommitmentGroups,
   quickSyncRailgunTransactions,
-} from '../railgun-tx-sync-graph';
+} from '../railgun-txid-sync-graph';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

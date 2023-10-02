@@ -1,16 +1,19 @@
 query GetRailgunTransactionsAfterGraphID($idLow: Bytes = "0x00") {
-  transactionInterfaces(orderBy: id, first: 1000, where: { id_gt: $idLow }) {
+  transactions(orderBy: id, first: 1000, where: { id_gt: $idLow }) {
     id
     nullifiers
     commitments
     transactionHash
     boundParamsHash
     blockNumber
+    utxoTreeIn
+    utxoTreeOut
+    utxoBatchStartPositionOut
   }
 }
 
 query GetUnshieldRailgunTransactionsByTxid($txid: Bytes) {
-  transactionInterfaces(where: { transactionHash: $txid, isUnshield: true }) {
+  transactions(where: { transactionHash: $txid, hasUnshield: true }) {
     nullifiers
     commitments
     boundParamsHash

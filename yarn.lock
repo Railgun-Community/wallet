@@ -2115,10 +2115,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@5.6.9":
-  version "5.6.9"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.6.9.tgz#2262c0e100921d0b129c8bb838c9d868ed281284"
-  integrity sha512-f6dMFKzA8Nn/TMR+fTdegqL1Mn3fk+01b0V0riPnUK1RDZesGqJmgY2cmcjmsgD3nZ5vx4YqnX+mPzayC6Zi7g==
+"@railgun-community/engine@5.7.0":
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.7.0.tgz#3e4c820b9809ec3bbaa2ee95153220b3105adb20"
+  integrity sha512-8dtRPexWqtdsNFMLQfRMpz6oYiSiFQF6GWuhM8VJBnu/H/GRM6+uhG41BA5ytvrNqTm+Fbdm7Z2NfqIN0qKQ6w==
   dependencies:
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.0"
@@ -2135,8 +2135,8 @@
     ethereum-cryptography "^2.0.0"
     ethers "github:Railgun-Community/ethers.js#v6.7.6"
     fast-text-encoding "^1.0.6"
+    hemoji "^0.2.1"
     levelup "^5.1.1"
-    lodash "^4.17.21"
     msgpack-lite "^0.1.26"
 
 "@railgun-community/shared-models@5.6.2":
@@ -3677,6 +3677,11 @@ crypto-browserify@3.12.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
     randomfill "^1.0.3"
+
+crypto-js@^4.0.0:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
+  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 d@1, d@^1.0.1:
   version "1.0.1"
@@ -5280,6 +5285,13 @@ header-case@^2.0.4:
     capital-case "^1.0.4"
     tslib "^2.0.3"
 
+hemoji@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/hemoji/-/hemoji-0.2.1.tgz#679766bb1dff3bdcc15f8633b2468c5f9044d8df"
+  integrity sha512-JB1fgftoRjIfbLAJy7SYvkLE8oaryr6t6V8vQGYzfjJsBTniU+Bl+d703QczlCRw1C3F8O3wA7/CYsu2c5Smaw==
+  dependencies:
+    crypto-js "^4.0.0"
+
 hmac-drbg@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/hmac-drbg/-/hmac-drbg-1.0.1.tgz#d2745701025a6c775a6c545793ed502fc0c649a1"
@@ -6114,7 +6126,7 @@ lodash.topath@4.5.2:
   resolved "https://registry.yarnpkg.com/lodash.topath/-/lodash.topath-4.5.2.tgz#3616351f3bba61994a0931989660bd03254fd009"
   integrity sha512-1/W4dM+35DwvE/iEd1M9ekewOSTlpFekhw9mhAtrwjVqUr83/ilQiyAvmg4tVX7Unkcfl1KC+i9WdaT4B6aQcg==
 
-lodash@4.17.21, lodash@^4.17.21, lodash@~4.17.0:
+lodash@4.17.21, lodash@~4.17.0:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==

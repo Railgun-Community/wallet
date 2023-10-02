@@ -3,9 +3,6 @@ import {
   BlindedCommitmentData,
   POIsPerList,
   TXOPOIListStatus,
-  POIEngineProofInputs,
-  POIEngineProofInputsWithListPOIData,
-  createDummyMerkleProof,
   POINodeInterface,
   RailgunEngine,
 } from '@railgun-community/engine';
@@ -13,11 +10,11 @@ import { POINodeRequest } from './poi-node-request';
 import {
   MerkleProof,
   POIStatus,
+  SnarkProof,
   TXIDVersion,
   TransactProofData,
   networkForChain,
 } from '@railgun-community/shared-models';
-import { sendMessage } from '../../utils';
 
 export class WalletPOINodeInterface extends POINodeInterface {
   private poiNodeRequest: POINodeRequest;
@@ -91,75 +88,37 @@ export class WalletPOINodeInterface extends POINodeInterface {
     return poisPerListConverted;
   }
 
-  private async getPOIMerkleProofs(
+  async getPOIMerkleProofs(
     txidVersion: TXIDVersion,
     chain: Chain,
     listKey: string,
-    proofInputs: POIEngineProofInputs,
-    railgunTransactionBlockNumber: number,
+    blindedCommitments: string[],
   ): Promise<MerkleProof[]> {
-    const { launchBlock } = WalletPOINodeInterface.getPOISettings(chain);
-
-    if (railgunTransactionBlockNumber < launchBlock) {
-      return proofInputs.blindedCommitmentsIn.map(createDummyMerkleProof);
-    }
-
     return this.poiNodeRequest.getPOIMerkleProofs(
       txidVersion,
       chain,
       listKey,
-      proofInputs.blindedCommitmentsIn,
+      blindedCommitments,
     );
   }
 
-  async generateAndSubmitPOI(
+  async submitPOI(
     txidVersion: TXIDVersion,
     chain: Chain,
     listKey: string,
-    proofInputs: POIEngineProofInputs,
-    blindedCommitmentsOut: string[],
+    snarkProof: SnarkProof,
+    poiMerkleroots: string[],
+    txidMerkleroot: string,
     txidMerklerootIndex: number,
-    railgunTransactionBlockNumber: number,
+    blindedCommitmentsOut: string[],
   ): Promise<void> {
-    const poiMerkleProofs = await this.getPOIMerkleProofs(
-      txidVersion,
-      chain,
-      listKey,
-      proofInputs,
-      railgunTransactionBlockNumber,
-    );
-    const poiMerkleroots = poiMerkleProofs.map(merkleProof => merkleProof.root);
-    const finalProofInputs: POIEngineProofInputsWithListPOIData = {
-      ...proofInputs,
-      poiMerkleroots,
-      poiInMerkleProofIndices: poiMerkleProofs.map(
-        merkleProof => merkleProof.indices,
-      ),
-      poiInMerkleProofPathElements: poiMerkleProofs.map(
-        merkleProof => merkleProof.elements,
-      ),
-    };
-
-    const progressCallback = (progress: number) => {
-      sendMessage(
-        `Generating POI proof for ${listKey}... ${Math.round(progress * 100)}%`,
-      );
-    };
-
-    const { proof } = await this.engine.prover.provePOI(
-      finalProofInputs,
-      blindedCommitmentsOut,
-      progressCallback,
-    );
-
     const transactProofData: TransactProofData = {
-      snarkProof: proof,
+      snarkProof,
       poiMerkleroots,
-      txidMerkleroot: proofInputs.anyRailgunTxidMerklerootAfterTransaction,
+      txidMerkleroot,
       txidMerklerootIndex,
       blindedCommitmentOutputs: blindedCommitmentsOut,
     };
-
     return this.poiNodeRequest.submitPOI(
       txidVersion,
       chain,

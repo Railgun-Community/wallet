@@ -48,11 +48,10 @@ export const refreshReceivePOIsForWallet = (
   txidVersion: TXIDVersion,
   networkName: NetworkName,
   walletID: string,
-  railgunTxid?: string,
 ): Promise<void> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   const wallet = walletForID(walletID);
-  return wallet.refreshReceivePOIsAllTXOs(txidVersion, chain, railgunTxid);
+  return wallet.refreshReceivePOIsAllTXOs(txidVersion, chain);
 };
 
 export const refreshSpentPOIsForWallet = (
