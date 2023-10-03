@@ -82,6 +82,7 @@ export class TestWalletPOINodeInterface extends POINodeInterface {
     txidMerkleroot: string,
     txidMerklerootIndex: number,
     blindedCommitmentsOut: string[],
+    railgunTxidIfHasUnshield: string,
   ): Promise<void> {
     throw new Error('Could not submit POI - no POI node');
   }

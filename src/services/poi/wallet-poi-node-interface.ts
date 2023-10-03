@@ -111,13 +111,15 @@ export class WalletPOINodeInterface extends POINodeInterface {
     txidMerkleroot: string,
     txidMerklerootIndex: number,
     blindedCommitmentsOut: string[],
+    railgunTxidIfHasUnshield: string,
   ): Promise<void> {
     const transactProofData: TransactProofData = {
       snarkProof,
       poiMerkleroots,
       txidMerkleroot,
       txidMerklerootIndex,
-      blindedCommitmentOutputs: blindedCommitmentsOut,
+      blindedCommitmentsOut,
+      railgunTxidIfHasUnshield,
     };
     return this.poiNodeRequest.submitPOI(
       txidVersion,
