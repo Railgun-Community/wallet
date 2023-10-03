@@ -10,7 +10,7 @@ const MASTER_IPFS_HASH_ARTIFACTS =
   'QmeBrG7pii1qTqsn7rusvDiqXopHPjCT9gR4PsmW7wXqZq';
 
 const IPFS_HASH_ARTIFACTS_POI =
-  'Qmaxi749eTU3QSjXJxRNuL9QCRyqAGTmWtZFBe4XTS6eEw';
+  'QmSwivV3zjYRXCwwL49HxwtMrFVjP1YK21obsmhbhsRsvs';
 
 export const ARTIFACT_VARIANT_STRING_POI_PREFIX = 'POI';
 
@@ -112,9 +112,11 @@ export const getArtifactUrl = (
   artifactVariantString: string,
 ) => {
   if (artifactVariantString.startsWith(ARTIFACT_VARIANT_STRING_POI_PREFIX)) {
-    if (artifactVariantString === getArtifactVariantStringPOI(13, 13)) {
-      // TODO: Add variant for MINI.
-      return `${IPFS_GATEWAY}/ipfs/${IPFS_HASH_ARTIFACTS_POI}/${getArtifactIPFSFilepathPOI(
+    if (
+      artifactVariantString === getArtifactVariantStringPOI(3, 3) ||
+      artifactVariantString === getArtifactVariantStringPOI(13, 13)
+    ) {
+      return `${IPFS_GATEWAY}/ipfs/${IPFS_HASH_ARTIFACTS_POI}/poi/${artifactVariantString}/${getArtifactIPFSFilepathPOI(
         artifactName,
       )}`;
     }

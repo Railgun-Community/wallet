@@ -96,13 +96,22 @@ describe('artifact-downloader', () => {
     clearArtifactCache();
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const artifacts: Artifact =
+    const artifacts3x3: Artifact =
+      await artifactGetterDownloadJustInTime.getArtifactsPOI(3, 3);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const artifacts13x13: Artifact =
       await artifactGetterDownloadJustInTime.getArtifactsPOI(13, 13);
 
-    expect(artifacts.vkey).to.not.be.undefined;
-    expect(artifacts.zkey).to.not.be.undefined;
-    expect(artifacts.wasm).to.not.be.undefined;
-    expect(artifacts.dat).to.be.undefined;
+    expect(artifacts3x3.vkey).to.not.be.undefined;
+    expect(artifacts3x3.zkey).to.not.be.undefined;
+    expect(artifacts3x3.wasm).to.not.be.undefined;
+    expect(artifacts3x3.dat).to.be.undefined;
+
+    expect(artifacts13x13.vkey).to.not.be.undefined;
+    expect(artifacts13x13.zkey).to.not.be.undefined;
+    expect(artifacts13x13.wasm).to.not.be.undefined;
+    expect(artifacts13x13.dat).to.be.undefined;
 
     const cached = artifactCache.POI_13x13;
     expect(cached?.vkey).to.not.be.undefined;
@@ -117,13 +126,22 @@ describe('artifact-downloader', () => {
     clearArtifactCache();
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const artifacts: Artifact =
+    const artifacts3x3: Artifact =
+      await artifactGetterDownloadJustInTime.getArtifactsPOI(3, 3);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const artifacts13x13: Artifact =
       await artifactGetterDownloadJustInTime.getArtifactsPOI(13, 13);
 
-    expect(artifacts.vkey).to.not.be.undefined;
-    expect(artifacts.zkey).to.not.be.undefined;
-    expect(artifacts.wasm).to.be.undefined;
-    expect(artifacts.dat).to.not.be.undefined;
+    expect(artifacts3x3.vkey).to.not.be.undefined;
+    expect(artifacts3x3.zkey).to.not.be.undefined;
+    expect(artifacts3x3.wasm).to.be.undefined;
+    expect(artifacts3x3.dat).to.not.be.undefined;
+
+    expect(artifacts13x13.vkey).to.not.be.undefined;
+    expect(artifacts13x13.zkey).to.not.be.undefined;
+    expect(artifacts13x13.wasm).to.be.undefined;
+    expect(artifacts13x13.dat).to.not.be.undefined;
 
     const cached = artifactCache.POI_13x13;
     expect(cached?.vkey).to.not.be.undefined;

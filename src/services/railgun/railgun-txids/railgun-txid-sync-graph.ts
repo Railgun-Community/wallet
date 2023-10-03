@@ -2,7 +2,6 @@ import {
   Chain,
   RailgunTransaction,
   getRailgunTransactionIDHex,
-  getBlindedCommitmentForUnshield,
 } from '@railgun-community/engine';
 import {
   NetworkName,
@@ -45,11 +44,10 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
-export const getUnshieldRailgunTransactionBlindedCommitmentGroups = async (
+export const getRailgunTxidsForUnshields = async (
   chain: Chain,
   txid: string,
-  toAddress: string,
-): Promise<string[][]> => {
+): Promise<string[]> => {
   const network = networkForChain(chain);
   if (!network) {
     return [];
@@ -60,22 +58,12 @@ export const getUnshieldRailgunTransactionBlindedCommitmentGroups = async (
   const transactions: GetUnshieldRailgunTransactionsByTxidQuery['transactions'] =
     (await sdk.GetUnshieldRailgunTransactionsByTxid({ txid })).transactions;
 
-  const unshieldRailgunTransactionBlindedCommitmentGroups: string[][] =
-    transactions.map(transaction => {
-      const railgunTxid = getRailgunTransactionIDHex(transaction);
-      const blindedCommitments: string[] = transaction.commitments.map(
-        commitment => {
-          return getBlindedCommitmentForUnshield(
-            commitment,
-            toAddress,
-            railgunTxid,
-          );
-        },
-      );
-      return blindedCommitments;
-    });
+  const railgunTxidsForUnshields: string[] = transactions.map(transaction => {
+    const railgunTxid = getRailgunTransactionIDHex(transaction);
+    return railgunTxid;
+  });
 
-  return unshieldRailgunTransactionBlindedCommitmentGroups;
+  return railgunTxidsForUnshields;
 };
 
 export const quickSyncRailgunTransactions = async (
