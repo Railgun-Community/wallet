@@ -2115,10 +2115,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@5.7.2":
-  version "5.7.2"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.7.2.tgz#1544a67c18033dae9441273f695f5747810928b6"
-  integrity sha512-WbGTPMXfO39otgXb6rD6OXa2lQSJXNdFJHpyKvE90fY/FCh8G7SLp6Za/puuKf1wTs/wtXoQXzFiRViCzsWQqw==
+"@railgun-community/engine@5.7.3":
+  version "5.7.3"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.7.3.tgz#0f0ebdc1685aaf1dd95aef8957ae14e1b234022e"
+  integrity sha512-dYYMbfdET6Z+iQE296JlDPDE8JlU+moVQWhffhxze2kekCRGYAzmpSrj3MhIPw5mWq/nuybjP8/WXgkpgvWHXQ==
   dependencies:
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.0"
@@ -2135,7 +2135,6 @@
     ethereum-cryptography "^2.0.0"
     ethers "github:Railgun-Community/ethers.js#v6.7.6"
     fast-text-encoding "^1.0.6"
-    hemoji "^0.2.1"
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
@@ -3677,11 +3676,6 @@ crypto-browserify@3.12.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
     randomfill "^1.0.3"
-
-crypto-js@^4.0.0:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.1.1.tgz#9e485bcf03521041bd85844786b83fb7619736cf"
-  integrity sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==
 
 d@1, d@^1.0.1:
   version "1.0.1"
@@ -5284,13 +5278,6 @@ header-case@^2.0.4:
   dependencies:
     capital-case "^1.0.4"
     tslib "^2.0.3"
-
-hemoji@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/hemoji/-/hemoji-0.2.1.tgz#679766bb1dff3bdcc15f8633b2468c5f9044d8df"
-  integrity sha512-JB1fgftoRjIfbLAJy7SYvkLE8oaryr6t6V8vQGYzfjJsBTniU+Bl+d703QczlCRw1C3F8O3wA7/CYsu2c5Smaw==
-  dependencies:
-    crypto-js "^4.0.0"
 
 hmac-drbg@^1.0.1:
   version "1.0.1"

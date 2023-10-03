@@ -15,7 +15,7 @@ const ETH_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Ethereum].chain;
 const ETH_GOERLI_CHAIN: Chain =
   NETWORK_CONFIG[NetworkName.EthereumGoerli].chain;
 
-describe('railgun-tx-sync-graph', () => {
+describe('railgun-txid-sync-graph', () => {
   before(() => {
     NETWORK_CONFIG[NetworkName.Ethereum].poi = { launchBlock: 1000 };
   });
