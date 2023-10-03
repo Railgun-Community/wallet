@@ -32,4 +32,5 @@ export {
   toUTF8String,
   hexStringToBytes,
   ByteLength,
+  formatToByteLength,
 };
