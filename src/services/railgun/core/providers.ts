@@ -173,7 +173,7 @@ const loadProviderForNetwork = async (
   const {
     proxyContract,
     relayAdaptContract,
-    deploymentBlock: deploymentBlockV2,
+    deploymentBlock,
     publicName,
     poi,
   } = network;
@@ -194,7 +194,7 @@ const loadProviderForNetwork = async (
   }
 
   const deploymentBlocks: Record<TXIDVersion, number> = {
-    [TXIDVersion.V2_PoseidonMerkle]: deploymentBlockV2 ?? 0,
+    [TXIDVersion.V2_PoseidonMerkle]: deploymentBlock ?? 0,
   };
 
   // This function will set up the contracts for this chain.
@@ -214,7 +214,7 @@ const loadProviderForNetwork = async (
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   engine.scanHistory(chain);
 
-  if (isDefined(NETWORK_CONFIG[networkName].poi)) {
+  if (isDefined(poi)) {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     engine.startSyncRailgunTransactionsPoller(chain);
   }
