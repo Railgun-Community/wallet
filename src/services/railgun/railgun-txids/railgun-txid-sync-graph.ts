@@ -22,9 +22,7 @@ import { removeDuplicatesByID } from '../util/graph-util';
 
 const meshes: MapType<MeshInstance> = {};
 
-// 1.5 full trees of commitments
-// TODO: This will have to change when we have more than 100k commitments.
-const MAX_QUERY_RESULTS = 100000;
+const MAX_QUERY_RESULTS = 5000;
 
 const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   switch (networkName) {

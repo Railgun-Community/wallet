@@ -50,7 +50,7 @@ export type GraphCommitmentBatch = {
   blockNumber: number;
 };
 
-const graphTokenTypeToEngineTokenType = (
+export const graphTokenTypeToEngineTokenType = (
   graphTokenType: GraphTokenType,
 ): TokenType => {
   switch (graphTokenType) {

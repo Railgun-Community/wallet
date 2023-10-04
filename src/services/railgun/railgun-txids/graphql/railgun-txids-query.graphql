@@ -9,6 +9,12 @@ query GetRailgunTransactionsAfterGraphID($idLow: Bytes = "0x00") {
     utxoTreeIn
     utxoTreeOut
     utxoBatchStartPositionOut
+    hasUnshield
+    token {
+      tokenType
+      tokenSubID
+      tokenAddress
+    }
   }
 }
 

@@ -1988,6 +1988,7 @@ type Transaction implements TransactionInterface {
   utxoTreeIn: BigInt!
   utxoTreeOut: BigInt!
   utxoBatchStartPositionOut: BigInt!
+  token: Token!
 }
 
 interface TransactionInterface {
@@ -2002,6 +2003,7 @@ interface TransactionInterface {
   utxoTreeIn: BigInt!
   utxoTreeOut: BigInt!
   utxoBatchStartPositionOut: BigInt!
+  token: Token!
 }
 
 input TransactionInterface_filter {
@@ -2093,6 +2095,27 @@ input TransactionInterface_filter {
   utxoBatchStartPositionOut_lte: BigInt
   utxoBatchStartPositionOut_in: [BigInt!]
   utxoBatchStartPositionOut_not_in: [BigInt!]
+  token: String
+  token_not: String
+  token_gt: String
+  token_lt: String
+  token_gte: String
+  token_lte: String
+  token_in: [String!]
+  token_not_in: [String!]
+  token_contains: String
+  token_contains_nocase: String
+  token_not_contains: String
+  token_not_contains_nocase: String
+  token_starts_with: String
+  token_starts_with_nocase: String
+  token_not_starts_with: String
+  token_not_starts_with_nocase: String
+  token_ends_with: String
+  token_ends_with_nocase: String
+  token_not_ends_with: String
+  token_not_ends_with_nocase: String
+  token_: Token_filter
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
   and: [TransactionInterface_filter]
@@ -2111,6 +2134,11 @@ enum TransactionInterface_orderBy {
   utxoTreeIn
   utxoTreeOut
   utxoBatchStartPositionOut
+  token
+  token__id
+  token__tokenType
+  token__tokenAddress
+  token__tokenSubID
 }
 
 input Transaction_filter {
@@ -2202,6 +2230,27 @@ input Transaction_filter {
   utxoBatchStartPositionOut_lte: BigInt
   utxoBatchStartPositionOut_in: [BigInt!]
   utxoBatchStartPositionOut_not_in: [BigInt!]
+  token: String
+  token_not: String
+  token_gt: String
+  token_lt: String
+  token_gte: String
+  token_lte: String
+  token_in: [String!]
+  token_not_in: [String!]
+  token_contains: String
+  token_contains_nocase: String
+  token_not_contains: String
+  token_not_contains_nocase: String
+  token_starts_with: String
+  token_starts_with_nocase: String
+  token_not_starts_with: String
+  token_not_starts_with_nocase: String
+  token_ends_with: String
+  token_ends_with_nocase: String
+  token_not_ends_with: String
+  token_not_ends_with_nocase: String
+  token_: Token_filter
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
   and: [Transaction_filter]
@@ -2220,6 +2269,11 @@ enum Transaction_orderBy {
   utxoTreeIn
   utxoTreeOut
   utxoBatchStartPositionOut
+  token
+  token__id
+  token__tokenType
+  token__tokenAddress
+  token__tokenSubID
 }
 
 type Unshield {

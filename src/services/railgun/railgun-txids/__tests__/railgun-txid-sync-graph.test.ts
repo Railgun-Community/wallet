@@ -27,7 +27,7 @@ describe('railgun-txid-sync-graph', () => {
     );
 
     expect(railgunTxs).to.be.an('array');
-    expect(railgunTxs.length).to.be.greaterThan(8000);
+    expect(railgunTxs.length).to.equal(5000);
 
     expect(railgunTxs[0].commitments).to.deep.equal([
       '0x1afd01a29faf22dcc5678694092a08d38de99fc97d07b9281fa66f956ce43579',
@@ -44,7 +44,12 @@ describe('railgun-txid-sync-graph', () => {
     expect(railgunTxs[0].boundParamsHash).to.equal(
       '0x2c72a0bcce4f1169dd988204775483938ded5f5899cec84829b1cc667a683784',
     );
+    expect(railgunTxs[0].utxoTreeIn).to.equal(0);
+    expect(railgunTxs[0].utxoTreeOut).to.equal(0);
+    expect(railgunTxs[0].utxoBatchStartPositionOut).to.equal(2);
+    expect(railgunTxs[0].hasUnshield).to.equal(false);
     expect(railgunTxs[0].blockNumber).to.equal(14755920);
+    expect(railgunTxs[0].unshieldTokenHash).to.equal(undefined);
   }).timeout(20000);
 
   it('Should pull unshield railgun txids - Ethereum', async () => {
@@ -81,7 +86,18 @@ describe('railgun-txid-sync-graph', () => {
     expect(railgunTxs[0].boundParamsHash).to.equal(
       '0x0241df5c3ddca93c4bc340a10f628c7dff4acb0657469836836a2e824a4a000b',
     );
+    expect(railgunTxs[0].utxoTreeIn).to.equal(0);
+    expect(railgunTxs[0].utxoTreeOut).to.equal(0);
+    expect(railgunTxs[0].utxoBatchStartPositionOut).to.equal(2);
+    expect(railgunTxs[0].hasUnshield).to.equal(false);
     expect(railgunTxs[0].blockNumber).to.equal(7826407);
+    expect(railgunTxs[0].unshieldTokenHash).to.equal(undefined);
+
+    // Test transaction with unshield
+    expect(railgunTxs[2].hasUnshield).to.equal(true);
+    expect(railgunTxs[2].unshieldTokenHash).to.equal(
+      '000000000000000000000000b4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+    );
   }).timeout(20000);
 
   it('Should pull unshield railgun txids - Goerli', async () => {

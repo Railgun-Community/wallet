@@ -16,7 +16,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 // @ts-nocheck
-
 import {
   GraphQLResolveInfo,
   SelectionSetNode,
@@ -50,8 +49,8 @@ import {
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
 import type { TxsGoerliTypes } from './.graphclient/sources/txs-goerli/types';
+import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -1784,6 +1783,7 @@ export type Transaction = TransactionInterface & {
   utxoTreeIn: Scalars['BigInt'];
   utxoTreeOut: Scalars['BigInt'];
   utxoBatchStartPositionOut: Scalars['BigInt'];
+  token: Token;
 };
 
 export type TransactionInterface = {
@@ -1798,6 +1798,7 @@ export type TransactionInterface = {
   utxoTreeIn: Scalars['BigInt'];
   utxoTreeOut: Scalars['BigInt'];
   utxoBatchStartPositionOut: Scalars['BigInt'];
+  token: Token;
 };
 
 export type TransactionInterface_filter = {
@@ -1889,6 +1890,27 @@ export type TransactionInterface_filter = {
   utxoBatchStartPositionOut_lte?: InputMaybe<Scalars['BigInt']>;
   utxoBatchStartPositionOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
   utxoBatchStartPositionOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  token?: InputMaybe<Scalars['String']>;
+  token_not?: InputMaybe<Scalars['String']>;
+  token_gt?: InputMaybe<Scalars['String']>;
+  token_lt?: InputMaybe<Scalars['String']>;
+  token_gte?: InputMaybe<Scalars['String']>;
+  token_lte?: InputMaybe<Scalars['String']>;
+  token_in?: InputMaybe<Array<Scalars['String']>>;
+  token_not_in?: InputMaybe<Array<Scalars['String']>>;
+  token_contains?: InputMaybe<Scalars['String']>;
+  token_contains_nocase?: InputMaybe<Scalars['String']>;
+  token_not_contains?: InputMaybe<Scalars['String']>;
+  token_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  token_starts_with?: InputMaybe<Scalars['String']>;
+  token_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  token_not_starts_with?: InputMaybe<Scalars['String']>;
+  token_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  token_ends_with?: InputMaybe<Scalars['String']>;
+  token_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  token_not_ends_with?: InputMaybe<Scalars['String']>;
+  token_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  token_?: InputMaybe<Token_filter>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<TransactionInterface_filter>>>;
@@ -1906,7 +1928,12 @@ export type TransactionInterface_orderBy =
   | 'hasUnshield'
   | 'utxoTreeIn'
   | 'utxoTreeOut'
-  | 'utxoBatchStartPositionOut';
+  | 'utxoBatchStartPositionOut'
+  | 'token'
+  | 'token__id'
+  | 'token__tokenType'
+  | 'token__tokenAddress'
+  | 'token__tokenSubID';
 
 export type Transaction_filter = {
   id?: InputMaybe<Scalars['Bytes']>;
@@ -1997,6 +2024,27 @@ export type Transaction_filter = {
   utxoBatchStartPositionOut_lte?: InputMaybe<Scalars['BigInt']>;
   utxoBatchStartPositionOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
   utxoBatchStartPositionOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  token?: InputMaybe<Scalars['String']>;
+  token_not?: InputMaybe<Scalars['String']>;
+  token_gt?: InputMaybe<Scalars['String']>;
+  token_lt?: InputMaybe<Scalars['String']>;
+  token_gte?: InputMaybe<Scalars['String']>;
+  token_lte?: InputMaybe<Scalars['String']>;
+  token_in?: InputMaybe<Array<Scalars['String']>>;
+  token_not_in?: InputMaybe<Array<Scalars['String']>>;
+  token_contains?: InputMaybe<Scalars['String']>;
+  token_contains_nocase?: InputMaybe<Scalars['String']>;
+  token_not_contains?: InputMaybe<Scalars['String']>;
+  token_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  token_starts_with?: InputMaybe<Scalars['String']>;
+  token_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  token_not_starts_with?: InputMaybe<Scalars['String']>;
+  token_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  token_ends_with?: InputMaybe<Scalars['String']>;
+  token_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  token_not_ends_with?: InputMaybe<Scalars['String']>;
+  token_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  token_?: InputMaybe<Token_filter>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Transaction_filter>>>;
@@ -2014,7 +2062,12 @@ export type Transaction_orderBy =
   | 'hasUnshield'
   | 'utxoTreeIn'
   | 'utxoTreeOut'
-  | 'utxoBatchStartPositionOut';
+  | 'utxoBatchStartPositionOut'
+  | 'token'
+  | 'token__id'
+  | 'token__tokenType'
+  | 'token__tokenAddress'
+  | 'token__tokenSubID';
 
 export type Unshield = {
   id: Scalars['Bytes'];
@@ -3245,6 +3298,7 @@ export type TransactionResolvers<
     ParentType,
     ContextType
   >;
+  token?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3276,6 +3330,7 @@ export type TransactionInterfaceResolvers<
     ParentType,
     ContextType
   >;
+  token?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
 }>;
 
 export type UnshieldResolvers<
@@ -3370,14 +3425,10 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     .replace(baseDir + '/', '');
   switch (relativeModuleId) {
     case '.graphclient/sources/txs-ethereum/introspectionSchema':
-      return import(
-        './.graphclient/sources/txs-ethereum/introspectionSchema'
-      ) as T;
+      return import('./.graphclient/sources/txs-ethereum/introspectionSchema') as T;
 
     case '.graphclient/sources/txs-goerli/introspectionSchema':
-      return import(
-        './.graphclient/sources/txs-goerli/introspectionSchema'
-      ) as T;
+      return import('./.graphclient/sources/txs-goerli/introspectionSchema') as T;
 
     default:
       return Promise.reject(
@@ -3553,7 +3604,8 @@ export type GetRailgunTransactionsAfterGraphIDQuery = {
       | 'utxoTreeIn'
       | 'utxoTreeOut'
       | 'utxoBatchStartPositionOut'
-    >
+      | 'hasUnshield'
+    > & { token: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
   >;
 };
 
@@ -3579,6 +3631,12 @@ export const GetRailgunTransactionsAfterGraphIDDocument = gql`
       utxoTreeIn
       utxoTreeOut
       utxoBatchStartPositionOut
+      hasUnshield
+      token {
+        tokenType
+        tokenSubID
+        tokenAddress
+      }
     }
   }
 ` as unknown as DocumentNode<

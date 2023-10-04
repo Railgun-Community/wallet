@@ -1801,6 +1801,7 @@ export type Transaction = TransactionInterface & {
   utxoTreeIn: Scalars['BigInt'];
   utxoTreeOut: Scalars['BigInt'];
   utxoBatchStartPositionOut: Scalars['BigInt'];
+  token: Token;
 };
 
 export type TransactionInterface = {
@@ -1815,6 +1816,7 @@ export type TransactionInterface = {
   utxoTreeIn: Scalars['BigInt'];
   utxoTreeOut: Scalars['BigInt'];
   utxoBatchStartPositionOut: Scalars['BigInt'];
+  token: Token;
 };
 
 export type TransactionInterface_filter = {
@@ -1906,6 +1908,27 @@ export type TransactionInterface_filter = {
   utxoBatchStartPositionOut_lte?: InputMaybe<Scalars['BigInt']>;
   utxoBatchStartPositionOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
   utxoBatchStartPositionOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  token?: InputMaybe<Scalars['String']>;
+  token_not?: InputMaybe<Scalars['String']>;
+  token_gt?: InputMaybe<Scalars['String']>;
+  token_lt?: InputMaybe<Scalars['String']>;
+  token_gte?: InputMaybe<Scalars['String']>;
+  token_lte?: InputMaybe<Scalars['String']>;
+  token_in?: InputMaybe<Array<Scalars['String']>>;
+  token_not_in?: InputMaybe<Array<Scalars['String']>>;
+  token_contains?: InputMaybe<Scalars['String']>;
+  token_contains_nocase?: InputMaybe<Scalars['String']>;
+  token_not_contains?: InputMaybe<Scalars['String']>;
+  token_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  token_starts_with?: InputMaybe<Scalars['String']>;
+  token_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  token_not_starts_with?: InputMaybe<Scalars['String']>;
+  token_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  token_ends_with?: InputMaybe<Scalars['String']>;
+  token_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  token_not_ends_with?: InputMaybe<Scalars['String']>;
+  token_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  token_?: InputMaybe<Token_filter>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<TransactionInterface_filter>>>;
@@ -1923,7 +1946,12 @@ export type TransactionInterface_orderBy =
   | 'hasUnshield'
   | 'utxoTreeIn'
   | 'utxoTreeOut'
-  | 'utxoBatchStartPositionOut';
+  | 'utxoBatchStartPositionOut'
+  | 'token'
+  | 'token__id'
+  | 'token__tokenType'
+  | 'token__tokenAddress'
+  | 'token__tokenSubID';
 
 export type Transaction_filter = {
   id?: InputMaybe<Scalars['Bytes']>;
@@ -2014,6 +2042,27 @@ export type Transaction_filter = {
   utxoBatchStartPositionOut_lte?: InputMaybe<Scalars['BigInt']>;
   utxoBatchStartPositionOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
   utxoBatchStartPositionOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  token?: InputMaybe<Scalars['String']>;
+  token_not?: InputMaybe<Scalars['String']>;
+  token_gt?: InputMaybe<Scalars['String']>;
+  token_lt?: InputMaybe<Scalars['String']>;
+  token_gte?: InputMaybe<Scalars['String']>;
+  token_lte?: InputMaybe<Scalars['String']>;
+  token_in?: InputMaybe<Array<Scalars['String']>>;
+  token_not_in?: InputMaybe<Array<Scalars['String']>>;
+  token_contains?: InputMaybe<Scalars['String']>;
+  token_contains_nocase?: InputMaybe<Scalars['String']>;
+  token_not_contains?: InputMaybe<Scalars['String']>;
+  token_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  token_starts_with?: InputMaybe<Scalars['String']>;
+  token_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  token_not_starts_with?: InputMaybe<Scalars['String']>;
+  token_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  token_ends_with?: InputMaybe<Scalars['String']>;
+  token_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  token_not_ends_with?: InputMaybe<Scalars['String']>;
+  token_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  token_?: InputMaybe<Token_filter>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Transaction_filter>>>;
@@ -2031,7 +2080,12 @@ export type Transaction_orderBy =
   | 'hasUnshield'
   | 'utxoTreeIn'
   | 'utxoTreeOut'
-  | 'utxoBatchStartPositionOut';
+  | 'utxoBatchStartPositionOut'
+  | 'token'
+  | 'token__id'
+  | 'token__tokenType'
+  | 'token__tokenAddress'
+  | 'token__tokenSubID';
 
 export type Unshield = {
   id: Scalars['Bytes'];
