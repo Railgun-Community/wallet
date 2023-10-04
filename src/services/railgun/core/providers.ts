@@ -209,15 +209,10 @@ const loadProviderForNetwork = async (
     poi?.launchBlock,
   );
 
-  // NOTE: These are async calls, but we need not await.
+  // NOTE: This is an async call, but we need not await.
   // Let Engine scan events in the background.
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   engine.scanHistory(chain);
-
-  if (isDefined(poi)) {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    engine.startSyncRailgunTransactionsPoller(chain);
-  }
 };
 
 /**

@@ -11,7 +11,8 @@ import {
 } from '@railgun-community/shared-models';
 import {
   getEngine,
-  setOnMerkletreeScanCallback,
+  setOnUTXOMerkletreeScanCallback,
+  setOnTXIDMerkletreeScanCallback,
   startRailgunEngine,
   stopRailgunEngine,
 } from '../services/railgun/core/engine';
@@ -67,16 +68,24 @@ const testArtifactStore = new ArtifactStore(
   fileExists,
 );
 
-let currentMerkletreeScanStatus: Optional<MerkletreeScanStatus>;
+let currentUTXOMerkletreeScanStatus: Optional<MerkletreeScanStatus>;
+let currentTXIDMerkletreeScanStatus: Optional<MerkletreeScanStatus>;
 
-export const merkletreeHistoryScanCallback = (
+export const utxoMerkletreeHistoryScanCallback = (
   scanData: MerkletreeScanUpdateEvent,
 ): void => {
-  currentMerkletreeScanStatus = scanData.scanStatus;
+  currentUTXOMerkletreeScanStatus = scanData.scanStatus;
 };
 
-export const clearMerkletreeScanStatus = () => {
-  currentMerkletreeScanStatus = undefined;
+export const txidMerkletreeHistoryScanCallback = (
+  scanData: MerkletreeScanUpdateEvent,
+): void => {
+  currentTXIDMerkletreeScanStatus = scanData.scanStatus;
+};
+
+export const clearAllMerkletreeScanStatus = () => {
+  currentUTXOMerkletreeScanStatus = undefined;
+  currentTXIDMerkletreeScanStatus = undefined;
 };
 
 export const initTestEngine = (useNativeArtifacts = false) => {
@@ -120,7 +129,9 @@ export const initTestEngine = (useNativeArtifacts = false) => {
   WalletPOI.init(testPOINodeInterface, []);
 
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);
-  setOnMerkletreeScanCallback(merkletreeHistoryScanCallback);
+
+  setOnUTXOMerkletreeScanCallback(utxoMerkletreeHistoryScanCallback);
+  setOnTXIDMerkletreeScanCallback(txidMerkletreeHistoryScanCallback);
 };
 
 export const initTestEngineNetwork = async () => {
@@ -135,12 +146,24 @@ export const initTestEngineNetwork = async () => {
 export const closeTestEngine = async () => {
   await stopRailgunEngine();
 
-  clearMerkletreeScanStatus();
+  clearAllMerkletreeScanStatus();
 };
 
-export const pollUntilMerkletreeScanned = async () => {
+export const pollUntilUTXOMerkletreeScanned = async () => {
   const status = await poll(
-    async () => currentMerkletreeScanStatus,
+    async () => currentUTXOMerkletreeScanStatus,
+    status => status === MerkletreeScanStatus.Complete,
+    50,
+    30000 / 50, // 30 sec.
+  );
+  if (status !== MerkletreeScanStatus.Complete) {
+    throw new Error(`Merkletree scan should be completed - timed out`);
+  }
+};
+
+export const pollUntilTXIDMerkletreeScanned = async () => {
+  const status = await poll(
+    async () => currentTXIDMerkletreeScanStatus,
     status => status === MerkletreeScanStatus.Complete,
     50,
     30000 / 50, // 30 sec.

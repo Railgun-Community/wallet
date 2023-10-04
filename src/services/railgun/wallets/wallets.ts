@@ -20,7 +20,7 @@ import { onBalancesUpdate } from './balance-update';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { getAddress } from 'ethers';
 
-const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
+const subscribeToEvents = (wallet: AbstractWallet) => {
   wallet.on(
     EngineEvent.WalletScanComplete,
     ({ txidVersion, chain }: WalletScannedEventData) => {
@@ -28,6 +28,13 @@ const subscribeToBalanceEvents = (wallet: AbstractWallet) => {
       onBalancesUpdate(txidVersion, wallet, chain);
     },
   );
+  // wallet.on(
+  //   EngineEvent.WalletScanComplete,
+  //   ({ txidVersion, chain }: WalletScannedEventData) => {
+  //     // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  //     onWalletPOIProofProgress(txidVersion, wallet, chain);
+  //   },
+  // );
 };
 
 const addressForWallet = (wallet: AbstractWallet): string => {
@@ -74,7 +81,7 @@ const loadExistingWallet = async (
     wallet = await engine.loadExistingWallet(encryptionKey, railgunWalletID);
   }
 
-  subscribeToBalanceEvents(wallet);
+  subscribeToEvents(wallet);
   return infoForWallet(wallet);
 };
 
@@ -93,7 +100,7 @@ const createWallet = async (
     0,
     formattedCreationBlockNumbers,
   );
-  subscribeToBalanceEvents(wallet);
+  subscribeToEvents(wallet);
   return infoForWallet(wallet);
 };
 
@@ -111,7 +118,7 @@ const createViewOnlyWallet = async (
     shareableViewingKey,
     formattedCreationBlockNumbers,
   );
-  subscribeToBalanceEvents(wallet);
+  subscribeToEvents(wallet);
   return infoForWallet(wallet);
 };
 

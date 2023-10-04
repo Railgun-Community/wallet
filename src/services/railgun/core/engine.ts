@@ -6,13 +6,11 @@ import {
   AbstractWallet,
   EngineEvent,
   MerkletreeHistoryScanEventData,
-  MerkletreeHistoryScanUpdateData,
   POIList,
   POIListType,
 } from '@railgun-community/engine';
 import {
   MerkletreeScanUpdateEvent,
-  MerkletreeScanStatus,
   isDefined,
 } from '@railgun-community/shared-models';
 import { sendErrorMessage, sendMessage } from '../../../utils/logger';
@@ -74,44 +72,32 @@ const createEngineDebugger = (): EngineDebugger => {
   };
 };
 
-export const setOnMerkletreeScanCallback = (
-  onMerkletreeScanCallback: (scanData: MerkletreeScanUpdateEvent) => void,
+export const setOnUTXOMerkletreeScanCallback = (
+  onUTXOMerkletreeScanCallback: (scanData: MerkletreeScanUpdateEvent) => void,
 ) => {
   const engine = getEngine();
   engine.on(
-    EngineEvent.MerkletreeHistoryScanStarted,
-    ({ chain }: MerkletreeHistoryScanEventData) =>
-      onMerkletreeScanCallback({
-        scanStatus: MerkletreeScanStatus.Started,
+    EngineEvent.UTXOMerkletreeHistoryScanUpdate,
+    ({ chain, scanStatus, progress }: MerkletreeHistoryScanEventData) =>
+      onUTXOMerkletreeScanCallback({
+        scanStatus,
         chain,
-        progress: 0.0,
+        progress: progress ?? 0.0,
       }),
   );
+};
+
+export const setOnTXIDMerkletreeScanCallback = (
+  onTXIDMerkletreeScanCallback: (scanData: MerkletreeScanUpdateEvent) => void,
+) => {
+  const engine = getEngine();
   engine.on(
-    EngineEvent.MerkletreeHistoryScanUpdate,
-    ({ chain, progress }: MerkletreeHistoryScanUpdateData) =>
-      onMerkletreeScanCallback({
-        scanStatus: MerkletreeScanStatus.Updated,
+    EngineEvent.TXIDMerkletreeHistoryScanUpdate,
+    ({ chain, scanStatus, progress }: MerkletreeHistoryScanEventData) =>
+      onTXIDMerkletreeScanCallback({
+        scanStatus,
         chain,
-        progress,
-      }),
-  );
-  engine.on(
-    EngineEvent.MerkletreeHistoryScanComplete,
-    ({ chain }: MerkletreeHistoryScanEventData) =>
-      onMerkletreeScanCallback({
-        scanStatus: MerkletreeScanStatus.Complete,
-        chain,
-        progress: 1.0,
-      }),
-  );
-  engine.on(
-    EngineEvent.MerkletreeHistoryScanIncomplete,
-    ({ chain }: MerkletreeHistoryScanEventData) =>
-      onMerkletreeScanCallback({
-        scanStatus: MerkletreeScanStatus.Incomplete,
-        chain,
-        progress: 1.0,
+        progress: progress ?? 0.0,
       }),
   );
 };

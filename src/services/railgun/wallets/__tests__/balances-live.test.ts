@@ -8,7 +8,8 @@ import {
 import {
   closeTestEngine,
   initTestEngine,
-  pollUntilMerkletreeScanned,
+  pollUntilTXIDMerkletreeScanned,
+  pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
 import { createRailgunWallet } from '../wallets';
 import { refreshRailgunBalances } from '../balances';
@@ -19,7 +20,10 @@ import {
   TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
-import { loadProvider } from '../../core/providers';
+import {
+  getTXIDMerkletreeForNetwork,
+  loadProvider,
+} from '../../core/providers';
 import { walletForID } from '../../core';
 
 chai.use(chaiAsPromised);
@@ -55,7 +59,11 @@ describe('balances-live', () => {
       networkName,
       10000, // pollingInterval
     );
-    await pollUntilMerkletreeScanned();
+
+    await Promise.all([
+      pollUntilUTXOMerkletreeScanned(),
+      pollUntilTXIDMerkletreeScanned(),
+    ]);
   });
 
   after(async () => {
@@ -92,6 +100,12 @@ describe('balances-live', () => {
     expect(poiStatusReceived[0].strings.blindedCommitment).to.not.equal(
       'Missing',
     );
+
+    const txidMerkletree = getTXIDMerkletreeForNetwork(
+      txidVersion,
+      networkName,
+    );
+    expect(txidMerkletree.savedPOILaunchSnapshot).to.equal(true);
 
     // const poiStatusSpent = await wallet.getTXOsSpentPOIStatusInfo(
     //   txidVersion,
