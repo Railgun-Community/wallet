@@ -1,5 +1,7 @@
 import {
+  ByteLength,
   RailgunTransaction,
+  formatToByteLength,
   getTokenDataHash,
 } from '@railgun-community/engine';
 import { GetRailgunTransactionsAfterGraphIDQuery } from './graphql';
@@ -30,7 +32,7 @@ export const formatRailgunTransactions = (
       utxoTreeIn: Number(tx.utxoTreeIn),
       utxoTreeOut: Number(tx.utxoTreeOut),
       utxoBatchStartPositionOut: Number(tx.utxoBatchStartPositionOut),
-      transactionHash: tx.transactionHash,
+      txid: formatToByteLength(tx.transactionHash, ByteLength.UINT_256, false),
       hasUnshield: tx.hasUnshield,
       unshieldTokenHash,
     };

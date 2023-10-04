@@ -44,6 +44,9 @@ describe('railgun-txid-sync-graph', () => {
     expect(railgunTxs[0].boundParamsHash).to.equal(
       '0x2c72a0bcce4f1169dd988204775483938ded5f5899cec84829b1cc667a683784',
     );
+    expect(railgunTxs[0].txid).to.equal(
+      'f07a9a458f57f1cc9cc2e5a627c3ef611a18b77e10c2bfc133fceca7743f8d0c',
+    );
     expect(railgunTxs[0].utxoTreeIn).to.equal(0);
     expect(railgunTxs[0].utxoTreeOut).to.equal(0);
     expect(railgunTxs[0].utxoBatchStartPositionOut).to.equal(2);
@@ -85,6 +88,9 @@ describe('railgun-txid-sync-graph', () => {
     );
     expect(railgunTxs[0].boundParamsHash).to.equal(
       '0x0241df5c3ddca93c4bc340a10f628c7dff4acb0657469836836a2e824a4a000b',
+    );
+    expect(railgunTxs[0].txid).to.equal(
+      'cb7f6aae245502117c440a52a587afcb5e14d89665c9bda0a8e6bdf780b7f6f5',
     );
     expect(railgunTxs[0].utxoTreeIn).to.equal(0);
     expect(railgunTxs[0].utxoTreeOut).to.equal(0);
