@@ -5,6 +5,7 @@ import {
   EngineEvent,
   WalletScannedEventData,
   TokenBalances,
+  NFTTokenData,
 } from '@railgun-community/engine';
 import {
   RailgunBalancesEvent,
@@ -13,6 +14,7 @@ import {
   NetworkName,
   NETWORK_CONFIG,
   TXIDVersion,
+  NFTTokenType,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
 import { parseRailgunTokenAddress } from '../util/bytes';
@@ -47,6 +49,32 @@ const getSerializedERC20Balances = (
         amount: balances[railgunBalanceAddress].balance,
       };
       return erc20Balance;
+    });
+};
+
+const getSerializedNFTBalances = (
+  balances: TokenBalances,
+): RailgunNFTAmount[] => {
+  const tokenHashes = Object.keys(balances);
+
+  return tokenHashes
+    .filter(tokenHash => {
+      return [TokenType.ERC721, TokenType.ERC1155].includes(
+        balances[tokenHash].tokenData.tokenType,
+      );
+    })
+    .map(railgunBalanceAddress => {
+      const balanceForToken = balances[railgunBalanceAddress];
+      const tokenData = balanceForToken.tokenData;
+      const nftBalance: RailgunNFTAmount = {
+        nftAddress: parseRailgunTokenAddress(
+          tokenData.tokenAddress,
+        ).toLowerCase(),
+        tokenSubID: tokenData.tokenSubID,
+        nftTokenType: tokenData.tokenType as 1 | 2,
+        amount: balanceForToken.balance,
+      };
+      return nftBalance;
     });
 };
 
@@ -127,6 +155,31 @@ export const balanceForERC20Token = async (
     return 0n;
   }
   return matchingTokenBalance.amount;
+};
+
+export const balanceForNFT = async (
+  txidVersion: TXIDVersion,
+  wallet: AbstractWallet,
+  networkName: NetworkName,
+  nftTokenData: NFTTokenData,
+): Promise<bigint> => {
+  const { chain } = NETWORK_CONFIG[networkName];
+  const balances = await wallet.getTokenBalancesByTxidVersion(
+    txidVersion,
+    chain,
+  );
+  const nftBalances = getSerializedNFTBalances(balances);
+
+  const matchingNFTBalance: Optional<RailgunNFTAmount> = nftBalances.find(
+    nftBalance =>
+      nftBalance.nftAddress.toLowerCase() ===
+        nftTokenData.tokenAddress.toLowerCase() &&
+      BigInt(nftBalance.tokenSubID) === BigInt(nftTokenData.tokenSubID),
+  );
+  if (!matchingNFTBalance) {
+    return 0n;
+  }
+  return matchingNFTBalance.amount;
 };
 
 export const awaitWalletScan = (walletID: string, chain: Chain) => {
