@@ -4,6 +4,7 @@ import {
   TXIDVersion,
   isDefined,
   networkForChain,
+  promiseTimeout,
   removeUndefineds,
 } from '@railgun-community/shared-models';
 import { EMPTY_EVENTS } from './empty-events';
@@ -138,7 +139,11 @@ const autoPaginatingQuery = async <ReturnType extends { blockNumber: string }>(
   blockNumber: string,
   prevResults: ReturnType[] = [],
 ): Promise<ReturnType[]> => {
-  const newResults = await query(blockNumber);
+  const newResults = await promiseTimeout(
+    query(blockNumber),
+    15000,
+    new Error('Timeout querying Graph for QuickSync of RAILGUN Events'),
+  );
   if (newResults.length === 0) {
     return prevResults;
   }
