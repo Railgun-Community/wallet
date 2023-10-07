@@ -212,4 +212,11 @@ export const awaitMultipleWalletScans = async (
   return Promise.resolve();
 };
 
-export { getTokenDataHash, getTokenDataNFT, getTokenDataERC20 };
+export {
+  getTokenDataHash,
+  getTokenDataNFT,
+  getTokenDataERC20,
+  TokenType,
+  NFTTokenType,
+  NFTTokenData,
+};
