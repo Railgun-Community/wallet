@@ -14,14 +14,16 @@ import {
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { walletForID } from '../engine';
 import {
-  getUTXOMerkletreeForNetwork,
   getFallbackProviderForNetwork,
   loadProvider,
   getRelayAdaptContractForNetwork,
   getRailgunSmartWalletContractForNetwork,
-  getTXIDMerkletreeForNetwork,
 } from '../providers';
 import { createRailgunWallet } from '../../wallets/wallets';
+import {
+  getUTXOMerkletreeForNetwork,
+  getTXIDMerkletreeForNetwork,
+} from '../merkletree';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

@@ -59,36 +59,6 @@ export const setPollingProviderForNetwork = (
   pollingProviderMap[networkName] = provider;
 };
 
-export const getUTXOMerkletreeForNetwork = (
-  txidVersion: TXIDVersion,
-  networkName: NetworkName,
-) => {
-  const network = NETWORK_CONFIG[networkName];
-  const { chain } = network;
-  const utxoMerkletree = getEngine().getUTXOMerkletree(txidVersion, chain);
-  if (!isDefined(utxoMerkletree)) {
-    throw new Error(
-      `MerkleTree not yet loaded for network ${network.publicName}`,
-    );
-  }
-  return utxoMerkletree;
-};
-
-export const getTXIDMerkletreeForNetwork = (
-  txidVersion: TXIDVersion,
-  networkName: NetworkName,
-) => {
-  const network = NETWORK_CONFIG[networkName];
-  const { chain } = network;
-  const txidMerkletree = getEngine().getTXIDMerkletree(txidVersion, chain);
-  if (!isDefined(txidMerkletree)) {
-    throw new Error(
-      `MerkleTree not yet loaded for network ${network.publicName}`,
-    );
-  }
-  return txidMerkletree;
-};
-
 export const getRailgunSmartWalletContractForNetwork = (
   networkName: NetworkName,
 ): RailgunSmartWalletContract => {
