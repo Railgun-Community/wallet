@@ -6,6 +6,9 @@ import {
   WalletScannedEventData,
   TokenBalances,
   NFTTokenData,
+  getTokenDataHash,
+  getTokenDataNFT,
+  getTokenDataERC20,
 } from '@railgun-community/engine';
 import {
   RailgunBalancesEvent,
@@ -208,3 +211,5 @@ export const awaitMultipleWalletScans = async (
   }
   return Promise.resolve();
 };
+
+export { getTokenDataHash, getTokenDataNFT, getTokenDataERC20 };
