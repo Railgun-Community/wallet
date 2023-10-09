@@ -23,6 +23,7 @@ import {
 import { loadProvider } from '../../core/providers';
 import { walletForID } from '../../core';
 import { getTXIDMerkletreeForNetwork } from '../../core/merkletree';
+import { WalletBalanceBucket } from '@railgun-community/engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -81,6 +82,7 @@ describe('balances-live', () => {
     const balances = await wallet.getTokenBalancesByTxidVersion(
       txidVersion,
       chain,
+      Object.values(WalletBalanceBucket), // TODO: Filter by Balance Bucket
     );
     expect(Object.keys(balances).length).to.be.greaterThanOrEqual(1);
 
