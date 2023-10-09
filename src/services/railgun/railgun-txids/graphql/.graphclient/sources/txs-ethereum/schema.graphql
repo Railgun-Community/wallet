@@ -1988,7 +1988,10 @@ type Transaction implements TransactionInterface {
   utxoTreeIn: BigInt!
   utxoTreeOut: BigInt!
   utxoBatchStartPositionOut: BigInt!
-  token: Token!
+  unshieldToken: Token!
+  unshieldToAddress: Bytes!
+  unshieldValue: BigInt!
+  blockTimestamp: BigInt!
 }
 
 interface TransactionInterface {
@@ -2003,7 +2006,10 @@ interface TransactionInterface {
   utxoTreeIn: BigInt!
   utxoTreeOut: BigInt!
   utxoBatchStartPositionOut: BigInt!
-  token: Token!
+  unshieldToken: Token!
+  unshieldToAddress: Bytes!
+  unshieldValue: BigInt!
+  blockTimestamp: BigInt!
 }
 
 input TransactionInterface_filter {
@@ -2095,27 +2101,53 @@ input TransactionInterface_filter {
   utxoBatchStartPositionOut_lte: BigInt
   utxoBatchStartPositionOut_in: [BigInt!]
   utxoBatchStartPositionOut_not_in: [BigInt!]
-  token: String
-  token_not: String
-  token_gt: String
-  token_lt: String
-  token_gte: String
-  token_lte: String
-  token_in: [String!]
-  token_not_in: [String!]
-  token_contains: String
-  token_contains_nocase: String
-  token_not_contains: String
-  token_not_contains_nocase: String
-  token_starts_with: String
-  token_starts_with_nocase: String
-  token_not_starts_with: String
-  token_not_starts_with_nocase: String
-  token_ends_with: String
-  token_ends_with_nocase: String
-  token_not_ends_with: String
-  token_not_ends_with_nocase: String
-  token_: Token_filter
+  unshieldToken: String
+  unshieldToken_not: String
+  unshieldToken_gt: String
+  unshieldToken_lt: String
+  unshieldToken_gte: String
+  unshieldToken_lte: String
+  unshieldToken_in: [String!]
+  unshieldToken_not_in: [String!]
+  unshieldToken_contains: String
+  unshieldToken_contains_nocase: String
+  unshieldToken_not_contains: String
+  unshieldToken_not_contains_nocase: String
+  unshieldToken_starts_with: String
+  unshieldToken_starts_with_nocase: String
+  unshieldToken_not_starts_with: String
+  unshieldToken_not_starts_with_nocase: String
+  unshieldToken_ends_with: String
+  unshieldToken_ends_with_nocase: String
+  unshieldToken_not_ends_with: String
+  unshieldToken_not_ends_with_nocase: String
+  unshieldToken_: Token_filter
+  unshieldToAddress: Bytes
+  unshieldToAddress_not: Bytes
+  unshieldToAddress_gt: Bytes
+  unshieldToAddress_lt: Bytes
+  unshieldToAddress_gte: Bytes
+  unshieldToAddress_lte: Bytes
+  unshieldToAddress_in: [Bytes!]
+  unshieldToAddress_not_in: [Bytes!]
+  unshieldToAddress_contains: Bytes
+  unshieldToAddress_not_contains: Bytes
+  unshieldValue: BigInt
+  unshieldValue_not: BigInt
+  unshieldValue_gt: BigInt
+  unshieldValue_lt: BigInt
+  unshieldValue_gte: BigInt
+  unshieldValue_lte: BigInt
+  unshieldValue_in: [BigInt!]
+  unshieldValue_not_in: [BigInt!]
+  blockTimestamp: BigInt
+  blockTimestamp_not: BigInt
+  blockTimestamp_gt: BigInt
+  blockTimestamp_lt: BigInt
+  blockTimestamp_gte: BigInt
+  blockTimestamp_lte: BigInt
+  blockTimestamp_in: [BigInt!]
+  blockTimestamp_not_in: [BigInt!]
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
   and: [TransactionInterface_filter]
@@ -2134,11 +2166,14 @@ enum TransactionInterface_orderBy {
   utxoTreeIn
   utxoTreeOut
   utxoBatchStartPositionOut
-  token
-  token__id
-  token__tokenType
-  token__tokenAddress
-  token__tokenSubID
+  unshieldToken
+  unshieldToken__id
+  unshieldToken__tokenType
+  unshieldToken__tokenAddress
+  unshieldToken__tokenSubID
+  unshieldToAddress
+  unshieldValue
+  blockTimestamp
 }
 
 input Transaction_filter {
@@ -2230,27 +2265,53 @@ input Transaction_filter {
   utxoBatchStartPositionOut_lte: BigInt
   utxoBatchStartPositionOut_in: [BigInt!]
   utxoBatchStartPositionOut_not_in: [BigInt!]
-  token: String
-  token_not: String
-  token_gt: String
-  token_lt: String
-  token_gte: String
-  token_lte: String
-  token_in: [String!]
-  token_not_in: [String!]
-  token_contains: String
-  token_contains_nocase: String
-  token_not_contains: String
-  token_not_contains_nocase: String
-  token_starts_with: String
-  token_starts_with_nocase: String
-  token_not_starts_with: String
-  token_not_starts_with_nocase: String
-  token_ends_with: String
-  token_ends_with_nocase: String
-  token_not_ends_with: String
-  token_not_ends_with_nocase: String
-  token_: Token_filter
+  unshieldToken: String
+  unshieldToken_not: String
+  unshieldToken_gt: String
+  unshieldToken_lt: String
+  unshieldToken_gte: String
+  unshieldToken_lte: String
+  unshieldToken_in: [String!]
+  unshieldToken_not_in: [String!]
+  unshieldToken_contains: String
+  unshieldToken_contains_nocase: String
+  unshieldToken_not_contains: String
+  unshieldToken_not_contains_nocase: String
+  unshieldToken_starts_with: String
+  unshieldToken_starts_with_nocase: String
+  unshieldToken_not_starts_with: String
+  unshieldToken_not_starts_with_nocase: String
+  unshieldToken_ends_with: String
+  unshieldToken_ends_with_nocase: String
+  unshieldToken_not_ends_with: String
+  unshieldToken_not_ends_with_nocase: String
+  unshieldToken_: Token_filter
+  unshieldToAddress: Bytes
+  unshieldToAddress_not: Bytes
+  unshieldToAddress_gt: Bytes
+  unshieldToAddress_lt: Bytes
+  unshieldToAddress_gte: Bytes
+  unshieldToAddress_lte: Bytes
+  unshieldToAddress_in: [Bytes!]
+  unshieldToAddress_not_in: [Bytes!]
+  unshieldToAddress_contains: Bytes
+  unshieldToAddress_not_contains: Bytes
+  unshieldValue: BigInt
+  unshieldValue_not: BigInt
+  unshieldValue_gt: BigInt
+  unshieldValue_lt: BigInt
+  unshieldValue_gte: BigInt
+  unshieldValue_lte: BigInt
+  unshieldValue_in: [BigInt!]
+  unshieldValue_not_in: [BigInt!]
+  blockTimestamp: BigInt
+  blockTimestamp_not: BigInt
+  blockTimestamp_gt: BigInt
+  blockTimestamp_lt: BigInt
+  blockTimestamp_gte: BigInt
+  blockTimestamp_lte: BigInt
+  blockTimestamp_in: [BigInt!]
+  blockTimestamp_not_in: [BigInt!]
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
   and: [Transaction_filter]
@@ -2269,11 +2330,14 @@ enum Transaction_orderBy {
   utxoTreeIn
   utxoTreeOut
   utxoBatchStartPositionOut
-  token
-  token__id
-  token__tokenType
-  token__tokenAddress
-  token__tokenSubID
+  unshieldToken
+  unshieldToken__id
+  unshieldToken__tokenType
+  unshieldToken__tokenAddress
+  unshieldToken__tokenSubID
+  unshieldToAddress
+  unshieldValue
+  blockTimestamp
 }
 
 type Unshield {

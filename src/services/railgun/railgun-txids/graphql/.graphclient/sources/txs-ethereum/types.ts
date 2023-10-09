@@ -1801,7 +1801,10 @@ export type Transaction = TransactionInterface & {
   utxoTreeIn: Scalars['BigInt'];
   utxoTreeOut: Scalars['BigInt'];
   utxoBatchStartPositionOut: Scalars['BigInt'];
-  token: Token;
+  unshieldToken: Token;
+  unshieldToAddress: Scalars['Bytes'];
+  unshieldValue: Scalars['BigInt'];
+  blockTimestamp: Scalars['BigInt'];
 };
 
 export type TransactionInterface = {
@@ -1816,7 +1819,10 @@ export type TransactionInterface = {
   utxoTreeIn: Scalars['BigInt'];
   utxoTreeOut: Scalars['BigInt'];
   utxoBatchStartPositionOut: Scalars['BigInt'];
-  token: Token;
+  unshieldToken: Token;
+  unshieldToAddress: Scalars['Bytes'];
+  unshieldValue: Scalars['BigInt'];
+  blockTimestamp: Scalars['BigInt'];
 };
 
 export type TransactionInterface_filter = {
@@ -1908,27 +1914,53 @@ export type TransactionInterface_filter = {
   utxoBatchStartPositionOut_lte?: InputMaybe<Scalars['BigInt']>;
   utxoBatchStartPositionOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
   utxoBatchStartPositionOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  token?: InputMaybe<Scalars['String']>;
-  token_not?: InputMaybe<Scalars['String']>;
-  token_gt?: InputMaybe<Scalars['String']>;
-  token_lt?: InputMaybe<Scalars['String']>;
-  token_gte?: InputMaybe<Scalars['String']>;
-  token_lte?: InputMaybe<Scalars['String']>;
-  token_in?: InputMaybe<Array<Scalars['String']>>;
-  token_not_in?: InputMaybe<Array<Scalars['String']>>;
-  token_contains?: InputMaybe<Scalars['String']>;
-  token_contains_nocase?: InputMaybe<Scalars['String']>;
-  token_not_contains?: InputMaybe<Scalars['String']>;
-  token_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  token_starts_with?: InputMaybe<Scalars['String']>;
-  token_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  token_not_starts_with?: InputMaybe<Scalars['String']>;
-  token_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  token_ends_with?: InputMaybe<Scalars['String']>;
-  token_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  token_not_ends_with?: InputMaybe<Scalars['String']>;
-  token_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  token_?: InputMaybe<Token_filter>;
+  unshieldToken?: InputMaybe<Scalars['String']>;
+  unshieldToken_not?: InputMaybe<Scalars['String']>;
+  unshieldToken_gt?: InputMaybe<Scalars['String']>;
+  unshieldToken_lt?: InputMaybe<Scalars['String']>;
+  unshieldToken_gte?: InputMaybe<Scalars['String']>;
+  unshieldToken_lte?: InputMaybe<Scalars['String']>;
+  unshieldToken_in?: InputMaybe<Array<Scalars['String']>>;
+  unshieldToken_not_in?: InputMaybe<Array<Scalars['String']>>;
+  unshieldToken_contains?: InputMaybe<Scalars['String']>;
+  unshieldToken_contains_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_contains?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_starts_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_starts_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_ends_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_ends_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_?: InputMaybe<Token_filter>;
+  unshieldToAddress?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_not?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_gte?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_lte?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  unshieldToAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  unshieldToAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
+  unshieldValue?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_not?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_gt?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_lt?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_gte?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_lte?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  unshieldValue_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_not?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_lt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<TransactionInterface_filter>>>;
@@ -1947,11 +1979,14 @@ export type TransactionInterface_orderBy =
   | 'utxoTreeIn'
   | 'utxoTreeOut'
   | 'utxoBatchStartPositionOut'
-  | 'token'
-  | 'token__id'
-  | 'token__tokenType'
-  | 'token__tokenAddress'
-  | 'token__tokenSubID';
+  | 'unshieldToken'
+  | 'unshieldToken__id'
+  | 'unshieldToken__tokenType'
+  | 'unshieldToken__tokenAddress'
+  | 'unshieldToken__tokenSubID'
+  | 'unshieldToAddress'
+  | 'unshieldValue'
+  | 'blockTimestamp';
 
 export type Transaction_filter = {
   id?: InputMaybe<Scalars['Bytes']>;
@@ -2042,27 +2077,53 @@ export type Transaction_filter = {
   utxoBatchStartPositionOut_lte?: InputMaybe<Scalars['BigInt']>;
   utxoBatchStartPositionOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
   utxoBatchStartPositionOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
-  token?: InputMaybe<Scalars['String']>;
-  token_not?: InputMaybe<Scalars['String']>;
-  token_gt?: InputMaybe<Scalars['String']>;
-  token_lt?: InputMaybe<Scalars['String']>;
-  token_gte?: InputMaybe<Scalars['String']>;
-  token_lte?: InputMaybe<Scalars['String']>;
-  token_in?: InputMaybe<Array<Scalars['String']>>;
-  token_not_in?: InputMaybe<Array<Scalars['String']>>;
-  token_contains?: InputMaybe<Scalars['String']>;
-  token_contains_nocase?: InputMaybe<Scalars['String']>;
-  token_not_contains?: InputMaybe<Scalars['String']>;
-  token_not_contains_nocase?: InputMaybe<Scalars['String']>;
-  token_starts_with?: InputMaybe<Scalars['String']>;
-  token_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  token_not_starts_with?: InputMaybe<Scalars['String']>;
-  token_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  token_ends_with?: InputMaybe<Scalars['String']>;
-  token_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  token_not_ends_with?: InputMaybe<Scalars['String']>;
-  token_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
-  token_?: InputMaybe<Token_filter>;
+  unshieldToken?: InputMaybe<Scalars['String']>;
+  unshieldToken_not?: InputMaybe<Scalars['String']>;
+  unshieldToken_gt?: InputMaybe<Scalars['String']>;
+  unshieldToken_lt?: InputMaybe<Scalars['String']>;
+  unshieldToken_gte?: InputMaybe<Scalars['String']>;
+  unshieldToken_lte?: InputMaybe<Scalars['String']>;
+  unshieldToken_in?: InputMaybe<Array<Scalars['String']>>;
+  unshieldToken_not_in?: InputMaybe<Array<Scalars['String']>>;
+  unshieldToken_contains?: InputMaybe<Scalars['String']>;
+  unshieldToken_contains_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_contains?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_starts_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_starts_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_ends_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_ends_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_?: InputMaybe<Token_filter>;
+  unshieldToAddress?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_not?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_gte?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_lte?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  unshieldToAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  unshieldToAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
+  unshieldValue?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_not?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_gt?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_lt?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_gte?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_lte?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  unshieldValue_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_not?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_lt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Transaction_filter>>>;
@@ -2081,11 +2142,14 @@ export type Transaction_orderBy =
   | 'utxoTreeIn'
   | 'utxoTreeOut'
   | 'utxoBatchStartPositionOut'
-  | 'token'
-  | 'token__id'
-  | 'token__tokenType'
-  | 'token__tokenAddress'
-  | 'token__tokenSubID';
+  | 'unshieldToken'
+  | 'unshieldToken__id'
+  | 'unshieldToken__tokenType'
+  | 'unshieldToken__tokenAddress'
+  | 'unshieldToken__tokenSubID'
+  | 'unshieldToAddress'
+  | 'unshieldValue'
+  | 'blockTimestamp';
 
 export type Unshield = {
   id: Scalars['Bytes'];
