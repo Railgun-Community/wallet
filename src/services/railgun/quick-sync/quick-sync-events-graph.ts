@@ -141,7 +141,7 @@ const autoPaginatingQuery = async <ReturnType extends { blockNumber: string }>(
 ): Promise<ReturnType[]> => {
   const newResults = await promiseTimeout(
     query(blockNumber),
-    15000,
+    20000,
     new Error('Timeout querying Graph for QuickSync of RAILGUN Events'),
   );
   if (newResults.length === 0) {

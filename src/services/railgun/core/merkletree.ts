@@ -51,11 +51,14 @@ export const getSpendableUTXOsForToken = async (
 ): Promise<Optional<TXO[]>> => {
   const wallet = walletForID(walletID);
   const chain = NETWORK_CONFIG[networkName].chain;
-  const balances = await wallet.getAllBalances(chain, [
-    WalletBalanceBucket.Spendable,
-  ]);
+  const onlySpendable = true;
+  const balances = await wallet.getTokenBalances(
+    txidVersion,
+    chain,
+    onlySpendable,
+  );
   const tokenHash = getTokenDataHash(tokenData);
-  return balances[txidVersion]?.[tokenHash]?.utxos;
+  return balances[tokenHash]?.utxos;
 };
 
 export const getMerkleProofForERC721 = async (

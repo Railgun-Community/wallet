@@ -79,10 +79,10 @@ describe('balances-live', () => {
     );
 
     const wallet = walletForID(railgunWalletID);
-    const balances = await wallet.getTokenBalancesByTxidVersion(
+    const balances = await wallet.getTokenBalances(
       txidVersion,
       chain,
-      Object.values(WalletBalanceBucket), // TODO: Filter by Balance Bucket
+      false, // onlySpendable
     );
     expect(Object.keys(balances).length).to.be.greaterThanOrEqual(1);
 

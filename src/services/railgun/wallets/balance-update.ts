@@ -120,10 +120,11 @@ export const onBalancesUpdate = async (
     return;
   }
 
-  const tokenBalances = await wallet.getTokenBalancesByTxidVersion(
+  // TODO: Get balances by bucket
+  const tokenBalances = await wallet.getTokenBalances(
     txidVersion,
     chain,
-    Object.values(WalletBalanceBucket), // TODO: Filter by Balance Bucket
+    false, // onlySpendable
   );
   const erc20Amounts = getSerializedERC20Balances(tokenBalances);
   const nftAmounts = getNFTBalances(tokenBalances);
@@ -146,10 +147,11 @@ export const balanceForERC20Token = async (
   tokenAddress: string,
 ): Promise<bigint> => {
   const { chain } = NETWORK_CONFIG[networkName];
-  const balances = await wallet.getTokenBalancesByTxidVersion(
+  // TODO: Pass in bucket for filter
+  const balances = await wallet.getTokenBalances(
     txidVersion,
     chain,
-    Object.values(WalletBalanceBucket), // TODO: Filter by Balance Bucket
+    false, // onlySpendable
   );
   const tokenBalances = getSerializedERC20Balances(balances);
 
@@ -170,10 +172,11 @@ export const balanceForNFT = async (
   nftTokenData: NFTTokenData,
 ): Promise<bigint> => {
   const { chain } = NETWORK_CONFIG[networkName];
-  const balances = await wallet.getTokenBalancesByTxidVersion(
+  // TODO: Pass in bucket for filter
+  const balances = await wallet.getTokenBalances(
     txidVersion,
     chain,
-    Object.values(WalletBalanceBucket), // TODO: Filter by Balance Bucket
+    false, // onlySpendable
   );
   const nftBalances = getSerializedNFTBalances(balances);
 
