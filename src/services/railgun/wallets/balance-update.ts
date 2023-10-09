@@ -9,6 +9,7 @@ import {
   getTokenDataHash,
   getTokenDataNFT,
   getTokenDataERC20,
+  WalletBalanceBucket,
 } from '@railgun-community/engine';
 import {
   RailgunBalancesEvent,
@@ -122,6 +123,7 @@ export const onBalancesUpdate = async (
   const tokenBalances = await wallet.getTokenBalancesByTxidVersion(
     txidVersion,
     chain,
+    Object.values(WalletBalanceBucket), // TODO: Filter by Balance Bucket
   );
   const erc20Amounts = getSerializedERC20Balances(tokenBalances);
   const nftAmounts = getNFTBalances(tokenBalances);
@@ -147,6 +149,7 @@ export const balanceForERC20Token = async (
   const balances = await wallet.getTokenBalancesByTxidVersion(
     txidVersion,
     chain,
+    Object.values(WalletBalanceBucket), // TODO: Filter by Balance Bucket
   );
   const tokenBalances = getSerializedERC20Balances(balances);
 
@@ -170,6 +173,7 @@ export const balanceForNFT = async (
   const balances = await wallet.getTokenBalancesByTxidVersion(
     txidVersion,
     chain,
+    Object.values(WalletBalanceBucket), // TODO: Filter by Balance Bucket
   );
   const nftBalances = getSerializedNFTBalances(balances);
 

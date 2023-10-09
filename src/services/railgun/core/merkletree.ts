@@ -1,5 +1,4 @@
 import {
-  Chain,
   NETWORK_CONFIG,
   NetworkName,
   TXIDVersion,
@@ -10,6 +9,7 @@ import {
   NFTTokenData,
   TXO,
   TokenData,
+  WalletBalanceBucket,
   getTokenDataHash,
 } from '@railgun-community/engine';
 
@@ -43,7 +43,7 @@ export const getTXIDMerkletreeForNetwork = (
   return txidMerkletree;
 };
 
-export const getUTXOsForToken = async (
+export const getSpendableUTXOsForToken = async (
   txidVersion: TXIDVersion,
   networkName: NetworkName,
   walletID: string,
@@ -51,7 +51,9 @@ export const getUTXOsForToken = async (
 ): Promise<Optional<TXO[]>> => {
   const wallet = walletForID(walletID);
   const chain = NETWORK_CONFIG[networkName].chain;
-  const balances = await wallet.getAllBalances(chain);
+  const balances = await wallet.getAllBalances(chain, [
+    WalletBalanceBucket.Spendable,
+  ]);
   const tokenHash = getTokenDataHash(tokenData);
   return balances[txidVersion]?.[tokenHash]?.utxos;
 };
@@ -62,14 +64,14 @@ export const getMerkleProofForERC721 = async (
   walletID: string,
   nftTokenData: NFTTokenData,
 ) => {
-  const utxos = await getUTXOsForToken(
+  const utxos = await getSpendableUTXOsForToken(
     txidVersion,
     networkName,
     walletID,
     nftTokenData,
   );
   if (!utxos || !utxos.length) {
-    throw new Error('No UTXOs found for NFT');
+    throw new Error('No spendable UTXOs found for NFT');
   }
   if (utxos.length !== 1) {
     throw new Error('Expected 1 UTXO for NFT');
