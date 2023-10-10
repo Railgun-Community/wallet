@@ -23,13 +23,11 @@ import {
   setGasDetailsForTransaction,
 } from './tx-gas-details';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import {
-  assertValidRailgunAddress,
-  getRailgunSmartWalletContractForNetwork,
-} from '../railgun';
+import { getRailgunSmartWalletContractForNetwork } from '../railgun/core/contracts';
 import { createNFTTokenDataFromRailgunNFTAmount } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
 import { ContractTransaction } from 'ethers';
+import { assertValidRailgunAddress } from '../railgun/wallets';
 
 export const getShieldPrivateKeySignatureMessage = () => {
   return ShieldNote.getShieldPrivateKeySignatureMessage();

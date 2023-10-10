@@ -144,7 +144,7 @@ export const startRailgunEngine = (
     );
 
     if (isDefined(poiNodeURL)) {
-      const poiNodeInterface = new WalletPOINodeInterface(poiNodeURL, engine);
+      const poiNodeInterface = new WalletPOINodeInterface(poiNodeURL);
       WalletPOI.init(poiNodeInterface, customPOILists ?? []);
     }
   } catch (err) {

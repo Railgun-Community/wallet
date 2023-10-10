@@ -114,6 +114,7 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
     wallet,
     networkName,
     feeTokenDetails.tokenAddress,
+    true,
   );
 
   let relayerFeeCommitment = getRelayerFeeCommitment(serializedTransactions);

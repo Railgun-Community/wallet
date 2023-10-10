@@ -5,7 +5,6 @@ import {
   NetworkName,
   TransactionGasDetails,
 } from '@railgun-community/shared-models';
-import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
   gasEstimateResponse,
   getGasEstimate,
@@ -18,9 +17,10 @@ import {
   RailgunEngine,
   hexToBytes,
 } from '@railgun-community/engine';
-import { assertValidRailgunAddress } from '../railgun';
+import { getRelayAdaptContractForNetwork } from '../railgun/core/contracts';
 import { reportAndSanitizeError } from '../../utils/error';
 import { ContractTransaction } from 'ethers';
+import { assertValidRailgunAddress } from '../railgun/wallets/wallets';
 
 const generateShieldBaseTokenTransaction = async (
   networkName: NetworkName,

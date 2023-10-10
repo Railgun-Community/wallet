@@ -9,7 +9,6 @@ import {
   NFTTokenData,
   TXO,
   TokenData,
-  WalletBalanceBucket,
   getTokenDataHash,
 } from '@railgun-community/engine';
 

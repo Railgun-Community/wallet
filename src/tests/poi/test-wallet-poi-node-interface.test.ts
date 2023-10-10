@@ -44,6 +44,11 @@ export class TestWalletPOINodeInterface extends POINodeInterface {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  async isRequired(chain: Chain): Promise<boolean> {
+    return true;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   async getPOIsPerList(
     txidVersion: TXIDVersion,
     _chain: Chain,

@@ -21,7 +21,6 @@ import {
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
   TEST_WALLET_SOURCE,
 } from './mocks.test';
-import { loadProvider } from '../services/railgun/core/providers';
 import { ArtifactStore } from '../services/artifacts/artifact-store';
 import { setOnBalanceUpdateCallback } from '../services/railgun/wallets/balance-update';
 import { WalletPOI } from '../services/poi/wallet-poi';
@@ -29,6 +28,7 @@ import { TestWalletPOIRequester } from './poi/test-wallet-poi-requester.test';
 import { TestWalletPOINodeInterface } from './poi/test-wallet-poi-node-interface.test';
 import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
 import { GetLatestValidatedRailgunTxid } from '@railgun-community/engine';
+import { loadProvider } from '../services/railgun/core';
 
 const ENGINE_TEST_DB = 'test.db';
 const db = new LevelDOWN(ENGINE_TEST_DB);

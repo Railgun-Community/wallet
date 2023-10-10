@@ -15,7 +15,6 @@ import {
 } from './tx-generator';
 import { assertValidEthAddress } from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
-import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
   AdaptID,
   ProverProgressCallback,
@@ -24,6 +23,7 @@ import {
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
+import { getRelayAdaptContractForNetwork } from '../railgun/core/contracts';
 
 export const generateUnshieldProof = async (
   txidVersion: TXIDVersion,

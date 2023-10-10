@@ -20,10 +20,9 @@ import {
   TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
-import { loadProvider } from '../../core/providers';
+import { loadProvider } from '../../core/load-provider';
 import { walletForID } from '../../core';
 import { getTXIDMerkletreeForNetwork } from '../../core/merkletree';
-import { WalletBalanceBucket } from '@railgun-community/engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

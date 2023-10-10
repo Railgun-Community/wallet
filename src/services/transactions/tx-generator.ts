@@ -24,7 +24,7 @@ import { fullWalletForID, walletForID } from '../railgun/core/engine';
 import {
   getRailgunSmartWalletContractForNetwork,
   getRelayAdaptContractForNetwork,
-} from '../railgun/core/providers';
+} from '../railgun/core/contracts';
 import {
   erc20NoteFromERC20AmountRecipient,
   nftNoteFromNFTAmountRecipient,

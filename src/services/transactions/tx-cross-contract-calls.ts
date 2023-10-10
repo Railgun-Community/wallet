@@ -14,7 +14,6 @@ import {
   RailgunERC20Recipient,
   TXIDVersion,
 } from '@railgun-community/shared-models';
-import { getRelayAdaptContractForNetwork } from '../railgun/core/providers';
 import {
   generateDummyProofTransactions,
   generateProofTransactions,
@@ -43,6 +42,7 @@ import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { reportAndSanitizeError } from '../../utils/error';
 import { ContractTransaction, Log } from 'ethers';
+import { getRelayAdaptContractForNetwork } from '../railgun/core/contracts';
 
 const createValidCrossContractCalls = (
   crossContractCalls: ContractTransaction[],

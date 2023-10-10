@@ -58,7 +58,7 @@ describe('balance-update', () => {
       },
     };
     walletBalanceStub = Sinon.stub(
-      RailgunWallet.prototype,
+      RailgunWallet,
       'getTokenBalancesByTxidVersion',
     ).resolves(balances);
   });

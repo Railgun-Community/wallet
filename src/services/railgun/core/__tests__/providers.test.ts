@@ -13,17 +13,17 @@ import {
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { walletForID } from '../engine';
-import {
-  getFallbackProviderForNetwork,
-  loadProvider,
-  getRelayAdaptContractForNetwork,
-  getRailgunSmartWalletContractForNetwork,
-} from '../providers';
+import { getFallbackProviderForNetwork } from '../providers';
+import { loadProvider } from '../load-provider';
 import { createRailgunWallet } from '../../wallets/wallets';
 import {
   getUTXOMerkletreeForNetwork,
   getTXIDMerkletreeForNetwork,
 } from '../merkletree';
+import {
+  getRailgunSmartWalletContractForNetwork,
+  getRelayAdaptContractForNetwork,
+} from '../contracts';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

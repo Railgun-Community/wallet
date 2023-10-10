@@ -18,7 +18,6 @@ import {
 import {
   getPollingProviderForNetwork,
   getFallbackProviderForNetwork,
-  loadProvider,
 } from '../../core/providers';
 import { extractFirstNoteERC20AmountMapFromTransactionRequest } from '../extract-first-note';
 import {
@@ -43,6 +42,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { randomBytes } from 'ethers';
+import { loadProvider } from '../../core/load-provider';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
