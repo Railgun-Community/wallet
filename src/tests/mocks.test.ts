@@ -9,7 +9,10 @@ import {
   TransactionGasDetails,
   RailgunERC20Recipient,
 } from '@railgun-community/shared-models';
-import { BalancesUpdatedCallback } from '../services/railgun/wallets/balance-update';
+import {
+  BalancesUpdatedCallback,
+  POIProofProgressCallback,
+} from '../services/railgun/wallets/balance-update';
 import { CommitmentCiphertext } from '@railgun-community/engine';
 
 export const MOCK_MNEMONIC =
@@ -169,6 +172,11 @@ export const MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2: TransactionGasDetai
 export const MOCK_BALANCES_UPDATE_CALLBACK: BalancesUpdatedCallback = () => {
   // noop
 };
+
+export const MOCK_POI_PROOF_PROGRESS_CALLBACK_CALLBACK: POIProofProgressCallback =
+  () => {
+    // noop
+  };
 
 export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG: FallbackProviderJsonConfig = {
   chainId: 137,

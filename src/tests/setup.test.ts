@@ -19,10 +19,14 @@ import {
 import {
   MOCK_BALANCES_UPDATE_CALLBACK,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
+  MOCK_POI_PROOF_PROGRESS_CALLBACK_CALLBACK,
   TEST_WALLET_SOURCE,
 } from './mocks.test';
 import { ArtifactStore } from '../services/artifacts/artifact-store';
-import { setOnBalanceUpdateCallback } from '../services/railgun/wallets/balance-update';
+import {
+  setOnBalanceUpdateCallback,
+  setOnWalletPOIProofProgressCallback,
+} from '../services/railgun/wallets/balance-update';
 import { WalletPOI } from '../services/poi/wallet-poi';
 import { TestWalletPOIRequester } from './poi/test-wallet-poi-requester.test';
 import { TestWalletPOINodeInterface } from './poi/test-wallet-poi-node-interface.test';
@@ -129,6 +133,9 @@ export const initTestEngine = (useNativeArtifacts = false) => {
   WalletPOI.init(testPOINodeInterface, []);
 
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);
+  setOnWalletPOIProofProgressCallback(
+    MOCK_POI_PROOF_PROGRESS_CALLBACK_CALLBACK,
+  );
 
   setOnUTXOMerkletreeScanCallback(utxoMerkletreeHistoryScanCallback);
   setOnTXIDMerkletreeScanCallback(txidMerkletreeHistoryScanCallback);
