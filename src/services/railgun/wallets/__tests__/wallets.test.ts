@@ -33,7 +33,8 @@ const { expect } = chai;
 let wallet: RailgunWallet;
 
 describe('wallets', () => {
-  before(async () => {
+  before(async function run() {
+    this.timeout(10000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletInfo = await createRailgunWallet(

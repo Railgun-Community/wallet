@@ -10,7 +10,6 @@ import {
   poll,
 } from '@railgun-community/shared-models';
 import {
-  getEngine,
   setOnUTXOMerkletreeScanCallback,
   setOnTXIDMerkletreeScanCallback,
   startRailgunEngine,
@@ -31,7 +30,10 @@ import { WalletPOI } from '../services/poi/wallet-poi';
 import { TestWalletPOIRequester } from './poi/test-wallet-poi-requester.test';
 import { TestWalletPOINodeInterface } from './poi/test-wallet-poi-node-interface.test';
 import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
-import { GetLatestValidatedRailgunTxid } from '@railgun-community/engine';
+import {
+  GetLatestValidatedRailgunTxid,
+  TXOPOIListStatus,
+} from '@railgun-community/engine';
 import { loadProvider } from '../services/railgun/core';
 
 const ENGINE_TEST_DB = 'test.db';
@@ -52,6 +54,10 @@ before(async () => {
   await rmDirSafe(ENGINE_TEST_DB);
   await rmDirSafe('artifacts-v2.1');
   setupTests();
+});
+
+beforeEach(() => {
+  TestWalletPOINodeInterface.overridePOIsListStatus = TXOPOIListStatus.Missing;
 });
 
 const fileExists = (path: string): Promise<boolean> => {
@@ -128,8 +134,7 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     undefined, // poiNodeURL
   );
 
-  const engine = getEngine();
-  const testPOINodeInterface = new TestWalletPOINodeInterface(engine);
+  const testPOINodeInterface = new TestWalletPOINodeInterface();
   WalletPOI.init(testPOINodeInterface, []);
 
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);

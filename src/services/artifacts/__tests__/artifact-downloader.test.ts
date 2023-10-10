@@ -16,7 +16,7 @@ import { getArtifactVariantString } from '../artifact-util';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-describe.skip('artifact-downloader', () => {
+describe('artifact-downloader', () => {
   before(() => {
     const useNativeArtifacts = false;
     initTestEngine(useNativeArtifacts);

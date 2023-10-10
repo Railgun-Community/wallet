@@ -38,6 +38,7 @@ const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 let wallet: RailgunWallet;
 
 let walletBalanceStub: SinonStub;
+let walletTokenBalanceStub: SinonStub;
 
 describe('balance-update', () => {
   before(async () => {
@@ -64,12 +65,18 @@ describe('balance-update', () => {
       RailgunWallet,
       'getTokenBalancesByTxidVersion',
     ).resolves(balances);
+    walletTokenBalanceStub = Sinon.stub(
+      RailgunWallet.prototype,
+      'getTokenBalances',
+    ).resolves(balances);
   });
   afterEach(() => {
     walletBalanceStub.resetHistory();
+    walletTokenBalanceStub.resetHistory();
   });
   after(async () => {
     walletBalanceStub.restore();
+    walletTokenBalanceStub.restore();
     await closeTestEngine();
   });
 
@@ -88,7 +95,7 @@ describe('balance-update', () => {
     setOnBalanceUpdateCallback(callback);
     const chain: Chain = { type: ChainType.EVM, id: 69 };
     await expect(onBalancesUpdate(txidVersion, wallet, chain)).to.be.fulfilled;
-    expect(walletBalanceStub.calledOnce).to.be.true;
+    expect(walletTokenBalanceStub.calledOnce).to.be.true;
     expect(formattedBalances.chain).to.deep.equal(chain);
     expect(formattedBalances.erc20Amounts.length).to.equal(1);
     expect(formattedBalances.erc20Amounts[0]).to.deep.equal({

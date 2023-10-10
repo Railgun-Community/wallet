@@ -18,13 +18,7 @@ import {
 export const MOCK_LIST_KEY = 'test_list';
 
 export class TestWalletPOINodeInterface extends POINodeInterface {
-  // Prevents a circular dependency
-  private engine: RailgunEngine;
-
-  constructor(engine: RailgunEngine) {
-    super();
-    this.engine = engine;
-  }
+  static overridePOIsListStatus = TXOPOIListStatus.Missing;
 
   private static getPOISettings(chain: Chain) {
     const network = networkForChain(chain);
@@ -61,7 +55,7 @@ export class TestWalletPOINodeInterface extends POINodeInterface {
       listKeys.forEach(listKey => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         allMissing[blindedCommitmentData.blindedCommitment][listKey] =
-          TXOPOIListStatus.Missing;
+          TestWalletPOINodeInterface.overridePOIsListStatus;
       });
     });
     return allMissing;

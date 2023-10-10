@@ -71,18 +71,6 @@ export const createEngineWalletBalancesStub = async (
   tree: number,
 ) => {
   balancesStub = sinon
-    .stub(RailgunWallet, 'getTokenBalancesByTxidVersion')
-    .resolves({
-      [tokenAddress]: await getMockBalanceData(addressData, tokenAddress, tree),
-    });
-};
-
-export const createAbstractWalletBalancesStub = async (
-  addressData: AddressData,
-  tokenAddress: string,
-  tree: number,
-) => {
-  balancesStub = sinon
     .stub(AbstractWallet, 'getTokenBalancesByTxidVersion')
     .resolves({
       [tokenAddress]: await getMockBalanceData(addressData, tokenAddress, tree),

@@ -14,6 +14,7 @@ import {
   closeTestEngine,
   initTestEngine,
   initTestEngineNetwork,
+  pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
 import {
@@ -211,11 +212,14 @@ describe('transaction-history', () => {
       throw new Error(`Could not create wallet`);
     }
     wallet = fullWalletForID(railgunWalletInfo.id);
+
+    await pollUntilUTXOMerkletreeScanned();
   });
   after(async () => {
     await closeTestEngine();
   });
 
+  // Skipped because entire balance needs to scan before this can execute.
   it.skip('Should get wallet transaction history', async () => {
     const items = await getWalletTransactionHistory(
       POLYGON_CHAIN,
