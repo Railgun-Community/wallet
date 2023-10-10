@@ -162,7 +162,9 @@ export const onWalletPOIProofProgress = (
   index: number,
   totalCount: number,
 ): void => {
-  sendMessage(`Wallet POI proof progress. Chain ${chain.type}:${chain.id}.`);
+  sendMessage(
+    `[${listKey}, ${chain.type}:${chain.id}] Wallet POI proof progress: ${progress}.`,
+  );
   if (!onWalletPOIProofProgressCallback) {
     return;
   }
