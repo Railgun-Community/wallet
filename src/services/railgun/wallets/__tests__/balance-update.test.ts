@@ -127,6 +127,7 @@ describe('balance-update', () => {
       railgunTxid,
       index,
       totalCount,
+      undefined, // errMessage
     );
     expect(proofProgress.chain).to.deep.equal(chain);
     expect(proofProgress.railgunWalletID).to.equal(wallet.id);
@@ -137,5 +138,6 @@ describe('balance-update', () => {
     expect(proofProgress.index).to.equal(index);
     expect(proofProgress.totalCount).to.equal(totalCount);
     expect(proofProgress.txidVersion).to.equal(txidVersion);
+    expect(proofProgress.errMessage).to.be.undefined;
   });
 });

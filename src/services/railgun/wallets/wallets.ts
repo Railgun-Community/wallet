@@ -40,6 +40,7 @@ const subscribeToEvents = (wallet: AbstractWallet) => {
       railgunTxid,
       index,
       totalCount,
+      errorMsg,
     }: POICurrentProofEventData) => {
       onWalletPOIProofProgress(
         txidVersion,
@@ -51,6 +52,7 @@ const subscribeToEvents = (wallet: AbstractWallet) => {
         railgunTxid,
         index,
         totalCount,
+        errorMsg,
       );
     },
   );

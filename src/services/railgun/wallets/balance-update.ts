@@ -161,6 +161,7 @@ export const onWalletPOIProofProgress = (
   railgunTxid: string,
   index: number,
   totalCount: number,
+  errMessage: Optional<string>,
 ): void => {
   sendMessage(
     `[${listKey}, ${chain.type}:${chain.id}] Wallet POI proof progress: ${progress}.`,
@@ -179,6 +180,7 @@ export const onWalletPOIProofProgress = (
     railgunTxid,
     index,
     totalCount,
+    errMessage,
   };
 
   onWalletPOIProofProgressCallback(poiProofEvent);
