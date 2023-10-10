@@ -29,7 +29,7 @@ export const getTXOsSpentPOIStatusInfoForWallet = (
   return wallet.getTXOsSpentPOIStatusInfo(txidVersion, chain);
 };
 
-export const generatePOIForWallet = (
+export const generatePOIsForWallet = (
   txidVersion: TXIDVersion,
   networkName: NetworkName,
   walletID: string,
