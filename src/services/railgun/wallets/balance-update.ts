@@ -12,6 +12,7 @@ import {
 } from '@railgun-community/engine';
 import {
   RailgunBalancesEvent,
+  POIProofProgressEvent,
   RailgunNFTAmount,
   RailgunERC20Amount,
   NetworkName,
@@ -33,6 +34,18 @@ export const setOnBalanceUpdateCallback = (
   callback?: BalancesUpdatedCallback,
 ) => {
   onBalanceUpdateCallback = callback;
+};
+
+export type POIProofProgressCallback = (
+  poiProofProgressEvent: POIProofProgressEvent,
+) => void;
+
+let onWalletPOIProofProgressCallback: Optional<POIProofProgressCallback>;
+
+export const setOnWalletPOIProofProgressCallback = (
+  callback?: POIProofProgressCallback,
+) => {
+  onWalletPOIProofProgressCallback = callback;
 };
 
 const getSerializedERC20Balances = (
@@ -136,6 +149,37 @@ export const onBalancesUpdate = async (
   };
 
   onBalanceUpdateCallback(balancesEvent);
+};
+
+export const onWalletPOIProofProgress = (
+  txidVersion: TXIDVersion,
+  wallet: AbstractWallet,
+  chain: Chain,
+  progress: number,
+  listKey: string,
+  txid: string,
+  railgunTxid: string,
+  index: number,
+  totalCount: number,
+): void => {
+  sendMessage(`Wallet POI proof progress. Chain ${chain.type}:${chain.id}.`);
+  if (!onWalletPOIProofProgressCallback) {
+    return;
+  }
+
+  const poiProofEvent: POIProofProgressEvent = {
+    txidVersion,
+    chain,
+    railgunWalletID: wallet.id,
+    progress,
+    listKey,
+    txid,
+    railgunTxid,
+    index,
+    totalCount,
+  };
+
+  onWalletPOIProofProgressCallback(poiProofEvent);
 };
 
 export const balanceForERC20Token = async (

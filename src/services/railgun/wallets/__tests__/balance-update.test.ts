@@ -9,13 +9,16 @@ import {
 } from '@railgun-community/engine';
 import Sinon, { SinonStub } from 'sinon';
 import {
+  POIProofProgressEvent,
   RailgunBalancesEvent,
   TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
 import {
   onBalancesUpdate,
+  onWalletPOIProofProgress,
   setOnBalanceUpdateCallback,
+  setOnWalletPOIProofProgressCallback,
 } from '../balance-update';
 import { createRailgunWallet } from '../wallets';
 import { fullWalletForID } from '../../core/engine';
@@ -92,5 +95,40 @@ describe('balance-update', () => {
       tokenAddress: '0x0000000000000000000000000000000000012536',
       amount: 10n,
     });
+  });
+
+  it('Should parse poi proof progress response', async () => {
+    let proofProgress!: POIProofProgressEvent;
+    const callback = (proofProgressEvent: POIProofProgressEvent) => {
+      proofProgress = proofProgressEvent;
+    };
+    setOnWalletPOIProofProgressCallback(callback);
+    const chain: Chain = { type: ChainType.EVM, id: 69 };
+    const progress = 5;
+    const listKey = 'listKey';
+    const txid = 'txid';
+    const railgunTxid = 'railgunTxid';
+    const index = 2;
+    const totalCount = 10;
+    onWalletPOIProofProgress(
+      txidVersion,
+      wallet,
+      chain,
+      progress,
+      listKey,
+      txid,
+      railgunTxid,
+      index,
+      totalCount,
+    );
+    expect(proofProgress.chain).to.deep.equal(chain);
+    expect(proofProgress.railgunWalletID).to.equal(wallet.id);
+    expect(proofProgress.progress).to.equal(progress);
+    expect(proofProgress.listKey).to.equal(listKey);
+    expect(proofProgress.txid).to.equal(txid);
+    expect(proofProgress.railgunTxid).to.equal(railgunTxid);
+    expect(proofProgress.index).to.equal(index);
+    expect(proofProgress.totalCount).to.equal(totalCount);
+    expect(proofProgress.txidVersion).to.equal(txidVersion);
   });
 });
