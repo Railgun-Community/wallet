@@ -6,6 +6,7 @@ import {
   Chain,
   ChainType,
   getTokenDataERC20,
+  POIProofEventStatus,
 } from '@railgun-community/engine';
 import Sinon, { SinonStub } from 'sinon';
 import {
@@ -111,6 +112,7 @@ describe('balance-update', () => {
     };
     setOnWalletPOIProofProgressCallback(callback);
     const chain: Chain = { type: ChainType.EVM, id: 69 };
+    const status = POIProofEventStatus.InProgress;
     const progress = 5;
     const listKey = 'listKey';
     const txid = 'txid';
@@ -118,6 +120,7 @@ describe('balance-update', () => {
     const index = 2;
     const totalCount = 10;
     onWalletPOIProofProgress(
+      status,
       txidVersion,
       wallet,
       chain,
