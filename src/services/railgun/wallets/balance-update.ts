@@ -9,6 +9,7 @@ import {
   getTokenDataHash,
   getTokenDataNFT,
   getTokenDataERC20,
+  POIProofEventStatus,
 } from '@railgun-community/engine';
 import {
   RailgunBalancesEvent,
@@ -152,6 +153,7 @@ export const onBalancesUpdate = async (
 };
 
 export const onWalletPOIProofProgress = (
+  status: POIProofEventStatus,
   txidVersion: TXIDVersion,
   wallet: AbstractWallet,
   chain: Chain,
@@ -171,6 +173,7 @@ export const onWalletPOIProofProgress = (
   }
 
   const poiProofEvent: POIProofProgressEvent = {
+    status,
     txidVersion,
     chain,
     railgunWalletID: wallet.id,

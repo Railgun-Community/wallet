@@ -32,6 +32,7 @@ const subscribeToEvents = (wallet: AbstractWallet) => {
   wallet.on(
     EngineEvent.POIProofUpdate,
     ({
+      status,
       txidVersion,
       chain,
       progress,
@@ -43,6 +44,7 @@ const subscribeToEvents = (wallet: AbstractWallet) => {
       errorMsg,
     }: POICurrentProofEventData) => {
       onWalletPOIProofProgress(
+        status,
         txidVersion,
         wallet,
         chain,
