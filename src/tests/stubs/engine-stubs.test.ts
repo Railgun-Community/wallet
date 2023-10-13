@@ -42,6 +42,7 @@ const getMockBalanceData = async (
       {
         tree,
         position: 0,
+        blockNumber: 100,
         txid: '123',
         timestamp: undefined,
         spendtxid: '123',
