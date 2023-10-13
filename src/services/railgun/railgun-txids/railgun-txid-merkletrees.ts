@@ -39,6 +39,23 @@ export const validateRailgunTxidOccurredBeforeBlockNumber = (
   );
 };
 
+export const getGlobalUTXOTreePositionForRailgunTransactionCommitment = (
+  txidVersion: TXIDVersion,
+  networkName: NetworkName,
+  tree: number,
+  index: number,
+  commitmentHash: string,
+): Promise<number> => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  return getEngine().getGlobalUTXOTreePositionForRailgunTransactionCommitment(
+    txidVersion,
+    chain,
+    tree,
+    index,
+    commitmentHash,
+  );
+};
+
 export const fullResetTXIDMerkletrees = async (networkName: NetworkName) => {
   const chain = NETWORK_CONFIG[networkName].chain;
   return getEngine().fullResetTXIDMerkletrees(chain);
