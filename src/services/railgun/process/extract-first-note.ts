@@ -282,4 +282,4 @@ export const extractERC20AmountFromCommitmentCiphertext = async (
   return erc20Amount;
 };
 
-export { CommitmentCiphertext };
+export { CommitmentCiphertext, TransactNote };
