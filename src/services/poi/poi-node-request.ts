@@ -11,9 +11,11 @@ import {
   ValidatedRailgunTxidStatus,
   TXIDVersion,
   GetLatestValidatedRailgunTxidParams,
+  SubmitLegacyTransactProofParams,
 } from '@railgun-community/shared-models';
 import axios, { AxiosError } from 'axios';
 import { sendErrorMessage } from '../../utils';
+import { LegacyTransactProofData } from '@railgun-community/engine';
 
 export class POINodeRequest {
   private nodeURL: string;
@@ -149,5 +151,24 @@ export class POINodeRequest {
       listKey,
       transactProofData,
     });
+  };
+
+  submitLegacyTransactProofs = async (
+    txidVersion: TXIDVersion,
+    chain: Chain,
+    listKeys: string[],
+    legacyTransactProofDatas: LegacyTransactProofData[],
+  ) => {
+    const route = `submit-legacy-transact-proofs/${chain.type}/${chain.id}`;
+    const url = this.getNodeRouteURL(route);
+
+    await POINodeRequest.postRequest<SubmitLegacyTransactProofParams, void>(
+      url,
+      {
+        txidVersion,
+        listKeys,
+        legacyTransactProofDatas,
+      },
+    );
   };
 }

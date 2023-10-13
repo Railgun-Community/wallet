@@ -4,6 +4,7 @@ import {
   POIsPerList,
   TXOPOIListStatus,
   POINodeInterface,
+  LegacyTransactProofData,
 } from '@railgun-community/engine';
 import { POINodeRequest } from './poi-node-request';
 import {
@@ -131,6 +132,20 @@ export class WalletPOINodeInterface extends POINodeInterface {
       chain,
       listKey,
       transactProofData,
+    );
+  }
+
+  async submitLegacyTransactProofs(
+    txidVersion: TXIDVersion,
+    chain: Chain,
+    listKeys: string[],
+    legacyTransactProofDatas: LegacyTransactProofData[],
+  ): Promise<void> {
+    return this.poiNodeRequest.submitLegacyTransactProofs(
+      txidVersion,
+      chain,
+      listKeys,
+      legacyTransactProofDatas,
     );
   }
 }

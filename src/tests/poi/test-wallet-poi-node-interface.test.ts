@@ -3,6 +3,7 @@
 import {
   BlindedCommitmentData,
   Chain,
+  LegacyTransactProofData,
   POINodeInterface,
   POIsPerList,
   RailgunEngine,
@@ -84,5 +85,15 @@ export class TestWalletPOINodeInterface extends POINodeInterface {
     railgunTxidIfHasUnshield: string,
   ): Promise<void> {
     throw new Error('Could not submit POI - no POI node');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async submitLegacyTransactProofs(
+    txidVersion: TXIDVersion,
+    chain: Chain,
+    listKeys: string[],
+    legacyTransactProofDatas: LegacyTransactProofData[],
+  ): Promise<void> {
+    return Promise.resolve();
   }
 }

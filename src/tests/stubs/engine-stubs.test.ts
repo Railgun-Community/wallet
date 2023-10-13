@@ -61,6 +61,7 @@ const getMockBalanceData = async (
         nullifier: ZERO_32_BYTE_VALUE,
         poisPerList: undefined,
         blindedCommitment: undefined,
+        transactCreationRailgunTxid: undefined,
       },
     ],
   };
