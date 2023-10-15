@@ -30,18 +30,12 @@ export const getTXOsSpentPOIStatusInfoForWallet = (
 };
 
 export const generatePOIsForWallet = async (
-  txidVersion: TXIDVersion,
   networkName: NetworkName,
   walletID: string,
-  railgunTxid: Optional<string>,
 ): Promise<void> => {
   const chain = NETWORK_CONFIG[networkName].chain;
   const wallet = walletForID(walletID);
-  await wallet.generatePOIsAllSentCommitmentsAndUnshieldEvents(
-    chain,
-    txidVersion,
-    railgunTxid,
-  );
+  await wallet.refreshPOIsForAllTXIDVersions(chain);
 };
 
 export const refreshReceivePOIsForWallet = (
