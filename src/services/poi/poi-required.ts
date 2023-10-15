@@ -6,7 +6,7 @@ import {
 import { getFallbackProviderForNetwork } from '../railgun/core/providers';
 
 export class POIRequired {
-  private static requiredForNetwork: Partial<Record<NetworkName, boolean>>;
+  private static requiredForNetwork: Partial<Record<NetworkName, boolean>> = {};
 
   static async isRequiredForNetwork(
     networkName: NetworkName,
