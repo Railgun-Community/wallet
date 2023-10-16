@@ -30,9 +30,17 @@ export const formatRailgunTransactions = (
 
     const railgunTransaction: RailgunTransaction = {
       graphID: tx.id,
-      commitments: tx.commitments,
-      nullifiers: tx.nullifiers,
-      boundParamsHash: tx.boundParamsHash,
+      commitments: tx.commitments.map(commitment =>
+        formatToByteLength(commitment, ByteLength.UINT_256, true),
+      ),
+      nullifiers: tx.nullifiers.map(nullifier =>
+        formatToByteLength(nullifier, ByteLength.UINT_256, true),
+      ),
+      boundParamsHash: formatToByteLength(
+        tx.boundParamsHash,
+        ByteLength.UINT_256,
+        true,
+      ),
       blockNumber: Number(tx.blockNumber),
       timestamp: Number(tx.blockTimestamp),
       utxoTreeIn: Number(tx.utxoTreeIn),
