@@ -73,10 +73,10 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  BigDecimal: any;
-  BigInt: any;
-  Bytes: any;
-  Int8: any;
+  BigDecimal: string; // MODIFIED
+  BigInt: string; // MODIFIED
+  Bytes: string; // MODIFIED
+  Int8: string; // MODIFIED
 };
 
 export type Query = {
