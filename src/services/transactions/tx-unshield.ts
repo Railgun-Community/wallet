@@ -143,6 +143,7 @@ export const gasEstimateForUnprovenUnshield = async (
           relayerFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          true, // onlySpendable
         ),
       (txs: TransactionStruct[]) =>
         generateTransact(
@@ -202,6 +203,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           relayerFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          true, // onlySpendable
         ),
       (txs: TransactionStruct[]) => {
         const relayAdaptParamsRandom = randomHex(31);

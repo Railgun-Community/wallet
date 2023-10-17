@@ -27,7 +27,7 @@ export class POIProof {
     maxOutputs: number,
   ) => {
     if (!this.engine) {
-      throw new Error('No RAILGUN engine found');
+      throw new Error('No RAILGUN engine found for POI Prover');
     }
     const prover = this.engine.prover;
     return prover.getPublicInputsPOI(
@@ -47,7 +47,7 @@ export class POIProof {
   ) => {
     try {
       if (!this.engine) {
-        throw new Error('No RAILGUN engine found');
+        throw new Error('No RAILGUN engine found for POI Prover');
       }
       const prover = this.engine.prover;
       const publicInputs = this.getPublicInputsPOI(

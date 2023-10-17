@@ -40,26 +40,28 @@ export const generateUnshieldProof = async (
   try {
     setCachedProvedTransaction(undefined);
 
-    const transactions = await generateProofTransactions(
-      ProofType.Unshield,
-      networkName,
-      railgunWalletID,
-      txidVersion,
-      encryptionKey,
-      false, // showSenderAddressToRecipient
-      undefined, // memoText
-      erc20AmountRecipients,
-      nftAmountRecipients,
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      undefined, // relayAdaptID
-      false, // useDummyProof
-      overallBatchMinGasPrice,
-      progressCallback,
-    );
-    const transaction = await generateTransact(transactions, networkName);
+    const { provedTransactions, preTransactionPOIsPerTxidLeafPerList } =
+      await generateProofTransactions(
+        ProofType.Unshield,
+        networkName,
+        railgunWalletID,
+        txidVersion,
+        encryptionKey,
+        false, // showSenderAddressToRecipient
+        undefined, // memoText
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        undefined, // relayAdaptID
+        false, // useDummyProof
+        overallBatchMinGasPrice,
+        progressCallback,
+        true, // onlySpendable
+      );
+    const transaction = await generateTransact(provedTransactions, networkName);
 
-    const nullifiers = nullifiersForTransactions(transactions);
+    const nullifiers = nullifiersForTransactions(provedTransactions);
 
     setCachedProvedTransaction({
       proofType: ProofType.Unshield,
@@ -77,6 +79,7 @@ export const generateUnshieldProof = async (
       relayerFeeERC20AmountRecipient,
       transaction,
       sendWithPublicWallet,
+      preTransactionPOIsPerTxidLeafPerList,
       overallBatchMinGasPrice,
       nullifiers,
     });
@@ -140,6 +143,7 @@ export const generateUnshieldBaseTokenProof = async (
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
+      true, // onlySpendable
     );
 
     const relayAdaptParamsRandom = randomHex(31);
@@ -158,33 +162,35 @@ export const generateUnshieldBaseTokenProof = async (
     const memoText: Optional<string> = undefined;
 
     // Generate final txs with relay adapt ID.
-    const transactions = await generateProofTransactions(
-      ProofType.UnshieldBaseToken,
-      networkName,
-      railgunWalletID,
-      txidVersion,
-      encryptionKey,
-      showSenderAddressToRecipient,
-      memoText,
-      relayAdaptUnshieldERC20AmountRecipients,
-      relayAdaptUnshieldNFTAmountRecipients,
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      relayAdaptID,
-      false, // useDummyProof
-      overallBatchMinGasPrice,
-      progressCallback,
-    );
+    const { provedTransactions, preTransactionPOIsPerTxidLeafPerList } =
+      await generateProofTransactions(
+        ProofType.UnshieldBaseToken,
+        networkName,
+        railgunWalletID,
+        txidVersion,
+        encryptionKey,
+        showSenderAddressToRecipient,
+        memoText,
+        relayAdaptUnshieldERC20AmountRecipients,
+        relayAdaptUnshieldNFTAmountRecipients,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        relayAdaptID,
+        false, // useDummyProof
+        overallBatchMinGasPrice,
+        progressCallback,
+        true, // onlySpendable
+      );
 
     const transaction = await generateUnshieldBaseToken(
-      transactions,
+      provedTransactions,
       networkName,
       publicWalletAddress,
       relayAdaptParamsRandom,
       false, // useDummyProof
     );
 
-    const nullifiers = nullifiersForTransactions(transactions);
+    const nullifiers = nullifiersForTransactions(provedTransactions);
 
     setCachedProvedTransaction({
       proofType: ProofType.UnshieldBaseToken,
@@ -202,6 +208,7 @@ export const generateUnshieldBaseTokenProof = async (
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       transaction,
+      preTransactionPOIsPerTxidLeafPerList,
       overallBatchMinGasPrice,
       nullifiers,
     });

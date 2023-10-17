@@ -31,26 +31,28 @@ export const generateTransferProof = async (
   try {
     setCachedProvedTransaction(undefined);
 
-    const transactions = await generateProofTransactions(
-      ProofType.Transfer,
-      networkName,
-      railgunWalletID,
-      txidVersion,
-      encryptionKey,
-      showSenderAddressToRecipient,
-      memoText,
-      erc20AmountRecipients,
-      nftAmountRecipients,
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      undefined, // relayAdaptID
-      false, // useDummyProof
-      overallBatchMinGasPrice,
-      progressCallback,
-    );
-    const transaction = await generateTransact(transactions, networkName);
+    const { provedTransactions, preTransactionPOIsPerTxidLeafPerList } =
+      await generateProofTransactions(
+        ProofType.Transfer,
+        networkName,
+        railgunWalletID,
+        txidVersion,
+        encryptionKey,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        undefined, // relayAdaptID
+        false, // useDummyProof
+        overallBatchMinGasPrice,
+        progressCallback,
+        true, // onlySpendable
+      );
+    const transaction = await generateTransact(provedTransactions, networkName);
 
-    const nullifiers = nullifiersForTransactions(transactions);
+    const nullifiers = nullifiersForTransactions(provedTransactions);
 
     setCachedProvedTransaction({
       proofType: ProofType.Transfer,
@@ -68,6 +70,7 @@ export const generateTransferProof = async (
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       transaction,
+      preTransactionPOIsPerTxidLeafPerList,
       overallBatchMinGasPrice,
       nullifiers,
     });

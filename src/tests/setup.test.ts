@@ -34,7 +34,8 @@ import {
   GetLatestValidatedRailgunTxid,
   TXOPOIListStatus,
 } from '@railgun-community/engine';
-import { loadProvider } from '../services/railgun/core';
+import { getEngine, loadProvider } from '../services/railgun/core';
+import { groth16 } from 'snarkjs';
 
 const ENGINE_TEST_DB = 'test.db';
 const db = new LevelDOWN(ENGINE_TEST_DB);
@@ -136,6 +137,8 @@ export const initTestEngine = (useNativeArtifacts = false) => {
 
   const testPOINodeInterface = new TestWalletPOINodeInterface();
   WalletPOI.init(testPOINodeInterface, []);
+
+  getEngine().prover.setSnarkJSGroth16(groth16);
 
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);
   setOnWalletPOIProofProgressCallback(

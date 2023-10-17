@@ -22,6 +22,7 @@ import {
   compareERC20RecipientArrays,
 } from './tx-notes';
 import { ContractTransaction } from 'ethers';
+import { PreTransactionPOIsPerTxidLeafPerList } from '@railgun-community/engine';
 
 export type ProvedTransaction = {
   proofType: ProofType;
@@ -40,6 +41,7 @@ export type ProvedTransaction = {
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>;
   sendWithPublicWallet: boolean;
   overallBatchMinGasPrice: Optional<bigint>;
+  preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
   nullifiers: string[];
 };
 

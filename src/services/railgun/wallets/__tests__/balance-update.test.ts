@@ -98,7 +98,7 @@ describe('balance-update', () => {
     expect(walletBalancesByBucketStub.notCalled).to.be.true;
   });
 
-  it.only('Should parse wallet balances response', async () => {
+  it('Should parse wallet balances response', async () => {
     let formattedBalances!: RailgunBalancesEvent;
     const callback = (balancesFormatted: RailgunBalancesEvent) => {
       formattedBalances = balancesFormatted;

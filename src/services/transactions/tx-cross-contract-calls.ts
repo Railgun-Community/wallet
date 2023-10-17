@@ -233,6 +233,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           relayerFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          true, // onlySpendable
         ),
       async (txs: TransactionStruct[]) => {
         const relayAdaptParamsRandom = randomHex(31);
@@ -328,6 +329,7 @@ export const generateCrossContractCallsProof = async (
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
+      true, // onlySpendable
     );
 
     // Generate relay adapt params from dummy transactions.
@@ -360,28 +362,30 @@ export const generateCrossContractCallsProof = async (
     };
 
     // Create real transactions with relay adapt params.
-    const transactions = await generateProofTransactions(
-      ProofType.CrossContractCalls,
-      networkName,
-      railgunWalletID,
-      txidVersion,
-      encryptionKey,
-      false, // showSenderAddressToRecipient
-      undefined, // memoText
-      relayAdaptUnshieldERC20AmountRecipients,
-      relayAdaptUnshieldNFTAmountRecipients,
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      relayAdaptID,
-      false, // useDummyProof
-      overallBatchMinGasPrice,
-      progressCallback,
-    );
+    const { provedTransactions, preTransactionPOIsPerTxidLeafPerList } =
+      await generateProofTransactions(
+        ProofType.CrossContractCalls,
+        networkName,
+        railgunWalletID,
+        txidVersion,
+        encryptionKey,
+        false, // showSenderAddressToRecipient
+        undefined, // memoText
+        relayAdaptUnshieldERC20AmountRecipients,
+        relayAdaptUnshieldNFTAmountRecipients,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        relayAdaptID,
+        false, // useDummyProof
+        overallBatchMinGasPrice,
+        progressCallback,
+        true, // onlySpendable
+      );
 
-    const nullifiers = nullifiersForTransactions(transactions);
+    const nullifiers = nullifiersForTransactions(provedTransactions);
 
     const transaction = await relayAdaptContract.populateCrossContractCalls(
-      transactions,
+      provedTransactions,
       validCrossContractCalls,
       relayShieldRequests,
       relayAdaptParamsRandom,
@@ -407,6 +411,7 @@ export const generateCrossContractCallsProof = async (
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       transaction,
+      preTransactionPOIsPerTxidLeafPerList,
       overallBatchMinGasPrice,
       nullifiers,
     });

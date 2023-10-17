@@ -168,11 +168,14 @@ describe('tx-transfer', () => {
     railProveStub = Sinon.stub(
       TransactionBatch.prototype,
       'generateTransactions',
-    ).resolves([
-      {
-        nullifiers: MOCK_NULLIFIERS,
-      },
-    ] as TransactionStruct[]);
+    ).resolves({
+      provedTransactions: [
+        {
+          nullifiers: MOCK_NULLIFIERS,
+        },
+      ] as TransactionStruct[],
+      preTransactionPOIsPerTxidLeafPerList: {},
+    });
     railDummyProveStub = Sinon.stub(
       TransactionBatch.prototype,
       'generateDummyTransactions',

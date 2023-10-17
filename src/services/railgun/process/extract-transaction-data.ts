@@ -15,6 +15,7 @@ import {
   getRailgunTransactionIDHex,
   hashBoundParams,
 } from '@railgun-community/engine';
+// eslint-disable-next-line import/no-cycle
 import { getEngine, walletForID } from '../core/engine';
 import { getRailgunWalletAddressData } from '../wallets';
 import {
@@ -66,11 +67,11 @@ export const extractFirstNoteERC20AmountMapFromTransactionRequest = (
   );
 };
 
-export const extractRailgunTxidsFromTransactionRequest = (
+export const extractRailgunTransactionDataFromTransactionRequest = (
   network: Network,
   transactionRequest: ContractTransaction,
   useRelayAdapt: boolean,
-): string[] => {
+): { railgunTxid: string; utxoTreeIn: bigint }[] => {
   const transactionName = useRelayAdapt
     ? TransactionName.RelayAdapt
     : TransactionName.RailgunSmartWallet;
@@ -78,7 +79,7 @@ export const extractRailgunTxidsFromTransactionRequest = (
     ? network.relayAdaptContract
     : network.proxyContract;
 
-  return extractRailgunTxids(
+  return extractRailgunTransactionData(
     network,
     transactionRequest,
     transactionName,
@@ -211,12 +212,12 @@ const extractFirstNoteERC20AmountMap = async (
   return erc20PaymentAmounts;
 };
 
-const extractRailgunTxids = (
+const extractRailgunTransactionData = (
   network: Network,
   transactionRequest: ContractTransaction,
   transactionName: TransactionName,
   contractAddress: string,
-): string[] => {
+): { railgunTxid: string; utxoTreeIn: bigint }[] => {
   const railgunTxs: TransactionStructOutput[] = getRailgunTransactionRequests(
     network,
     transactionRequest,
@@ -233,11 +234,11 @@ const extractRailgunTxids = (
       true,
     );
     const railgunTxid = getRailgunTransactionIDHex({
-      commitments,
       nullifiers,
+      commitments,
       boundParamsHash,
     });
-    return railgunTxid;
+    return { railgunTxid, utxoTreeIn: boundParams.treeNumber };
   });
 };
 
