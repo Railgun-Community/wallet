@@ -10,12 +10,6 @@ import {
   poll,
 } from '@railgun-community/shared-models';
 import {
-  setOnUTXOMerkletreeScanCallback,
-  setOnTXIDMerkletreeScanCallback,
-  startRailgunEngine,
-  stopRailgunEngine,
-} from '../services/railgun/core/engine';
-import {
   MOCK_BALANCES_UPDATE_CALLBACK,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
   MOCK_POI_PROOF_PROGRESS_CALLBACK_CALLBACK,
@@ -34,7 +28,14 @@ import {
   GetLatestValidatedRailgunTxid,
   TXOPOIListStatus,
 } from '@railgun-community/engine';
-import { getEngine, loadProvider } from '../services/railgun/core';
+import {
+  getEngine,
+  loadProvider,
+  setOnTXIDMerkletreeScanCallback,
+  setOnUTXOMerkletreeScanCallback,
+  startRailgunEngine,
+  stopRailgunEngine,
+} from '../services/railgun/core';
 import { groth16 } from 'snarkjs';
 
 const ENGINE_TEST_DB = 'test.db';

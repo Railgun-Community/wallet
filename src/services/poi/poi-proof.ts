@@ -1,15 +1,8 @@
 import { TransactProofData } from '@railgun-community/shared-models';
 import { sendErrorMessage } from '../../utils';
-import { RailgunEngine } from '@railgun-community/engine';
+import { getEngine } from '../railgun/core/engine';
 
 export class POIProof {
-  // Prevents a circular dependency
-  private static engine: Optional<RailgunEngine>;
-
-  static init(engine: RailgunEngine) {
-    this.engine = engine;
-  }
-
   static verifyTransactProof = async (
     transactProofData: TransactProofData,
   ): Promise<boolean> => {
@@ -26,10 +19,7 @@ export class POIProof {
     maxInputs: number,
     maxOutputs: number,
   ) => {
-    if (!this.engine) {
-      throw new Error('No RAILGUN engine found for POI Prover');
-    }
-    const prover = this.engine.prover;
+    const prover = getEngine().prover;
     return prover.getPublicInputsPOI(
       transactProofData.txidMerkleroot,
       transactProofData.blindedCommitmentsOut,
@@ -46,10 +36,7 @@ export class POIProof {
     maxOutputs: number,
   ) => {
     try {
-      if (!this.engine) {
-        throw new Error('No RAILGUN engine found for POI Prover');
-      }
-      const prover = this.engine.prover;
+      const prover = getEngine().prover;
       const publicInputs = this.getPublicInputsPOI(
         transactProofData,
         maxInputs,

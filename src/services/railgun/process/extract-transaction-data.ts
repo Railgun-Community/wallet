@@ -15,9 +15,7 @@ import {
   getRailgunTransactionIDHex,
   hashBoundParams,
 } from '@railgun-community/engine';
-// eslint-disable-next-line import/no-cycle
-import { getEngine, walletForID } from '../core/engine';
-import { getRailgunWalletAddressData } from '../wallets';
+import { getRailgunWalletAddressData, walletForID } from '../wallets';
 import {
   Chain,
   Network,
@@ -26,10 +24,11 @@ import {
 } from '@railgun-community/shared-models';
 import { getFallbackProviderForNetwork } from '../core/providers';
 import { sendMessage } from '../../../utils';
-import { parseRailgunTokenAddress } from '../util';
+import { parseRailgunTokenAddress } from '../util/bytes';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { Contract, ContractTransaction, Result } from 'ethers';
 import { TransactionStructOutput } from '@railgun-community/engine/dist/abi/typechain/RailgunSmartWallet';
+import { getEngine } from '../core/engine';
 
 enum TransactionName {
   RailgunSmartWallet = 'transact',

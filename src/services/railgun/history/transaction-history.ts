@@ -23,9 +23,9 @@ import {
   TransactionHistoryItemCategory,
   RailgunWalletBalanceBucket,
 } from '@railgun-community/shared-models';
-import { walletForID } from '../core/engine';
 import { parseRailgunTokenAddress } from '../util/bytes';
 import { reportAndSanitizeError } from '../../../utils/error';
+import { walletForID } from '../wallets/wallets';
 
 const getRailgunBalanceBucketFromEngineBalanceBucket = (
   balanceBucket: WalletBalanceBucket,

@@ -42,8 +42,10 @@ import {
   MOCK_TOKEN_FEE,
   MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
 } from '../../../tests/mocks.test';
-import { createRailgunWallet } from '../../railgun/wallets/wallets';
-import { fullWalletForID } from '../../railgun/core/engine';
+import {
+  createRailgunWallet,
+  fullWalletForID,
+} from '../../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from '../proof-cache';
 import {
   createNFTTokenDataFromRailgunNFTAmount,

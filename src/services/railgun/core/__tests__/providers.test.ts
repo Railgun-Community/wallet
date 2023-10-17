@@ -12,10 +12,9 @@ import {
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
-import { walletForID } from '../engine';
 import { getFallbackProviderForNetwork } from '../providers';
 import { loadProvider } from '../load-provider';
-import { createRailgunWallet } from '../../wallets/wallets';
+import { createRailgunWallet, walletForID } from '../../wallets/wallets';
 import {
   getUTXOMerkletreeForNetwork,
   getTXIDMerkletreeForNetwork,

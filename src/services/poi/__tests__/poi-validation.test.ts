@@ -12,10 +12,9 @@ import {
   POI,
   PreTransactionPOIsPerTxidLeafPerList,
 } from '@railgun-community/engine';
-import { getEngine, loadProvider } from '../../railgun';
+import { loadProvider } from '../../railgun';
 import { MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI } from '../../../tests/mocks.test';
 import Sinon, { SinonStub } from 'sinon';
-import { POIProof } from '../poi-proof';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -42,7 +41,6 @@ describe('poi-validation', () => {
 
     // Set a mock validator for poi merkleroots.
     POIValidation.init(async () => true);
-    POIProof.init(getEngine());
   });
 
   after(() => {

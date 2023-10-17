@@ -40,8 +40,8 @@ import {
   isDefined,
   TXIDVersion,
 } from '@railgun-community/shared-models';
-import { createRailgunWallet } from '../../wallets';
-import { fullWalletForID, getEngine } from '../../core/engine';
+import { createRailgunWallet, fullWalletForID } from '../../wallets';
+import { getEngine } from '../../core/engine';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';

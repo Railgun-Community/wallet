@@ -91,6 +91,7 @@ export const populateShieldBaseToken = async (
 
     return {
       transaction,
+      preTransactionPOIsPerTxidLeafPerList: {},
     };
   } catch (err) {
     throw reportAndSanitizeError(populateShieldBaseToken.name, err);

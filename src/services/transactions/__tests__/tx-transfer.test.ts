@@ -46,8 +46,10 @@ import {
   gasEstimateForUnprovenTransfer,
 } from '../tx-transfer';
 import { generateTransferProof } from '../tx-proof-transfer';
-import { createRailgunWallet } from '../../railgun/wallets/wallets';
-import { fullWalletForID } from '../../railgun/core/engine';
+import {
+  createRailgunWallet,
+  fullWalletForID,
+} from '../../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from '../proof-cache';
 import * as txNotes from '../tx-notes';
 import { ContractTransaction, FallbackProvider } from 'ethers';

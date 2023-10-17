@@ -68,6 +68,7 @@ export const populateProvedTransaction = async (
 ): Promise<{
   transaction: ContractTransaction;
   nullifiers: string[];
+  preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
 }> => {
   try {
     validateCachedProvedTransaction(
@@ -95,7 +96,8 @@ export const populateProvedTransaction = async (
     throw new Error(`Invalid proof for this transaction. ${err.message}`);
   }
 
-  const { transaction, nullifiers } = getCachedProvedTransaction();
+  const { transaction, nullifiers, preTransactionPOIsPerTxidLeafPerList } =
+    getCachedProvedTransaction();
 
   setGasDetailsForTransaction(
     networkName,
@@ -104,7 +106,7 @@ export const populateProvedTransaction = async (
     sendWithPublicWallet,
   );
 
-  return { transaction, nullifiers };
+  return { transaction, nullifiers, preTransactionPOIsPerTxidLeafPerList };
 };
 
 export const setCachedProvedTransaction = (tx?: ProvedTransaction) => {

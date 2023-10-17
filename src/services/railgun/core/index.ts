@@ -1,5 +1,6 @@
 export * from './artifacts';
 export * from './contracts';
+export * from './init';
 export * from './engine';
 export * from './load-provider';
 export * from './merkletree';

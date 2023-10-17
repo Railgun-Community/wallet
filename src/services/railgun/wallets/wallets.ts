@@ -9,17 +9,71 @@ import {
   hexlify,
   hexStringToBytes,
   POICurrentProofEventData,
+  ViewOnlyWallet,
 } from '@railgun-community/engine';
 import {
   RailgunWalletInfo,
   NetworkName,
   NETWORK_CONFIG,
   isDefined,
+  Chain,
 } from '@railgun-community/shared-models';
-import { getEngine, walletForID } from '../core/engine';
 import { onBalancesUpdate, onWalletPOIProofProgress } from './balance-update';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { getAddress } from 'ethers';
+import { getEngine } from '../core/engine';
+
+export const awaitWalletScan = (walletID: string, chain: Chain) => {
+  const wallet = walletForID(walletID);
+  return new Promise((resolve, reject) =>
+    wallet.once(
+      EngineEvent.WalletScanComplete,
+      ({ chain: returnedChain }: WalletScannedEventData) =>
+        returnedChain.type === chain.type && returnedChain.id === chain.id
+          ? resolve(returnedChain)
+          : reject(),
+    ),
+  );
+};
+
+export const awaitMultipleWalletScans = async (
+  walletID: string,
+  chain: Chain,
+  numScans: number,
+) => {
+  let i = 0;
+  while (i < numScans) {
+    // eslint-disable-next-line no-await-in-loop
+    await awaitWalletScan(walletID, chain);
+    i += 1;
+  }
+  return Promise.resolve();
+};
+
+export const walletForID = (id: string): AbstractWallet => {
+  const engine = getEngine();
+  const wallet = engine.wallets[id];
+  if (!isDefined(wallet)) {
+    throw new Error('No RAILGUN wallet for ID');
+  }
+  return wallet;
+};
+
+export const fullWalletForID = (id: string): RailgunWallet => {
+  const wallet = walletForID(id);
+  if (!(wallet instanceof RailgunWallet)) {
+    throw new Error('Can not load View-Only wallet.');
+  }
+  return wallet;
+};
+
+export const viewOnlyWalletForID = (id: string): RailgunWallet => {
+  const wallet = walletForID(id);
+  if (!(wallet instanceof ViewOnlyWallet)) {
+    throw new Error('Can only load View-Only wallet.');
+  }
+  return wallet as RailgunWallet;
+};
 
 const subscribeToEvents = (wallet: AbstractWallet) => {
   wallet.on(

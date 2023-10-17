@@ -2,12 +2,12 @@ import {
   TXOsReceivedPOIStatusInfo,
   TXOsSpentPOIStatusInfo,
 } from '@railgun-community/engine';
-import { walletForID } from '../railgun/core';
 import {
   NETWORK_CONFIG,
   NetworkName,
   TXIDVersion,
 } from '@railgun-community/shared-models';
+import { walletForID } from '../railgun/wallets/wallets';
 
 export const getTXOsReceivedPOIStatusInfoForWallet = (
   txidVersion: TXIDVersion,

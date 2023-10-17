@@ -15,7 +15,6 @@ import {
   PreTransactionPOIsPerTxidLeafPerList,
   hexToBigInt,
 } from '@railgun-community/engine';
-// eslint-disable-next-line import/no-cycle
 import { extractRailgunTransactionDataFromTransactionRequest } from '../railgun/process/extract-transaction-data';
 import { ContractTransaction } from 'ethers';
 

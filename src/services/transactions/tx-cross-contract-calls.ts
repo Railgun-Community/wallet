@@ -141,30 +141,32 @@ export const populateProvedCrossContractCalls = async (
   gasDetails: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const { transaction, nullifiers } = await populateProvedTransaction(
-      txidVersion,
-      networkName,
-      ProofType.CrossContractCalls,
-      railgunWalletID,
-      false, // showSenderAddressToRecipient
-      undefined, // memoText
-      [], // erc20AmountRecipients
-      [], // nftAmountRecipients
-      relayAdaptUnshieldERC20Amounts,
-      relayAdaptUnshieldNFTAmounts,
-      relayAdaptShieldERC20Recipients,
-      relayAdaptShieldNFTRecipients,
-      crossContractCalls,
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      overallBatchMinGasPrice,
-      gasDetails,
-    );
+    const { transaction, nullifiers, preTransactionPOIsPerTxidLeafPerList } =
+      await populateProvedTransaction(
+        txidVersion,
+        networkName,
+        ProofType.CrossContractCalls,
+        railgunWalletID,
+        false, // showSenderAddressToRecipient
+        undefined, // memoText
+        [], // erc20AmountRecipients
+        [], // nftAmountRecipients
+        relayAdaptUnshieldERC20Amounts,
+        relayAdaptUnshieldNFTAmounts,
+        relayAdaptShieldERC20Recipients,
+        relayAdaptShieldNFTRecipients,
+        crossContractCalls,
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+        gasDetails,
+      );
     delete transaction.from;
 
     return {
       nullifiers,
       transaction,
+      preTransactionPOIsPerTxidLeafPerList,
     };
   } catch (err) {
     throw reportAndSanitizeError(populateProvedCrossContractCalls.name, err);

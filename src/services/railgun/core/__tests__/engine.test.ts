@@ -1,8 +1,9 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
-import { stopRailgunEngine, getEngine } from '../engine';
+import { getEngine } from '../engine';
 import { getProver } from '../prover';
+import { stopRailgunEngine } from '../init';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

@@ -4,13 +4,14 @@ import {
   TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
-import { getEngine, walletForID } from './engine';
 import {
   NFTTokenData,
   TXO,
   TokenData,
   getTokenDataHash,
 } from '@railgun-community/engine';
+import { getEngine } from './engine';
+import { walletForID } from '../wallets/wallets';
 
 export const getUTXOMerkletreeForNetwork = (
   txidVersion: TXIDVersion,

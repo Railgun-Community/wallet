@@ -33,28 +33,30 @@ export const populateProvedTransfer = async (
   gasDetails: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
-    const { transaction, nullifiers } = await populateProvedTransaction(
-      txidVersion,
-      networkName,
-      ProofType.Transfer,
-      railgunWalletID,
-      showSenderAddressToRecipient,
-      memoText,
-      erc20AmountRecipients,
-      nftAmountRecipients,
-      undefined, // relayAdaptUnshieldERC20AmountRecipients
-      undefined, // relayAdaptUnshieldNFTAmounts
-      undefined, // relayAdaptShieldERC20Recipients
-      undefined, // relayAdaptShieldNFTRecipients
-      undefined, // crossContractCalls
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      overallBatchMinGasPrice,
-      gasDetails,
-    );
+    const { transaction, nullifiers, preTransactionPOIsPerTxidLeafPerList } =
+      await populateProvedTransaction(
+        txidVersion,
+        networkName,
+        ProofType.Transfer,
+        railgunWalletID,
+        showSenderAddressToRecipient,
+        memoText,
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        undefined, // relayAdaptUnshieldERC20AmountRecipients
+        undefined, // relayAdaptUnshieldNFTAmounts
+        undefined, // relayAdaptShieldERC20Recipients
+        undefined, // relayAdaptShieldNFTRecipients
+        undefined, // crossContractCalls
+        relayerFeeERC20AmountRecipient,
+        sendWithPublicWallet,
+        overallBatchMinGasPrice,
+        gasDetails,
+      );
     return {
       nullifiers,
       transaction,
+      preTransactionPOIsPerTxidLeafPerList,
     };
   } catch (err) {
     throw reportAndSanitizeError(populateProvedTransfer.name, err);

@@ -22,8 +22,7 @@ import {
   setOnBalanceUpdateCallback,
   setOnWalletPOIProofProgressCallback,
 } from '../balance-update';
-import { createRailgunWallet } from '../wallets';
-import { fullWalletForID } from '../../core/engine';
+import { createRailgunWallet, fullWalletForID } from '../wallets';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MNEMONIC,

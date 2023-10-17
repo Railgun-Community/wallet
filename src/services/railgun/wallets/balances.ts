@@ -4,7 +4,8 @@ import {
   TXIDVersion,
 } from '@railgun-community/shared-models';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { getEngine, walletForID } from '../core/engine';
+import { getEngine } from '../core/engine';
+import { walletForID } from './wallets';
 
 export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
   txidVersion: TXIDVersion,

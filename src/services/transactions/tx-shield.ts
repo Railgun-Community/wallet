@@ -147,6 +147,7 @@ export const populateShield = async (
 
     return {
       transaction,
+      preTransactionPOIsPerTxidLeafPerList: {},
     };
   } catch (err) {
     throw reportAndSanitizeError(populateShield.name, err);

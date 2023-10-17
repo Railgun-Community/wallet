@@ -11,7 +11,7 @@ import {
   pollUntilTXIDMerkletreeScanned,
   pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
-import { createRailgunWallet } from '../wallets';
+import { createRailgunWallet, walletForID } from '../wallets';
 import { refreshRailgunBalances } from '../balances';
 import {
   Chain,
@@ -21,7 +21,6 @@ import {
   isDefined,
 } from '@railgun-community/shared-models';
 import { loadProvider } from '../../core/load-provider';
-import { walletForID } from '../../core';
 import { getTXIDMerkletreeForNetwork } from '../../core/merkletree';
 
 chai.use(chaiAsPromised);

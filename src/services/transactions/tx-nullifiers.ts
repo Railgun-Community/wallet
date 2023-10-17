@@ -4,7 +4,7 @@ import {
   TXIDVersion,
 } from '@railgun-community/shared-models';
 import { reportAndSanitizeError } from '../../utils/error';
-import { getEngine } from '../railgun';
+import { getEngine } from '../railgun/core/engine';
 
 export const getCompletedTxidFromNullifiers = async (
   txidVersion: TXIDVersion,

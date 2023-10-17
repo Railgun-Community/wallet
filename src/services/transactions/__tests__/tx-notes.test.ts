@@ -24,8 +24,10 @@ import {
   initTestEngine,
   initTestEngineNetwork,
 } from '../../../tests/setup.test';
-import { fullWalletForID } from '../../railgun/core/engine';
-import { createRailgunWallet } from '../../railgun/wallets/wallets';
+import {
+  createRailgunWallet,
+  fullWalletForID,
+} from '../../railgun/wallets/wallets';
 import {
   compareERC20AmountRecipientArrays,
   erc20NoteFromERC20AmountRecipient,

@@ -21,7 +21,6 @@ import {
   NFTTokenType,
   TXIDVersion,
 } from '@railgun-community/shared-models';
-import { fullWalletForID, walletForID } from '../railgun/core/engine';
 import {
   getRailgunSmartWalletContractForNetwork,
   getRelayAdaptContractForNetwork,
@@ -31,10 +30,16 @@ import {
   nftNoteFromNFTAmountRecipient,
 } from './tx-notes';
 import { getProver } from '../railgun/core/prover';
-import { assertValidEthAddress, assertValidRailgunAddress } from '../railgun';
+import {
+  assertValidEthAddress,
+  assertValidRailgunAddress,
+  fullWalletForID,
+  walletForID,
+} from '../railgun/wallets/wallets';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { shouldSetOverallBatchMinGasPriceForNetwork } from '../../utils/gas-price';
 import { ContractTransaction } from 'ethers';
+import { POIRequired } from '../poi/poi-required';
 
 const DUMMY_AMOUNT = 0n;
 export const DUMMY_FROM_ADDRESS = '0x000000000000000000000000000000000000dEaD';
@@ -275,7 +280,9 @@ const transactionsFromERC20Amounts = async (
     },
   );
 
-  const shouldGeneratePreTransactionPOIs = !sendWithPublicWallet;
+  const shouldGeneratePreTransactionPOIs =
+    !sendWithPublicWallet &&
+    (await POIRequired.isRequiredForNetwork(networkName));
 
   const txBatches = await generateAllProofs(
     transactionBatch,

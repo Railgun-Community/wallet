@@ -52,8 +52,10 @@ import {
   generateUnshieldBaseTokenProof,
   generateUnshieldProof,
 } from '../tx-proof-unshield';
-import { createRailgunWallet } from '../../railgun/wallets/wallets';
-import { fullWalletForID } from '../../railgun/core/engine';
+import {
+  createRailgunWallet,
+  fullWalletForID,
+} from '../../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from '../proof-cache';
 import { ContractTransaction, FallbackProvider } from 'ethers';
 
