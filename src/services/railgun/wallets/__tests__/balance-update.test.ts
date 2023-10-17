@@ -12,6 +12,7 @@ import Sinon, { SinonStub } from 'sinon';
 import {
   POIProofProgressEvent,
   RailgunBalancesEvent,
+  RailgunWalletBalanceBucket,
   TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
@@ -39,6 +40,7 @@ const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 let wallet: RailgunWallet;
 
 let walletBalanceStub: SinonStub;
+let walletBalancesByBucketStub: SinonStub;
 let walletTokenBalanceStub: SinonStub;
 
 describe('balance-update', () => {
@@ -66,6 +68,11 @@ describe('balance-update', () => {
       RailgunWallet,
       'getTokenBalancesByTxidVersion',
     ).resolves(balances);
+    walletBalancesByBucketStub = Sinon.stub(
+      RailgunWallet.prototype,
+      'getTokenBalancesByBucket',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    ).resolves({ Spendable: balances } as any);
     walletTokenBalanceStub = Sinon.stub(
       RailgunWallet.prototype,
       'getTokenBalances',
@@ -73,10 +80,12 @@ describe('balance-update', () => {
   });
   afterEach(() => {
     walletBalanceStub.resetHistory();
+    walletBalancesByBucketStub.resetHistory();
     walletTokenBalanceStub.resetHistory();
   });
   after(async () => {
     walletBalanceStub.restore();
+    walletBalancesByBucketStub.restore();
     walletTokenBalanceStub.restore();
     await closeTestEngine();
   });
@@ -86,9 +95,10 @@ describe('balance-update', () => {
     const chain: Chain = { type: ChainType.EVM, id: 1 };
     await expect(onBalancesUpdate(txidVersion, wallet, chain)).to.be.fulfilled;
     expect(walletBalanceStub.notCalled).to.be.true;
+    expect(walletBalancesByBucketStub.notCalled).to.be.true;
   });
 
-  it('Should parse wallet balances response', async () => {
+  it.only('Should parse wallet balances response', async () => {
     let formattedBalances!: RailgunBalancesEvent;
     const callback = (balancesFormatted: RailgunBalancesEvent) => {
       formattedBalances = balancesFormatted;
@@ -96,7 +106,10 @@ describe('balance-update', () => {
     setOnBalanceUpdateCallback(callback);
     const chain: Chain = { type: ChainType.EVM, id: 69 };
     await expect(onBalancesUpdate(txidVersion, wallet, chain)).to.be.fulfilled;
-    expect(walletTokenBalanceStub.calledOnce).to.be.true;
+    expect(walletBalancesByBucketStub.calledOnce).to.be.true;
+    expect(formattedBalances.balanceBucket).to.deep.equal(
+      RailgunWalletBalanceBucket.Spendable,
+    );
     expect(formattedBalances.chain).to.deep.equal(chain);
     expect(formattedBalances.erc20Amounts.length).to.equal(1);
     expect(formattedBalances.erc20Amounts[0]).to.deep.equal({
