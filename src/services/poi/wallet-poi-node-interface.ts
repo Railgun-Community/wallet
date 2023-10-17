@@ -31,12 +31,10 @@ export class WalletPOINodeInterface extends POINodeInterface {
     switch (poiStatus) {
       case POIStatus.Valid:
         return TXOPOIListStatus.Valid;
-      case POIStatus.ShieldPending:
-        return TXOPOIListStatus.ShieldPending;
       case POIStatus.ShieldBlocked:
         return TXOPOIListStatus.ShieldBlocked;
-      case POIStatus.TransactProofSubmitted:
-        return TXOPOIListStatus.TransactProofSubmitted;
+      case POIStatus.ProofSubmitted:
+        return TXOPOIListStatus.ProofSubmitted;
       case POIStatus.Missing:
         return TXOPOIListStatus.Missing;
     }
