@@ -218,7 +218,11 @@ describe('extract-first-note', () => {
       false, // useRelayAdapt
     );
     expect(railgunTxids).to.deep.equal([
-      '18759632f78e7ce85cbd04769b98c8a5436d5144ff9f96f9743eeab43864f98a',
+      {
+        railgunTxid:
+          '18759632f78e7ce85cbd04769b98c8a5436d5144ff9f96f9743eeab43864f98a',
+        utxoTreeIn: 0n,
+      },
     ]);
   });
 
