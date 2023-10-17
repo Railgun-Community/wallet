@@ -20,6 +20,7 @@ import {
   NETWORK_CONFIG,
   TXIDVersion,
   NFTTokenType,
+  RailgunWalletBalanceBucket,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils/logger';
 import { parseRailgunTokenAddress } from '../util/bytes';
@@ -129,27 +130,35 @@ export const onBalancesUpdate = async (
   sendMessage(
     `Wallet balance SCANNED. Getting balances for chain ${chain.type}:${chain.id}.`,
   );
-  if (!onBalanceUpdateCallback) {
-    return;
-  }
 
-  const tokenBalances = await wallet.getTokenBalances(
+  const tokenBalancesByBucket = await wallet.getTokenBalancesByBucket(
     txidVersion,
     chain,
-    false, // onlySpendable
   );
-  const erc20Amounts = getSerializedERC20Balances(tokenBalances);
-  const nftAmounts = getNFTBalances(tokenBalances);
 
-  const balancesEvent: RailgunBalancesEvent = {
-    txidVersion,
-    chain,
-    erc20Amounts,
-    nftAmounts,
-    railgunWalletID: wallet.id,
-  };
+  const balanceBuckets = Object.values(RailgunWalletBalanceBucket);
 
-  onBalanceUpdateCallback(balancesEvent);
+  balanceBuckets.forEach(balanceBucket => {
+    if (!onBalanceUpdateCallback) {
+      return;
+    }
+
+    const tokenBalances = tokenBalancesByBucket[balanceBucket];
+
+    const erc20Amounts = getSerializedERC20Balances(tokenBalances);
+    const nftAmounts = getNFTBalances(tokenBalances);
+
+    const balancesEvent: RailgunBalancesEvent = {
+      txidVersion,
+      chain,
+      erc20Amounts,
+      nftAmounts,
+      railgunWalletID: wallet.id,
+      balanceBucket,
+    };
+
+    onBalanceUpdateCallback(balancesEvent);
+  });
 };
 
 export const onWalletPOIProofProgress = (
