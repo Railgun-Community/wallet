@@ -21,9 +21,6 @@ export class WalletPOI {
   static getPOITxidMerklerootValidator = (
     poiNodeURL?: string,
   ): MerklerootValidator => {
-    if (!this.started) {
-      throw new Error('WalletPOI not started');
-    }
     const poiRequester = new WalletPOIRequester(poiNodeURL);
     const txidMerklerootValidator: MerklerootValidator = (
       txidVersion,
@@ -45,9 +42,6 @@ export class WalletPOI {
   static getPOILatestValidatedRailgunTxid = (
     poiNodeURL?: string,
   ): GetLatestValidatedRailgunTxid => {
-    if (!this.started) {
-      throw new Error('WalletPOI not started');
-    }
     const poiRequester = new WalletPOIRequester(poiNodeURL);
     const getLatestValidatedRailgunTxid: GetLatestValidatedRailgunTxid = (
       txidVersion,
@@ -57,9 +51,6 @@ export class WalletPOI {
   };
 
   static getPOIMerklerootsValidator = (poiNodeURL?: string) => {
-    if (!this.started) {
-      throw new Error('WalletPOI not started');
-    }
     const poiRequester = new WalletPOIRequester(poiNodeURL);
     const validatePOIMerkleroots = (
       txidVersion: TXIDVersion,
