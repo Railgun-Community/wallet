@@ -8,6 +8,7 @@ import {
   formatToByteLength,
   ByteLength,
   TransactionHistoryUnshieldTokenAmount,
+  WalletBalanceBucket,
 } from '@railgun-community/engine';
 import {
   TransactionHistoryItem,
@@ -26,6 +27,26 @@ import { walletForID } from '../core/engine';
 import { parseRailgunTokenAddress } from '../util/bytes';
 import { reportAndSanitizeError } from '../../../utils/error';
 
+const getRailgunBalanceBucketFromEngineBalanceBucket = (
+  balanceBucket: WalletBalanceBucket,
+): RailgunWalletBalanceBucket => {
+  switch (balanceBucket) {
+    case WalletBalanceBucket.Spendable:
+      return RailgunWalletBalanceBucket.Spendable;
+    case WalletBalanceBucket.ShieldBlocked:
+      return RailgunWalletBalanceBucket.ShieldBlocked;
+    case WalletBalanceBucket.ShieldPending:
+      return RailgunWalletBalanceBucket.ShieldPending;
+    case WalletBalanceBucket.ProofSubmitted:
+      return RailgunWalletBalanceBucket.ProofSubmitted;
+    case WalletBalanceBucket.MissingInternalPOI:
+      return RailgunWalletBalanceBucket.MissingInternalPOI;
+    case WalletBalanceBucket.MissingExternalPOI:
+      return RailgunWalletBalanceBucket.MissingExternalPOI;
+  }
+  throw new Error('Unrecognized WalletBalanceBucket');
+};
+
 const transactionHistoryReceiveTokenAmountToRailgunERC20Amount = (
   transactionHistoryReceiveTokenAmount: TransactionHistoryReceiveTokenAmount,
 ): RailgunHistoryReceiveERC20Amount => {
@@ -38,8 +59,9 @@ const transactionHistoryReceiveTokenAmountToRailgunERC20Amount = (
     shieldFee: transactionHistoryReceiveTokenAmount.shieldFee,
     hasValidPOIForActiveLists:
       transactionHistoryReceiveTokenAmount.hasValidPOIForActiveLists,
-    balanceBucket:
-      transactionHistoryReceiveTokenAmount.balanceBucket as unknown as RailgunWalletBalanceBucket,
+    balanceBucket: getRailgunBalanceBucketFromEngineBalanceBucket(
+      transactionHistoryReceiveTokenAmount.balanceBucket,
+    ),
   };
 };
 
@@ -55,8 +77,9 @@ const transactionHistoryReceiveNFTToRailgunNFTAmount = (
     shieldFee: transactionHistoryReceiveTokenAmount.shieldFee,
     hasValidPOIForActiveLists:
       transactionHistoryReceiveTokenAmount.hasValidPOIForActiveLists,
-    balanceBucket:
-      transactionHistoryReceiveTokenAmount.balanceBucket as unknown as RailgunWalletBalanceBucket,
+    balanceBucket: getRailgunBalanceBucketFromEngineBalanceBucket(
+      transactionHistoryReceiveTokenAmount.balanceBucket,
+    ),
   };
 };
 
