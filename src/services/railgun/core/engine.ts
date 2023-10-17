@@ -25,6 +25,8 @@ import { quickSyncEventsGraphV2 } from '../quick-sync/quick-sync-events-graph';
 import { quickSyncRailgunTransactions } from '../railgun-txids/railgun-txid-sync-graph';
 import { WalletPOI } from '../../poi/wallet-poi';
 import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
+import { POIValidation } from '../../poi/poi-validation';
+import { POIProof } from '../../poi/poi-proof';
 
 let engine: Optional<RailgunEngine>;
 
@@ -144,8 +146,10 @@ export const startRailgunEngine = (
     );
 
     if (isDefined(poiNodeURL)) {
+      POIProof.init(engine);
       const poiNodeInterface = new WalletPOINodeInterface(poiNodeURL);
       WalletPOI.init(poiNodeInterface, customPOILists ?? []);
+      POIValidation.init(WalletPOI.getPOIMerklerootsValidator(poiNodeURL));
     }
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngine.name, err);
@@ -171,6 +175,7 @@ export const startRailgunEngineForPOINode = (
       quickSyncRailgunTransactions,
       shouldDebug ? createEngineDebugger() : undefined,
     );
+    POIProof.init(engine);
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngineForPOINode.name, err);
   }

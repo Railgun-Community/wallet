@@ -7,6 +7,7 @@ import {
 import { POI_REQUIRED_LISTS } from './poi-constants';
 import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
 import { WalletPOIRequester } from './wallet-poi-requester';
+import { Chain, TXIDVersion } from '@railgun-community/shared-models';
 
 export class WalletPOI {
   static started = false;
@@ -20,6 +21,9 @@ export class WalletPOI {
   static getPOITxidMerklerootValidator = (
     poiNodeURL?: string,
   ): MerklerootValidator => {
+    if (!this.started) {
+      throw new Error('WalletPOI not started');
+    }
     const poiRequester = new WalletPOIRequester(poiNodeURL);
     const txidMerklerootValidator: MerklerootValidator = (
       txidVersion,
@@ -41,11 +45,34 @@ export class WalletPOI {
   static getPOILatestValidatedRailgunTxid = (
     poiNodeURL?: string,
   ): GetLatestValidatedRailgunTxid => {
+    if (!this.started) {
+      throw new Error('WalletPOI not started');
+    }
     const poiRequester = new WalletPOIRequester(poiNodeURL);
     const getLatestValidatedRailgunTxid: GetLatestValidatedRailgunTxid = (
       txidVersion,
       chain,
     ) => poiRequester.getLatestValidatedRailgunTxid(txidVersion, chain);
     return getLatestValidatedRailgunTxid;
+  };
+
+  static getPOIMerklerootsValidator = (poiNodeURL?: string) => {
+    if (!this.started) {
+      throw new Error('WalletPOI not started');
+    }
+    const poiRequester = new WalletPOIRequester(poiNodeURL);
+    const validatePOIMerkleroots = (
+      txidVersion: TXIDVersion,
+      chain: Chain,
+      listKey: string,
+      poiMerkleroots: string[],
+    ) =>
+      poiRequester.validatePOIMerkleroots(
+        txidVersion,
+        chain,
+        listKey,
+        poiMerkleroots,
+      );
+    return validatePOIMerkleroots;
   };
 }

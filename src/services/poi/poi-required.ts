@@ -4,6 +4,7 @@ import {
   isDefined,
 } from '@railgun-community/shared-models';
 import { getFallbackProviderForNetwork } from '../railgun/core/providers';
+import { POI } from '@railgun-community/engine';
 
 export class POIRequired {
   private static requiredForNetwork: Partial<Record<NetworkName, boolean>> = {};
@@ -28,5 +29,12 @@ export class POIRequired {
       this.requiredForNetwork[networkName] = true;
     }
     return isRequired;
+  }
+
+  static async getRequiredListKeys(networkName: NetworkName) {
+    if (!(await this.isRequiredForNetwork(networkName))) {
+      return [];
+    }
+    return POI.getActiveListKeys();
   }
 }

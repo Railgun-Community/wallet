@@ -12,6 +12,7 @@ import {
   TXIDVersion,
   GetLatestValidatedRailgunTxidParams,
   SubmitLegacyTransactProofParams,
+  ValidatePOIMerklerootsParams,
 } from '@railgun-community/shared-models';
 import axios, { AxiosError } from 'axios';
 import { sendErrorMessage } from '../../utils';
@@ -95,6 +96,21 @@ export class POINodeRequest {
       ValidatedRailgunTxidStatus
     >(url, { txidVersion });
     return status;
+  };
+
+  validatePOIMerkleroots = async (
+    txidVersion: TXIDVersion,
+    chain: Chain,
+    listKey: string,
+    poiMerkleroots: string[],
+  ): Promise<boolean> => {
+    const route = `validate-poi-merkleroots/${chain.type}/${chain.id}`;
+    const url = this.getNodeRouteURL(route);
+    const validated = await POINodeRequest.postRequest<
+      ValidatePOIMerklerootsParams,
+      boolean
+    >(url, { txidVersion, listKey, poiMerkleroots });
+    return validated;
   };
 
   getPOIsPerList = async (
