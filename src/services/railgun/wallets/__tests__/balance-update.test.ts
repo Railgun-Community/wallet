@@ -10,6 +10,7 @@ import {
 } from '@railgun-community/engine';
 import Sinon, { SinonStub } from 'sinon';
 import {
+  NetworkName,
   POIProofProgressEvent,
   RailgunBalancesEvent,
   RailgunWalletBalanceBucket,
@@ -25,9 +26,11 @@ import {
 import { createRailgunWallet, fullWalletForID } from '../wallets';
 import {
   MOCK_DB_ENCRYPTION_KEY,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
   MOCK_MNEMONIC,
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
+import { loadProvider } from '../../core/load-provider';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -53,6 +56,11 @@ describe('balance-update', () => {
     if (!isDefined(railgunWalletInfo)) {
       throw new Error('Expected railgunWalletInfo');
     }
+    await loadProvider(
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
+      NetworkName.EthereumGoerli,
+      10000, // pollingInterval
+    );
     wallet = fullWalletForID(railgunWalletInfo.id);
     const tokenAddress = MOCK_TOKEN_ADDRESS.replace('0x', '');
     const tokenData = getTokenDataERC20(tokenAddress);
@@ -103,7 +111,7 @@ describe('balance-update', () => {
       formattedBalances = balancesFormatted;
     };
     setOnBalanceUpdateCallback(callback);
-    const chain: Chain = { type: ChainType.EVM, id: 69 };
+    const chain: Chain = { type: ChainType.EVM, id: 5 };
     await expect(onBalancesUpdate(txidVersion, wallet, chain)).to.be.fulfilled;
     expect(walletBalancesByBucketStub.calledOnce).to.be.true;
     expect(formattedBalances.balanceBucket).to.deep.equal(
