@@ -51,7 +51,7 @@ export class POIValidation {
     return hasValidPOIs;
   }
 
-  static async isValidSpendableTXID(
+  static async isValidSpendableTransaction(
     railgunWalletID: string,
     txidVersion: TXIDVersion,
     chain: Chain,
@@ -64,9 +64,6 @@ export class POIValidation {
     extractedRailgunTransactionData?: ExtractedRailgunTransactionData;
   }> {
     try {
-      if (!this.validatePOIMerkleroots) {
-        throw new Error('No POI merkleroot validator found');
-      }
       const network = networkForChain(chain);
       if (!network) {
         throw new Error('Invalid network');
@@ -79,75 +76,18 @@ export class POIValidation {
           transactionRequest,
           useRelayAdapt,
         );
-      const expectedTxidLeafHashes: string[] =
-        extractedRailgunTransactionData.map(({ railgunTxid, utxoTreeIn }) =>
-          getRailgunTxidLeafHash(
-            hexToBigInt(railgunTxid),
-            utxoTreeIn,
-            getGlobalTreePositionPreTransactionPOIProof(),
-            txidVersion,
-          ),
-        );
 
       const activeListKeys = POI.getActiveListKeys();
 
-      for (const activeListKey of activeListKeys) {
-        // 1. Validate all active lists are present
-        if (!isDefined(pois[activeListKey])) {
-          throw new Error(`Missing POIs for list: ${activeListKey}`);
-        }
-
-        const poisForList = pois[activeListKey];
-
-        for (const txidLeafHash of expectedTxidLeafHashes) {
-          // 2. Validate txid leaf hash
-          if (!isDefined(poisForList[txidLeafHash])) {
-            throw new Error(
-              `Missing POI for txidLeafHash ${txidLeafHash} for list ${activeListKey}`,
-            );
-          }
-
-          const {
-            snarkProof,
-            txidMerkleroot,
-            poiMerkleroots,
-            blindedCommitmentsOut,
-            railgunTxidIfHasUnshield,
-          } = poisForList[txidLeafHash];
-
-          // 3. Validate txidDummyMerkleProof and txid root
-          const dummyMerkleProof = createDummyMerkleProof(txidLeafHash);
-          if (dummyMerkleProof.root !== txidMerkleroot) {
-            throw new Error('Invalid txid merkle proof');
-          }
-
-          // 4. Validate POI merkleroots for each list
-          const validPOIMerkleroots = await this.validatePOIMerkleroots(
-            txidVersion,
-            chain,
-            activeListKey,
-            poiMerkleroots,
-          );
-          if (!validPOIMerkleroots) {
-            throw new Error(`Invalid POI merkleroots: list ${activeListKey}`);
-          }
-
-          // 5. Verify snark proof for each list
-          const transactProofData: TransactProofData = {
-            snarkProof,
-            txidMerkleroot,
-            poiMerkleroots,
-            blindedCommitmentsOut,
-            railgunTxidIfHasUnshield,
-            txidMerklerootIndex: 0, // Unused
-          };
-          const validProof = await POIProof.verifyTransactProof(
-            transactProofData,
-          );
-          if (!validProof) {
-            throw new Error(`Invalid POI snark proof: list ${activeListKey}`);
-          }
-        }
+      for (const listKey of activeListKeys) {
+        await this.assertIsValidSpendableTXID(
+          listKey,
+          txidVersion,
+          chain,
+          pois,
+          extractedRailgunTransactionData.map(data => data.railgunTxid),
+          extractedRailgunTransactionData.map(data => data.utxoTreeIn),
+        );
       }
 
       return { isValid: true, extractedRailgunTransactionData };
@@ -160,5 +100,84 @@ export class POIValidation {
         error: `Could not validate spendable TXID: ${err.message}`,
       };
     }
+  }
+
+  static async assertIsValidSpendableTXID(
+    listKey: string,
+    txidVersion: TXIDVersion,
+    chain: Chain,
+    pois: PreTransactionPOIsPerTxidLeafPerList,
+    railgunTxids: string[],
+    utxoTreesIn: bigint[],
+  ): Promise<boolean> {
+    if (!this.validatePOIMerkleroots) {
+      throw new Error('No POI merkleroot validator found');
+    }
+
+    const txidLeafHashes: string[] = railgunTxids.map((railgunTxid, index) =>
+      getRailgunTxidLeafHash(
+        hexToBigInt(railgunTxid),
+        utxoTreesIn[index],
+        getGlobalTreePositionPreTransactionPOIProof(),
+        txidVersion,
+      ),
+    );
+
+    // 1. Validate list key is present
+    if (!isDefined(pois[listKey])) {
+      throw new Error(`Missing POIs for list: ${listKey}`);
+    }
+
+    const poisForList = pois[listKey];
+
+    for (const txidLeafHash of txidLeafHashes) {
+      // 2. Validate txid leaf hash
+      if (!isDefined(poisForList[txidLeafHash])) {
+        throw new Error(
+          `Missing POI for txidLeafHash ${txidLeafHash} for list ${listKey}`,
+        );
+      }
+
+      const {
+        snarkProof,
+        txidMerkleroot,
+        poiMerkleroots,
+        blindedCommitmentsOut,
+        railgunTxidIfHasUnshield,
+      } = poisForList[txidLeafHash];
+
+      // 3. Validate txidDummyMerkleProof and txid root
+      const dummyMerkleProof = createDummyMerkleProof(txidLeafHash);
+      if (dummyMerkleProof.root !== txidMerkleroot) {
+        throw new Error('Invalid txid merkle proof');
+      }
+
+      // 4. Validate POI merkleroots for each list
+      const validPOIMerkleroots = await this.validatePOIMerkleroots(
+        txidVersion,
+        chain,
+        listKey,
+        poiMerkleroots,
+      );
+      if (!validPOIMerkleroots) {
+        throw new Error(`Invalid POI merkleroots: list ${listKey}`);
+      }
+
+      // 5. Verify snark proof for each list
+      const transactProofData: TransactProofData = {
+        snarkProof,
+        txidMerkleroot,
+        poiMerkleroots,
+        blindedCommitmentsOut,
+        railgunTxidIfHasUnshield,
+        txidMerklerootIndex: 0, // Unused
+      };
+      const validProof = await POIProof.verifyTransactProof(transactProofData);
+      if (!validProof) {
+        throw new Error(`Invalid POI snark proof: list ${listKey}`);
+      }
+    }
+
+    return true;
   }
 }

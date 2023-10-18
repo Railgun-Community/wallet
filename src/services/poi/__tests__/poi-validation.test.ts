@@ -117,7 +117,7 @@ describe('poi-validation', () => {
       },
     };
 
-    const validSpendable = await POIValidation.isValidSpendableTXID(
+    const validSpendable = await POIValidation.isValidSpendableTransaction(
       railgunWallet.id,
       txidVersion,
       chain,
@@ -144,7 +144,7 @@ describe('poi-validation', () => {
     ].snarkProof.pi_a[0] =
       '13766471856281251472923302905099603168301598594631438526482227084351434874783';
 
-    const invalidSpendable = await POIValidation.isValidSpendableTXID(
+    const invalidSpendable = await POIValidation.isValidSpendableTransaction(
       railgunWallet.id,
       txidVersion,
       chain,
