@@ -26,6 +26,7 @@ import { TestWalletPOINodeInterface } from './poi/test-wallet-poi-node-interface
 import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
 import {
   GetLatestValidatedRailgunTxid,
+  SnarkJSGroth16,
   TXOPOIListStatus,
 } from '@railgun-community/engine';
 import {
@@ -139,7 +140,7 @@ export const initTestEngine = (useNativeArtifacts = false) => {
   const testPOINodeInterface = new TestWalletPOINodeInterface();
   WalletPOI.init(testPOINodeInterface, []);
 
-  getEngine().prover.setSnarkJSGroth16(groth16);
+  getEngine().prover.setSnarkJSGroth16(groth16 as SnarkJSGroth16);
 
   setOnBalanceUpdateCallback(MOCK_BALANCES_UPDATE_CALLBACK);
   setOnWalletPOIProofProgressCallback(
