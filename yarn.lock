@@ -2128,16 +2128,15 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@5.8.16":
-  version "5.8.16"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.8.16.tgz#b57f71d1247460bc701998df7d51d0fe872c450b"
-  integrity sha512-K5pnxVDrSilhc2AG3DcDA1nmptdKSUa7VQlPARUuLv0cfIZLnb/h5NyGfJfOup3kVfwR/TmWl4QXj+a37uL8UA==
+"@railgun-community/engine@5.8.17":
+  version "5.8.17"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.8.17.tgz#51a72e905ccfdbbbd6afecb3b6f633cec7c51450"
+  integrity sha512-Ws+bkIB2K9CvFKVZ+FNULfd9OvITl16mFycU9GzdR0cg7NBlVKMyGI5KjvTGuyspg52oS8OSGJWzJtWNaAUOOQ==
   dependencies:
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.0"
     "@railgun-community/curve25519-scalarmult-wasm" "0.1.5"
     "@scure/base" "^1.1.1"
-    "@types/lodash" "^4.14.199"
     abstract-leveldown "^7.2.0"
     bn.js "^5.2.1"
     browserify-aes "^1.2.0"
@@ -2151,10 +2150,10 @@
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
-"@railgun-community/shared-models@5.7.10":
-  version "5.7.10"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.7.10.tgz#31a077c097923638557894e6afff0930d12a9b1e"
-  integrity sha512-lq7zF4LrjkCh8B2OrUZToVHa6sIk+HtZkfBQ6ch7dGSMuTA12aIkCDIgp4SrQksYeAVh9sW5EfrCD9wiZI6BbA==
+"@railgun-community/shared-models@5.7.11":
+  version "5.7.11"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.7.11.tgz#88abaecbb25c52e5816585be4138a28180f390b7"
+  integrity sha512-6Otfyj+npfZGjfO/GDxLzMXqN1MxLLmZlnbxPCn2jcwGzFkF+0cjXzi5dgqIchj4Ec+njL5rFx6oB3WXfcDYnw==
 
 "@repeaterjs/repeater@3.0.4", "@repeaterjs/repeater@^3.0.4":
   version "3.0.4"
@@ -2332,11 +2331,6 @@
   dependencies:
     "@types/abstract-leveldown" "*"
     "@types/node" "*"
-
-"@types/lodash@^4.14.199":
-  version "4.14.199"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.199.tgz#c3edb5650149d847a277a8961a7ad360c474e9bf"
-  integrity sha512-Vrjz5N5Ia4SEzWWgIVwnHNEnb1UE1XMkvY5DGXrAeOGE9imk0hgTHh5GyDjLDJi9OTCn9oo9dXH1uToK1VRfrg==
 
 "@types/mocha@^10.0.1":
   version "10.0.1"

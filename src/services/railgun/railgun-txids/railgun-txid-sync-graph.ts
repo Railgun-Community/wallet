@@ -8,11 +8,7 @@ import {
   isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
-import {
-  getMeshOptions,
-  getSdk,
-  GetUnshieldRailgunTransactionsByTxidQuery,
-} from './graphql';
+import { getMeshOptions, getSdk } from './graphql';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
   GraphRailgunTransactions,
@@ -53,15 +49,42 @@ export const getRailgunTxidsForUnshields = async (
 
   const sdk = getBuiltGraphSDK(network.name);
 
-  const transactions: GetUnshieldRailgunTransactionsByTxidQuery['transactions'] =
-    (await sdk.GetUnshieldRailgunTransactionsByTxid({ txid })).transactions;
+  const transactions: GraphRailgunTransactions = (
+    await sdk.GetRailgunTransactionsByTxid({ txid })
+  ).transactions;
 
-  const railgunTxidsForUnshields: string[] = transactions.map(transaction => {
-    const railgunTxid = getRailgunTransactionIDHex(transaction);
-    return railgunTxid;
-  });
+  const railgunTxidsForUnshields: string[] = transactions
+    .filter(transaction => transaction.hasUnshield)
+    .map(transaction => {
+      const railgunTxid = getRailgunTransactionIDHex(transaction);
+      return railgunTxid;
+    });
 
   return railgunTxidsForUnshields;
+};
+
+export const getRailgunTransactionsForTxid = async (
+  chain: Chain,
+  txid: string,
+): Promise<RailgunTransaction[]> => {
+  const network = networkForChain(chain);
+  if (!network) {
+    return [];
+  }
+
+  const sdk = getBuiltGraphSDK(network.name);
+
+  const railgunTransactions: GraphRailgunTransactions = (
+    await sdk.GetRailgunTransactionsByTxid({ txid })
+  ).transactions;
+
+  const filteredRailgunTransactions: GraphRailgunTransactions =
+    removeDuplicatesByID(railgunTransactions);
+
+  const formattedRailgunTransactions: RailgunTransaction[] =
+    formatRailgunTransactions(filteredRailgunTransactions);
+
+  return formattedRailgunTransactions;
 };
 
 export const quickSyncRailgunTransactions = async (

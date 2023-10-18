@@ -166,6 +166,7 @@ const createWallet = async (
   encryptionKey: string,
   mnemonic: string,
   creationBlockNumbers: Optional<MapType<number>>,
+  railgunWalletDerivationIndex?: number,
 ): Promise<RailgunWalletInfo> => {
   const formattedCreationBlockNumbers =
     formatCreationBlockNumbers(creationBlockNumbers);
@@ -174,7 +175,7 @@ const createWallet = async (
   const wallet = await engine.createWalletFromMnemonic(
     encryptionKey,
     mnemonic,
-    0,
+    railgunWalletDerivationIndex ?? 0,
     formattedCreationBlockNumbers,
   );
   subscribeToEvents(wallet);
@@ -203,9 +204,15 @@ export const createRailgunWallet = async (
   encryptionKey: string,
   mnemonic: string,
   creationBlockNumbers: Optional<MapType<number>>,
+  railgunWalletDerivationIndex?: number,
 ): Promise<RailgunWalletInfo> => {
   try {
-    return await createWallet(encryptionKey, mnemonic, creationBlockNumbers);
+    return await createWallet(
+      encryptionKey,
+      mnemonic,
+      creationBlockNumbers,
+      railgunWalletDerivationIndex,
+    );
   } catch (err) {
     throw reportAndSanitizeError(createRailgunWallet.name, err);
   }

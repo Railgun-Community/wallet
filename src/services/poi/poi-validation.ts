@@ -15,7 +15,10 @@ import {
   PreTransactionPOIsPerTxidLeafPerList,
   hexToBigInt,
 } from '@railgun-community/engine';
-import { extractRailgunTransactionDataFromTransactionRequest } from '../railgun/process/extract-transaction-data';
+import {
+  ExtractedRailgunTransactionData,
+  extractRailgunTransactionDataFromTransactionRequest,
+} from '../railgun/process/extract-transaction-data';
 import { ContractTransaction } from 'ethers';
 
 export type POIMerklerootsValidator = (
@@ -33,12 +36,17 @@ export class POIValidation {
   }
 
   static async isValidSpendableTXID(
+    railgunWalletID: string,
     txidVersion: TXIDVersion,
     chain: Chain,
     transactionRequest: ContractTransaction,
     useRelayAdapt: boolean,
     pois: PreTransactionPOIsPerTxidLeafPerList,
-  ): Promise<{ isValid: boolean; error?: string }> {
+  ): Promise<{
+    isValid: boolean;
+    error?: string;
+    extractedRailgunTransactionData?: ExtractedRailgunTransactionData;
+  }> {
     try {
       if (!this.validatePOIMerkleroots) {
         throw new Error('No POI merkleroot validator found');
@@ -48,8 +56,9 @@ export class POIValidation {
         throw new Error('Invalid network');
       }
 
-      const extractedRailgunTransactionData =
-        extractRailgunTransactionDataFromTransactionRequest(
+      const extractedRailgunTransactionData: ExtractedRailgunTransactionData =
+        await extractRailgunTransactionDataFromTransactionRequest(
+          railgunWalletID,
           network,
           transactionRequest,
           useRelayAdapt,
@@ -125,7 +134,7 @@ export class POIValidation {
         }
       }
 
-      return { isValid: true };
+      return { isValid: true, extractedRailgunTransactionData };
     } catch (err) {
       if (!(err instanceof Error)) {
         throw err;

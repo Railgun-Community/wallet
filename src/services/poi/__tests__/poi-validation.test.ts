@@ -7,13 +7,22 @@ import {
   NETWORK_CONFIG,
   NetworkName,
   TXIDVersion,
+  isDefined,
 } from '@railgun-community/shared-models';
 import {
   POI,
   PreTransactionPOIsPerTxidLeafPerList,
+  RailgunWallet,
 } from '@railgun-community/engine';
-import { loadProvider } from '../../railgun';
-import { MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI } from '../../../tests/mocks.test';
+import {
+  createRailgunWallet,
+  fullWalletForID,
+  loadProvider,
+} from '../../railgun';
+import {
+  MOCK_DB_ENCRYPTION_KEY,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
+} from '../../../tests/mocks.test';
 import Sinon, { SinonStub } from 'sinon';
 
 chai.use(chaiAsPromised);
@@ -23,7 +32,11 @@ const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 const networkName = NetworkName.EthereumGoerli;
 const chain: Chain = NETWORK_CONFIG[networkName].chain;
 
+const MOCK_MNEMONIC_1 =
+  'test test test test test test test test test test test junk';
+
 let getActiveListsStub: SinonStub;
+let railgunWallet: RailgunWallet;
 
 describe('poi-validation', () => {
   before(async () => {
@@ -38,6 +51,17 @@ describe('poi-validation', () => {
       networkName,
       10000, // pollingInterval
     );
+
+    const railgunWalletInfo = await createRailgunWallet(
+      MOCK_DB_ENCRYPTION_KEY,
+      MOCK_MNEMONIC_1,
+      undefined,
+      1, // derivation index for receiving wallet
+    );
+    if (!isDefined(railgunWalletInfo)) {
+      throw new Error('No railgun wallet created');
+    }
+    railgunWallet = fullWalletForID(railgunWalletInfo.id);
 
     // Set a mock validator for poi merkleroots.
     POIValidation.init(async () => true);
@@ -92,13 +116,25 @@ describe('poi-validation', () => {
     };
 
     const validSpendable = await POIValidation.isValidSpendableTXID(
+      railgunWallet.id,
       txidVersion,
       chain,
       contractTransaction,
       false, // useRelayAdapt
       pois,
     );
-    expect(validSpendable).to.deep.equal({ isValid: true });
+    expect(validSpendable).to.deep.equal({
+      isValid: true,
+      extractedRailgunTransactionData: [
+        {
+          railgunTxid:
+            '0fefd169291c1deec2affa8dcbfbee4a4bbeddfc3b5723c031665ba631725c62',
+          utxoTreeIn: 0n,
+          walletAddressedNotePublicKey:
+            2800314339815912641032015410982157821342520564864853273055282304996901162130n,
+        },
+      ],
+    });
 
     // Invalid value
     pois.test_list[
@@ -107,6 +143,7 @@ describe('poi-validation', () => {
       '13766471856281251472923302905099603168301598594631438526482227084351434874783';
 
     const invalidSpendable = await POIValidation.isValidSpendableTXID(
+      railgunWallet.id,
       txidVersion,
       chain,
       contractTransaction,

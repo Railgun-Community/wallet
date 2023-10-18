@@ -106,6 +106,8 @@ export type Query = {
   nullifiers: Array<Nullifier>;
   transaction?: Maybe<Transaction>;
   transactions: Array<Transaction>;
+  verificationHash?: Maybe<VerificationHash>;
+  verificationHashes: Array<VerificationHash>;
   commitment?: Maybe<Commitment>;
   commitments: Array<Commitment>;
   transactionInterface?: Maybe<TransactionInterface>;
@@ -322,6 +324,22 @@ export type QuerytransactionsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+export type QueryverificationHashArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+export type QueryverificationHashesArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<VerificationHash_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<VerificationHash_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
 export type QuerycommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
@@ -385,6 +403,8 @@ export type Subscription = {
   nullifiers: Array<Nullifier>;
   transaction?: Maybe<Transaction>;
   transactions: Array<Transaction>;
+  verificationHash?: Maybe<VerificationHash>;
+  verificationHashes: Array<VerificationHash>;
   commitment?: Maybe<Commitment>;
   commitments: Array<Commitment>;
   transactionInterface?: Maybe<TransactionInterface>;
@@ -597,6 +617,22 @@ export type SubscriptiontransactionsArgs = {
   orderBy?: InputMaybe<Transaction_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
   where?: InputMaybe<Transaction_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+export type SubscriptionverificationHashArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+export type SubscriptionverificationHashesArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<VerificationHash_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<VerificationHash_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -1787,6 +1823,7 @@ export type Transaction = TransactionInterface & {
   unshieldToAddress: Scalars['Bytes'];
   unshieldValue: Scalars['BigInt'];
   blockTimestamp: Scalars['BigInt'];
+  verificationHash: Scalars['Bytes'];
 };
 
 export type TransactionInterface = {
@@ -1805,6 +1842,7 @@ export type TransactionInterface = {
   unshieldToAddress: Scalars['Bytes'];
   unshieldValue: Scalars['BigInt'];
   blockTimestamp: Scalars['BigInt'];
+  verificationHash: Scalars['Bytes'];
 };
 
 export type TransactionInterface_filter = {
@@ -1943,6 +1981,16 @@ export type TransactionInterface_filter = {
   blockTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
   blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
   blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  verificationHash?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_contains?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not_contains?: InputMaybe<Scalars['Bytes']>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<TransactionInterface_filter>>>;
@@ -1968,7 +2016,8 @@ export type TransactionInterface_orderBy =
   | 'unshieldToken__tokenSubID'
   | 'unshieldToAddress'
   | 'unshieldValue'
-  | 'blockTimestamp';
+  | 'blockTimestamp'
+  | 'verificationHash';
 
 export type Transaction_filter = {
   id?: InputMaybe<Scalars['Bytes']>;
@@ -2106,6 +2155,16 @@ export type Transaction_filter = {
   blockTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
   blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
   blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  verificationHash?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_contains?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not_contains?: InputMaybe<Scalars['Bytes']>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Transaction_filter>>>;
@@ -2131,7 +2190,8 @@ export type Transaction_orderBy =
   | 'unshieldToken__tokenSubID'
   | 'unshieldToAddress'
   | 'unshieldValue'
-  | 'blockTimestamp';
+  | 'blockTimestamp'
+  | 'verificationHash';
 
 export type Unshield = {
   id: Scalars['Bytes'];
@@ -2257,6 +2317,40 @@ export type Unshield_orderBy =
   | 'amount'
   | 'fee'
   | 'eventLogIndex';
+
+export type VerificationHash = {
+  id: Scalars['Bytes'];
+  verificationHash: Scalars['Bytes'];
+};
+
+export type VerificationHash_filter = {
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_gt?: InputMaybe<Scalars['Bytes']>;
+  id_lt?: InputMaybe<Scalars['Bytes']>;
+  id_gte?: InputMaybe<Scalars['Bytes']>;
+  id_lte?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  verificationHash?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_contains?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<VerificationHash_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<VerificationHash_filter>>>;
+};
+
+export type VerificationHash_orderBy = 'id' | 'verificationHash';
 
 export type _Block_ = {
   /** The hash of the block */
@@ -2478,6 +2572,9 @@ export type ResolversTypes = ResolversObject<{
   Unshield: ResolverTypeWrapper<Unshield>;
   Unshield_filter: Unshield_filter;
   Unshield_orderBy: Unshield_orderBy;
+  VerificationHash: ResolverTypeWrapper<VerificationHash>;
+  VerificationHash_filter: VerificationHash_filter;
+  VerificationHash_orderBy: VerificationHash_orderBy;
   _Block_: ResolverTypeWrapper<_Block_>;
   _Meta_: ResolverTypeWrapper<_Meta_>;
   _SubgraphErrorPolicy_: _SubgraphErrorPolicy_;
@@ -2532,6 +2629,8 @@ export type ResolversParentTypes = ResolversObject<{
   Transaction_filter: Transaction_filter;
   Unshield: Unshield;
   Unshield_filter: Unshield_filter;
+  VerificationHash: VerificationHash;
+  VerificationHash_filter: VerificationHash_filter;
   _Block_: _Block_;
   _Meta_: _Meta_;
 }>;
@@ -2750,6 +2849,21 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QuerytransactionsArgs, 'skip' | 'first' | 'subgraphError'>
+  >;
+  verificationHash?: Resolver<
+    Maybe<ResolversTypes['VerificationHash']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryverificationHashArgs, 'id' | 'subgraphError'>
+  >;
+  verificationHashes?: Resolver<
+    Array<ResolversTypes['VerificationHash']>,
+    ParentType,
+    ContextType,
+    RequireFields<
+      QueryverificationHashesArgs,
+      'skip' | 'first' | 'subgraphError'
+    >
   >;
   commitment?: Resolver<
     Maybe<ResolversTypes['Commitment']>,
@@ -3014,6 +3128,23 @@ export type SubscriptionResolvers<
     ContextType,
     RequireFields<
       SubscriptiontransactionsArgs,
+      'skip' | 'first' | 'subgraphError'
+    >
+  >;
+  verificationHash?: SubscriptionResolver<
+    Maybe<ResolversTypes['VerificationHash']>,
+    'verificationHash',
+    ParentType,
+    ContextType,
+    RequireFields<SubscriptionverificationHashArgs, 'id' | 'subgraphError'>
+  >;
+  verificationHashes?: SubscriptionResolver<
+    Array<ResolversTypes['VerificationHash']>,
+    'verificationHashes',
+    ParentType,
+    ContextType,
+    RequireFields<
+      SubscriptionverificationHashesArgs,
       'skip' | 'first' | 'subgraphError'
     >
   >;
@@ -3370,6 +3501,7 @@ export type TransactionResolvers<
   >;
   unshieldValue?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  verificationHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3409,6 +3541,7 @@ export type TransactionInterfaceResolvers<
   >;
   unshieldValue?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  verificationHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
 }>;
 
 export type UnshieldResolvers<
@@ -3424,6 +3557,15 @@ export type UnshieldResolvers<
   amount?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   fee?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   eventLogIndex?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type VerificationHashResolvers<
+  ContextType = MeshContext,
+  ParentType extends ResolversParentTypes['VerificationHash'] = ResolversParentTypes['VerificationHash'],
+> = ResolversObject<{
+  id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  verificationHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3473,6 +3615,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
   Transaction?: TransactionResolvers<ContextType>;
   TransactionInterface?: TransactionInterfaceResolvers<ContextType>;
   Unshield?: UnshieldResolvers<ContextType>;
+  VerificationHash?: VerificationHashResolvers<ContextType>;
   _Block_?: _Block_Resolvers<ContextType>;
   _Meta_?: _Meta_Resolvers<ContextType>;
 }>;
@@ -3483,8 +3626,8 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
   derivedFrom?: derivedFromDirectiveResolver<any, any, ContextType>;
 }>;
 
-export type MeshContext = TxsGoerliTypes.Context &
-  TxsEthereumTypes.Context &
+export type MeshContext = TxsEthereumTypes.Context &
+  TxsGoerliTypes.Context &
   BaseMeshContext;
 
 const baseDir = pathModule.join(
@@ -3502,14 +3645,14 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     .join('/')
     .replace(baseDir + '/', '');
   switch (relativeModuleId) {
-    case '.graphclient/sources/txs-goerli/introspectionSchema':
-      return import(
-        './.graphclient/sources/txs-goerli/introspectionSchema'
-      ) as T;
-
     case '.graphclient/sources/txs-ethereum/introspectionSchema':
       return import(
         './.graphclient/sources/txs-ethereum/introspectionSchema'
+      ) as T;
+
+    case '.graphclient/sources/txs-goerli/introspectionSchema':
+      return import(
+        './.graphclient/sources/txs-goerli/introspectionSchema'
       ) as T;
 
     default:
@@ -3615,11 +3758,11 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
           location: 'GetRailgunTransactionsAfterGraphIdDocument.graphql',
         },
         {
-          document: GetUnshieldRailgunTransactionsByTxidDocument,
+          document: GetRailgunTransactionsByTxidDocument,
           get rawSDL() {
-            return printWithCache(GetUnshieldRailgunTransactionsByTxidDocument);
+            return printWithCache(GetRailgunTransactionsByTxidDocument);
           },
-          location: 'GetUnshieldRailgunTransactionsByTxidDocument.graphql',
+          location: 'GetRailgunTransactionsByTxidDocument.graphql',
         },
       ];
     },
@@ -3696,13 +3839,30 @@ export type GetRailgunTransactionsAfterGraphIDQuery = {
   >;
 };
 
-export type GetUnshieldRailgunTransactionsByTxidQueryVariables = Exact<{
+export type GetRailgunTransactionsByTxidQueryVariables = Exact<{
   txid?: InputMaybe<Scalars['Bytes']>;
 }>;
 
-export type GetUnshieldRailgunTransactionsByTxidQuery = {
+export type GetRailgunTransactionsByTxidQuery = {
   transactions: Array<
-    Pick<Transaction, 'nullifiers' | 'commitments' | 'boundParamsHash'>
+    Pick<
+      Transaction,
+      | 'id'
+      | 'nullifiers'
+      | 'commitments'
+      | 'transactionHash'
+      | 'boundParamsHash'
+      | 'blockNumber'
+      | 'utxoTreeIn'
+      | 'utxoTreeOut'
+      | 'utxoBatchStartPositionOut'
+      | 'hasUnshield'
+      | 'unshieldToAddress'
+      | 'unshieldValue'
+      | 'blockTimestamp'
+    > & {
+      unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'>;
+    }
   >;
 };
 
@@ -3733,17 +3893,32 @@ export const GetRailgunTransactionsAfterGraphIDDocument = gql`
   GetRailgunTransactionsAfterGraphIDQuery,
   GetRailgunTransactionsAfterGraphIDQueryVariables
 >;
-export const GetUnshieldRailgunTransactionsByTxidDocument = gql`
-  query GetUnshieldRailgunTransactionsByTxid($txid: Bytes) {
-    transactions(where: { transactionHash: $txid, hasUnshield: true }) {
+export const GetRailgunTransactionsByTxidDocument = gql`
+  query GetRailgunTransactionsByTxid($txid: Bytes) {
+    transactions(where: { transactionHash: $txid }) {
+      id
       nullifiers
       commitments
+      transactionHash
       boundParamsHash
+      blockNumber
+      utxoTreeIn
+      utxoTreeOut
+      utxoBatchStartPositionOut
+      hasUnshield
+      unshieldToken {
+        tokenType
+        tokenSubID
+        tokenAddress
+      }
+      unshieldToAddress
+      unshieldValue
+      blockTimestamp
     }
   }
 ` as unknown as DocumentNode<
-  GetUnshieldRailgunTransactionsByTxidQuery,
-  GetUnshieldRailgunTransactionsByTxidQueryVariables
+  GetRailgunTransactionsByTxidQuery,
+  GetRailgunTransactionsByTxidQueryVariables
 >;
 
 export type Requester<C = {}, E = unknown> = <R, V>(
@@ -3766,18 +3941,18 @@ export function getSdk<C, E>(requester: Requester<C, E>) {
         options,
       ) as Promise<GetRailgunTransactionsAfterGraphIDQuery>;
     },
-    GetUnshieldRailgunTransactionsByTxid(
-      variables?: GetUnshieldRailgunTransactionsByTxidQueryVariables,
+    GetRailgunTransactionsByTxid(
+      variables?: GetRailgunTransactionsByTxidQueryVariables,
       options?: C,
-    ): Promise<GetUnshieldRailgunTransactionsByTxidQuery> {
+    ): Promise<GetRailgunTransactionsByTxidQuery> {
       return requester<
-        GetUnshieldRailgunTransactionsByTxidQuery,
-        GetUnshieldRailgunTransactionsByTxidQueryVariables
+        GetRailgunTransactionsByTxidQuery,
+        GetRailgunTransactionsByTxidQueryVariables
       >(
-        GetUnshieldRailgunTransactionsByTxidDocument,
+        GetRailgunTransactionsByTxidDocument,
         variables,
         options,
-      ) as Promise<GetUnshieldRailgunTransactionsByTxidQuery>;
+      ) as Promise<GetRailgunTransactionsByTxidQuery>;
     },
   };
 }

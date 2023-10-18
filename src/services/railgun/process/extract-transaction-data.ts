@@ -30,6 +30,12 @@ import { Contract, ContractTransaction, Result } from 'ethers';
 import { TransactionStructOutput } from '@railgun-community/engine/dist/abi/typechain/RailgunSmartWallet';
 import { getEngine } from '../core/engine';
 
+export type ExtractedRailgunTransactionData = {
+  railgunTxid: string;
+  utxoTreeIn: bigint;
+  walletAddressedNotePublicKey: Optional<bigint>;
+}[];
+
 enum TransactionName {
   RailgunSmartWallet = 'transact',
   RelayAdapt = 'relay',
@@ -67,10 +73,11 @@ export const extractFirstNoteERC20AmountMapFromTransactionRequest = (
 };
 
 export const extractRailgunTransactionDataFromTransactionRequest = (
+  railgunWalletID: string,
   network: Network,
   transactionRequest: ContractTransaction,
   useRelayAdapt: boolean,
-): { railgunTxid: string; utxoTreeIn: bigint }[] => {
+): Promise<ExtractedRailgunTransactionData> => {
   const transactionName = useRelayAdapt
     ? TransactionName.RelayAdapt
     : TransactionName.RailgunSmartWallet;
@@ -79,6 +86,7 @@ export const extractRailgunTransactionDataFromTransactionRequest = (
     : network.proxyContract;
 
   return extractRailgunTransactionData(
+    railgunWalletID,
     network,
     transactionRequest,
     transactionName,
@@ -212,11 +220,18 @@ const extractFirstNoteERC20AmountMap = async (
 };
 
 const extractRailgunTransactionData = (
+  railgunWalletID: string,
   network: Network,
   transactionRequest: ContractTransaction,
   transactionName: TransactionName,
   contractAddress: string,
-): { railgunTxid: string; utxoTreeIn: bigint }[] => {
+): Promise<ExtractedRailgunTransactionData> => {
+  const railgunWallet = walletForID(railgunWalletID);
+  const railgunWalletAddress = railgunWallet.getAddress();
+  const receivingViewingPrivateKey = railgunWallet.viewingKeyPair.privateKey;
+  const receivingRailgunAddressData =
+    getRailgunWalletAddressData(railgunWalletAddress);
+
   const railgunTxs: TransactionStructOutput[] = getRailgunTransactionRequests(
     network,
     transactionRequest,
@@ -224,21 +239,46 @@ const extractRailgunTransactionData = (
     contractAddress,
   );
 
-  return railgunTxs.map((railgunTx: TransactionStructOutput) => {
-    const { commitments, nullifiers, boundParams } = railgunTx;
+  return Promise.all(
+    railgunTxs.map(async (railgunTx: TransactionStructOutput) => {
+      const { commitments, nullifiers, boundParams } = railgunTx;
 
-    const boundParamsHash = nToHex(
-      hashBoundParams(boundParams),
-      ByteLength.UINT_256,
-      true,
-    );
-    const railgunTxid = getRailgunTransactionIDHex({
-      nullifiers,
-      commitments,
-      boundParamsHash,
-    });
-    return { railgunTxid, utxoTreeIn: boundParams.treeNumber };
-  });
+      const boundParamsHash = nToHex(
+        hashBoundParams(boundParams),
+        ByteLength.UINT_256,
+        true,
+      );
+      const railgunTxid = getRailgunTransactionIDHex({
+        nullifiers,
+        commitments,
+        boundParamsHash,
+      });
+
+      // Extract first commitment (index 0)
+      const index = 0;
+      const commitmentCiphertextStructOutput =
+        boundParams.commitmentCiphertext[index];
+
+      const commitmentCiphertext = formatCommitmentCiphertext(
+        commitmentCiphertextStructOutput,
+      );
+
+      // Get NPK for first note, if addressed to current wallet.
+      const walletAddressedNotePublicKey =
+        await extractNPKFromCommitmentCiphertext(
+          network,
+          commitmentCiphertext,
+          receivingViewingPrivateKey,
+          receivingRailgunAddressData,
+        );
+
+      return {
+        railgunTxid,
+        utxoTreeIn: boundParams.treeNumber,
+        walletAddressedNotePublicKey,
+      };
+    }),
+  );
 };
 
 const decryptReceiverNoteSafe = async (
@@ -285,6 +325,21 @@ const decryptReceiverNoteSafe = async (
     reportAndSanitizeError(decryptReceiverNoteSafe.name, err);
     return undefined;
   }
+};
+
+export const extractNPKFromCommitmentCiphertext = async (
+  network: Network,
+  commitmentCiphertext: CommitmentCiphertext,
+  receivingViewingPrivateKey: Uint8Array,
+  receivingRailgunAddressData: AddressData,
+): Promise<Optional<bigint>> => {
+  const decryptedReceiverNote = await decryptReceiverNoteSafe(
+    commitmentCiphertext,
+    receivingViewingPrivateKey,
+    receivingRailgunAddressData,
+    network.chain,
+  );
+  return decryptedReceiverNote?.notePublicKey;
 };
 
 export const extractERC20AmountFromCommitmentCiphertext = async (
