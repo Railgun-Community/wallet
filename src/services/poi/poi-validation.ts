@@ -20,6 +20,7 @@ import {
   extractRailgunTransactionDataFromTransactionRequest,
 } from '../railgun/process/extract-transaction-data';
 import { ContractTransaction } from 'ethers';
+import { walletForID } from '../railgun/wallets/wallets';
 
 export type POIMerklerootsValidator = (
   txidVersion: TXIDVersion,
@@ -33,6 +34,21 @@ export class POIValidation {
 
   static init(validatePOIMerkleroots: POIMerklerootsValidator) {
     this.validatePOIMerkleroots = validatePOIMerkleroots;
+  }
+
+  static async hasValidPOIsForReceiveCommitment(
+    railgunWalletID: string,
+    txidVersion: TXIDVersion,
+    chain: Chain,
+    commitment: string,
+  ): Promise<boolean> {
+    const wallet = walletForID(railgunWalletID);
+    const hasValidPOIs = await wallet.receiveCommitmentHasValidPOI(
+      txidVersion,
+      chain,
+      commitment,
+    );
+    return hasValidPOIs;
   }
 
   static async isValidSpendableTXID(
