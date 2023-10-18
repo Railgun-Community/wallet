@@ -157,7 +157,7 @@ describe('poi-validation', () => {
     expect(invalidSpendable).to.deep.equal({
       isValid: false,
       error:
-        'Could not validate spendable TXID: Invalid POI snark proof: list test_list',
+        'Could not validate spendable TXID: Could not verify POI snark proof: list test_list',
     });
   }).timeout(20000);
 });

@@ -174,7 +174,7 @@ export class POIValidation {
       };
       const validProof = await POIProof.verifyTransactProof(transactProofData);
       if (!validProof) {
-        throw new Error(`Invalid POI snark proof: list ${listKey}`);
+        throw new Error(`Could not verify POI snark proof: list ${listKey}`);
       }
     }
 
