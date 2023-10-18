@@ -33,7 +33,8 @@ import { getEngine } from '../core/engine';
 export type ExtractedRailgunTransactionData = {
   railgunTxid: string;
   utxoTreeIn: bigint;
-  walletAddressedNotePublicKey: Optional<bigint>;
+  firstCommitment: Optional<string>;
+  firstCommitmentNotePublicKey: Optional<bigint>;
 }[];
 
 enum TransactionName {
@@ -264,7 +265,7 @@ const extractRailgunTransactionData = (
       );
 
       // Get NPK for first note, if addressed to current wallet.
-      const walletAddressedNotePublicKey =
+      const firstCommitmentNotePublicKey =
         await extractNPKFromCommitmentCiphertext(
           network,
           commitmentCiphertext,
@@ -275,7 +276,8 @@ const extractRailgunTransactionData = (
       return {
         railgunTxid,
         utxoTreeIn: boundParams.treeNumber,
-        walletAddressedNotePublicKey,
+        firstCommitmentNotePublicKey,
+        firstCommitment: commitments[0],
       };
     }),
   );

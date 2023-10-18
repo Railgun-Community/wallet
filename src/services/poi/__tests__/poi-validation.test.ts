@@ -132,7 +132,9 @@ describe('poi-validation', () => {
           railgunTxid:
             '0fefd169291c1deec2affa8dcbfbee4a4bbeddfc3b5723c031665ba631725c62',
           utxoTreeIn: 0n,
-          walletAddressedNotePublicKey:
+          firstCommitment:
+            '0x2c5acad8f41f95a2795997353f6cdb0838493cd5604f8ddc1859a468233e15ac',
+          firstCommitmentNotePublicKey:
             2800314339815912641032015410982157821342520564864853273055282304996901162130n,
         },
       ],

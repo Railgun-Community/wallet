@@ -142,7 +142,7 @@ const createGoerliRelayAdaptUnshieldTransactions = async (
   );
 };
 
-describe('extract-first-note', () => {
+describe('extract-transaction-data', () => {
   before(async function run() {
     this.timeout(10000);
 
@@ -224,7 +224,9 @@ describe('extract-first-note', () => {
         railgunTxid:
           '18759632f78e7ce85cbd04769b98c8a5436d5144ff9f96f9743eeab43864f98a',
         utxoTreeIn: 0n,
-        walletAddressedNotePublicKey:
+        firstCommitment:
+          '0x2d19ecebdbe7eaf95d5e36841de3df4fa84f4d978f00aea308f0edb3deb19586',
+        firstCommitmentNotePublicKey:
           5359614152058359376498286929274915634684900503457035822149709199778311325149n,
       },
     ]);
