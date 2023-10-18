@@ -73,3 +73,13 @@ export const refreshSpentPOIsForWallet = (
     railgunTxid,
   );
 };
+
+export const getChainTxidsStillPendingSpentPOIs = (
+  txidVersion: TXIDVersion,
+  networkName: NetworkName,
+  walletID: string,
+): Promise<string[]> => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  const wallet = walletForID(walletID);
+  return wallet.getChainTxidsStillPendingSpentPOIs(txidVersion, chain);
+};
