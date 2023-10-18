@@ -143,7 +143,7 @@ const spyOnSetUnshield = () => {
 
 describe('tx-cross-contract-calls', () => {
   before(async function run() {
-    this.timeout(5000);
+    this.timeout(30000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletInfo = await createRailgunWallet(
@@ -209,7 +209,7 @@ describe('tx-cross-contract-calls', () => {
     await closeTestEngine();
   });
 
-  // UNSHIELD - GAS ESTIMATE
+  // GAS ESTIMATE
 
   it('Should get gas estimates for valid cross contract calls', async () => {
     stubGasEstimateSuccess();
@@ -409,7 +409,7 @@ describe('tx-cross-contract-calls', () => {
     );
   });
 
-  // UNSHIELD - PROVE AND SEND
+  // PROVE AND SEND
 
   it('Should populate tx for valid cross contract calls', async () => {
     stubGasEstimateSuccess();

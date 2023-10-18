@@ -49,8 +49,13 @@ const createPollingProviderForNetwork = async (
   if (existingProvider) {
     return existingProvider;
   }
+  const network = NETWORK_CONFIG[networkName];
+  if (!isDefined(network)) {
+    throw new Error('No network found');
+  }
   const pollingProvider = await createPollingJsonRpcProviderForListeners(
     fallbackProvider,
+    network.chain.id,
     pollingInterval,
   );
   setPollingProviderForNetwork(networkName, pollingProvider);

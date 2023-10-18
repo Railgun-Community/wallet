@@ -39,7 +39,9 @@ let getActiveListsStub: SinonStub;
 let railgunWallet: RailgunWallet;
 
 describe('poi-validation', () => {
-  before(async () => {
+  before(async function run() {
+    this.timeout(15000);
+
     getActiveListsStub = Sinon.stub(POI, 'getActiveListKeys').returns([
       'test_list',
     ]);

@@ -126,6 +126,10 @@ export const onBalancesUpdate = async (
   chain: Chain,
 ): Promise<void> => {
   try {
+    if (!onBalanceUpdateCallback) {
+      return;
+    }
+
     sendMessage(
       `Wallet balance SCANNED. Getting balances for chain ${chain.type}:${chain.id}.`,
     );

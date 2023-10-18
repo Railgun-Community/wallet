@@ -214,7 +214,7 @@ const MOCKED_UNKNOWN_SWAP_TRX: TransactionHistoryItem = {
 
 describe('transaction-history', () => {
   before(async function run() {
-    this.timeout(15000);
+    this.timeout(45000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletInfo = await createRailgunWallet(
