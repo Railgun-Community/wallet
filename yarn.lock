@@ -2128,10 +2128,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@5.8.31":
-  version "5.8.31"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.8.31.tgz#3a3de921fb992ce61bdac0c94901a3a0fcd1157d"
-  integrity sha512-ZDpsWABm/9GbuTANjhKzDa3DeO+fGPrdhKDMZdrkWPaheUWwux88mn7wHHsKdTiEQ2b7Mn3MqAVKeOV/JWy78Q==
+"@railgun-community/engine@5.8.32":
+  version "5.8.32"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-5.8.32.tgz#046f5e6fde8cb6c28427476580911c92f519f1d2"
+  integrity sha512-ziGFXLt1qkQqCIfigoarzgzKrnx/7fgkGKsDh0rzbr7ZDWzLcLjwlMtX8Yem/fd5kDCKi4G/SSVpoYAtB6rq3Q==
   dependencies:
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.0"
@@ -2150,10 +2150,10 @@
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
-"@railgun-community/shared-models@5.7.15":
-  version "5.7.15"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.7.15.tgz#23a1d8843df44c7f9e028b838b41ecf431d05473"
-  integrity sha512-p0EJAOmAe3ldxw/7WJF5/X+vZNDElGTGRhNv3U0gJ4V4IgMnV0kT/j8eaDL3ET7mRdPlL73wxcX/liCy3Ckd3Q==
+"@railgun-community/shared-models@5.7.16":
+  version "5.7.16"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.7.16.tgz#30a913b1eb98e8451607371aa3ef4ff97014ff92"
+  integrity sha512-BckqW6mFgv4ln/m+65V7M5vz+QFNZ4G8cfTZbZgMGw0EZpyaM9P2kYZCsk/XElSRJXFMya/2nEt9s0xkKhPNTw==
 
 "@repeaterjs/repeater@3.0.4", "@repeaterjs/repeater@^3.0.4":
   version "3.0.4"

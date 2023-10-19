@@ -43,6 +43,8 @@ const getRailgunBalanceBucketFromEngineBalanceBucket = (
       return RailgunWalletBalanceBucket.MissingInternalPOI;
     case WalletBalanceBucket.MissingExternalPOI:
       return RailgunWalletBalanceBucket.MissingExternalPOI;
+    case WalletBalanceBucket.Spent:
+      return RailgunWalletBalanceBucket.Spent;
   }
   throw new Error('Unrecognized WalletBalanceBucket');
 };
