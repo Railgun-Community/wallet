@@ -83,3 +83,13 @@ export const getChainTxidsStillPendingSpentPOIs = (
   const wallet = walletForID(walletID);
   return wallet.getChainTxidsStillPendingSpentPOIs(txidVersion, chain);
 };
+
+export const getSpendableReceivedChainTxids = (
+  txidVersion: TXIDVersion,
+  networkName: NetworkName,
+  walletID: string,
+): Promise<string[]> => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  const wallet = walletForID(walletID);
+  return wallet.getSpendableReceivedChainTxids(txidVersion, chain);
+};
