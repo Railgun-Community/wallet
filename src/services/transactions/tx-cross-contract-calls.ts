@@ -235,7 +235,6 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           relayerFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
-          true, // onlySpendable
         ),
       async (txs: TransactionStruct[]) => {
         const relayAdaptParamsRandom = randomHex(31);
@@ -331,7 +330,6 @@ export const generateCrossContractCallsProof = async (
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
-      true, // onlySpendable
     );
 
     // Generate relay adapt params from dummy transactions.
@@ -381,7 +379,6 @@ export const generateCrossContractCallsProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
-        true, // onlySpendable
       );
 
     const nullifiers = nullifiersForTransactions(provedTransactions);

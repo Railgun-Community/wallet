@@ -48,7 +48,6 @@ export const generateTransferProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
-        true, // onlySpendable
       );
     const transaction = await generateTransact(provedTransactions, networkName);
 

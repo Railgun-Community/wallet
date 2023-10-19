@@ -47,10 +47,13 @@ import {
   gasEstimateForUnprovenUnshield,
   populateProvedUnshieldBaseToken,
   gasEstimateForUnprovenUnshieldBaseToken,
+  populateProvedUnshieldToOrigin,
+  gasEstimateForUnprovenUnshieldToOrigin,
 } from '../tx-unshield';
 import {
   generateUnshieldBaseTokenProof,
   generateUnshieldProof,
+  generateUnshieldToOriginProof,
 } from '../tx-proof-unshield';
 import {
   createRailgunWallet,
@@ -58,6 +61,12 @@ import {
 } from '../../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from '../proof-cache';
 import { ContractTransaction, FallbackProvider } from 'ethers';
+import {
+  MOCK_SHIELD_TXID_FOR_BALANCES,
+  MOCK_TOKEN_BALANCE,
+  createEngineWalletBalancesStub,
+  restoreEngineStubs,
+} from '../../../tests/stubs/engine-stubs.test';
 
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
@@ -112,6 +121,12 @@ const gasDetails: TransactionGasDetails = {
   evmGasType: EVMGasType.Type1,
   gasEstimate: 1000n,
   gasPrice: overallBatchMinGasPrice,
+};
+const gasDetailsType2: TransactionGasDetails = {
+  evmGasType: EVMGasType.Type2,
+  gasEstimate: 1000n,
+  maxFeePerGas: overallBatchMinGasPrice,
+  maxPriorityFeePerGas: overallBatchMinGasPrice,
 };
 
 const MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID: RailgunERC20AmountRecipient[] =
@@ -209,6 +224,13 @@ describe('tx-unshield', () => {
       RelayAdaptContract.prototype,
       'populateUnshieldBaseToken',
     ).resolves({ data: '0x0123' } as ContractTransaction);
+
+    // For Unshield To Origin
+    await createEngineWalletBalancesStub(
+      railgunWallet.addressKeys,
+      MOCK_TOKEN_ADDRESS,
+      0,
+    );
   });
   afterEach(() => {
     gasEstimateStub?.restore();
@@ -220,6 +242,7 @@ describe('tx-unshield', () => {
     railDummyProveStub.restore();
     railTransactStub.restore();
     relayAdaptPopulateUnshieldBaseToken.restore();
+    restoreEngineStubs();
     await closeTestEngine();
   });
 
@@ -277,6 +300,40 @@ describe('tx-unshield', () => {
           allowOverride: false,
         },
       ], // run 2 - token 2
+    ]);
+    // Add 7500 for the dummy tx variance
+    expect(rsp.gasEstimate).to.equal(7500n + 200n);
+  }).timeout(10000);
+
+  it('Should get gas estimates for valid Unshield To Origin', async () => {
+    stubGasEstimateSuccess();
+    spyOnSetUnshield();
+    const rsp = await gasEstimateForUnprovenUnshieldToOrigin(
+      MOCK_SHIELD_TXID_FOR_BALANCES, // originalShieldTxid
+      txidVersion,
+      NetworkName.Polygon,
+      railgunWallet.id,
+      MOCK_DB_ENCRYPTION_KEY,
+      [
+        {
+          tokenAddress: MOCK_TOKEN_ADDRESS,
+          amount: MOCK_TOKEN_BALANCE,
+          recipientAddress: MOCK_ETH_WALLET_ADDRESS,
+        },
+      ],
+      [], // nftAmountRecipients
+    );
+    expect(rsp.relayerFeeCommitment).to.be.undefined;
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: MOCK_ETH_WALLET_ADDRESS,
+          tokenData: mockERC20TokenData0,
+          value: MOCK_TOKEN_BALANCE,
+          allowOverride: false,
+        },
+      ],
     ]);
     // Add 7500 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(7500n + 200n);
@@ -502,6 +559,69 @@ describe('tx-unshield', () => {
     expect(transaction.to).to.equal(undefined);
     expect(transaction.chainId).to.equal(undefined);
     expect(transaction.type).to.equal(1);
+  });
+
+  it('Should populate tx for valid Unshield To Origin', async () => {
+    stubGasEstimateSuccess();
+    setCachedProvedTransaction(undefined);
+    spyOnSetUnshield();
+    await generateUnshieldToOriginProof(
+      MOCK_SHIELD_TXID_FOR_BALANCES, // originalShieldTxid
+      txidVersion,
+      NetworkName.Polygon,
+      railgunWallet.id,
+      MOCK_DB_ENCRYPTION_KEY,
+      [
+        {
+          tokenAddress: MOCK_TOKEN_ADDRESS,
+          amount: MOCK_TOKEN_BALANCE,
+          recipientAddress: MOCK_ETH_WALLET_ADDRESS,
+        },
+      ],
+      [],
+      overallBatchMinGasPrice,
+      () => {}, // progressCallback
+    );
+    expect(addUnshieldDataSpy.called).to.be.true;
+    expect(addUnshieldDataSpy.args).to.deep.equal([
+      [
+        {
+          toAddress: MOCK_ETH_WALLET_ADDRESS,
+          tokenData: mockERC20TokenData0,
+          value: MOCK_TOKEN_BALANCE,
+          allowOverride: false,
+        },
+      ], // run 1 - erc20 token 1
+    ]);
+    const populateResponse = await populateProvedUnshieldToOrigin(
+      txidVersion,
+      NetworkName.Polygon,
+      railgunWallet.id,
+      [
+        {
+          tokenAddress: MOCK_TOKEN_ADDRESS,
+          amount: MOCK_TOKEN_BALANCE,
+          recipientAddress: MOCK_ETH_WALLET_ADDRESS,
+        },
+      ],
+      [],
+      overallBatchMinGasPrice,
+      gasDetailsType2,
+    );
+    expect(populateResponse.nullifiers).to.deep.equal([
+      '0x0000000000000000000000000000000000000000000000000000000000000001',
+      '0x0000000000000000000000000000000000000000000000000000000000000002',
+    ]);
+
+    const { transaction } = populateResponse;
+
+    expect(transaction.nonce).to.equal(undefined);
+    expect(transaction.gasLimit).to.equal(1200n);
+    expect(transaction.value?.toString()).to.equal(undefined);
+    expect(transaction.data).to.equal('0x0123');
+    expect(transaction.to).to.equal(undefined);
+    expect(transaction.chainId).to.equal(undefined);
+    expect(transaction.type).to.equal(2);
   });
 
   it('Should error on populate tx for invalid Unshield', async () => {

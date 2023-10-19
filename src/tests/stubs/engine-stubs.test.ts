@@ -22,6 +22,9 @@ let balancesStub: SinonStub;
 let treeBalancesStub: SinonStub;
 let verifyProofStub: SinonStub;
 
+export const MOCK_SHIELD_TXID_FOR_BALANCES = '123';
+export const MOCK_TOKEN_BALANCE = BigInt('1000000000000000000000');
+
 const getMockBalanceData = async (
   addressData: AddressData,
   tokenAddress: string,
@@ -36,16 +39,16 @@ const getMockBalanceData = async (
   const tokenData = getTokenDataERC20(tokenAddress);
 
   return {
-    balance: BigInt('1000000000000000000000'),
+    balance: MOCK_TOKEN_BALANCE,
     tokenData,
     utxos: [
       {
         tree,
         position: 0,
         blockNumber: 100,
-        txid: '123',
+        txid: MOCK_SHIELD_TXID_FOR_BALANCES,
         timestamp: undefined,
-        spendtxid: '123',
+        spendtxid: false,
         note: TransactNote.createTransfer(
           addressData, // receiver
           addressData, // sender
@@ -57,7 +60,7 @@ const getMockBalanceData = async (
           OutputType.Transfer,
           undefined, // memoText
         ),
-        commitmentType: CommitmentType.TransactCommitment,
+        commitmentType: CommitmentType.ShieldCommitment,
         nullifier: ZERO_32_BYTE_VALUE,
         poisPerList: undefined,
         blindedCommitment: undefined,

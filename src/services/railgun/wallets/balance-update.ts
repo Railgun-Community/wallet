@@ -50,7 +50,7 @@ export const setOnWalletPOIProofProgressCallback = (
   onWalletPOIProofProgressCallback = callback;
 };
 
-const getSerializedERC20Balances = (
+export const getSerializedERC20Balances = (
   balances: TokenBalances,
 ): RailgunERC20Amount[] => {
   const tokenHashes = Object.keys(balances);
@@ -70,7 +70,7 @@ const getSerializedERC20Balances = (
     });
 };
 
-const getSerializedNFTBalances = (
+export const getSerializedNFTBalances = (
   balances: TokenBalances,
 ): RailgunNFTAmount[] => {
   const tokenHashes = Object.keys(balances);

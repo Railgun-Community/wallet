@@ -60,7 +60,7 @@ export const generateProofTransactions = async (
   useDummyProof: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: ProverProgressCallback,
-  onlySpendable: boolean,
+  originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
   provedTransactions: TransactionStruct[];
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
@@ -83,7 +83,7 @@ export const generateProofTransactions = async (
     useDummyProof,
     overallBatchMinGasPrice,
     progressCallback,
-    onlySpendable,
+    originShieldTxidForSpendabilityOverride,
   );
   return txs;
 };
@@ -117,7 +117,7 @@ export const generateDummyProofTransactions = async (
   relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
-  onlySpendable: boolean,
+  originShieldTxidForSpendabilityOverride?: string,
 ): Promise<TransactionStruct[]> => {
   if (!relayerFeeERC20Amount && !sendWithPublicWallet) {
     throw new Error('Must send with relayer or public wallet.');
@@ -153,7 +153,7 @@ export const generateDummyProofTransactions = async (
       true, // useDummyProof
       overallBatchMinGasPrice,
       () => {}, // progressCallback (not necessary for dummy txs)
-      onlySpendable,
+      originShieldTxidForSpendabilityOverride,
     )
   ).provedTransactions;
 };
@@ -217,7 +217,7 @@ const transactionsFromERC20Amounts = async (
   useDummyProof: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: ProverProgressCallback,
-  onlySpendable: boolean,
+  originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
   provedTransactions: TransactionStruct[];
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
@@ -292,7 +292,7 @@ const transactionsFromERC20Amounts = async (
     useDummyProof,
     progressCallback,
     shouldGeneratePreTransactionPOIs,
-    onlySpendable,
+    originShieldTxidForSpendabilityOverride,
   );
   return txBatches;
 };
@@ -456,7 +456,7 @@ const generateAllProofs = async (
   useDummyProof: boolean,
   progressCallback: ProverProgressCallback,
   shouldGeneratePreTransactionPOIs: boolean,
-  onlySpendable: boolean,
+  originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
   provedTransactions: TransactionStruct[];
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
@@ -469,7 +469,7 @@ const generateAllProofs = async (
         railgunWallet,
         txidVersion,
         encryptionKey,
-        onlySpendable,
+        originShieldTxidForSpendabilityOverride,
       ),
       preTransactionPOIsPerTxidLeafPerList: {},
     };
@@ -481,6 +481,6 @@ const generateAllProofs = async (
     encryptionKey,
     progressCallback,
     shouldGeneratePreTransactionPOIs,
-    onlySpendable,
+    originShieldTxidForSpendabilityOverride,
   );
 };

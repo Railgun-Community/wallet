@@ -57,7 +57,6 @@ export const generateUnshieldProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
-        true, // onlySpendable
       );
     const transaction = await generateTransact(provedTransactions, networkName);
 
@@ -79,6 +78,68 @@ export const generateUnshieldProof = async (
       relayerFeeERC20AmountRecipient,
       transaction,
       sendWithPublicWallet,
+      preTransactionPOIsPerTxidLeafPerList,
+      overallBatchMinGasPrice,
+      nullifiers,
+    });
+  } catch (err) {
+    throw reportAndSanitizeError(generateUnshieldProof.name, err);
+  }
+};
+
+export const generateUnshieldToOriginProof = async (
+  originalShieldTxid: string,
+  txidVersion: TXIDVersion,
+  networkName: NetworkName,
+  railgunWalletID: string,
+  encryptionKey: string,
+  erc20AmountRecipients: RailgunERC20AmountRecipient[],
+  nftAmountRecipients: RailgunNFTAmountRecipient[],
+  overallBatchMinGasPrice: Optional<bigint>,
+  progressCallback: ProverProgressCallback,
+): Promise<void> => {
+  try {
+    setCachedProvedTransaction(undefined);
+
+    const { provedTransactions, preTransactionPOIsPerTxidLeafPerList } =
+      await generateProofTransactions(
+        ProofType.Unshield,
+        networkName,
+        railgunWalletID,
+        txidVersion,
+        encryptionKey,
+        false, // showSenderAddressToRecipient
+        undefined, // memoText
+        erc20AmountRecipients,
+        nftAmountRecipients,
+        undefined, // relayerFeeERC20AmountRecipient
+        true, // sendWithPublicWallet
+        undefined, // relayAdaptID
+        false, // useDummyProof
+        overallBatchMinGasPrice,
+        progressCallback,
+        originalShieldTxid,
+      );
+    const transaction = await generateTransact(provedTransactions, networkName);
+
+    const nullifiers = nullifiersForTransactions(provedTransactions);
+
+    setCachedProvedTransaction({
+      proofType: ProofType.Unshield,
+      txidVersion,
+      railgunWalletID,
+      showSenderAddressToRecipient: false,
+      memoText: undefined,
+      erc20AmountRecipients,
+      nftAmountRecipients,
+      relayAdaptUnshieldERC20Amounts: undefined,
+      relayAdaptUnshieldNFTAmounts: undefined,
+      relayAdaptShieldERC20Recipients: undefined,
+      relayAdaptShieldNFTRecipients: undefined,
+      crossContractCalls: undefined,
+      relayerFeeERC20AmountRecipient: undefined,
+      transaction,
+      sendWithPublicWallet: true,
       preTransactionPOIsPerTxidLeafPerList,
       overallBatchMinGasPrice,
       nullifiers,
@@ -143,7 +204,6 @@ export const generateUnshieldBaseTokenProof = async (
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
-      true, // onlySpendable
     );
 
     const relayAdaptParamsRandom = randomHex(31);
@@ -179,7 +239,6 @@ export const generateUnshieldBaseTokenProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
-        true, // onlySpendable
       );
 
     const transaction = await generateUnshieldBaseToken(
