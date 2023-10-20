@@ -143,7 +143,7 @@ const spyOnSetUnshield = () => {
 
 describe('tx-cross-contract-calls', () => {
   before(async function run() {
-    this.timeout(30000);
+    this.timeout(60000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletInfo = await createRailgunWallet(

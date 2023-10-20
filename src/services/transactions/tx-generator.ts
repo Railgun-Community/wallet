@@ -225,9 +225,12 @@ const transactionsFromERC20Amounts = async (
   const network = NETWORK_CONFIG[networkName];
   const { chain } = network;
 
-  // Removes overallBatchMinGasPrice for L2 networks.
+  // Removes overallBatchMinGasPrice for L2 networks and non-Relayer transactions.
   const validatedOverallBatchMinGasPrice =
-    shouldSetOverallBatchMinGasPriceForNetwork(networkName)
+    shouldSetOverallBatchMinGasPriceForNetwork(
+      sendWithPublicWallet,
+      networkName,
+    )
       ? BigInt(overallBatchMinGasPrice ?? 0)
       : BigInt(0);
 

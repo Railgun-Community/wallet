@@ -214,7 +214,7 @@ const MOCKED_UNKNOWN_SWAP_TRX: TransactionHistoryItem = {
 
 describe('transaction-history', () => {
   before(async function run() {
-    this.timeout(45000);
+    this.timeout(90000);
     initTestEngine();
     await initTestEngineNetwork();
     const railgunWalletInfo = await createRailgunWallet(
@@ -233,8 +233,7 @@ describe('transaction-history', () => {
     await closeTestEngine();
   });
 
-  // Skipped because entire balance needs to scan before this can execute.
-  it.skip('Should get wallet transaction history', async () => {
+  it('Should get wallet transaction history', async () => {
     const items = await getWalletTransactionHistory(
       POLYGON_CHAIN,
       wallet.id,

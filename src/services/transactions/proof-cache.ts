@@ -261,7 +261,10 @@ export const validateCachedProvedTransaction = (
   ) {
     throw new Error('Mismatch: sendWithPublicWallet.');
   } else if (
-    shouldSetOverallBatchMinGasPriceForNetwork(networkName) &&
+    shouldSetOverallBatchMinGasPriceForNetwork(
+      cachedProvedTransaction.sendWithPublicWallet,
+      networkName,
+    ) &&
     overallBatchMinGasPrice !== cachedProvedTransaction.overallBatchMinGasPrice
   ) {
     throw new Error('Mismatch: overallBatchMinGasPrice.');

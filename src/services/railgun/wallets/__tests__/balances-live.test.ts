@@ -35,7 +35,7 @@ const chain: Chain = NETWORK_CONFIG[networkName].chain;
 
 describe('balances-live', () => {
   before(async function run() {
-    this.timeout(30000);
+    this.timeout(60000);
 
     initTestEngine();
 

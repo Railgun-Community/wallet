@@ -5,8 +5,13 @@ import { NetworkName } from '@railgun-community/shared-models';
  * Since overallBatchMinGasPrice is an optional parameter, we simply remove it for L2s. This will skip validation on the contract side.
  */
 export const shouldSetOverallBatchMinGasPriceForNetwork = (
+  sendWithPublicWallet: boolean,
   networkName: NetworkName,
 ) => {
+  if (sendWithPublicWallet) {
+    // Only Relayer transactions require overallBatchMinGasPrice.
+    return false;
+  }
   switch (networkName) {
     case NetworkName.Arbitrum:
     case NetworkName.ArbitrumGoerli:
