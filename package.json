@@ -40,7 +40,7 @@
     "@graphql-mesh/utils": "^0.43.22",
     "@noble/ed25519": "^1.7.1",
     "@railgun-community/engine": "5.8.32",
-    "@railgun-community/shared-models": "5.8.0",
+    "@railgun-community/shared-models": "5.8.1",
     "@whatwg-node/fetch": "^0.8.4",
     "assert": "2.0.0",
     "axios": "0.27.2",

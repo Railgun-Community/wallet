@@ -31,8 +31,6 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
       return 'ethereum';
     case NetworkName.EthereumGoerli:
       return 'goerli';
-    case NetworkName.EthereumSepolia:
-      return 'sepolia';
     case NetworkName.BNBChain:
       return 'bsc';
     case NetworkName.Polygon:
@@ -45,6 +43,7 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
       return 'mumbai';
     case NetworkName.Railgun:
     case NetworkName.EthereumRopsten_DEPRECATED:
+    case NetworkName.EthereumSepolia:
     case NetworkName.Hardhat:
       throw new Error('No Graph API hosted service for this network');
   }
@@ -56,7 +55,7 @@ export const quickSyncEventsGraphV2 = async (
   startingBlock: number,
 ): Promise<AccumulatedEvents> => {
   const network = networkForChain(chain);
-  if (!network || !network.shouldQuickSync) {
+  if (!network || !network.hasGraphQuickSync) {
     // Return empty logs, Engine will default to full scan.
     return EMPTY_EVENTS;
   }

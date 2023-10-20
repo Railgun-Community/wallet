@@ -28,10 +28,11 @@ sources:
     handler:
       graphql:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum-goerli
-  - name: sepolia
-    handler:
-      graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-sepolia
+  # Not supported by hosted service
+  # - name: sepolia
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-sepolia
 
 documents:
   - ./quick-sync-query.graphql
