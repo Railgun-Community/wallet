@@ -31,6 +31,10 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
       return 'ethereum';
     case NetworkName.EthereumGoerli:
       return 'goerli';
+    case NetworkName.EthereumSepolia:
+      // NOTE: Not supported by hosted service yet, but it is deployed.
+      // Enable by setting NETWORK_CONFIG hasGraphQuickSync to true.
+      return 'sepolia';
     case NetworkName.BNBChain:
       return 'bsc';
     case NetworkName.Polygon:
@@ -43,7 +47,6 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
       return 'mumbai';
     case NetworkName.Railgun:
     case NetworkName.EthereumRopsten_DEPRECATED:
-    case NetworkName.EthereumSepolia:
     case NetworkName.Hardhat:
       throw new Error('No Graph API hosted service for this network');
   }
