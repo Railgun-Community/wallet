@@ -95,7 +95,6 @@ export const generateUnshieldToOriginProof = async (
   encryptionKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: ProverProgressCallback,
 ): Promise<void> => {
   try {
@@ -116,7 +115,7 @@ export const generateUnshieldToOriginProof = async (
         true, // sendWithPublicWallet
         undefined, // relayAdaptID
         false, // useDummyProof
-        overallBatchMinGasPrice,
+        undefined, // overallBatchMinGasPrice
         progressCallback,
         originalShieldTxid,
       );
@@ -141,7 +140,7 @@ export const generateUnshieldToOriginProof = async (
       transaction,
       sendWithPublicWallet: true,
       preTransactionPOIsPerTxidLeafPerList,
-      overallBatchMinGasPrice,
+      overallBatchMinGasPrice: undefined,
       nullifiers,
     });
   } catch (err) {

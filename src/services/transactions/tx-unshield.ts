@@ -292,7 +292,6 @@ export const populateProvedUnshieldToOrigin = async (
   railgunWalletID: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  overallBatchMinGasPrice: Optional<bigint>,
   gasDetails: TransactionGasDetails,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
@@ -313,7 +312,7 @@ export const populateProvedUnshieldToOrigin = async (
         undefined, // crossContractCalls
         undefined, // relayerFeeERC20AmountRecipient
         true, // sendWithPublicWallet
-        overallBatchMinGasPrice,
+        undefined, // overallBatchMinGasPrice
         gasDetails,
       );
     return {

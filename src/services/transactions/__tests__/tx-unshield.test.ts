@@ -579,7 +579,6 @@ describe('tx-unshield', () => {
         },
       ],
       [],
-      overallBatchMinGasPrice,
       () => {}, // progressCallback
     );
     expect(addUnshieldDataSpy.called).to.be.true;
@@ -605,7 +604,6 @@ describe('tx-unshield', () => {
         },
       ],
       [],
-      overallBatchMinGasPrice,
       gasDetailsType2,
     );
     expect(populateResponse.nullifiers).to.deep.equal([
