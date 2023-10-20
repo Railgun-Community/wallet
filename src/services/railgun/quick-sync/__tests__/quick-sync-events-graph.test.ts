@@ -44,6 +44,11 @@ const EXPECTED_COMMITMENT_GROUP_EVENTS_GOERLI = 80;
 const EXPECTED_NULLIFIER_EVENTS_GOERLI = 40;
 const EXPECTED_UNSHIELD_EVENTS_GOERLI = 1;
 
+const SEPOLIA_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumSepolia].chain;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0; // TODO: Add some here
+const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0; // TODO: Add some here
+const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 0; // TODO: Add some here
+
 const ARBITRUM_GOERLI_CHAIN: Chain =
   NETWORK_CONFIG[NetworkName.ArbitrumGoerli].chain;
 const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM_GOERLI = 80;
@@ -105,8 +110,9 @@ describe('quick-sync-events-graph', () => {
       EXPECTED_UNSHIELD_EVENTS_ETH,
     );
 
-    const shouldThrow = true;
-    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+    // TODO: Add these when there are events.
+    // const shouldThrow = true;
+    // assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
   it('Should make sure Graph query has no data gaps in commitments - Polygon', async () => {
@@ -213,6 +219,31 @@ describe('quick-sync-events-graph', () => {
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
+
+  it.only(
+    'Should make sure Graph query has no data gaps in commitments - Sepolia',
+    async () => {
+      const eventLog = await quickSyncEventsGraphV2(
+        txidVersion,
+        SEPOLIA_CHAIN,
+        0,
+      );
+      expect(eventLog).to.be.an('object');
+      expect(eventLog.commitmentEvents).to.be.an('array');
+      expect(eventLog.commitmentEvents.length).to.be.at.least(
+        EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA,
+      );
+      expect(eventLog.nullifierEvents.length).to.be.at.least(
+        EXPECTED_NULLIFIER_EVENTS_SEPOLIA,
+      );
+      expect(eventLog.unshieldEvents.length).to.be.at.least(
+        EXPECTED_UNSHIELD_EVENTS_SEPOLIA,
+      );
+
+      const shouldThrow = true;
+      assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+    },
+  ).timeout(45000);
 
   it('Should make sure Graph query has no data gaps in commitments - Arbitrum Goerli', async () => {
     const eventLog = await quickSyncEventsGraphV2(

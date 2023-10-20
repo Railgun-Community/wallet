@@ -49,13 +49,14 @@ import {
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { BscTypes } from './.graphclient/sources/bsc/types';
-import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
-import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
-import type { GoerliTypes } from './.graphclient/sources/goerli/types';
-import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
-import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
 import type { MaticTypes } from './.graphclient/sources/matic/types';
+import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
+import type { SepoliaTypes } from './.graphclient/sources/sepolia/types';
+import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
+import type { GoerliTypes } from './.graphclient/sources/goerli/types';
+import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
+import type { BscTypes } from './.graphclient/sources/bsc/types';
+import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -81,7 +82,7 @@ export type Scalars = {
   BigDecimal: string; // MODIFIED
   BigInt: string; // MODIFIED
   Bytes: string; // MODIFIED
-  Int8: number; // MODIFIED
+  Int8: string; // MODIFIED
 };
 
 export type Query = {
@@ -2770,13 +2771,14 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
   derivedFrom?: derivedFromDirectiveResolver<any, any, ContextType>;
 }>;
 
-export type MeshContext = EthereumTypes.Context &
-  ArbitrumGoerliTypes.Context &
-  MumbaiTypes.Context &
+export type MeshContext = ArbitrumGoerliTypes.Context &
+  EthereumTypes.Context &
   GoerliTypes.Context &
+  MaticTypes.Context &
+  MumbaiTypes.Context &
   ArbitrumOneTypes.Context &
   BscTypes.Context &
-  MaticTypes.Context &
+  SepoliaTypes.Context &
   BaseMeshContext;
 
 const baseDir = pathModule.join(
@@ -2794,19 +2796,22 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     .join('/')
     .replace(baseDir + '/', '');
   switch (relativeModuleId) {
-    case '.graphclient/sources/ethereum/introspectionSchema':
-      return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
-
     case '.graphclient/sources/arbitrum-goerli/introspectionSchema':
       return import(
         './.graphclient/sources/arbitrum-goerli/introspectionSchema'
       ) as T;
 
-    case '.graphclient/sources/mumbai/introspectionSchema':
-      return import('./.graphclient/sources/mumbai/introspectionSchema') as T;
+    case '.graphclient/sources/ethereum/introspectionSchema':
+      return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
 
     case '.graphclient/sources/goerli/introspectionSchema':
       return import('./.graphclient/sources/goerli/introspectionSchema') as T;
+
+    case '.graphclient/sources/matic/introspectionSchema':
+      return import('./.graphclient/sources/matic/introspectionSchema') as T;
+
+    case '.graphclient/sources/mumbai/introspectionSchema':
+      return import('./.graphclient/sources/mumbai/introspectionSchema') as T;
 
     case '.graphclient/sources/arbitrum-one/introspectionSchema':
       return import(
@@ -2816,8 +2821,8 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     case '.graphclient/sources/bsc/introspectionSchema':
       return import('./.graphclient/sources/bsc/introspectionSchema') as T;
 
-    case '.graphclient/sources/matic/introspectionSchema':
-      return import('./.graphclient/sources/matic/introspectionSchema') as T;
+    case '.graphclient/sources/sepolia/introspectionSchema':
+      return import('./.graphclient/sources/sepolia/introspectionSchema') as T;
 
     default:
       return Promise.reject(
@@ -2862,6 +2867,7 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
   const mumbaiTransforms = [];
   const arbitrumOneTransforms = [];
   const arbitrumGoerliTransforms = [];
+  const sepoliaTransforms = [];
   const additionalTypeDefs = [] as any[];
   const ethereumHandler = new GraphqlHandler({
     name: 'ethereum',
@@ -2954,6 +2960,19 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
     logger: logger.child('arbitrum-goerli'),
     importFn,
   });
+  const sepoliaHandler = new GraphqlHandler({
+    name: 'sepolia',
+    config: {
+      endpoint:
+        'https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-sepolia',
+    },
+    baseDir,
+    cache,
+    pubsub,
+    store: sourcesStore.child('sepolia'),
+    logger: logger.child('sepolia'),
+    importFn,
+  });
   sources[0] = {
     name: 'ethereum',
     handler: ethereumHandler,
@@ -2988,6 +3007,11 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
     name: 'arbitrum-goerli',
     handler: arbitrumGoerliHandler,
     transforms: arbitrumGoerliTransforms,
+  };
+  sources[7] = {
+    name: 'sepolia',
+    handler: sepoliaHandler,
+    transforms: sepoliaTransforms,
   };
   const additionalResolvers = [] as any[];
   const merger = new (StitchingMerger as any)({

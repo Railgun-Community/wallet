@@ -31,6 +31,8 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
       return 'ethereum';
     case NetworkName.EthereumGoerli:
       return 'goerli';
+    case NetworkName.EthereumSepolia:
+      return 'sepolia';
     case NetworkName.BNBChain:
       return 'bsc';
     case NetworkName.Polygon:
