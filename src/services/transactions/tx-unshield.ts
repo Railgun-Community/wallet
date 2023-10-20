@@ -271,18 +271,18 @@ export const getERC20AndNFTAmountRecipientsForUnshieldToOrigin = async (
   const recipientAddress = transaction.from;
   const erc20Amounts = getSerializedERC20Balances(balances);
   const nftAmounts = getSerializedNFTBalances(balances);
-  const erc20AmountRecipients: RailgunERC20AmountRecipient[] = erc20Amounts.map(
-    erc20Amount => ({
+  const erc20AmountRecipients: RailgunERC20AmountRecipient[] = erc20Amounts
+    .filter(({ amount }) => amount > 0n)
+    .map(erc20Amount => ({
       ...erc20Amount,
       recipientAddress,
-    }),
-  );
-  const nftAmountRecipients: RailgunNFTAmountRecipient[] = nftAmounts.map(
-    nftAmount => ({
+    }));
+  const nftAmountRecipients: RailgunNFTAmountRecipient[] = nftAmounts
+    .filter(({ amount }) => amount > 0n)
+    .map(nftAmount => ({
       ...nftAmount,
       recipientAddress,
-    }),
-  );
+    }));
   return { erc20AmountRecipients, nftAmountRecipients };
 };
 
