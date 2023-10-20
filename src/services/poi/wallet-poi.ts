@@ -4,10 +4,13 @@ import {
   POIList,
   POINodeInterface,
 } from '@railgun-community/engine';
-import { POI_REQUIRED_LISTS } from './poi-constants';
 import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
 import { WalletPOIRequester } from './wallet-poi-requester';
-import { Chain, TXIDVersion } from '@railgun-community/shared-models';
+import {
+  Chain,
+  TXIDVersion,
+  POI_REQUIRED_LISTS,
+} from '@railgun-community/shared-models';
 
 export class WalletPOI {
   static started = false;

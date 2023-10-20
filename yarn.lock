@@ -2150,10 +2150,10 @@
     levelup "^5.1.1"
     msgpack-lite "^0.1.26"
 
-"@railgun-community/shared-models@5.7.16":
-  version "5.7.16"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.7.16.tgz#30a913b1eb98e8451607371aa3ef4ff97014ff92"
-  integrity sha512-BckqW6mFgv4ln/m+65V7M5vz+QFNZ4G8cfTZbZgMGw0EZpyaM9P2kYZCsk/XElSRJXFMya/2nEt9s0xkKhPNTw==
+"@railgun-community/shared-models@5.7.17":
+  version "5.7.17"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-5.7.17.tgz#fc26721b2b251a5efa2cde034e59f4232dd1b496"
+  integrity sha512-mYz4+Ojj08p8kK8qaXy0tUPSKSh65avFbgBzdopvdL/382lXuy9eUSNqUIeJK9RhXEgQ0ghNT8pdE+TMoo8cBQ==
 
 "@repeaterjs/repeater@3.0.4", "@repeaterjs/repeater@^3.0.4":
   version "3.0.4"
