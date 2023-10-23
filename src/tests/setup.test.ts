@@ -174,7 +174,7 @@ export const pollUntilUTXOMerkletreeScanned = async () => {
     30000 / 50, // 30 sec.
   );
   if (status !== MerkletreeScanStatus.Complete) {
-    throw new Error(`Merkletree scan should be completed - timed out`);
+    throw new Error(`UTXO merkletree scan should be completed - timed out`);
   }
 };
 
@@ -186,6 +186,6 @@ export const pollUntilTXIDMerkletreeScanned = async () => {
     30000 / 50, // 30 sec.
   );
   if (status !== MerkletreeScanStatus.Complete) {
-    throw new Error(`Merkletree scan should be completed - timed out`);
+    throw new Error(`TXID merkletree scan should be completed - timed out`);
   }
 };

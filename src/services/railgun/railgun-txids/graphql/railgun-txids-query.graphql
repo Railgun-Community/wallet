@@ -19,6 +19,7 @@ query GetRailgunTransactionsAfterGraphID($idLow: Bytes = "0x00") {
     unshieldToAddress
     unshieldValue
     blockTimestamp
+    verificationHash
   }
 }
 
@@ -43,5 +44,6 @@ query GetRailgunTransactionsByTxid($txid: Bytes) {
     unshieldToAddress
     unshieldValue
     blockTimestamp
+    verificationHash
   }
 }

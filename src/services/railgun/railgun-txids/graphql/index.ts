@@ -3833,6 +3833,7 @@ export type GetRailgunTransactionsAfterGraphIDQuery = {
       | 'unshieldToAddress'
       | 'unshieldValue'
       | 'blockTimestamp'
+      | 'verificationHash'
     > & {
       unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'>;
     }
@@ -3860,6 +3861,7 @@ export type GetRailgunTransactionsByTxidQuery = {
       | 'unshieldToAddress'
       | 'unshieldValue'
       | 'blockTimestamp'
+      | 'verificationHash'
     > & {
       unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'>;
     }
@@ -3887,6 +3889,7 @@ export const GetRailgunTransactionsAfterGraphIDDocument = gql`
       unshieldToAddress
       unshieldValue
       blockTimestamp
+      verificationHash
     }
   }
 ` as unknown as DocumentNode<
@@ -3914,6 +3917,7 @@ export const GetRailgunTransactionsByTxidDocument = gql`
       unshieldToAddress
       unshieldValue
       blockTimestamp
+      verificationHash
     }
   }
 ` as unknown as DocumentNode<

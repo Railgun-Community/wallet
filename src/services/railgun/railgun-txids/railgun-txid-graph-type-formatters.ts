@@ -48,6 +48,11 @@ export const formatRailgunTransactions = (
       utxoBatchStartPositionOut: Number(tx.utxoBatchStartPositionOut),
       txid: formatToByteLength(tx.transactionHash, ByteLength.UINT_256, false),
       unshield,
+      verificationHash: formatToByteLength(
+        tx.verificationHash,
+        ByteLength.UINT_256,
+        true,
+      ),
     };
     return railgunTransaction;
   });
