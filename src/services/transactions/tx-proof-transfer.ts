@@ -6,12 +6,12 @@ import {
   TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
+  GenerateTransactionsProgressCallback,
   generateProofTransactions,
   generateTransact,
   nullifiersForTransactions,
 } from './tx-generator';
 import { setCachedProvedTransaction } from './proof-cache';
-import { ProverProgressCallback } from '@railgun-community/engine';
 import { reportAndSanitizeError } from '../../utils/error';
 
 export const generateTransferProof = async (
@@ -26,7 +26,7 @@ export const generateTransferProof = async (
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
-  progressCallback: ProverProgressCallback,
+  progressCallback: GenerateTransactionsProgressCallback,
 ): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);

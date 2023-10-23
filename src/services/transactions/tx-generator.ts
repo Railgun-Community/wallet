@@ -4,7 +4,6 @@ import {
   AdaptID,
   OutputType,
   TransactionStruct,
-  ProverProgressCallback,
   getTokenDataERC20,
   getTokenDataNFT,
   ERC721_NOTE_VALUE,
@@ -44,6 +43,11 @@ import { POIRequired } from '../poi/poi-required';
 const DUMMY_AMOUNT = 0n;
 export const DUMMY_FROM_ADDRESS = '0x000000000000000000000000000000000000dEaD';
 
+export type GenerateTransactionsProgressCallback = (
+  progress: number,
+  status: string,
+) => void;
+
 export const generateProofTransactions = async (
   proofType: ProofType,
   networkName: NetworkName,
@@ -59,7 +63,7 @@ export const generateProofTransactions = async (
   relayAdaptID: Optional<AdaptID>,
   useDummyProof: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
-  progressCallback: ProverProgressCallback,
+  progressCallback: GenerateTransactionsProgressCallback,
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
   provedTransactions: TransactionStruct[];
@@ -216,7 +220,7 @@ const transactionsFromERC20Amounts = async (
   relayAdaptID: Optional<AdaptID>,
   useDummyProof: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
-  progressCallback: ProverProgressCallback,
+  progressCallback: GenerateTransactionsProgressCallback,
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
   provedTransactions: TransactionStruct[];
@@ -457,7 +461,7 @@ const generateAllProofs = async (
   txidVersion: TXIDVersion,
   encryptionKey: string,
   useDummyProof: boolean,
-  progressCallback: ProverProgressCallback,
+  progressCallback: GenerateTransactionsProgressCallback,
   shouldGeneratePreTransactionPOIs: boolean,
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{

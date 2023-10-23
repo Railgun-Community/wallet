@@ -7,6 +7,7 @@ import {
   TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
+  GenerateTransactionsProgressCallback,
   generateDummyProofTransactions,
   generateProofTransactions,
   generateTransact,
@@ -15,11 +16,7 @@ import {
 } from './tx-generator';
 import { assertValidEthAddress } from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
-import {
-  AdaptID,
-  ProverProgressCallback,
-  randomHex,
-} from '@railgun-community/engine';
+import { AdaptID, randomHex } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
@@ -35,7 +32,7 @@ export const generateUnshieldProof = async (
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
-  progressCallback: ProverProgressCallback,
+  progressCallback: GenerateTransactionsProgressCallback,
 ): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -95,7 +92,7 @@ export const generateUnshieldToOriginProof = async (
   encryptionKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  progressCallback: ProverProgressCallback,
+  progressCallback: GenerateTransactionsProgressCallback,
 ): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -158,7 +155,7 @@ export const generateUnshieldBaseTokenProof = async (
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
-  progressCallback: ProverProgressCallback,
+  progressCallback: GenerateTransactionsProgressCallback,
 ): Promise<void> => {
   try {
     assertNotBlockedAddress(publicWalletAddress);

@@ -15,6 +15,7 @@ import {
   TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
+  GenerateTransactionsProgressCallback,
   generateDummyProofTransactions,
   generateProofTransactions,
   nullifiersForTransactions,
@@ -295,7 +296,7 @@ export const generateCrossContractCallsProof = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   minGasLimit: Optional<bigint>,
-  progressCallback: ProverProgressCallback,
+  progressCallback: GenerateTransactionsProgressCallback,
 ): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);
