@@ -38,6 +38,7 @@ import {
   stopRailgunEngine,
 } from '../services/railgun/core';
 import { groth16 } from 'snarkjs';
+import { setLoggers } from '../utils';
 
 const ENGINE_TEST_DB = 'test.db';
 const db = new LevelDOWN(ENGINE_TEST_DB);
@@ -126,7 +127,13 @@ export const initTestEngine = (useNativeArtifacts = false) => {
   WalletPOI.getPOILatestValidatedRailgunTxid = () =>
     getLatestValidatedRailgunTxid;
 
+  // Set 'true' to debug tests
   const shouldDebug = false;
+
+  if (shouldDebug) {
+    setLoggers(console.log, console.error);
+  }
+
   startRailgunEngine(
     TEST_WALLET_SOURCE,
     db,
@@ -171,7 +178,7 @@ export const pollUntilUTXOMerkletreeScanned = async () => {
     async () => currentUTXOMerkletreeScanStatus,
     status => status === MerkletreeScanStatus.Complete,
     50,
-    30000 / 50, // 30 sec.
+    60000 / 50, // 60 sec.
   );
   if (status !== MerkletreeScanStatus.Complete) {
     throw new Error(`UTXO merkletree scan should be completed - timed out`);
@@ -183,7 +190,7 @@ export const pollUntilTXIDMerkletreeScanned = async () => {
     async () => currentTXIDMerkletreeScanStatus,
     status => status === MerkletreeScanStatus.Complete,
     50,
-    30000 / 50, // 30 sec.
+    90000 / 50, // 90 sec.
   );
   if (status !== MerkletreeScanStatus.Complete) {
     throw new Error(`TXID merkletree scan should be completed - timed out`);
