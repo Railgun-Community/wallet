@@ -12,8 +12,8 @@ export class POIRequired {
   static async isRequiredForNetwork(
     networkName: NetworkName,
   ): Promise<boolean> {
-    if (this.requiredForNetwork[networkName] === true) {
-      return true;
+    if (isDefined(this.requiredForNetwork[networkName])) {
+      return this.requiredForNetwork[networkName] as boolean;
     }
 
     const { poi } = NETWORK_CONFIG[networkName];
@@ -27,6 +27,10 @@ export class POIRequired {
     const isRequired = poi.launchBlock < blockNumber;
     if (isRequired) {
       this.requiredForNetwork[networkName] = true;
+    }
+    if (blockNumber + 10000 < poi.launchBlock) {
+      // Launches in at least 10k blocks.
+      this.requiredForNetwork[networkName] = false;
     }
     return isRequired;
   }
