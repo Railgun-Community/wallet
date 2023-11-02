@@ -10,7 +10,7 @@ const MASTER_IPFS_HASH_ARTIFACTS =
   'QmeBrG7pii1qTqsn7rusvDiqXopHPjCT9gR4PsmW7wXqZq';
 
 const IPFS_HASH_ARTIFACTS_POI =
-  'QmSwivV3zjYRXCwwL49HxwtMrFVjP1YK21obsmhbhsRsvs';
+  'QmZrP9zaZw2LwErT2yA6VpMWm65UdToQiKj4DtStVsUJHr';
 
 export const ARTIFACT_VARIANT_STRING_POI_PREFIX = 'POI';
 
@@ -120,7 +120,7 @@ export const getArtifactUrl = (
       artifactVariantString === getArtifactVariantStringPOI(3, 3) ||
       artifactVariantString === getArtifactVariantStringPOI(13, 13)
     ) {
-      return `${IPFS_GATEWAY}/ipfs/${IPFS_HASH_ARTIFACTS_POI}/poi/${artifactVariantString}/${getArtifactIPFSFilepathPOI(
+      return `${IPFS_GATEWAY}/ipfs/${IPFS_HASH_ARTIFACTS_POI}/${artifactVariantString}/${getArtifactIPFSFilepathPOI(
         artifactName,
       )}`;
     }
