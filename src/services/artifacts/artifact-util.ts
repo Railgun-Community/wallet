@@ -15,6 +15,10 @@ const IPFS_HASH_ARTIFACTS_POI =
 export const ARTIFACT_VARIANT_STRING_POI_PREFIX = 'POI';
 
 export const artifactDownloadsDir = (artifactVariantString: string) => {
+  if (artifactVariantString.startsWith(ARTIFACT_VARIANT_STRING_POI_PREFIX)) {
+    return `artifacts-v2.1/poi-nov-2-23/${artifactVariantString}`;
+  }
+
   return `artifacts-v2.1/${artifactVariantString}`;
 };
 
