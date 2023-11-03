@@ -153,6 +153,14 @@ const getRailgunTransactionRequests = (
 
   // eslint-disable-next-line no-underscore-dangle
   const railgunTxs: TransactionStructOutput[] = args._transactions;
+
+  for (const railgunTx of railgunTxs) {
+    if (!('length' in railgunTx.boundParams.commitmentCiphertext)) {
+      // 'commitmentCiphertext' is potentially parsed as an object.
+      railgunTx.boundParams.commitmentCiphertext = [];
+    }
+  }
+
   return railgunTxs;
 };
 
@@ -220,7 +228,7 @@ const extractFirstNoteERC20AmountMap = async (
   return erc20PaymentAmounts;
 };
 
-const extractRailgunTransactionData = (
+const extractRailgunTransactionData = async (
   railgunWalletID: string,
   network: Network,
   transactionRequest: ContractTransaction,
@@ -240,47 +248,61 @@ const extractRailgunTransactionData = (
     contractAddress,
   );
 
-  return Promise.all(
-    railgunTxs.map(async (railgunTx: TransactionStructOutput) => {
-      const { commitments, nullifiers, boundParams } = railgunTx;
+  const extractedRailgunTransactionData: ExtractedRailgunTransactionData =
+    await Promise.all(
+      railgunTxs.map(
+        async (railgunTx: TransactionStructOutput, railgunTxIndex: number) => {
+          const { commitments, nullifiers, boundParams } = railgunTx;
 
-      const boundParamsHash = nToHex(
-        hashBoundParams(boundParams),
-        ByteLength.UINT_256,
-        true,
-      );
-      const railgunTxid = getRailgunTransactionIDHex({
-        nullifiers,
-        commitments,
-        boundParamsHash,
-      });
+          const boundParamsHash = nToHex(
+            hashBoundParams(boundParams),
+            ByteLength.UINT_256,
+            true,
+          );
+          const railgunTxid = getRailgunTransactionIDHex({
+            nullifiers,
+            commitments,
+            boundParamsHash,
+          });
 
-      // Extract first commitment (index 0)
-      const index = 0;
-      const commitmentCiphertextStructOutput =
-        boundParams.commitmentCiphertext[index];
+          if (railgunTxIndex > 0) {
+            return {
+              railgunTxid,
+              utxoTreeIn: boundParams.treeNumber,
+              firstCommitmentNotePublicKey: undefined,
+              firstCommitment: commitments[0],
+            };
+          }
 
-      const commitmentCiphertext = formatCommitmentCiphertext(
-        commitmentCiphertextStructOutput,
-      );
+          // Extract first commitment (index 0)
+          const index = 0;
+          const commitmentCiphertextStructOutput =
+            boundParams.commitmentCiphertext[index];
 
-      // Get NPK for first note, if addressed to current wallet.
-      const firstCommitmentNotePublicKey =
-        await extractNPKFromCommitmentCiphertext(
-          network,
-          commitmentCiphertext,
-          receivingViewingPrivateKey,
-          receivingRailgunAddressData,
-        );
+          const commitmentCiphertext = formatCommitmentCiphertext(
+            commitmentCiphertextStructOutput,
+          );
 
-      return {
-        railgunTxid,
-        utxoTreeIn: boundParams.treeNumber,
-        firstCommitmentNotePublicKey,
-        firstCommitment: commitments[0],
-      };
-    }),
-  );
+          // Get NPK for first note, if addressed to current wallet.
+          const firstCommitmentNotePublicKey =
+            await extractNPKFromCommitmentCiphertext(
+              network,
+              commitmentCiphertext,
+              receivingViewingPrivateKey,
+              receivingRailgunAddressData,
+            );
+
+          return {
+            railgunTxid,
+            utxoTreeIn: boundParams.treeNumber,
+            firstCommitmentNotePublicKey,
+            firstCommitment: commitments[0],
+          };
+        },
+      ),
+    );
+
+  return extractedRailgunTransactionData;
 };
 
 const decryptReceiverNoteSafe = async (
