@@ -233,6 +233,9 @@ describe('transaction-history', () => {
     await closeTestEngine();
   });
 
+  // TODO: improve reliability and speed of this test.
+  // It currently downloads a large history from the Graph into a local DB.
+  // We could cache this DB and use it for future tests, avoiding redownloads.
   it('Should get wallet transaction history', async () => {
     const items = await getWalletTransactionHistory(
       POLYGON_CHAIN,

@@ -73,6 +73,10 @@ describe('poi-validation', () => {
     getActiveListsStub.restore();
   });
 
+  // How to update mock data in this test:
+  //
+  // Send an actual transaction on Goerli, it will fail, but grab the parameters
+  // that you sent into the relayer, it will contain the pre-transaction proof.
   it('Should validate pre-transaction POI', async () => {
     const contractTransaction = {
       to: '0xe8bEa99BB438C2f3D533604D33258d74d5eE4824',
