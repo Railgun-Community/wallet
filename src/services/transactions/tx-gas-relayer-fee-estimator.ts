@@ -1,4 +1,8 @@
-import { TransactionStruct } from '@railgun-community/engine';
+import {
+  TransactionStructV2,
+  TransactionStructV3,
+  convertTransactionStructToCommitmentSummary,
+} from '@railgun-community/engine';
 import {
   NetworkName,
   TransactionGasDetails,
@@ -16,7 +20,6 @@ import {
 } from './tx-generator';
 import { getGasEstimate, gasEstimateResponse } from './tx-gas-details';
 import { balanceForERC20Token } from '../railgun/wallets/balance-update';
-import { convertTransactionStructToCommitmentSummary } from '../railgun/util/commitment';
 import { ContractTransaction } from 'ethers';
 import { walletForID } from '../railgun/wallets/wallets';
 
@@ -37,7 +40,7 @@ export const calculateRelayerFeeERC20Amount = (
 };
 
 const getRelayerFeeCommitment = (
-  transactionStructs: TransactionStruct[],
+  transactionStructs: (TransactionStructV2 | TransactionStructV3)[],
 ): CommitmentSummary => {
   const transactionIndex = 0;
   const relayerFeeCommitment = transactionStructs[transactionIndex];
@@ -51,9 +54,9 @@ const getRelayerFeeCommitment = (
 export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
   generateDummyTransactionStructsWithRelayerFee: (
     relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
-  ) => Promise<TransactionStruct[]>,
+  ) => Promise<(TransactionStructV2 | TransactionStructV3)[]>,
   generateTransaction: (
-    serializedTransactions: TransactionStruct[],
+    serializedTransactions: (TransactionStructV2 | TransactionStructV3)[],
   ) => Promise<ContractTransaction>,
   txidVersion: TXIDVersion,
   networkName: NetworkName,
@@ -80,6 +83,7 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
   let transaction = await generateTransaction(serializedTransactions);
 
   let gasEstimate = await getGasEstimate(
+    txidVersion,
     networkName,
     transaction,
     fromWalletAddress,
@@ -172,6 +176,7 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
 
     // eslint-disable-next-line no-await-in-loop
     const newGasEstimate = await getGasEstimate(
+      txidVersion,
       networkName,
       transaction,
       fromWalletAddress,
@@ -197,8 +202,8 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
 };
 
 const compareCircuitSizesTransactionStructs = (
-  serializedA: TransactionStruct[],
-  serializedB: TransactionStruct[],
+  serializedA: (TransactionStructV2 | TransactionStructV3)[],
+  serializedB: (TransactionStructV2 | TransactionStructV3)[],
 ) => {
   if (serializedA.length !== serializedB.length) {
     return false;

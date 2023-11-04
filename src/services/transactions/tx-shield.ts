@@ -6,6 +6,8 @@ import {
   RailgunNFTAmountRecipient,
   NFTTokenType,
   TransactionGasDetails,
+  NETWORK_CONFIG,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   ShieldNote,
@@ -16,6 +18,7 @@ import {
   ShieldNoteERC20,
   ShieldNoteNFT,
   ERC721_NOTE_VALUE,
+  RailgunVersionedSmartContracts,
 } from '@railgun-community/engine';
 import {
   gasEstimateResponse,
@@ -23,7 +26,6 @@ import {
   setGasDetailsForTransaction,
 } from './tx-gas-details';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { getRailgunSmartWalletContractForNetwork } from '../railgun/core/contracts';
 import { createNFTTokenDataFromRailgunNFTAmount } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
 import { ContractTransaction } from 'ethers';
@@ -84,14 +86,13 @@ const generateNFTShieldRequests = async (
 };
 
 export const generateShieldTransaction = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   shieldPrivateKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
 ): Promise<ContractTransaction> => {
   try {
-    const railgunSmartWalletContract =
-      getRailgunSmartWalletContractForNetwork(networkName);
     const random = randomHex(16);
 
     const shieldInputs: ShieldRequestStruct[] = await Promise.all([
@@ -107,7 +108,10 @@ export const generateShieldTransaction = async (
       ),
     ]);
 
-    const transaction = await railgunSmartWalletContract.generateShield(
+    const chain = NETWORK_CONFIG[networkName].chain;
+    const transaction = await RailgunVersionedSmartContracts.generateShield(
+      txidVersion,
+      chain,
       shieldInputs,
     );
     return transaction;
@@ -121,6 +125,7 @@ export const generateShieldTransaction = async (
 };
 
 export const populateShield = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   shieldPrivateKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
@@ -129,6 +134,7 @@ export const populateShield = async (
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     const transaction = await generateShieldTransaction(
+      txidVersion,
       networkName,
       shieldPrivateKey,
       erc20AmountRecipients,
@@ -155,6 +161,7 @@ export const populateShield = async (
 };
 
 export const gasEstimateForShield = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   shieldPrivateKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
@@ -165,6 +172,7 @@ export const gasEstimateForShield = async (
     assertNotBlockedAddress(fromWalletAddress);
 
     const transaction = await generateShieldTransaction(
+      txidVersion,
       networkName,
       shieldPrivateKey,
       erc20AmountRecipients,
@@ -175,6 +183,7 @@ export const gasEstimateForShield = async (
     const isGasEstimateWithDummyProof = false;
     return gasEstimateResponse(
       await getGasEstimate(
+        txidVersion,
         networkName,
         transaction,
         fromWalletAddress,

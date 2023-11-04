@@ -33,7 +33,6 @@ export const erc20NoteFromERC20AmountRecipient = (
     railgunWallet.addressKeys,
     amount,
     tokenData,
-    railgunWallet.getViewingKeyPair(),
     showSenderAddressToRecipient,
     outputType,
     memoText,
@@ -63,7 +62,6 @@ export const nftNoteFromNFTAmountRecipient = (
         receiverAddressData,
         railgunWallet.addressKeys,
         tokenData,
-        railgunWallet.getViewingKeyPair(),
         showSenderAddressToRecipient,
         memoText,
       );
@@ -73,7 +71,6 @@ export const nftNoteFromNFTAmountRecipient = (
         railgunWallet.addressKeys,
         tokenData,
         BigInt(amount),
-        railgunWallet.getViewingKeyPair(),
         showSenderAddressToRecipient,
         memoText,
       );

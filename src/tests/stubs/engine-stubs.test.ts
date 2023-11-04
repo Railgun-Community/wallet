@@ -1,10 +1,8 @@
 import {
-  ViewingKeyPair,
   OutputType,
   TransactNote,
   Prover,
   formatToByteLength,
-  getPublicViewingKey,
   AbstractWallet,
   RailgunWallet,
   ByteLength,
@@ -14,7 +12,6 @@ import {
   CommitmentType,
   ZERO_32_BYTE_VALUE,
 } from '@railgun-community/engine';
-import { randomBytes } from 'ethers';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
 
@@ -30,12 +27,6 @@ const getMockBalanceData = async (
   tokenAddress: string,
   tree: number,
 ): Promise<TreeBalance> => {
-  const privateViewingKey = randomBytes(32);
-  const publicViewingKey = await getPublicViewingKey(privateViewingKey);
-  const senderViewingKeys: ViewingKeyPair = {
-    privateKey: privateViewingKey,
-    pubkey: publicViewingKey,
-  };
   const tokenData = getTokenDataERC20(tokenAddress);
 
   return {
@@ -55,7 +46,6 @@ const getMockBalanceData = async (
           // '12345678901234561234567890123456', // random
           BigInt('1000000000000000000000'), // value
           tokenData, // tokenData
-          senderViewingKeys,
           false, // shouldShowSender
           OutputType.Transfer,
           undefined, // memoText

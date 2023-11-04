@@ -9,7 +9,7 @@ import {
 import {
   closeTestEngine,
   initTestEngine,
-  initTestEngineNetwork,
+  initTestEngineNetworks,
 } from '../../../tests/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -24,10 +24,13 @@ import {
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { randomHex } from '@railgun-community/engine';
 import { FallbackProvider } from 'ethers';
+import { getTestTXIDVersion } from '../../../tests/helper.test';
 
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;
 let railgunAddress: string;
+
+const txidVersion = getTestTXIDVersion();
 
 const shieldPrivateKey = randomHex(32);
 
@@ -59,7 +62,7 @@ describe('tx-shield-base-token', () => {
   before(async function run() {
     this.timeout(5000);
     initTestEngine();
-    await initTestEngineNetwork();
+    await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
@@ -79,6 +82,7 @@ describe('tx-shield-base-token', () => {
   it('Should get gas estimate for valid shield base token', async () => {
     stubSuccess();
     const rsp = await gasEstimateForShieldBaseToken(
+      txidVersion,
       NetworkName.Polygon,
       railgunAddress,
       shieldPrivateKey,
@@ -92,6 +96,7 @@ describe('tx-shield-base-token', () => {
     stubSuccess();
     await expect(
       gasEstimateForShieldBaseToken(
+        txidVersion,
         NetworkName.Polygon,
         '123456789',
         shieldPrivateKey,
@@ -105,6 +110,7 @@ describe('tx-shield-base-token', () => {
     stubFailure();
     await expect(
       gasEstimateForShieldBaseToken(
+        txidVersion,
         NetworkName.Polygon,
         railgunAddress,
         shieldPrivateKey,
@@ -117,6 +123,7 @@ describe('tx-shield-base-token', () => {
   it('Should send tx for valid shield base token', async () => {
     stubSuccess();
     const { transaction } = await populateShieldBaseToken(
+      txidVersion,
       NetworkName.Polygon,
       railgunAddress,
       shieldPrivateKey,
@@ -132,6 +139,7 @@ describe('tx-shield-base-token', () => {
     stubSuccess();
     await expect(
       populateShieldBaseToken(
+        txidVersion,
         NetworkName.Polygon,
         '123456789',
         shieldPrivateKey,

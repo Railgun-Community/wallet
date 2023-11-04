@@ -23,9 +23,9 @@ import {
 import { WalletPOI } from '../services/poi/wallet-poi';
 import { TestWalletPOIRequester } from './poi/test-wallet-poi-requester.test';
 import { TestWalletPOINodeInterface } from './poi/test-wallet-poi-node-interface.test';
-import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
 import {
   GetLatestValidatedRailgunTxid,
+  MerklerootValidator,
   SnarkJSGroth16,
   TXOPOIListStatus,
 } from '@railgun-community/engine';
@@ -158,9 +158,14 @@ export const initTestEngine = (useNativeArtifacts = false) => {
   setOnTXIDMerkletreeScanCallback(txidMerkletreeHistoryScanCallback);
 };
 
-export const initTestEngineNetwork = async () => {
+export const initTestEngineNetworks = async () => {
   // Don't wait for async. It will try to load historical events, which takes a while.
-  return loadProvider(
+  await loadProvider(
+    MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
+    NetworkName.Polygon,
+    10000, // pollingInterval
+  );
+  await loadProvider(
     MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     NetworkName.Polygon,
     10000, // pollingInterval

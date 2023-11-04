@@ -13,17 +13,13 @@ import {
   rescanFullUTXOMerkletreesAndWallets,
   scanUpdatesForMerkletreeAndWallets,
 } from '../balances';
-import {
-  Chain,
-  ChainType,
-  TXIDVersion,
-  isDefined,
-} from '@railgun-community/shared-models';
+import { Chain, ChainType, isDefined } from '@railgun-community/shared-models';
+import { getTestTXIDVersion } from '../../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+const txidVersion = getTestTXIDVersion();
 
 let walletScanStub: SinonStub;
 let walletFullScanStub: SinonStub;
@@ -55,7 +51,7 @@ describe('balances', () => {
 
     walletFullScanStub = Sinon.stub(
       RailgunWallet.prototype,
-      'fullRescanBalances',
+      'fullRescanBalancesAllTXIDVersions',
     ).resolves();
 
     engineFullScanStub = Sinon.stub(

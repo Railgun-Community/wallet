@@ -5,6 +5,7 @@ import {
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
   TXIDVersion,
+  NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import {
   GenerateTransactionsProgressCallback,
@@ -16,11 +17,14 @@ import {
 } from './tx-generator';
 import { assertValidEthAddress } from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
-import { AdaptID, randomHex } from '@railgun-community/engine';
+import {
+  AdaptID,
+  RelayAdaptVersionedSmartContracts,
+  randomHex,
+} from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
-import { getRelayAdaptContractForNetwork } from '../railgun/core/contracts';
 
 export const generateUnshieldProof = async (
   txidVersion: TXIDVersion,
@@ -55,7 +59,11 @@ export const generateUnshieldProof = async (
         overallBatchMinGasPrice,
         progressCallback,
       );
-    const transaction = await generateTransact(provedTransactions, networkName);
+    const transaction = await generateTransact(
+      txidVersion,
+      provedTransactions,
+      networkName,
+    );
 
     const nullifiers = nullifiersForTransactions(provedTransactions);
 
@@ -116,7 +124,11 @@ export const generateUnshieldToOriginProof = async (
         progressCallback,
         originalShieldTxid,
       );
-    const transaction = await generateTransact(provedTransactions, networkName);
+    const transaction = await generateTransact(
+      txidVersion,
+      provedTransactions,
+      networkName,
+    );
 
     const nullifiers = nullifiersForTransactions(provedTransactions);
 
@@ -175,7 +187,7 @@ export const generateUnshieldBaseTokenProof = async (
     ];
 
     const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
-      createRelayAdaptUnshieldERC20AmountRecipients(networkName, [
+      createRelayAdaptUnshieldERC20AmountRecipients(txidVersion, networkName, [
         wrappedERC20Amount,
       ]);
 
@@ -183,8 +195,6 @@ export const generateUnshieldBaseTokenProof = async (
     const nftAmountRecipients: RailgunNFTAmountRecipient[] = [];
     const relayAdaptUnshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
       [];
-
-    const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
 
     // Generate dummy txs for relay adapt params.
     const dummyTxs = await generateDummyProofTransactions(
@@ -202,12 +212,21 @@ export const generateUnshieldBaseTokenProof = async (
       overallBatchMinGasPrice,
     );
 
+    const { chain } = NETWORK_CONFIG[networkName];
+
     const relayAdaptParamsRandom = randomHex(31);
     const relayAdaptParams =
-      await relayAdaptContract.getRelayAdaptParamsUnshieldBaseToken(
+      await RelayAdaptVersionedSmartContracts.getRelayAdaptParamsUnshieldBaseToken(
+        txidVersion,
+        chain,
         dummyTxs,
         publicWalletAddress,
         relayAdaptParamsRandom,
+      );
+    const relayAdaptContract =
+      RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
+        txidVersion,
+        chain,
       );
     const relayAdaptID: AdaptID = {
       contract: relayAdaptContract.address,
@@ -238,6 +257,7 @@ export const generateUnshieldBaseTokenProof = async (
       );
 
     const transaction = await generateUnshieldBaseToken(
+      txidVersion,
       provedTransactions,
       networkName,
       publicWalletAddress,

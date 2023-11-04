@@ -19,8 +19,11 @@ import {
 } from '../tx-gas-details';
 import { setFallbackProviderForNetwork } from '../../railgun';
 import { ContractTransaction, FallbackProvider } from 'ethers';
+import { getTestTXIDVersion } from '../../../tests/helper.test';
 
 let gasEstimateStub: SinonStub;
+
+const txidVersion = getTestTXIDVersion();
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -42,6 +45,7 @@ describe('tx-gas', () => {
     );
     setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
     const gasEstimate = await getGasEstimate(
+      txidVersion,
       NetworkName.Polygon,
       transaction,
       MOCK_ETH_WALLET_ADDRESS,
@@ -72,6 +76,7 @@ describe('tx-gas', () => {
       data: '0x',
     };
     const gasEstimate = await getGasEstimate(
+      txidVersion,
       NetworkName.Polygon,
       tx,
       MOCK_ETH_WALLET_ADDRESS,
@@ -99,6 +104,7 @@ describe('tx-gas', () => {
       data: '0x',
     };
     const gasEstimate = await getGasEstimate(
+      txidVersion,
       NetworkName.Polygon,
       tx,
       MOCK_ETH_WALLET_ADDRESS,

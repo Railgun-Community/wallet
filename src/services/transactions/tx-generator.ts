@@ -3,12 +3,15 @@ import {
   TransactionBatch,
   AdaptID,
   OutputType,
-  TransactionStruct,
   getTokenDataERC20,
   getTokenDataNFT,
   ERC721_NOTE_VALUE,
   NFTTokenData,
   PreTransactionPOIsPerTxidLeafPerList,
+  RailgunVersionedSmartContracts,
+  TransactionStructV2,
+  TransactionStructV3,
+  RelayAdaptVersionedSmartContracts,
 } from '@railgun-community/engine';
 import {
   RailgunERC20Amount,
@@ -20,10 +23,6 @@ import {
   NFTTokenType,
   TXIDVersion,
 } from '@railgun-community/shared-models';
-import {
-  getRailgunSmartWalletContractForNetwork,
-  getRelayAdaptContractForNetwork,
-} from '../railgun/core/contracts';
 import {
   erc20NoteFromERC20AmountRecipient,
   nftNoteFromNFTAmountRecipient,
@@ -66,7 +65,7 @@ export const generateProofTransactions = async (
   progressCallback: GenerateTransactionsProgressCallback,
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
-  provedTransactions: TransactionStruct[];
+  provedTransactions: (TransactionStructV2 | TransactionStructV3)[];
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
 }> => {
   const railgunWallet = fullWalletForID(railgunWalletID);
@@ -93,7 +92,7 @@ export const generateProofTransactions = async (
 };
 
 export const nullifiersForTransactions = (
-  transactions: TransactionStruct[],
+  transactions: (TransactionStructV2 | TransactionStructV3)[],
 ): string[] => {
   return transactions
     .map(transaction => transaction.nullifiers)
@@ -122,7 +121,7 @@ export const generateDummyProofTransactions = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   originShieldTxidForSpendabilityOverride?: string,
-): Promise<TransactionStruct[]> => {
+): Promise<(TransactionStructV2 | TransactionStructV3)[]> => {
   if (!relayerFeeERC20Amount && !sendWithPublicWallet) {
     throw new Error('Must send with relayer or public wallet.');
   }
@@ -163,13 +162,17 @@ export const generateDummyProofTransactions = async (
 };
 
 export const generateTransact = async (
-  txs: TransactionStruct[],
+  txidVersion: TXIDVersion,
+  txs: (TransactionStructV2 | TransactionStructV3)[],
   networkName: NetworkName,
   useDummyProof = false,
 ): Promise<ContractTransaction> => {
-  const railgunSmartWalletContract =
-    getRailgunSmartWalletContractForNetwork(networkName);
-  const transaction = await railgunSmartWalletContract.transact(txs);
+  const chain = NETWORK_CONFIG[networkName].chain;
+  const transaction = await RailgunVersionedSmartContracts.generateTransact(
+    txidVersion,
+    chain,
+    txs,
+  );
   if (useDummyProof) {
     return {
       ...transaction,
@@ -180,7 +183,8 @@ export const generateTransact = async (
 };
 
 export const generateUnshieldBaseToken = async (
-  txs: TransactionStruct[],
+  txidVersion: TXIDVersion,
+  txs: (TransactionStructV2 | TransactionStructV3)[],
   networkName: NetworkName,
   toWalletAddress: string,
   relayAdaptParamsRandom: string,
@@ -189,13 +193,16 @@ export const generateUnshieldBaseToken = async (
   assertValidEthAddress(toWalletAddress);
   assertNotBlockedAddress(toWalletAddress);
 
-  const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
+  const chain = NETWORK_CONFIG[networkName].chain;
 
-  const transaction = await relayAdaptContract.populateUnshieldBaseToken(
-    txs,
-    toWalletAddress,
-    relayAdaptParamsRandom,
-  );
+  const transaction =
+    await RelayAdaptVersionedSmartContracts.populateUnshieldBaseToken(
+      txidVersion,
+      chain,
+      txs,
+      toWalletAddress,
+      relayAdaptParamsRandom,
+    );
   if (useDummyProof) {
     return {
       ...transaction,
@@ -223,7 +230,7 @@ const transactionsFromERC20Amounts = async (
   progressCallback: GenerateTransactionsProgressCallback,
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
-  provedTransactions: TransactionStruct[];
+  provedTransactions: (TransactionStructV2 | TransactionStructV3)[];
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
 }> => {
   const network = NETWORK_CONFIG[networkName];
@@ -465,7 +472,7 @@ const generateAllProofs = async (
   shouldGeneratePreTransactionPOIs: boolean,
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
-  provedTransactions: TransactionStruct[];
+  provedTransactions: (TransactionStructV2 | TransactionStructV3)[];
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
 }> => {
   const prover = getProver();

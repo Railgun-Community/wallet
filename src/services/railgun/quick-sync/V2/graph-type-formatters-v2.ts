@@ -8,11 +8,11 @@ import {
   CommitmentType,
   LegacyEncryptedCommitment,
   ShieldCommitment,
-  TransactCommitment,
+  TransactCommitmentV2,
   PreImage,
   TokenData,
   ByteLength,
-  CommitmentCiphertext,
+  CommitmentCiphertextV2,
   Ciphertext,
   formatToByteLength,
   LegacyCommitmentCiphertext,
@@ -189,7 +189,7 @@ const formatLegacyCommitmentCiphertext = (
 
 const formatCommitmentCiphertext = (
   graphCommitmentCiphertext: GraphCommitmentCiphertext,
-): CommitmentCiphertext => {
+): CommitmentCiphertextV2 => {
   return {
     ciphertext: formatCiphertext(graphCommitmentCiphertext.ciphertext),
     blindedReceiverViewingKey: formatTo32Bytes(
@@ -268,11 +268,11 @@ const formatShieldCommitment = (
 
 const formatTransactCommitment = (
   commitment: GraphTransactCommitment,
-): TransactCommitment => {
+): TransactCommitmentV2 => {
   return {
     txid: formatTo32Bytes(commitment.transactionHash, false),
     timestamp: Number(commitment.blockTimestamp),
-    commitmentType: CommitmentType.TransactCommitment,
+    commitmentType: CommitmentType.TransactCommitmentV2,
     hash: formatTo32Bytes(bigIntStringToHex(commitment.hash), false),
     ciphertext: formatCommitmentCiphertext(commitment.ciphertext),
     blockNumber: Number(commitment.blockNumber),

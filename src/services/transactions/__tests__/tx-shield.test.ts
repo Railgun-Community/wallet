@@ -10,7 +10,7 @@ import {
 import {
   closeTestEngine,
   initTestEngine,
-  initTestEngineNetwork,
+  initTestEngineNetworks,
 } from '../../../tests/setup.test';
 import {
   MOCK_DB_ENCRYPTION_KEY,
@@ -29,9 +29,12 @@ import {
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { getRandomBytes } from '../../railgun';
 import { FallbackProvider } from 'ethers';
+import { getTestTXIDVersion } from '../../../tests/helper.test';
 
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;
+
+const txidVersion = getTestTXIDVersion();
 
 const shieldPrivateKey = getRandomBytes(32);
 
@@ -89,7 +92,7 @@ describe('tx-shield', () => {
   before(async function run() {
     this.timeout(5000);
     initTestEngine();
-    await initTestEngineNetwork();
+    await initTestEngineNetworks();
     await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
@@ -111,6 +114,7 @@ describe('tx-shield', () => {
   it('Should get gas estimate for valid shield', async () => {
     stubSuccess();
     const rsp = await gasEstimateForShield(
+      txidVersion,
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
@@ -124,6 +128,7 @@ describe('tx-shield', () => {
     stubSuccess();
     await expect(
       gasEstimateForShield(
+        txidVersion,
         NetworkName.Polygon,
         shieldPrivateKey,
         MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
@@ -137,6 +142,7 @@ describe('tx-shield', () => {
     stubFailure();
     await expect(
       gasEstimateForShield(
+        txidVersion,
         NetworkName.Polygon,
         shieldPrivateKey,
         MOCK_TOKEN_AMOUNT_RECIPIENTS,
@@ -149,6 +155,7 @@ describe('tx-shield', () => {
   it('Should send tx for valid shield - no gas details', async () => {
     stubSuccess();
     const { transaction } = await populateShield(
+      txidVersion,
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
@@ -169,6 +176,7 @@ describe('tx-shield', () => {
   it('Should send tx for valid shield - gas details', async () => {
     stubSuccess();
     const { transaction } = await populateShield(
+      txidVersion,
       NetworkName.Polygon,
       shieldPrivateKey,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
@@ -190,6 +198,7 @@ describe('tx-shield', () => {
     stubSuccess();
     await expect(
       populateShield(
+        txidVersion,
         NetworkName.Polygon,
         shieldPrivateKey,
         MOCK_TOKEN_AMOUNT_RECIPIENTS_INVALID,
