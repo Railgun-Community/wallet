@@ -17,18 +17,18 @@ import {
   Chain,
   NETWORK_CONFIG,
   NetworkName,
-  TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
 import { loadProvider } from '../../core/load-provider';
 import { getTXIDMerkletreeForNetwork } from '../../core/merkletree';
+import { getTestTXIDVersion, isV2Test } from '../../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 let railgunWalletID: string;
 
-const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+const txidVersion = getTestTXIDVersion();
 
 const networkName = NetworkName.EthereumGoerli;
 const chain: Chain = NETWORK_CONFIG[networkName].chain;
@@ -67,7 +67,12 @@ describe('balances-live', () => {
     await closeTestEngine();
   });
 
-  it('Should run live balance fetch, transaction history scan, and POI status info scan', async () => {
+  it('[V2] Should run live balance fetch, transaction history scan, and POI status info scan', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
     const fullRescan = false;
     await refreshRailgunBalances(
       txidVersion,

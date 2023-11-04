@@ -106,6 +106,20 @@ export class WalletPOINodeInterface extends POINodeInterface {
     );
   }
 
+  async validatePOIMerkleroots(
+    txidVersion: TXIDVersion,
+    chain: Chain,
+    listKey: string,
+    poiMerkleroots: string[],
+  ): Promise<boolean> {
+    return this.poiNodeRequest.validatePOIMerkleroots(
+      txidVersion,
+      chain,
+      listKey,
+      poiMerkleroots,
+    );
+  }
+
   async submitPOI(
     txidVersion: TXIDVersion,
     chain: Chain,

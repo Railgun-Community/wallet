@@ -49,7 +49,11 @@ export const generateTransferProof = async (
         overallBatchMinGasPrice,
         progressCallback,
       );
-    const transaction = await generateTransact(provedTransactions, networkName);
+    const transaction = await generateTransact(
+      txidVersion,
+      provedTransactions,
+      networkName,
+    );
 
     const nullifiers = nullifiersForTransactions(provedTransactions);
 

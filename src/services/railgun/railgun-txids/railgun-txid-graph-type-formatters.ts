@@ -1,20 +1,21 @@
 import {
   ByteLength,
-  RailgunTransaction,
+  RailgunTransactionV2,
+  RailgunTransactionVersion,
   formatToByteLength,
 } from '@railgun-community/engine';
 import { GetRailgunTransactionsAfterGraphIDQuery } from './graphql';
-import { graphTokenTypeToEngineTokenType } from '../quick-sync/graph-type-formatters';
 import { getAddress } from 'ethers';
+import { graphTokenTypeToEngineTokenType } from '../quick-sync/shared-formatters';
 
 export type GraphRailgunTransactions =
   GetRailgunTransactionsAfterGraphIDQuery['transactions'];
 
 export const formatRailgunTransactions = (
   txs: GraphRailgunTransactions,
-): RailgunTransaction[] => {
+): RailgunTransactionV2[] => {
   return txs.map(tx => {
-    const unshield: RailgunTransaction['unshield'] = tx.hasUnshield
+    const unshield: RailgunTransactionV2['unshield'] = tx.hasUnshield
       ? {
           tokenData: {
             tokenType: graphTokenTypeToEngineTokenType(
@@ -28,7 +29,8 @@ export const formatRailgunTransactions = (
         }
       : undefined;
 
-    const railgunTransaction: RailgunTransaction = {
+    const railgunTransaction: RailgunTransactionV2 = {
+      version: RailgunTransactionVersion.V2,
       graphID: tx.id,
       commitments: tx.commitments.map(commitment =>
         formatToByteLength(commitment, ByteLength.UINT_256, true),

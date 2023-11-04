@@ -12,7 +12,7 @@ import {
 import {
   closeTestEngine,
   initTestEngine,
-  initTestEngineNetwork,
+  initTestEngineNetworks,
   pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
@@ -24,16 +24,20 @@ import {
   RailgunHistorySendERC20Amount,
   RailgunHistoryUnshieldERC20Amount,
   RailgunWalletBalanceBucket,
+  TXIDVersion,
   TransactionHistoryItem,
   TransactionHistoryItemCategory,
   isDefined,
 } from '@railgun-community/shared-models';
+import { getTestTXIDVersion, isV2Test } from '../../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const POLYGON_CHAIN: Chain = { type: ChainType.EVM, id: 137 };
 let wallet: RailgunWallet;
+
+const txidVersion = getTestTXIDVersion();
 
 const transferERC20AmountsSend: RailgunHistorySendERC20Amount[] = [
   {
@@ -65,6 +69,7 @@ const transferERC20AmountsSend: RailgunHistorySendERC20Amount[] = [
   },
 ];
 const MOCKED_TRANSFER_SEND_TRX: TransactionHistoryItem = {
+  txidVersion,
   txid: '0x2cedf31ad89e317dab2bc522333c58e9d644e4977c9c7249ca99e3846eb5d652',
   blockNumber: 100,
   transferERC20Amounts: transferERC20AmountsSend,
@@ -98,6 +103,7 @@ const receiveERC20AmountsReceive: RailgunHistoryReceiveERC20Amount[] = [
   },
 ];
 const MOCKED_TRANSFER_RECEIVE_TRX: TransactionHistoryItem = {
+  txidVersion,
   txid: '0x3245173576d6fdd6032915e9d742498e08b327cd4fbdeb0d7bb1858455698fa4',
   blockNumber: 100,
   transferERC20Amounts: [],
@@ -124,6 +130,7 @@ const receiveERC20AmountsShield: RailgunHistoryReceiveERC20Amount[] = [
   },
 ];
 const MOCKED_SHIELD_TRX: TransactionHistoryItem = {
+  txidVersion,
   txid: '0x19a6a73d658c7517625ce16ab554ccb6dc3dbed85dfae8e7ced42b42ad71692c',
   blockNumber: 100,
   transferERC20Amounts: [],
@@ -150,6 +157,7 @@ const unshieldERC20AmountsUnshield: RailgunHistoryUnshieldERC20Amount[] = [
   },
 ];
 const MOCKED_UNSHIELD_TRX: TransactionHistoryItem = {
+  txidVersion,
   txid: '0xefcff65175d3dc33b7d384951fbeeb7698f8b86a29c635704e3ee78a9d947b66',
   blockNumber: 100,
   transferERC20Amounts: [],
@@ -187,6 +195,7 @@ const unshieldERC20AmountsUnknow: RailgunHistoryUnshieldERC20Amount[] = [
   },
 ];
 const MOCKED_UNKNOWN_SWAP_TRX: TransactionHistoryItem = {
+  txidVersion,
   txid: '0xf12496efa5966edb39308b424038a2fec0235a01a2cb469908bc0b4bda7e1cbe',
   blockNumber: 100,
   transferERC20Amounts: [],
@@ -216,7 +225,7 @@ describe('transaction-history', () => {
   before(async function run() {
     this.timeout(90000);
     initTestEngine();
-    await initTestEngineNetwork();
+    await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
@@ -236,7 +245,12 @@ describe('transaction-history', () => {
   // TODO: improve reliability and speed of this test.
   // It currently downloads a large history from the Graph into a local DB.
   // We could cache this DB and use it for future tests, avoiding redownloads.
-  it('Should get wallet transaction history', async () => {
+  it('[V2] Should get wallet transaction history', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
     const items = await getWalletTransactionHistory(
       POLYGON_CHAIN,
       wallet.id,
@@ -244,7 +258,8 @@ describe('transaction-history', () => {
     );
     expect(items.length).to.be.greaterThanOrEqual(6);
     items.forEach(item => {
-      expect(item.txid.length === 66); // '0x' + 32 bytes
+      expect(item.txidVersion).to.equal(TXIDVersion.V2_PoseidonMerkle);
+      expect(item.txid.length).to.equal(66); // '0x' + 32 bytes
     });
   });
 
@@ -252,6 +267,7 @@ describe('transaction-history', () => {
     const category = categoryForTransactionHistoryItem(MOCKED_UNKNOWN_SWAP_TRX);
     expect(category).to.equal(TransactionHistoryItemCategory.Unknown);
   });
+
   it('Should get TransferSendERC20s category for transaction history item', () => {
     const category = categoryForTransactionHistoryItem(
       MOCKED_TRANSFER_SEND_TRX,
@@ -260,10 +276,12 @@ describe('transaction-history', () => {
       TransactionHistoryItemCategory.TransferSendERC20s,
     );
   });
+
   it('Should get ShieldERC20s category for transaction history item', () => {
     const category = categoryForTransactionHistoryItem(MOCKED_SHIELD_TRX);
     expect(category).to.equal(TransactionHistoryItemCategory.ShieldERC20s);
   });
+
   it('Should get TransferReceiveERC20s category for transaction history item', () => {
     const category = categoryForTransactionHistoryItem(
       MOCKED_TRANSFER_RECEIVE_TRX,
@@ -272,6 +290,7 @@ describe('transaction-history', () => {
       TransactionHistoryItemCategory.TransferReceiveERC20s,
     );
   });
+
   it('Should get UnshieldERC20s category for transaction history item', () => {
     const category = categoryForTransactionHistoryItem(MOCKED_UNSHIELD_TRX);
     expect(category).to.equal(TransactionHistoryItemCategory.UnshieldERC20s);

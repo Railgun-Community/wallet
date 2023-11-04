@@ -4,7 +4,6 @@ import {
   NetworkName,
   FallbackProviderJsonConfig,
   isDefined,
-  TXIDVersion,
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import {
@@ -21,9 +20,10 @@ import {
   getTXIDMerkletreeForNetwork,
 } from '../merkletree';
 import {
-  getRailgunSmartWalletContractForNetwork,
-  getRelayAdaptContractForNetwork,
-} from '../contracts';
+  RailgunVersionedSmartContracts,
+  RelayAdaptVersionedSmartContracts,
+} from '@railgun-community/engine';
+import { getTestTXIDVersion, isV2Test } from '../../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -31,7 +31,7 @@ const { expect } = chai;
 const MOCK_MNEMONIC_PROVIDERS_ONLY =
   'pause crystal tornado alcohol genre cement fade large song like bag where';
 
-const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+const txidVersion = getTestTXIDVersion();
 
 describe('providers', () => {
   before(async () => {
@@ -51,9 +51,10 @@ describe('providers', () => {
         10000, // pollingInterval
       );
       expect(response.feesSerialized).to.deep.equal({
-        shield: '25',
-        unshield: '25',
-        nft: '25',
+        shieldFeeV2: '25',
+        unshieldFeeV2: '25',
+        shieldFeeV3: '25',
+        unshieldFeeV3: '25',
       });
     },
   ).timeout(20000);
@@ -65,9 +66,10 @@ describe('providers', () => {
       10000, // pollingInterval
     );
     expect(response.feesSerialized).to.deep.equal({
-      shield: '25',
-      unshield: '25',
-      nft: '25',
+      shieldFeeV2: '25',
+      unshieldFeeV2: '25',
+      shieldFeeV3: '25',
+      unshieldFeeV3: '25',
     });
 
     expect(getFallbackProviderForNetwork(NetworkName.PolygonMumbai)).to.not.be
@@ -94,18 +96,31 @@ describe('providers', () => {
       ),
     ).to.throw;
 
-    expect(getRailgunSmartWalletContractForNetwork(NetworkName.PolygonMumbai))
-      .to.not.be.undefined;
-    expect(() =>
-      getRailgunSmartWalletContractForNetwork(
-        NetworkName.EthereumRopsten_DEPRECATED,
+    const { chain } = NETWORK_CONFIG[NetworkName.PolygonMumbai];
+    expect(
+      RailgunVersionedSmartContracts.getShieldApprovalContract(
+        txidVersion,
+        chain,
       ),
-    ).to.throw;
+    ).to.not.be.undefined;
 
-    expect(getRelayAdaptContractForNetwork(NetworkName.PolygonMumbai)).to.not.be
-      .undefined;
+    if (isV2Test()) {
+      // TODO-V3: Remove when ready
+      expect(
+        RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
+          txidVersion,
+          chain,
+        ),
+      ).to.not.be.undefined;
+    }
+
+    const { chain: chainEthereumRopsten } =
+      NETWORK_CONFIG[NetworkName.EthereumRopsten_DEPRECATED];
     expect(() =>
-      getRelayAdaptContractForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
+      RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
+        txidVersion,
+        chainEthereumRopsten,
+      ),
     ).to.throw;
 
     // Check that new wallet has merkletree.

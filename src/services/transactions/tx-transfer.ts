@@ -15,7 +15,10 @@ import {
   generateTransact,
 } from './tx-generator';
 import { populateProvedTransaction } from './proof-cache';
-import { TransactionStruct } from '@railgun-community/engine';
+import {
+  TransactionStructV2,
+  TransactionStructV3,
+} from '@railgun-community/engine';
 import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { reportAndSanitizeError } from '../../utils/error';
 
@@ -94,8 +97,9 @@ export const gasEstimateForUnprovenTransfer = async (
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
-      (txs: TransactionStruct[]) =>
+      (txs: (TransactionStructV2 | TransactionStructV3)[]) =>
         generateTransact(
+          txidVersion,
           txs,
           networkName,
           true, // useDummyProof

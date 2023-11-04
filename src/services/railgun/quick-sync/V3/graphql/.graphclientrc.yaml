@@ -1,0 +1,38 @@
+# .graphclientrc.yml
+sources:
+  # - name: ethereum
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-ethereum
+  # - name: goerli
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-goerli
+  # - name: bsc
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-bsc
+  # - name: matic
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-polygon
+  - name: mumbai
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v3-mumbai
+  # - name: arbitrum-one
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum
+  # - name: arbitrum-goerli
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum-goerli
+  # # NOTE: Not supported by hosted service yet.
+  # - name: sepolia
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-sepolia
+
+documents:
+  - ./quick-sync-query-V3.graphql

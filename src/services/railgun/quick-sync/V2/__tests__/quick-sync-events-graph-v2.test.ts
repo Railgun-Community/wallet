@@ -1,12 +1,9 @@
-import { Chain, CommitmentEvent } from '@railgun-community/engine';
-import {
-  NetworkName,
-  NETWORK_CONFIG,
-  TXIDVersion,
-} from '@railgun-community/shared-models';
+import { Chain, CommitmentEvent, TXIDVersion } from '@railgun-community/engine';
+import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { quickSyncEventsGraphV2 } from '../quick-sync-events-graph';
+import { quickSyncEventsGraph } from '../../quick-sync-events';
+import { isV2Test } from '../../../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -45,9 +42,9 @@ const EXPECTED_NULLIFIER_EVENTS_GOERLI = 40;
 const EXPECTED_UNSHIELD_EVENTS_GOERLI = 1;
 
 const SEPOLIA_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumSepolia].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0; // TODO: Add some here
-const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0; // TODO: Add some here
-const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 0; // TODO: Add some here
+const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0; // TODO: Add some
+const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0; // TODO: Add some
+const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 0; // TODO: Add some
 
 const ARBITRUM_GOERLI_CHAIN: Chain =
   NETWORK_CONFIG[NetworkName.ArbitrumGoerli].chain;
@@ -90,10 +87,15 @@ const assertContiguousCommitmentEvents = (
   }
 };
 
-describe('quick-sync-events-graph', () => {
-  it('Should make sure Graph query has no data gaps in commitments - Ethereum', async () => {
-    // const eventLog = await quickSyncEventsGraphV2(txidVersion, ETH_CHAIN, 0);
-    const eventLog = await quickSyncEventsGraphV2(
+describe('quick-sync-events-graph-v2', () => {
+  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Ethereum', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
+    // const eventLog = await quickSyncEventsGraph(txidVersion, ETH_CHAIN, 0);
+    const eventLog = await quickSyncEventsGraph(
       txidVersion,
       ETH_CHAIN,
       14858124,
@@ -114,12 +116,13 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Polygon', async () => {
-    const eventLog = await quickSyncEventsGraphV2(
-      txidVersion,
-      POLYGON_CHAIN,
-      0,
-    );
+  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Polygon', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
+    const eventLog = await quickSyncEventsGraph(txidVersion, POLYGON_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -139,8 +142,13 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - BNB Smart Chain', async () => {
-    const eventLog = await quickSyncEventsGraphV2(txidVersion, BNB_CHAIN, 0);
+  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - BNB Smart Chain', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
+    const eventLog = await quickSyncEventsGraph(txidVersion, BNB_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -157,8 +165,13 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Polygon Mumbai', async () => {
-    const eventLog = await quickSyncEventsGraphV2(
+  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Polygon Mumbai', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
+    const eventLog = await quickSyncEventsGraph(
       txidVersion,
       POLYGON_MUMBAI_CHAIN,
       0,
@@ -179,12 +192,13 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Arbitrum', async () => {
-    const eventLog = await quickSyncEventsGraphV2(
-      txidVersion,
-      ARBITRUM_CHAIN,
-      0,
-    );
+  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Arbitrum', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
+    const eventLog = await quickSyncEventsGraph(txidVersion, ARBITRUM_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -201,8 +215,13 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Goerli', async () => {
-    const eventLog = await quickSyncEventsGraphV2(txidVersion, GOERLI_CHAIN, 0);
+  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Goerli', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
+    const eventLog = await quickSyncEventsGraph(txidVersion, GOERLI_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -219,12 +238,13 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Sepolia', async () => {
-    const eventLog = await quickSyncEventsGraphV2(
-      txidVersion,
-      SEPOLIA_CHAIN,
-      0,
-    );
+  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
+    const eventLog = await quickSyncEventsGraph(txidVersion, SEPOLIA_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
     expect(eventLog.commitmentEvents.length).to.be.at.least(
@@ -242,8 +262,13 @@ describe('quick-sync-events-graph', () => {
     // assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Arbitrum Goerli', async () => {
-    const eventLog = await quickSyncEventsGraphV2(
+  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Arbitrum Goerli', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
+    const eventLog = await quickSyncEventsGraph(
       txidVersion,
       ARBITRUM_GOERLI_CHAIN,
       0,
@@ -264,8 +289,13 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should run live Railgun Event Log fetch for Polygon with high starting block', async () => {
-    const eventLog = await quickSyncEventsGraphV2(
+  it('[V2] Should run live Railgun Event Log fetch for Polygon with high starting block', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
+    const eventLog = await quickSyncEventsGraph(
       txidVersion,
       POLYGON_CHAIN,
       100000000,

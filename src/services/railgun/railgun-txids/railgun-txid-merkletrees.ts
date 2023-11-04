@@ -69,9 +69,9 @@ export const getGlobalUTXOTreePositionForRailgunTransactionCommitment = (
   );
 };
 
-export const fullResetTXIDMerkletrees = async (networkName: NetworkName) => {
+export const fullResetTXIDMerkletreesV2 = async (networkName: NetworkName) => {
   const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().fullResetTXIDMerkletrees(chain);
+  return getEngine().fullResetTXIDMerkletreesV2(chain);
 };
 
 export const resetRailgunTxidsAfterTxidIndex = async (

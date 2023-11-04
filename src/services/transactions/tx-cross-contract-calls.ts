@@ -13,6 +13,7 @@ import {
   isDefined,
   RailgunERC20Recipient,
   TXIDVersion,
+  NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import {
   GenerateTransactionsProgressCallback,
@@ -28,22 +29,21 @@ import { sendErrorMessage } from '../../utils/logger';
 import {
   RelayAdaptHelper,
   AdaptID,
-  TransactionStruct,
   hexlify,
   randomHex,
-  RelayAdaptContract,
-  ProverProgressCallback,
   NFTTokenData,
   formatToByteLength,
   ByteLength,
-  MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT,
+  MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2,
   RelayAdaptShieldNFTRecipient,
+  TransactionStructV2,
+  TransactionStructV3,
+  RelayAdaptVersionedSmartContracts,
 } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { reportAndSanitizeError } from '../../utils/error';
-import { ContractTransaction, Log } from 'ethers';
-import { getRelayAdaptContractForNetwork } from '../railgun/core/contracts';
+import { ContractTransaction } from 'ethers';
 
 const createValidCrossContractCalls = (
   crossContractCalls: ContractTransaction[],
@@ -73,10 +73,13 @@ const createValidCrossContractCalls = (
 };
 
 export const createRelayAdaptUnshieldERC20AmountRecipients = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   unshieldERC20Amounts: RailgunERC20Amount[],
 ): RailgunERC20AmountRecipient[] => {
-  const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
+  const chain = NETWORK_CONFIG[networkName].chain;
+  const relayAdaptContract =
+    RelayAdaptVersionedSmartContracts.getRelayAdaptContract(txidVersion, chain);
   const unshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
     unshieldERC20Amounts.map(unshieldERC20Amount => ({
       ...unshieldERC20Amount,
@@ -86,10 +89,13 @@ export const createRelayAdaptUnshieldERC20AmountRecipients = (
 };
 
 export const createRelayAdaptUnshieldNFTAmountRecipients = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   unshieldNFTAmounts: RailgunNFTAmount[],
 ): RailgunNFTAmountRecipient[] => {
-  const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
+  const chain = NETWORK_CONFIG[networkName].chain;
+  const relayAdaptContract =
+    RelayAdaptVersionedSmartContracts.getRelayAdaptContract(txidVersion, chain);
   const unshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
     unshieldNFTAmounts.map(unshieldNFTAmount => ({
       ...unshieldNFTAmount,
@@ -197,15 +203,17 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
     const validCrossContractCalls =
       createValidCrossContractCalls(crossContractCalls);
 
-    const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
+    const chain = NETWORK_CONFIG[networkName].chain;
 
     const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
       createRelayAdaptUnshieldERC20AmountRecipients(
+        txidVersion,
         networkName,
         relayAdaptUnshieldERC20Amounts,
       );
     const relayAdaptUnshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
       createRelayAdaptUnshieldNFTAmountRecipients(
+        txidVersion,
         networkName,
         relayAdaptUnshieldNFTAmounts,
       );
@@ -218,8 +226,9 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
         createRelayAdaptShieldNFTRecipients(relayAdaptShieldNFTRecipients),
       );
 
+    // TODO-V3: Needs modification
     const minimumGasLimit =
-      minGasLimit ?? MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT;
+      minGasLimit ?? MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2;
 
     const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
       (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
@@ -237,19 +246,22 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
-      async (txs: TransactionStruct[]) => {
+      async (txs: (TransactionStructV2 | TransactionStructV3)[]) => {
         const relayAdaptParamsRandom = randomHex(31);
 
         // TODO: We should add the relay adapt contract gas limit here.
-        const transaction = await relayAdaptContract.populateCrossContractCalls(
-          txs,
-          validCrossContractCalls,
-          relayShieldRequests,
-          relayAdaptParamsRandom,
-          true, // isGasEstimate
-          !sendWithPublicWallet, // isRelayerTransaction
-          minimumGasLimit,
-        );
+        const transaction =
+          await RelayAdaptVersionedSmartContracts.populateCrossContractCalls(
+            txidVersion,
+            chain,
+            txs,
+            validCrossContractCalls,
+            relayShieldRequests,
+            relayAdaptParamsRandom,
+            true, // isGasEstimate
+            !sendWithPublicWallet, // isRelayerTransaction
+            minimumGasLimit,
+          );
         // Remove gasLimit, we'll set to the minimum below.
         // TODO: Remove after callbacks upgrade.
         delete transaction.gasLimit;
@@ -304,15 +316,15 @@ export const generateCrossContractCallsProof = async (
     const validCrossContractCalls =
       createValidCrossContractCalls(crossContractCalls);
 
-    const relayAdaptContract = getRelayAdaptContractForNetwork(networkName);
-
     const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
       createRelayAdaptUnshieldERC20AmountRecipients(
+        txidVersion,
         networkName,
         relayAdaptUnshieldERC20Amounts,
       );
     const relayAdaptUnshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
       createRelayAdaptUnshieldNFTAmountRecipients(
+        txidVersion,
         networkName,
         relayAdaptUnshieldNFTAmounts,
       );
@@ -343,19 +355,29 @@ export const generateCrossContractCallsProof = async (
         createRelayAdaptShieldNFTRecipients(relayAdaptShieldNFTRecipients),
       );
 
+    // TODO-V3: Needs modification
     const minimumGasLimit =
-      minGasLimit ?? MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT;
+      minGasLimit ?? MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2;
+
+    const { chain } = NETWORK_CONFIG[networkName];
 
     const isRelayerTransaction = !sendWithPublicWallet;
     const relayAdaptParamsRandom = randomHex(31);
     const relayAdaptParams =
-      await relayAdaptContract.getRelayAdaptParamsCrossContractCalls(
+      await RelayAdaptVersionedSmartContracts.getRelayAdaptParamsCrossContractCalls(
+        txidVersion,
+        chain,
         dummyUnshieldTxs,
         validCrossContractCalls,
         relayShieldRequests,
         relayAdaptParamsRandom,
         isRelayerTransaction,
         minimumGasLimit,
+      );
+    const relayAdaptContract =
+      RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
+        txidVersion,
+        chain,
       );
     const relayAdaptID: AdaptID = {
       contract: relayAdaptContract.address,
@@ -384,15 +406,18 @@ export const generateCrossContractCallsProof = async (
 
     const nullifiers = nullifiersForTransactions(provedTransactions);
 
-    const transaction = await relayAdaptContract.populateCrossContractCalls(
-      provedTransactions,
-      validCrossContractCalls,
-      relayShieldRequests,
-      relayAdaptParamsRandom,
-      false, // isGasEstimate
-      isRelayerTransaction,
-      minimumGasLimit,
-    );
+    const transaction =
+      await RelayAdaptVersionedSmartContracts.populateCrossContractCalls(
+        txidVersion,
+        chain,
+        provedTransactions,
+        validCrossContractCalls,
+        relayShieldRequests,
+        relayAdaptParamsRandom,
+        false, // isGasEstimate
+        isRelayerTransaction,
+        minimumGasLimit,
+      );
     delete transaction.from;
 
     setCachedProvedTransaction({
@@ -421,11 +446,16 @@ export const generateCrossContractCallsProof = async (
 };
 
 export const getRelayAdaptTransactionError = (
-  receiptLogs: TransactionReceiptLog[] | readonly Log[],
+  txidVersion: TXIDVersion,
+  receiptLogs: TransactionReceiptLog[],
+  // receiptLogs: TransactionReceiptLog[] | readonly Log[],
 ): Optional<string> => {
   try {
     const relayAdaptError =
-      RelayAdaptContract.getRelayAdaptCallError(receiptLogs);
+      RelayAdaptVersionedSmartContracts.getRelayAdaptCallError(
+        txidVersion,
+        receiptLogs,
+      );
     if (isDefined(relayAdaptError)) {
       sendErrorMessage(relayAdaptError);
       return relayAdaptError;
@@ -436,10 +466,16 @@ export const getRelayAdaptTransactionError = (
   }
 };
 
-export const parseRelayAdaptReturnValue = (data: string): Optional<string> => {
+export const parseRelayAdaptReturnValue = (
+  txidVersion: TXIDVersion,
+  data: string,
+): Optional<string> => {
   try {
     const relayAdaptErrorParsed =
-      RelayAdaptContract.parseRelayAdaptReturnValue(data);
+      RelayAdaptVersionedSmartContracts.parseRelayAdaptReturnValue(
+        txidVersion,
+        data,
+      );
     if (relayAdaptErrorParsed) {
       sendErrorMessage(relayAdaptErrorParsed.error);
       return relayAdaptErrorParsed.error;

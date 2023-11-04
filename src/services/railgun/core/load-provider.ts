@@ -11,10 +11,10 @@ import {
 import { sendMessage } from '../../../utils';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { WalletPOI } from '../../poi/wallet-poi';
-import { getRailgunSmartWalletContractForNetwork } from './contracts';
 import { getEngine } from './engine';
 import {
   PollingJsonRpcProvider,
+  RailgunVersionedSmartContracts,
   createPollingJsonRpcProviderForListeners,
 } from '@railgun-community/engine';
 import { FallbackProvider } from 'ethers';
@@ -84,9 +84,14 @@ const loadProviderForNetwork = async (
   const {
     proxyContract,
     relayAdaptContract,
+    poseidonMerkleAccumulatorV3Contract,
+    poseidonMerkleVerifierV3Contract,
+    tokenVaultV3Contract,
+    deploymentBlockPoseidonMerkleAccumulatorV3,
     deploymentBlock,
     publicName,
     poi,
+    supportsV3,
   } = network;
   if (!proxyContract) {
     throw new Error(`Could not find Proxy contract for network: ${publicName}`);
@@ -106,6 +111,8 @@ const loadProviderForNetwork = async (
 
   const deploymentBlocks: Record<TXIDVersion, number> = {
     [TXIDVersion.V2_PoseidonMerkle]: deploymentBlock ?? 0,
+    [TXIDVersion.V3_PoseidonMerkle]:
+      deploymentBlockPoseidonMerkleAccumulatorV3 ?? 0,
   };
 
   // This function will set up the contracts for this chain.
@@ -114,10 +121,14 @@ const loadProviderForNetwork = async (
     chain,
     proxyContract,
     relayAdaptContract,
+    poseidonMerkleAccumulatorV3Contract,
+    poseidonMerkleVerifierV3Contract,
+    tokenVaultV3Contract,
     fallbackProvider,
     pollingProvider,
     deploymentBlocks,
     poi?.launchBlock,
+    supportsV3,
   );
 
   // NOTE: This is an async call, but we need not await.
@@ -138,7 +149,7 @@ export const loadProvider = async (
   try {
     delete fallbackProviderMap[networkName];
 
-    const { chain } = NETWORK_CONFIG[networkName];
+    const { chain, supportsV3 } = NETWORK_CONFIG[networkName];
     if (fallbackProviderJsonConfig.chainId !== chain.id) {
       throw new Error('Invalid chain ID');
     }
@@ -150,19 +161,36 @@ export const loadProvider = async (
       pollingInterval,
     );
 
-    const railgunSmartWalletContract =
-      getRailgunSmartWalletContractForNetwork(networkName);
+    const { shield: shieldFeeV2, unshield: unshieldFeeV2 } =
+      await RailgunVersionedSmartContracts.fees(
+        TXIDVersion.V2_PoseidonMerkle,
+        chain,
+      );
 
-    const { shield, unshield, nft } = await railgunSmartWalletContract.fees();
+    if (supportsV3) {
+      const { shield: shieldFeeV3, unshield: unshieldFeeV3 } =
+        await RailgunVersionedSmartContracts.fees(
+          TXIDVersion.V3_PoseidonMerkle,
+          chain,
+        );
+
+      const feesSerialized = {
+        shieldFeeV2: shieldFeeV2.toString(),
+        unshieldFeeV2: unshieldFeeV2.toString(),
+        shieldFeeV3: shieldFeeV3?.toString(),
+        unshieldFeeV3: unshieldFeeV3?.toString(),
+      };
+      return { feesSerialized };
+    }
 
     // Note: Shield and Unshield fees are in basis points.
     // NFT fee is in wei (though currently 0).
     const feesSerialized = {
-      shield: shield.toString(),
-      unshield: unshield.toString(),
-      nft: nft.toString(),
+      shieldFeeV2: shieldFeeV2.toString(),
+      unshieldFeeV2: unshieldFeeV2.toString(),
+      shieldFeeV3: undefined,
+      unshieldFeeV3: undefined,
     };
-
     return { feesSerialized };
   } catch (err) {
     throw reportAndSanitizeError(loadProvider.name, err);

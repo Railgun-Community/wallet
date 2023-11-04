@@ -8,7 +8,6 @@ import {
   NetworkName,
   RailgunNFTAmount,
   RailgunERC20Recipient,
-  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   MOCK_NFT_AMOUNTS,
@@ -22,12 +21,13 @@ import {
   validateCachedProvedTransaction,
 } from '../proof-cache';
 import { ContractTransaction } from 'ethers';
+import { getTestTXIDVersion } from '../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const networkName = NetworkName.BNBChain;
-const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+const txidVersion = getTestTXIDVersion();
 const railgunWalletID = '123';
 const showSenderAddressToRecipient = true;
 const memoText = 'Some memo';

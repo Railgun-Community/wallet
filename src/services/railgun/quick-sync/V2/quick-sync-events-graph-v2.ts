@@ -1,23 +1,21 @@
 import { AccumulatedEvents, Chain } from '@railgun-community/engine';
 import {
   NetworkName,
-  TXIDVersion,
   isDefined,
   networkForChain,
-  promiseTimeout,
   removeUndefineds,
 } from '@railgun-community/shared-models';
-import { EMPTY_EVENTS } from './empty-events';
 import { getMeshOptions, getSdk } from './graphql';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
-  GraphCommitment,
-  GraphCommitmentBatch,
-  formatGraphCommitmentEvents,
-  formatGraphNullifierEvents,
-  formatGraphUnshieldEvents,
-} from './graph-type-formatters';
-import { removeDuplicatesByID } from '../util/graph-util';
+  GraphCommitmentV2,
+  GraphCommitmentBatchV2,
+  formatGraphCommitmentEventsV2,
+  formatGraphNullifierEventsV2,
+  formatGraphUnshieldEventsV2,
+} from './graph-type-formatters-v2';
+import { removeDuplicatesByID } from '../../util/graph-util';
+import { EMPTY_EVENTS, autoPaginatingQuery } from '../graph-query';
 
 const meshes: MapType<MeshInstance> = {};
 
@@ -32,9 +30,8 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.EthereumGoerli:
       return 'goerli';
     case NetworkName.EthereumSepolia:
-      // NOTE: Not supported by hosted service yet, but it is deployed.
-      // Enable by setting NETWORK_CONFIG hasGraphQuickSync to true.
-      return 'sepolia';
+      // return 'sepolia';
+      throw new Error('No Graph API hosted service for Sepolia');
     case NetworkName.BNBChain:
       return 'bsc';
     case NetworkName.Polygon:
@@ -52,21 +49,23 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
+const isSupportedByNetwork = (networkName: NetworkName) => {
+  try {
+    sourceNameForNetwork(networkName);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export const quickSyncEventsGraphV2 = async (
-  txidVersion: TXIDVersion,
   chain: Chain,
   startingBlock: number,
 ): Promise<AccumulatedEvents> => {
   const network = networkForChain(chain);
-  if (!network || !network.hasGraphQuickSync) {
+  if (!network || !isSupportedByNetwork(network.name)) {
     // Return empty logs, Engine will default to full scan.
     return EMPTY_EVENTS;
-  }
-
-  if (txidVersion !== TXIDVersion.V2_PoseidonMerkle) {
-    throw new Error(
-      'Only TXIDVersion.V2_PoseidonMerkle is supported by subgraph',
-    );
   }
 
   const sdk = getBuiltGraphSDK(network.name);
@@ -80,6 +79,7 @@ export const quickSyncEventsGraphV2 = async (
           })
         ).nullifiers,
       startingBlock.toString(),
+      MAX_QUERY_RESULTS,
     ),
     autoPaginatingQuery(
       async (blockNumber: string) =>
@@ -89,6 +89,7 @@ export const quickSyncEventsGraphV2 = async (
           })
         ).unshields,
       startingBlock.toString(),
+      MAX_QUERY_RESULTS,
     ),
     autoPaginatingQuery(
       async (blockNumber: string) =>
@@ -98,6 +99,7 @@ export const quickSyncEventsGraphV2 = async (
           })
         ).commitments,
       startingBlock.toString(),
+      MAX_QUERY_RESULTS,
     ),
   ]);
 
@@ -109,17 +111,19 @@ export const quickSyncEventsGraphV2 = async (
 
   graphCommitmentBatches.sort(sortByTreeNumberAndStartPosition);
 
-  const nullifierEvents = formatGraphNullifierEvents(filteredNullifiers);
-  const unshieldEvents = formatGraphUnshieldEvents(filteredUnshields);
-  const commitmentEvents = formatGraphCommitmentEvents(graphCommitmentBatches);
+  const nullifierEvents = formatGraphNullifierEventsV2(filteredNullifiers);
+  const unshieldEvents = formatGraphUnshieldEventsV2(filteredUnshields);
+  const commitmentEvents = formatGraphCommitmentEventsV2(
+    graphCommitmentBatches,
+  );
 
   return { nullifierEvents, unshieldEvents, commitmentEvents };
 };
 
 const createGraphCommitmentBatches = (
-  flattenedCommitments: GraphCommitment[],
-): GraphCommitmentBatch[] => {
-  const graphCommitmentMap: MapType<GraphCommitmentBatch> = {};
+  flattenedCommitments: GraphCommitmentV2[],
+): GraphCommitmentBatchV2[] => {
+  const graphCommitmentMap: MapType<GraphCommitmentBatchV2> = {};
   for (const commitment of flattenedCommitments) {
     const startPosition = commitment.batchStartTreePosition;
     const existingBatch = graphCommitmentMap[startPosition];
@@ -138,36 +142,9 @@ const createGraphCommitmentBatches = (
   return removeUndefineds(Object.values(graphCommitmentMap));
 };
 
-const autoPaginatingQuery = async <ReturnType extends { blockNumber: string }>(
-  query: (blockNumber: string) => Promise<ReturnType[]>,
-  blockNumber: string,
-  prevResults: ReturnType[] = [],
-): Promise<ReturnType[]> => {
-  const newResults = await promiseTimeout(
-    query(blockNumber),
-    20000,
-    new Error('Timeout querying Graph for QuickSync of RAILGUN Events'),
-  );
-  if (newResults.length === 0) {
-    return prevResults;
-  }
-
-  const totalResults = prevResults.concat(newResults);
-
-  const overLimit = totalResults.length >= MAX_QUERY_RESULTS;
-  const lastResult = totalResults[totalResults.length - 1];
-
-  const shouldQueryMore = newResults.length === 1000;
-  if (!overLimit && shouldQueryMore) {
-    return autoPaginatingQuery(query, lastResult.blockNumber, totalResults);
-  }
-
-  return totalResults;
-};
-
 const sortByTreeNumberAndStartPosition = (
-  a: GraphCommitmentBatch,
-  b: GraphCommitmentBatch,
+  a: GraphCommitmentBatchV2,
+  b: GraphCommitmentBatchV2,
 ) => {
   if (a.treeNumber < b.treeNumber) {
     return -1;

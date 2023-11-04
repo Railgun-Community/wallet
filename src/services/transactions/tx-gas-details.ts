@@ -6,16 +6,18 @@ import {
   getEVMGasTypeForTransaction,
   CommitmentSummary,
   TransactionGasDetails,
+  TXIDVersion,
 } from '@railgun-community/shared-models';
 import { getFallbackProviderForNetwork } from '../railgun';
 import { reportAndSanitizeError } from '../../utils/error';
 import {
   GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION,
-  RelayAdaptContract,
+  RelayAdaptVersionedSmartContracts,
 } from '@railgun-community/engine';
 import { ContractTransaction } from 'ethers';
 
 export const getGasEstimate = async (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   transaction: ContractTransaction,
   fromWalletAddress: string,
@@ -40,6 +42,7 @@ export const getGasEstimate = async (
 
   try {
     const gasEstimate = await estimateGas(
+      txidVersion,
       networkName,
       estimateGasTransactionRequest,
       isCrossContractCall,
@@ -51,6 +54,7 @@ export const getGasEstimate = async (
 };
 
 const estimateGas = (
+  txidVersion: TXIDVersion,
   networkName: NetworkName,
   transaction: ContractTransaction,
   isCrossContractCall: boolean,
@@ -58,7 +62,8 @@ const estimateGas = (
   const provider = getFallbackProviderForNetwork(networkName);
   if (isCrossContractCall) {
     // Includes custom error handler for relay-adapt transactions.
-    return RelayAdaptContract.estimateGasWithErrorHandler(
+    return RelayAdaptVersionedSmartContracts.estimateGasWithErrorHandler(
+      txidVersion,
       provider,
       transaction,
     );

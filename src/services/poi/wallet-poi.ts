@@ -3,14 +3,10 @@ import {
   POI,
   POIList,
   POINodeInterface,
+  MerklerootValidator,
 } from '@railgun-community/engine';
-import { MerklerootValidator } from '@railgun-community/engine/dist/models/merkletree-types';
 import { WalletPOIRequester } from './wallet-poi-requester';
-import {
-  Chain,
-  TXIDVersion,
-  POI_REQUIRED_LISTS,
-} from '@railgun-community/shared-models';
+import { POI_REQUIRED_LISTS } from '@railgun-community/shared-models';
 
 export class WalletPOI {
   static started = false;
@@ -51,22 +47,5 @@ export class WalletPOI {
       chain,
     ) => poiRequester.getLatestValidatedRailgunTxid(txidVersion, chain);
     return getLatestValidatedRailgunTxid;
-  };
-
-  static getPOIMerklerootsValidator = (poiNodeURL?: string) => {
-    const poiRequester = new WalletPOIRequester(poiNodeURL);
-    const validatePOIMerkleroots = (
-      txidVersion: TXIDVersion,
-      chain: Chain,
-      listKey: string,
-      poiMerkleroots: string[],
-    ) =>
-      poiRequester.validatePOIMerkleroots(
-        txidVersion,
-        chain,
-        listKey,
-        poiMerkleroots,
-      );
-    return validatePOIMerkleroots;
   };
 }

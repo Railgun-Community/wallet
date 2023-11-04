@@ -1,6 +1,7 @@
 import {
   Chain,
   RailgunTransaction,
+  RailgunTransactionV2,
   getRailgunTransactionIDHex,
 } from '@railgun-community/engine';
 import {
@@ -88,10 +89,10 @@ export const getRailgunTransactionsForTxid = async (
   return formattedRailgunTransactions;
 };
 
-export const quickSyncRailgunTransactions = async (
+export const quickSyncRailgunTransactionsV2 = async (
   chain: Chain,
   latestGraphID: Optional<string>,
-): Promise<RailgunTransaction[]> => {
+): Promise<RailgunTransactionV2[]> => {
   const network = networkForChain(chain);
   if (!network || !isDefined(network.poi)) {
     return [];
@@ -113,7 +114,7 @@ export const quickSyncRailgunTransactions = async (
   const filteredRailgunTransactions: GraphRailgunTransactions =
     removeDuplicatesByID(railgunTransactions);
 
-  const formattedRailgunTransactions: RailgunTransaction[] =
+  const formattedRailgunTransactions: RailgunTransactionV2[] =
     formatRailgunTransactions(filteredRailgunTransactions);
 
   return formattedRailgunTransactions;

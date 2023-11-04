@@ -1,0 +1,25 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-tests:
+    name: 🧪 Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+      - name: Install yarn
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install
+      - name: Yarn test
+        shell: bash
+        run: yarn test-V2
