@@ -3,10 +3,11 @@ import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
 import {
   RailgunWallet,
-  TransactionStruct,
   TransactionBatch,
-  RailgunSmartWalletContract,
-  RelayAdaptContract,
+  RelayAdaptVersionedSmartContracts,
+  TransactionStructV2,
+  TransactionStructV3,
+  RailgunVersionedSmartContracts,
 } from '@railgun-community/engine';
 import {
   RailgunERC20Amount,
@@ -16,20 +17,21 @@ import {
   RailgunNFTAmountRecipient,
   TransactionGasDetails,
   isDefined,
-  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   closeTestEngine,
   initTestEngine,
-  initTestEngineNetwork,
+  initTestEngineNetworks,
 } from '../../../tests/setup.test';
 import {
-  MOCK_BOUND_PARAMS,
+  MOCK_BOUND_PARAMS_V2,
+  MOCK_BOUND_PARAMS_V3,
   MOCK_COMMITMENTS,
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FEE_TOKEN_DETAILS,
-  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
+  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2,
+  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
   MOCK_MEMO,
   MOCK_MNEMONIC,
   MOCK_NFT_AMOUNT_RECIPIENTS,
@@ -53,6 +55,7 @@ import {
 import { setCachedProvedTransaction } from '../proof-cache';
 import * as txNotes from '../tx-notes';
 import { ContractTransaction, FallbackProvider } from 'ethers';
+import { getTestTXIDVersion, isV2Test } from '../../../tests/helper.test';
 
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
@@ -69,7 +72,7 @@ let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+const txidVersion = getTestTXIDVersion();
 
 const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
   {
@@ -140,7 +143,7 @@ describe('tx-transfer', () => {
   before(async function run() {
     this.timeout(5000);
     initTestEngine();
-    await initTestEngineNetwork();
+    await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
@@ -175,7 +178,7 @@ describe('tx-transfer', () => {
         {
           nullifiers: MOCK_NULLIFIERS,
         },
-      ] as TransactionStruct[],
+      ] as (TransactionStructV2 | TransactionStructV3)[],
       preTransactionPOIsPerTxidLeafPerList: {},
     });
     railDummyProveStub = Sinon.stub(
@@ -183,17 +186,18 @@ describe('tx-transfer', () => {
       'generateDummyTransactions',
     ).resolves([
       {
+        txidVersion,
         commitments: MOCK_COMMITMENTS,
-        boundParams: MOCK_BOUND_PARAMS,
+        boundParams: isV2Test() ? MOCK_BOUND_PARAMS_V2 : MOCK_BOUND_PARAMS_V3,
         nullifiers: MOCK_NULLIFIERS,
       },
-    ] as unknown as TransactionStruct[]);
+    ] as (TransactionStructV2 | TransactionStructV3)[]);
     railTransactStub = Sinon.stub(
-      RailgunSmartWalletContract.prototype,
-      'transact',
+      RailgunVersionedSmartContracts,
+      'generateTransact',
     ).resolves({ data: '0x0123' } as ContractTransaction);
     relayAdaptPopulateUnshieldBaseToken = Sinon.stub(
-      RelayAdaptContract.prototype,
+      RelayAdaptVersionedSmartContracts,
       'populateUnshieldBaseToken',
     ).resolves({ data: '0x0123' } as ContractTransaction);
   });
@@ -240,10 +244,12 @@ describe('tx-transfer', () => {
     expect(erc20NoteSpy.args[5][0].amount).to.equal(BigInt('0x200')); // token2
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
-      MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
+      isV2Test()
+        ? MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2
+        : MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
     );
-    // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimate).to.equal(7500n + 200n);
+    // Add 9000 for the dummy tx variance
+    expect(rsp.gasEstimate).to.equal(9000n + 200n);
   }).timeout(10000);
 
   it('Should get gas estimates for valid erc20 transfer: public wallet', async () => {
@@ -266,8 +272,8 @@ describe('tx-transfer', () => {
     expect(erc20NoteSpy.args[0][0].amount).to.equal(BigInt('0x100')); // token1
     expect(erc20NoteSpy.args[1][0].amount).to.equal(BigInt('0x200')); // token2
     expect(rsp.relayerFeeCommitment).to.be.undefined;
-    // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimate).to.equal(7500n + 200n);
+    // Add 9000 for the dummy tx variance
+    expect(rsp.gasEstimate).to.equal(9000n + 200n);
   }).timeout(10000);
 
   it('Should error on gas estimates for invalid erc20 transfer', async () => {
@@ -331,10 +337,12 @@ describe('tx-transfer', () => {
     expect(nftNoteSpy.args[3][0].tokenSubID).to.equal('0x02'); // nft2
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
-      MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
+      isV2Test()
+        ? MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2
+        : MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
     );
-    // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimate).to.equal(7500n + 200n);
+    // Add 9000 for the dummy tx variance
+    expect(rsp.gasEstimate).to.equal(9000n + 200n);
   }).timeout(10000);
 
   it('Should get gas estimates for valid NFT transfer: public wallet', async () => {
@@ -357,8 +365,8 @@ describe('tx-transfer', () => {
     expect(nftNoteSpy.args[0][0].tokenSubID).to.equal('0x01'); // nft1
     expect(nftNoteSpy.args[1][0].tokenSubID).to.equal('0x02'); // nft2
     expect(rsp.relayerFeeCommitment).to.be.undefined;
-    // Add 7500 for the dummy tx variance
-    expect(rsp.gasEstimate).to.equal(7500n + 200n);
+    // Add 9000 for the dummy tx variance
+    expect(rsp.gasEstimate).to.equal(9000n + 200n);
   }).timeout(10000);
 
   it('Should error on gas estimates for invalid NFT transfer', async () => {

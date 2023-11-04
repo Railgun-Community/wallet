@@ -18,11 +18,10 @@ import {
 } from './artifacts';
 import { ArtifactStore } from '../../artifacts/artifact-store';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { quickSyncEventsGraphV2 } from '../quick-sync/quick-sync-events-graph';
-import { quickSyncRailgunTransactions } from '../railgun-txids/railgun-txid-sync-graph';
+import { quickSyncEventsGraph } from '../quick-sync/quick-sync-events';
+import { quickSyncRailgunTransactionsV2 } from '../railgun-txids/railgun-txid-sync-graph-v2';
 import { WalletPOI } from '../../poi/wallet-poi';
 import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
-import { POIValidation } from '../../poi/poi-validation';
 import { setEngine, getEngine, hasEngine } from './engine';
 
 export type EngineDebugger = {
@@ -100,8 +99,8 @@ export const startRailgunEngine = (
       walletSource,
       db,
       artifactGetterDownloadJustInTime,
-      quickSyncEventsGraphV2,
-      quickSyncRailgunTransactions,
+      quickSyncEventsGraph,
+      quickSyncRailgunTransactionsV2,
       WalletPOI.getPOITxidMerklerootValidator(poiNodeURL),
       WalletPOI.getPOILatestValidatedRailgunTxid(poiNodeURL),
       shouldDebug ? createEngineDebugger() : undefined,
@@ -112,7 +111,6 @@ export const startRailgunEngine = (
     if (isDefined(poiNodeURL)) {
       const poiNodeInterface = new WalletPOINodeInterface(poiNodeURL);
       WalletPOI.init(poiNodeInterface, customPOILists ?? []);
-      POIValidation.init(WalletPOI.getPOIMerklerootsValidator(poiNodeURL));
     }
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngine.name, err);
@@ -134,8 +132,8 @@ export const startRailgunEngineForPOINode = (
     const engine = RailgunEngine.initForPOINode(
       db,
       artifactGetterDownloadJustInTime,
-      quickSyncEventsGraphV2,
-      quickSyncRailgunTransactions,
+      quickSyncEventsGraph,
+      quickSyncRailgunTransactionsV2,
       shouldDebug ? createEngineDebugger() : undefined,
     );
     setEngine(engine);

@@ -1,11 +1,11 @@
-import { Chain, RailgunTransaction } from '@railgun-community/engine';
+import { Chain, RailgunTransactionV2 } from '@railgun-community/engine';
 import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   getRailgunTxidsForUnshields,
-  quickSyncRailgunTransactions,
-} from '../railgun-txid-sync-graph';
+  quickSyncRailgunTransactionsV2,
+} from '../railgun-txid-sync-graph-v2';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -21,10 +21,8 @@ describe('railgun-txid-sync-graph', () => {
   });
 
   it('Should pull railgun txs subgraph query - Ethereum', async () => {
-    const railgunTxs: RailgunTransaction[] = await quickSyncRailgunTransactions(
-      ETH_CHAIN,
-      undefined,
-    );
+    const railgunTxs: RailgunTransactionV2[] =
+      await quickSyncRailgunTransactionsV2(ETH_CHAIN, undefined);
 
     expect(railgunTxs).to.be.an('array');
     expect(railgunTxs.length).to.equal(5000);
@@ -69,10 +67,8 @@ describe('railgun-txid-sync-graph', () => {
   }).timeout(20000);
 
   it('Should pull railgun txs subgraph query - Goerli', async () => {
-    const railgunTxs: RailgunTransaction[] = await quickSyncRailgunTransactions(
-      ETH_GOERLI_CHAIN,
-      undefined,
-    );
+    const railgunTxs: RailgunTransactionV2[] =
+      await quickSyncRailgunTransactionsV2(ETH_GOERLI_CHAIN, undefined);
 
     expect(railgunTxs).to.be.an('array');
     expect(railgunTxs.length).to.be.greaterThan(1000);

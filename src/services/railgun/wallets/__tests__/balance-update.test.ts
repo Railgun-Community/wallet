@@ -14,7 +14,6 @@ import {
   POIProofProgressEvent,
   RailgunBalancesEvent,
   RailgunWalletBalanceBucket,
-  TXIDVersion,
   isDefined,
 } from '@railgun-community/shared-models';
 import {
@@ -31,13 +30,14 @@ import {
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { loadProvider } from '../../core/load-provider';
+import { getTestTXIDVersion } from '../../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const MOCK_TOKEN_ADDRESS = '0x012536';
 
-const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+const txidVersion = getTestTXIDVersion();
 
 let wallet: RailgunWallet;
 

@@ -46,21 +46,4 @@ export class WalletPOIRequester {
       merkleroot: txidStatus.validatedMerkleroot,
     };
   }
-
-  async validatePOIMerkleroots(
-    txidVersion: TXIDVersion,
-    chain: Chain,
-    listKey: string,
-    poiMerkleroots: string[],
-  ): Promise<boolean> {
-    if (!this.poiNodeRequest) {
-      return false;
-    }
-    return this.poiNodeRequest.validatePOIMerkleroots(
-      txidVersion,
-      chain,
-      listKey,
-      poiMerkleroots,
-    );
-  }
 }

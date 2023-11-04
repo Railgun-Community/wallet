@@ -73,6 +73,16 @@ export class TestWalletPOINodeInterface extends POINodeInterface {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  async validatePOIMerkleroots(
+    txidVersion: TXIDVersion,
+    chain: Chain,
+    listKey: string,
+    poiMerkleroots: string[],
+  ): Promise<boolean> {
+    throw new Error('Could not validate POI merkleroots - no POI node');
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   async submitPOI(
     txidVersion: TXIDVersion,
     chain: Chain,

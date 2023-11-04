@@ -12,7 +12,7 @@ import {
 import {
   closeTestEngine,
   initTestEngine,
-  initTestEngineNetwork,
+  initTestEngineNetworks,
   pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
@@ -28,6 +28,7 @@ import {
   TransactionHistoryItemCategory,
   isDefined,
 } from '@railgun-community/shared-models';
+import { isV2Test } from '../../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -216,7 +217,7 @@ describe('transaction-history', () => {
   before(async function run() {
     this.timeout(90000);
     initTestEngine();
-    await initTestEngineNetwork();
+    await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
@@ -236,7 +237,12 @@ describe('transaction-history', () => {
   // TODO: improve reliability and speed of this test.
   // It currently downloads a large history from the Graph into a local DB.
   // We could cache this DB and use it for future tests, avoiding redownloads.
-  it('Should get wallet transaction history', async () => {
+  it('[V2] Should get wallet transaction history', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
+
     const items = await getWalletTransactionHistory(
       POLYGON_CHAIN,
       wallet.id,
@@ -252,6 +258,7 @@ describe('transaction-history', () => {
     const category = categoryForTransactionHistoryItem(MOCKED_UNKNOWN_SWAP_TRX);
     expect(category).to.equal(TransactionHistoryItemCategory.Unknown);
   });
+
   it('Should get TransferSendERC20s category for transaction history item', () => {
     const category = categoryForTransactionHistoryItem(
       MOCKED_TRANSFER_SEND_TRX,
@@ -260,10 +267,12 @@ describe('transaction-history', () => {
       TransactionHistoryItemCategory.TransferSendERC20s,
     );
   });
+
   it('Should get ShieldERC20s category for transaction history item', () => {
     const category = categoryForTransactionHistoryItem(MOCKED_SHIELD_TRX);
     expect(category).to.equal(TransactionHistoryItemCategory.ShieldERC20s);
   });
+
   it('Should get TransferReceiveERC20s category for transaction history item', () => {
     const category = categoryForTransactionHistoryItem(
       MOCKED_TRANSFER_RECEIVE_TRX,
@@ -272,6 +281,7 @@ describe('transaction-history', () => {
       TransactionHistoryItemCategory.TransferReceiveERC20s,
     );
   });
+
   it('Should get UnshieldERC20s category for transaction history item', () => {
     const category = categoryForTransactionHistoryItem(MOCKED_UNSHIELD_TRX);
     expect(category).to.equal(TransactionHistoryItemCategory.UnshieldERC20s);

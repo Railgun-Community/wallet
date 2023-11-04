@@ -18,7 +18,11 @@ import {
   generateUnshieldBaseToken,
 } from './tx-generator';
 import { populateProvedTransaction } from './proof-cache';
-import { randomHex, TransactionStruct } from '@railgun-community/engine';
+import {
+  randomHex,
+  TransactionStructV2,
+  TransactionStructV3,
+} from '@railgun-community/engine';
 import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
@@ -157,8 +161,9 @@ export const gasEstimateForUnprovenUnshield = async (
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
-      (txs: TransactionStruct[]) =>
+      (txs: (TransactionStructV2 | TransactionStructV3)[]) =>
         generateTransact(
+          txidVersion,
           txs,
           networkName,
           true, // useDummyProof
@@ -191,7 +196,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
-      createRelayAdaptUnshieldERC20AmountRecipients(networkName, [
+      createRelayAdaptUnshieldERC20AmountRecipients(txidVersion, networkName, [
         wrappedERC20Amount,
       ]);
 
@@ -216,9 +221,10 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
-      (txs: TransactionStruct[]) => {
+      (txs: (TransactionStructV2 | TransactionStructV3)[]) => {
         const relayAdaptParamsRandom = randomHex(31);
         return generateUnshieldBaseToken(
+          txidVersion,
           txs,
           networkName,
           publicWalletAddress,
@@ -356,12 +362,14 @@ export const gasEstimateForUnprovenUnshieldToOrigin = async (
       originalShieldTxid, // originShieldTxidForSpendabilityOverride
     );
     const transaction = await generateTransact(
+      txidVersion,
       serializedTransactions,
       networkName,
       true, // useDummyProof
     );
 
     const gasEstimate = await getGasEstimate(
+      txidVersion,
       networkName,
       transaction,
       fromWalletAddress,

@@ -3,11 +3,12 @@ import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub, SinonSpy } from 'sinon';
 import {
   RailgunWallet,
-  TransactionStruct,
   TransactionBatch,
-  RelayAdaptContract,
   getTokenDataERC20,
-  MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT,
+  MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2,
+  TransactionStructV2,
+  TransactionStructV3,
+  RelayAdaptVersionedSmartContracts,
 } from '@railgun-community/engine';
 import {
   RailgunERC20Amount,
@@ -17,21 +18,22 @@ import {
   RailgunERC20AmountRecipient,
   TransactionGasDetails,
   isDefined,
-  TXIDVersion,
 } from '@railgun-community/shared-models';
 import {
   closeTestEngine,
   initTestEngine,
-  initTestEngineNetwork,
+  initTestEngineNetworks,
 } from '../../../tests/setup.test';
 import {
-  MOCK_BOUND_PARAMS,
+  MOCK_BOUND_PARAMS_V2,
+  MOCK_BOUND_PARAMS_V3,
   MOCK_COMMITMENTS,
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ERC20_RECIPIENTS,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FEE_TOKEN_DETAILS,
-  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
+  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2,
+  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
   MOCK_MNEMONIC,
   MOCK_NFT_AMOUNTS,
   MOCK_NFT_AMOUNT_RECIPIENTS,
@@ -57,6 +59,7 @@ import {
 } from '../tx-cross-contract-calls';
 import FormattedRelayAdaptErrorLogs from './json/formatted-relay-adapt-error-logs.json';
 import { ContractTransaction, FallbackProvider } from 'ethers';
+import { getTestTXIDVersion, isV2Test } from '../../../tests/helper.test';
 
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
@@ -74,7 +77,7 @@ const polygonRelayAdaptContract =
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+const txidVersion = getTestTXIDVersion();
 
 const mockERC20TokenData0 = getTokenDataERC20(
   MOCK_TOKEN_AMOUNTS[0].tokenAddress,
@@ -115,7 +118,7 @@ const MOCK_TOKEN_AMOUNTS_DIFFERENT: RailgunERC20Amount[] = [
 
 const overallBatchMinGasPrice = BigInt('0x1000');
 
-const minGasLimit = MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT;
+const minGasLimit = MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2;
 
 const gasDetails: TransactionGasDetails = {
   evmGasType: EVMGasType.Type1,
@@ -145,7 +148,7 @@ describe('tx-cross-contract-calls', () => {
   before(async function run() {
     this.timeout(60000);
     initTestEngine();
-    await initTestEngineNetwork();
+    await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
@@ -179,7 +182,7 @@ describe('tx-cross-contract-calls', () => {
         {
           nullifiers: MOCK_NULLIFIERS,
         },
-      ] as TransactionStruct[],
+      ] as (TransactionStructV2 | TransactionStructV3)[],
       preTransactionPOIsPerTxidLeafPerList: {},
     });
     railDummyProveStub = Sinon.stub(
@@ -187,13 +190,14 @@ describe('tx-cross-contract-calls', () => {
       'generateDummyTransactions',
     ).resolves([
       {
+        txidVersion,
         commitments: MOCK_COMMITMENTS,
-        boundParams: MOCK_BOUND_PARAMS,
+        boundParams: isV2Test() ? MOCK_BOUND_PARAMS_V2 : MOCK_BOUND_PARAMS_V3,
         nullifiers: MOCK_NULLIFIERS,
       },
-    ] as unknown as TransactionStruct[]);
+    ] as (TransactionStructV2 | TransactionStructV3)[]);
     relayAdaptPopulateCrossContractCalls = Sinon.stub(
-      RelayAdaptContract.prototype,
+      RelayAdaptVersionedSmartContracts,
       'populateCrossContractCalls',
     ).resolves({ data: '0x0123' } as ContractTransaction);
   });
@@ -231,7 +235,9 @@ describe('tx-cross-contract-calls', () => {
     );
     expect(rsp.relayerFeeCommitment).to.not.be.undefined;
     expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
-      MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT,
+      isV2Test()
+        ? MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2
+        : MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
     );
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
@@ -300,8 +306,8 @@ describe('tx-cross-contract-calls', () => {
         },
       ], // run 2 - nft 1
     ]);
-    // Add 7500 for the dummy tx variance
-    // expect(rsp.gasEstimate).to.equal(7500n + 280n);
+    // Add 9000 for the dummy tx variance
+    // expect(rsp.gasEstimate).to.equal(9000n + 280n);
     expect(rsp.gasEstimate).to.equal(3_200_000n); // Cross Contract Minimum
   }).timeout(10000);
 
@@ -360,8 +366,8 @@ describe('tx-cross-contract-calls', () => {
         },
       ], // run 1 - nft 1
     ]);
-    // Add 7500 for the dummy tx variance
-    // expect(rsp.gasEstimate).to.equal(7500n + 280n);
+    // Add 9000 for the dummy tx variance
+    // expect(rsp.gasEstimate).to.equal(9000n + 280n);
     expect(rsp.gasEstimate).to.equal(3_200_000n); // Cross Contract Minimum
   }).timeout(10000);
 
@@ -612,6 +618,7 @@ describe('tx-cross-contract-calls', () => {
 
   it('Should decode and parse relay adapt error logs (from failed Sushi V2 LP removal)', () => {
     const transactionError = getRelayAdaptTransactionError(
+      txidVersion,
       FormattedRelayAdaptErrorLogs,
     );
     expect(transactionError).to.equal('ds-math-sub-underflow');
@@ -619,6 +626,7 @@ describe('tx-cross-contract-calls', () => {
 
   it('Should parse relay adapt log revert data', () => {
     const transactionError = parseRelayAdaptReturnValue(
+      txidVersion,
       `0x5c0dee5d00000000000000000000000000000000000000000000000000000000000000050000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000006408c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001564732d6d6174682d7375622d756e646572666c6f77000000000000000000000000000000000000000000000000000000000000000000000000000000`,
     );
     expect(transactionError).to.equal('ds-math-sub-underflow');
@@ -626,6 +634,7 @@ describe('tx-cross-contract-calls', () => {
 
   it('Should parse relay adapt revert data from railgun cookbook', () => {
     const transactionError = parseRelayAdaptReturnValue(
+      txidVersion,
       `0x5c0dee5d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000002d52656c617941646170743a205265667573696e6720746f2063616c6c205261696c67756e20636f6e747261637400000000000000000000000000000000000000`,
     );
     expect(transactionError).to.equal(

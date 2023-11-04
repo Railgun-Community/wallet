@@ -88,15 +88,13 @@ const transactionHistoryReceiveNFTToRailgunNFTAmount = (
 const transactionHistoryTransferTokenAmountToRailgunERC20Amount = (
   transactionHistoryTokenAmount: TransactionHistoryTransferTokenAmount,
 ): RailgunHistorySendERC20Amount => {
-  const walletSource =
-    transactionHistoryTokenAmount.noteAnnotationData?.walletSource;
   return {
     ...transactionHistoryTokenAmountToRailgunERC20Amount(
       transactionHistoryTokenAmount,
     ),
     recipientAddress: transactionHistoryTokenAmount.recipientAddress,
     memoText: transactionHistoryTokenAmount.memoText,
-    walletSource,
+    walletSource: transactionHistoryTokenAmount.walletSource,
     hasValidPOIForActiveLists:
       transactionHistoryTokenAmount.hasValidPOIForActiveLists,
   };
@@ -118,11 +116,10 @@ const transactionHistoryUnshieldTokenAmountToRailgunERC20Amount = (
 const transactionHistoryTransferNFTToRailgunNFTAmount = (
   transactionHistoryNFT: TransactionHistoryTransferTokenAmount,
 ): RailgunHistorySendNFTAmount => {
-  const walletSource = transactionHistoryNFT.noteAnnotationData?.walletSource;
   return {
     ...transactionHistoryNFTToRailgunNFTAmount(transactionHistoryNFT),
     memoText: transactionHistoryNFT.memoText,
-    walletSource,
+    walletSource: transactionHistoryNFT.walletSource,
     recipientAddress: transactionHistoryNFT.recipientAddress,
     hasValidPOIForActiveLists: transactionHistoryNFT.hasValidPOIForActiveLists,
   };

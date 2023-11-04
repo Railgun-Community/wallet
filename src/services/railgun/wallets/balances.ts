@@ -17,7 +17,7 @@ export const refreshRailgunBalances: RailgunBalanceRefreshTrigger = async (
   try {
     const wallet = walletForID(railgunWalletID);
     if (fullRescan) {
-      await wallet.fullRescanBalances(txidVersion, chain, progressCallback);
+      await wallet.fullRescanBalancesAllTXIDVersions(chain, progressCallback);
     } else {
       await wallet.scanBalances(txidVersion, chain, progressCallback);
     }

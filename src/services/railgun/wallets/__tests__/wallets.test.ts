@@ -20,7 +20,7 @@ import {
 import {
   closeTestEngine,
   initTestEngine,
-  initTestEngineNetwork,
+  initTestEngineNetworks,
 } from '../../../../tests/setup.test';
 import { RailgunWallet } from '@railgun-community/engine';
 import { NetworkName, isDefined } from '@railgun-community/shared-models';
@@ -34,7 +34,7 @@ describe('wallets', () => {
   before(async function run() {
     this.timeout(10000);
     initTestEngine();
-    await initTestEngineNetwork();
+    await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,

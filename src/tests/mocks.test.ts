@@ -8,12 +8,18 @@ import {
   RailgunNFTAmount,
   TransactionGasDetails,
   RailgunERC20Recipient,
+  XChaChaEncryptionAlgorithm,
 } from '@railgun-community/shared-models';
 import {
   BalancesUpdatedCallback,
   POIProofProgressCallback,
 } from '../services/railgun/wallets/balance-update';
-import { CommitmentCiphertext } from '@railgun-community/engine';
+import {
+  CommitmentCiphertextV2,
+  CommitmentCiphertextV3,
+} from '@railgun-community/engine';
+import { BoundParamsStruct } from '@railgun-community/engine/dist/abi/typechain/RailgunSmartWallet';
+import { PoseidonMerkleVerifier } from '@railgun-community/engine/dist/abi/typechain';
 
 export const MOCK_MNEMONIC =
   'test test test test test test test test test test test junk';
@@ -96,7 +102,7 @@ export const MOCK_NULLIFIERS: string[] = [
   '0x0000000000000000000000000000000000000000000000000000000000000002',
 ];
 
-export const MOCK_BOUND_PARAMS = {
+export const MOCK_BOUND_PARAMS_V2 = {
   commitmentCiphertext: [
     {
       ciphertext: [
@@ -116,10 +122,25 @@ export const MOCK_BOUND_PARAMS = {
   ],
 };
 
+export const MOCK_BOUND_PARAMS_V3 = {
+  local: {
+    commitmentCiphertext: [
+      {
+        ciphertext:
+          '0x7d6854cd1fc49f0602ccd933422ed2e2ee070a9f1806843d5c81c082531349508f54329134103720a7dac44d6f2a632ff18e7599b9bc1bf39d639e998a223b80ed1ec36daf72e389fc567b2b5507fb6bff80b601bd3c0c441e4e97f28551f2f2ede74ef3a06347178de5e4204f6bf8c475be62bcdb9911bd31be952f2e8af096',
+        blindedSenderViewingKey:
+          '0x898bc07d416014a2854f756b9f8873bde925b043e9e01ea6d97183b91217b5b6',
+        blindedReceiverViewingKey:
+          '0x898bc07d416014a2854f756b9f8873bde925b043e9e01ea6d97183b91217b5b6',
+      },
+    ],
+  },
+};
+
 export const MOCK_COMMITMENT_HASH =
   '0x2b13bccd4974c797df42a89221ed6e19e50c32055058cdcc5a8ea836233e4cab';
 
-export const MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT: CommitmentCiphertext =
+export const MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2: CommitmentCiphertextV2 =
   {
     annotationData:
       '0xfaeb57df19481f9ad59b8619a5687b2623aa2280d0df93aa77258326df9e6657bbdb72d305e1373906a47c6e684c34c2553c7e061baac1f744e8ece042c6',
@@ -137,6 +158,20 @@ export const MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT: CommitmentCiphert
       tag: 'ee070a9f1806843d5c81c08253134950',
     },
     memo: '0x',
+  };
+
+export const MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3: CommitmentCiphertextV3 =
+  {
+    blindedReceiverViewingKey:
+      '898bc07d416014a2854f756b9f8873bde925b043e9e01ea6d97183b91217b5b6',
+    blindedSenderViewingKey:
+      '898bc07d416014a2854f756b9f8873bde925b043e9e01ea6d97183b91217b5b6',
+    ciphertext: {
+      algorithm: XChaChaEncryptionAlgorithm.XChaChaPoly1305,
+      nonce: '7d6854cd1fc49f0602ccd933422ed2e2',
+      bundle:
+        'ee070a9f1806843d5c81c082531349508f54329134103720a7dac44d6f2a632ff18e7599b9bc1bf39d639e998a223b80ed1ec36daf72e389fc567b2b5507fb6bff80b601bd3c0c441e4e97f28551f2f2ede74ef3a06347178de5e4204f6bf8c475be62bcdb9911bd31be952f2e8af096',
+    },
   };
 
 export const MOCK_NFT_AMOUNT_RECIPIENTS: RailgunNFTAmountRecipient[] =

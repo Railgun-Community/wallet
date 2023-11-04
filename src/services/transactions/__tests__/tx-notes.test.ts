@@ -1,6 +1,5 @@
 import {
   OutputType,
-  Memo,
   ByteLength,
   padToLength,
   RailgunEngine,
@@ -17,12 +16,11 @@ import {
   MOCK_MEMO,
   MOCK_MNEMONIC,
   MOCK_RAILGUN_WALLET_ADDRESS,
-  TEST_WALLET_SOURCE,
 } from '../../../tests/mocks.test';
 import {
   closeTestEngine,
   initTestEngine,
-  initTestEngineNetwork,
+  initTestEngineNetworks,
 } from '../../../tests/setup.test';
 import {
   createRailgunWallet,
@@ -52,7 +50,7 @@ describe('tx-notes', () => {
   before(async function run() {
     this.timeout(10000);
     initTestEngine();
-    await initTestEngineNetwork();
+    await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
@@ -78,7 +76,6 @@ describe('tx-notes', () => {
       true, // showSenderAddressToRecipient
       MOCK_MEMO,
     );
-    const viewingPrivateKey = railgunWallet.getViewingKeyPair().privateKey;
 
     const addressData = RailgunEngine.decodeAddress(
       MOCK_RAILGUN_WALLET_ADDRESS,
@@ -89,15 +86,6 @@ describe('tx-notes', () => {
       addressData.masterPublicKey,
     );
     expect(note.tokenHash).to.equal(padTo32BytesUnHex(MOCK_TOKEN));
-
-    const decrypted = Memo.decryptNoteAnnotationData(
-      note.annotationData,
-      viewingPrivateKey,
-    );
-
-    expect(decrypted?.outputType).to.equal(OutputType.Transfer);
-    expect(decrypted?.senderRandom).to.be.a('string');
-    expect(decrypted?.walletSource).to.equal(TEST_WALLET_SOURCE);
   });
 
   it('Should test NFT note creation', () => {
@@ -114,7 +102,6 @@ describe('tx-notes', () => {
       true, // showSenderAddressToRecipient
       MOCK_MEMO,
     );
-    const viewingPrivateKey = railgunWallet.getViewingKeyPair().privateKey;
 
     const addressData = RailgunEngine.decodeAddress(
       MOCK_RAILGUN_WALLET_ADDRESS,
@@ -125,15 +112,6 @@ describe('tx-notes', () => {
       addressData.masterPublicKey,
     );
     expect(note.tokenHash).to.equal(padTo32BytesUnHex(MOCK_TOKEN));
-
-    const decrypted = Memo.decryptNoteAnnotationData(
-      note.annotationData,
-      viewingPrivateKey,
-    );
-
-    expect(decrypted?.outputType).to.equal(OutputType.Transfer);
-    expect(decrypted?.senderRandom).to.be.a('string');
-    expect(decrypted?.walletSource).to.equal(TEST_WALLET_SOURCE);
   });
 
   it('Should test token array comparisons', () => {
