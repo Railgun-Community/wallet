@@ -63,12 +63,14 @@ export const rescanFullUTXOMerkletreesAndWallets = async (
   }
 };
 
-export const resetFullTXIDMerkletrees = async (chain: Chain): Promise<void> => {
+export const resetFullTXIDMerkletreesV2 = async (
+  chain: Chain,
+): Promise<void> => {
   try {
     const engine = getEngine();
-    await engine.fullResetTXIDMerkletrees(chain);
+    await engine.fullResetTXIDMerkletreesV2(chain);
   } catch (err) {
-    throw reportAndSanitizeError(resetFullTXIDMerkletrees.name, err);
+    throw reportAndSanitizeError(resetFullTXIDMerkletreesV2.name, err);
   }
 };
 
