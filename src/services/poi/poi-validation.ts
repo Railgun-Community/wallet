@@ -21,6 +21,7 @@ import {
 } from '../railgun/process/extract-transaction-data';
 import { ContractTransaction } from 'ethers';
 import { walletForID } from '../railgun/wallets/wallets';
+import { sendErrorMessage } from '../../utils';
 
 export type POIMerklerootsValidator = (
   txidVersion: TXIDVersion,
@@ -95,6 +96,7 @@ export class POIValidation {
       if (!(err instanceof Error)) {
         throw err;
       }
+      sendErrorMessage(err);
       return {
         isValid: false,
         error: `Could not validate spendable TXID: ${err.message}`,
