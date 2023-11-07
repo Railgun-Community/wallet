@@ -15,6 +15,7 @@ import {
   ValidatePOIMerklerootsParams,
   SingleCommitmentProofsData,
   SubmitSingleCommitmentProofsParams,
+  delay,
 } from '@railgun-community/shared-models';
 import axios, { AxiosError } from 'axios';
 import { sendErrorMessage } from '../../utils';
@@ -105,14 +106,30 @@ export class POINodeRequest {
     chain: Chain,
     listKey: string,
     poiMerkleroots: string[],
+    retryCount = 0,
   ): Promise<boolean> => {
-    const route = `validate-poi-merkleroots/${chain.type}/${chain.id}`;
-    const url = this.getNodeRouteURL(route);
-    const validated = await POINodeRequest.postRequest<
-      ValidatePOIMerklerootsParams,
-      boolean
-    >(url, { txidVersion, listKey, poiMerkleroots });
-    return validated;
+    try {
+      const route = `validate-poi-merkleroots/${chain.type}/${chain.id}`;
+      const url = this.getNodeRouteURL(route);
+      const validated = await POINodeRequest.postRequest<
+        ValidatePOIMerklerootsParams,
+        boolean
+      >(url, { txidVersion, listKey, poiMerkleroots });
+      return validated;
+    } catch (err) {
+      if (retryCount < 3) {
+        // Delay 2.5s and try again.
+        await delay(2500);
+        return this.validatePOIMerkleroots(
+          txidVersion,
+          chain,
+          listKey,
+          poiMerkleroots,
+          retryCount + 1,
+        );
+      }
+      throw err;
+    }
   };
 
   getPOIsPerList = async (
