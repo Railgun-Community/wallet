@@ -55,6 +55,7 @@ export const formatGraphRailgunTransactionEventsV3 = (
       Number(railgunTransaction.utxoTreeIn),
       Number(railgunTransaction.utxoTreeOut),
       Number(railgunTransaction.utxoBatchStartPositionOut),
+      railgunTransaction.verificationHash,
     );
   });
 };
