@@ -18,8 +18,6 @@ import {
   CommitmentCiphertextV2,
   CommitmentCiphertextV3,
 } from '@railgun-community/engine';
-import { BoundParamsStruct } from '@railgun-community/engine/dist/abi/typechain/RailgunSmartWallet';
-import { PoseidonMerkleVerifier } from '@railgun-community/engine/dist/abi/typechain';
 
 export const MOCK_MNEMONIC =
   'test test test test test test test test test test test junk';

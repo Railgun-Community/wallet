@@ -6,7 +6,6 @@ import {
   getEVMGasTypeForTransaction,
   CommitmentSummary,
   TransactionGasDetails,
-  NETWORK_CONFIG,
   TXIDVersion,
 } from '@railgun-community/shared-models';
 import { getFallbackProviderForNetwork } from '../railgun';

@@ -49,14 +49,14 @@ import {
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { MaticTypes } from './.graphclient/sources/matic/types';
-import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
-import type { SepoliaTypes } from './.graphclient/sources/sepolia/types';
-import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
-import type { GoerliTypes } from './.graphclient/sources/goerli/types';
 import type { MumbaiTypes } from './.graphclient/sources/mumbai/types';
-import type { BscTypes } from './.graphclient/sources/bsc/types';
+import type { MaticTypes } from './.graphclient/sources/matic/types';
+import type { GoerliTypes } from './.graphclient/sources/goerli/types';
+import type { ArbitrumGoerliTypes } from './.graphclient/sources/arbitrum-goerli/types';
 import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
+import type { BscTypes } from './.graphclient/sources/bsc/types';
+import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
+import type { SepoliaTypes } from './.graphclient/sources/sepolia/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -2771,14 +2771,14 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
   derivedFrom?: derivedFromDirectiveResolver<any, any, ContextType>;
 }>;
 
-export type MeshContext = ArbitrumGoerliTypes.Context &
-  EthereumTypes.Context &
-  GoerliTypes.Context &
-  MaticTypes.Context &
-  MumbaiTypes.Context &
-  ArbitrumOneTypes.Context &
+export type MeshContext = MumbaiTypes.Context &
+  ArbitrumGoerliTypes.Context &
   BscTypes.Context &
   SepoliaTypes.Context &
+  MaticTypes.Context &
+  GoerliTypes.Context &
+  ArbitrumOneTypes.Context &
+  EthereumTypes.Context &
   BaseMeshContext;
 
 const baseDir = pathModule.join(
@@ -2796,26 +2796,12 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     .join('/')
     .replace(baseDir + '/', '');
   switch (relativeModuleId) {
-    case '.graphclient/sources/arbitrum-goerli/introspectionSchema':
-      return import(
-        './.graphclient/sources/arbitrum-goerli/introspectionSchema'
-      ) as T;
-
-    case '.graphclient/sources/ethereum/introspectionSchema':
-      return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
-
-    case '.graphclient/sources/goerli/introspectionSchema':
-      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
-
-    case '.graphclient/sources/matic/introspectionSchema':
-      return import('./.graphclient/sources/matic/introspectionSchema') as T;
-
     case '.graphclient/sources/mumbai/introspectionSchema':
       return import('./.graphclient/sources/mumbai/introspectionSchema') as T;
 
-    case '.graphclient/sources/arbitrum-one/introspectionSchema':
+    case '.graphclient/sources/arbitrum-goerli/introspectionSchema':
       return import(
-        './.graphclient/sources/arbitrum-one/introspectionSchema'
+        './.graphclient/sources/arbitrum-goerli/introspectionSchema'
       ) as T;
 
     case '.graphclient/sources/bsc/introspectionSchema':
@@ -2823,6 +2809,20 @@ const importFn: ImportFn = <T>(moduleId: string) => {
 
     case '.graphclient/sources/sepolia/introspectionSchema':
       return import('./.graphclient/sources/sepolia/introspectionSchema') as T;
+
+    case '.graphclient/sources/matic/introspectionSchema':
+      return import('./.graphclient/sources/matic/introspectionSchema') as T;
+
+    case '.graphclient/sources/goerli/introspectionSchema':
+      return import('./.graphclient/sources/goerli/introspectionSchema') as T;
+
+    case '.graphclient/sources/arbitrum-one/introspectionSchema':
+      return import(
+        './.graphclient/sources/arbitrum-one/introspectionSchema'
+      ) as T;
+
+    case '.graphclient/sources/ethereum/introspectionSchema':
+      return import('./.graphclient/sources/ethereum/introspectionSchema') as T;
 
     default:
       return Promise.reject(

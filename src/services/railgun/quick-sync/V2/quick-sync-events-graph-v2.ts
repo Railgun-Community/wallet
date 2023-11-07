@@ -8,11 +8,11 @@ import {
 import { getMeshOptions, getSdk } from './graphql';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
-  GraphCommitment,
-  GraphCommitmentBatch,
-  formatGraphCommitmentEvents,
-  formatGraphNullifierEvents,
-  formatGraphUnshieldEvents,
+  GraphCommitmentV2,
+  GraphCommitmentBatchV2,
+  formatGraphCommitmentEventsV2,
+  formatGraphNullifierEventsV2,
+  formatGraphUnshieldEventsV2,
 } from './graph-type-formatters-v2';
 import { removeDuplicatesByID } from '../../util/graph-util';
 import { EMPTY_EVENTS, autoPaginatingQuery } from '../graph-query';
@@ -111,17 +111,19 @@ export const quickSyncEventsGraphV2 = async (
 
   graphCommitmentBatches.sort(sortByTreeNumberAndStartPosition);
 
-  const nullifierEvents = formatGraphNullifierEvents(filteredNullifiers);
-  const unshieldEvents = formatGraphUnshieldEvents(filteredUnshields);
-  const commitmentEvents = formatGraphCommitmentEvents(graphCommitmentBatches);
+  const nullifierEvents = formatGraphNullifierEventsV2(filteredNullifiers);
+  const unshieldEvents = formatGraphUnshieldEventsV2(filteredUnshields);
+  const commitmentEvents = formatGraphCommitmentEventsV2(
+    graphCommitmentBatches,
+  );
 
   return { nullifierEvents, unshieldEvents, commitmentEvents };
 };
 
 const createGraphCommitmentBatches = (
-  flattenedCommitments: GraphCommitment[],
-): GraphCommitmentBatch[] => {
-  const graphCommitmentMap: MapType<GraphCommitmentBatch> = {};
+  flattenedCommitments: GraphCommitmentV2[],
+): GraphCommitmentBatchV2[] => {
+  const graphCommitmentMap: MapType<GraphCommitmentBatchV2> = {};
   for (const commitment of flattenedCommitments) {
     const startPosition = commitment.batchStartTreePosition;
     const existingBatch = graphCommitmentMap[startPosition];
@@ -141,8 +143,8 @@ const createGraphCommitmentBatches = (
 };
 
 const sortByTreeNumberAndStartPosition = (
-  a: GraphCommitmentBatch,
-  b: GraphCommitmentBatch,
+  a: GraphCommitmentBatchV2,
+  b: GraphCommitmentBatchV2,
 ) => {
   if (a.treeNumber < b.treeNumber) {
     return -1;

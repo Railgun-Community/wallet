@@ -59,91 +59,87 @@ describe('providers', () => {
     },
   ).timeout(20000);
 
-  it.only(
-    'Should load provider with json, pull fees, and check created objects',
-    async () => {
-      const response = await loadProvider(
-        MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
-        NetworkName.PolygonMumbai,
-        10000, // pollingInterval
-      );
-      expect(response.feesSerialized).to.deep.equal({
-        shieldFeeV2: '25',
-        unshieldFeeV2: '25',
-        shieldFeeV3: '25',
-        unshieldFeeV3: '25',
-      });
+  it('Should load provider with json, pull fees, and check created objects', async () => {
+    const response = await loadProvider(
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
+      NetworkName.PolygonMumbai,
+      10000, // pollingInterval
+    );
+    expect(response.feesSerialized).to.deep.equal({
+      shieldFeeV2: '25',
+      unshieldFeeV2: '25',
+      shieldFeeV3: '25',
+      unshieldFeeV3: '25',
+    });
 
-      expect(getFallbackProviderForNetwork(NetworkName.PolygonMumbai)).to.not.be
-        .undefined;
-      expect(() =>
-        getFallbackProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
-      ).to.throw;
+    expect(getFallbackProviderForNetwork(NetworkName.PolygonMumbai)).to.not.be
+      .undefined;
+    expect(() =>
+      getFallbackProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
+    ).to.throw;
 
+    expect(getUTXOMerkletreeForNetwork(txidVersion, NetworkName.PolygonMumbai))
+      .to.not.be.undefined;
+    expect(() =>
+      getUTXOMerkletreeForNetwork(
+        txidVersion,
+        NetworkName.EthereumRopsten_DEPRECATED,
+      ),
+    ).to.throw;
+
+    // expect(getTXIDMerkletreeForNetwork(txidVersion, NetworkName.PolygonMumbai))
+    //   .to.be.undefined; // Until poi.launchBlock is defined.
+    expect(() =>
+      getTXIDMerkletreeForNetwork(
+        txidVersion,
+        NetworkName.EthereumRopsten_DEPRECATED,
+      ),
+    ).to.throw;
+
+    const { chain } = NETWORK_CONFIG[NetworkName.PolygonMumbai];
+    expect(
+      RailgunVersionedSmartContracts.getShieldApprovalContract(
+        txidVersion,
+        chain,
+      ),
+    ).to.not.be.undefined;
+
+    if (isV2Test()) {
+      // TODO-V3: Remove when ready
       expect(
-        getUTXOMerkletreeForNetwork(txidVersion, NetworkName.PolygonMumbai),
-      ).to.not.be.undefined;
-      expect(() =>
-        getUTXOMerkletreeForNetwork(
-          txidVersion,
-          NetworkName.EthereumRopsten_DEPRECATED,
-        ),
-      ).to.throw;
-
-      // expect(getTXIDMerkletreeForNetwork(txidVersion, NetworkName.PolygonMumbai))
-      //   .to.be.undefined; // Until poi.launchBlock is defined.
-      expect(() =>
-        getTXIDMerkletreeForNetwork(
-          txidVersion,
-          NetworkName.EthereumRopsten_DEPRECATED,
-        ),
-      ).to.throw;
-
-      const { chain } = NETWORK_CONFIG[NetworkName.PolygonMumbai];
-      expect(
-        RailgunVersionedSmartContracts.getShieldApprovalContract(
+        RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
           txidVersion,
           chain,
         ),
       ).to.not.be.undefined;
+    }
 
-      if (isV2Test()) {
-        // TODO-V3: Remove when ready
-        expect(
-          RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
-            txidVersion,
-            chain,
-          ),
-        ).to.not.be.undefined;
-      }
+    const { chain: chainEthereumRopsten } =
+      NETWORK_CONFIG[NetworkName.EthereumRopsten_DEPRECATED];
+    expect(() =>
+      RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
+        txidVersion,
+        chainEthereumRopsten,
+      ),
+    ).to.throw;
 
-      const { chain: chainEthereumRopsten } =
-        NETWORK_CONFIG[NetworkName.EthereumRopsten_DEPRECATED];
-      expect(() =>
-        RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
-          txidVersion,
-          chainEthereumRopsten,
-        ),
-      ).to.throw;
-
-      // Check that new wallet has merkletree.
-      const railgunWalletInfo = await createRailgunWallet(
-        MOCK_DB_ENCRYPTION_KEY,
-        MOCK_MNEMONIC_PROVIDERS_ONLY,
-        undefined, // creationBlockNumbers
-      );
-      if (!isDefined(railgunWalletInfo)) {
-        throw new Error('Expected railgunWalletInfo.');
-      }
-      const wallet = walletForID(railgunWalletInfo.id);
-      expect(
-        wallet.getUTXOMerkletree(
-          txidVersion,
-          NETWORK_CONFIG[NetworkName.PolygonMumbai].chain,
-        ),
-      ).to.not.be.undefined;
-    },
-  ).timeout(15000);
+    // Check that new wallet has merkletree.
+    const railgunWalletInfo = await createRailgunWallet(
+      MOCK_DB_ENCRYPTION_KEY,
+      MOCK_MNEMONIC_PROVIDERS_ONLY,
+      undefined, // creationBlockNumbers
+    );
+    if (!isDefined(railgunWalletInfo)) {
+      throw new Error('Expected railgunWalletInfo.');
+    }
+    const wallet = walletForID(railgunWalletInfo.id);
+    expect(
+      wallet.getUTXOMerkletree(
+        txidVersion,
+        NETWORK_CONFIG[NetworkName.PolygonMumbai].chain,
+      ),
+    ).to.not.be.undefined;
+  }).timeout(15000);
 
   it('Should fail with invalid chain ID', async () => {
     await expect(

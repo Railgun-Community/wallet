@@ -35,4 +35,4 @@ sources:
         endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-sepolia
 
 documents:
-  - ./quick-sync-query.graphql
+  - ./quick-sync-query-V2.graphql

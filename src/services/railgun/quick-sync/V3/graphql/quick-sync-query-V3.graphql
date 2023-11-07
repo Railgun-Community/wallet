@@ -1,0 +1,125 @@
+query Nullifiers($blockNumber: BigInt = 0) {
+  nullifiers(
+    orderBy: blockNumber
+    where: { blockNumber_gte: $blockNumber }
+    first: 1000
+  ) {
+    id
+    blockNumber
+    blockTimestamp
+    transactionHash
+    treeNumber
+    nullifier
+  }
+}
+
+query Unshields($blockNumber: BigInt = 0) {
+  unshields(
+    orderBy: blockNumber
+    where: { blockNumber_gte: $blockNumber }
+    first: 1000
+  ) {
+    id
+    blockNumber
+    blockTimestamp
+    to
+    transactionHash
+    fee
+    value
+    transactIndex
+    token {
+      id
+      tokenType
+      tokenSubID
+      tokenAddress
+    }
+  }
+}
+
+query Commitments($blockNumber: BigInt = 0) {
+  commitments(
+    orderBy: blockNumber
+    where: { blockNumber_gte: $blockNumber }
+    first: 1000
+  ) {
+    id
+    treeNumber
+    blockNumber
+    transactionHash
+    blockTimestamp
+    ... on ShieldCommitment {
+      id
+      blockNumber
+      blockTimestamp
+      transactionHash
+      treeNumber
+      treePosition
+      commitmentType
+      hashes
+      shieldKey
+      fee
+      encryptedBundle
+      from
+      preimage {
+        id
+        npk
+        value
+        token {
+          id
+          tokenType
+          tokenSubID
+          tokenAddress
+        }
+      }
+    }
+    ... on TransactCommitment {
+      id
+      blockNumber
+      blockTimestamp
+      transactionHash
+      treeNumber
+      batchStartTreePosition
+      transactIndex
+      commitmentType
+      senderCiphertext
+      hashes
+      commitmentCiphertexts {
+        id
+        ciphertext
+        blindedSenderViewingKey
+        blindedReceiverViewingKey
+      }
+    }
+  }
+}
+
+query RailgunTransactions($blockNumber: BigInt = 0) {
+  railgunTransactions(
+    orderBy: blockNumber
+    where: { blockNumber_gte: $blockNumber }
+    first: 1000
+  ) {
+    id
+    blockNumber
+    blockTimestamp
+    transactionHash
+    blockNumber
+    blockTimestamp
+    nullifiers
+    commitments
+    boundParamsHash
+    hasUnshield
+    utxoTreeIn
+    utxoTreeOut
+    utxoBatchStartPositionOut
+    unshieldToken {
+      id
+      tokenType
+      tokenAddress
+      tokenSubID
+    }
+    unshieldToAddress
+    unshieldValue
+    verificationHash
+  }
+}

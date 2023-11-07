@@ -16,7 +16,6 @@ import {
 } from './tx-generator';
 import { populateProvedTransaction } from './proof-cache';
 import {
-  TransactionStruct,
   TransactionStructV2,
   TransactionStructV3,
 } from '@railgun-community/engine';

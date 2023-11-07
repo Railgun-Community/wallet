@@ -5,8 +5,8 @@ import {
   formatToByteLength,
 } from '@railgun-community/engine';
 import { GetRailgunTransactionsAfterGraphIDQuery } from './graphql';
-import { graphTokenTypeToEngineTokenType } from '../quick-sync/V2/graph-type-formatters-v2';
 import { getAddress } from 'ethers';
+import { graphTokenTypeToEngineTokenType } from '../quick-sync/shared-formatters';
 
 export type GraphRailgunTransactions =
   GetRailgunTransactionsAfterGraphIDQuery['transactions'];

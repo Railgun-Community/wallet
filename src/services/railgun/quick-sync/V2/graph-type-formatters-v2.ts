@@ -3,68 +3,52 @@ import {
   UnshieldStoredEvent,
   CommitmentEvent,
   Commitment,
-  TokenType,
   LegacyGeneratedCommitment,
   CommitmentType,
   LegacyEncryptedCommitment,
   ShieldCommitment,
   TransactCommitmentV2,
-  PreImage,
-  TokenData,
-  ByteLength,
   CommitmentCiphertextV2,
   Ciphertext,
-  formatToByteLength,
   LegacyCommitmentCiphertext,
-  serializeTokenData,
-  serializePreImage,
 } from '@railgun-community/engine';
 import {
-  Nullifier as GraphNullifier,
-  Unshield as GraphUnshield,
-  TokenType as GraphTokenType,
-  LegacyGeneratedCommitment as GraphLegacyGeneratedCommitment,
-  LegacyEncryptedCommitment as GraphLegacyEncryptedCommitment,
-  ShieldCommitment as GraphShieldCommitment,
-  TransactCommitment as GraphTransactCommitment,
-  CommitmentPreimage as GraphCommitmentPreimage,
-  LegacyCommitmentCiphertext as GraphLegacyCommitmentCiphertext,
-  CommitmentCiphertext as GraphCommitmentCiphertext,
-  Ciphertext as GraphCiphertext,
-  Token as GraphToken,
+  Nullifier as GraphNullifierV2,
+  Unshield as GraphUnshieldV2,
+  LegacyGeneratedCommitment as GraphLegacyGeneratedCommitmentV2,
+  LegacyEncryptedCommitment as GraphLegacyEncryptedCommitmentV2,
+  ShieldCommitment as GraphShieldCommitmentV2,
+  TransactCommitment as GraphTransactCommitmentV2,
+  LegacyCommitmentCiphertext as GraphLegacyCommitmentCiphertextV2,
+  CommitmentCiphertext as GraphCommitmentCiphertextV2,
+  Ciphertext as GraphCiphertextV2,
 } from './graphql';
 import { getAddress } from 'ethers';
 import { isDefined } from '@railgun-community/shared-models';
+import {
+  formatTo32Bytes,
+  bigIntStringToHex,
+  formatTo16Bytes,
+  formatPreImage,
+  graphTokenTypeToEngineTokenType,
+} from '../shared-formatters';
 
-export type GraphCommitment =
-  | GraphLegacyEncryptedCommitment
-  | GraphLegacyGeneratedCommitment
-  | GraphShieldCommitment
-  | GraphTransactCommitment;
+export type GraphCommitmentV2 =
+  | GraphLegacyEncryptedCommitmentV2
+  | GraphLegacyGeneratedCommitmentV2
+  | GraphShieldCommitmentV2
+  | GraphTransactCommitmentV2;
 
-export type GraphCommitmentBatch = {
+export type GraphCommitmentBatchV2 = {
   transactionHash: string;
-  commitments: GraphCommitment[];
+  commitments: GraphCommitmentV2[];
   treeNumber: number;
   startPosition: number;
   blockNumber: number;
 };
 
-export const graphTokenTypeToEngineTokenType = (
-  graphTokenType: GraphTokenType,
-): TokenType => {
-  switch (graphTokenType) {
-    case 'ERC20':
-      return TokenType.ERC20;
-    case 'ERC721':
-      return TokenType.ERC721;
-    case 'ERC1155':
-      return TokenType.ERC1155;
-  }
-};
-
-export const formatGraphNullifierEvents = (
-  nullifiers: GraphNullifier[],
+export const formatGraphNullifierEventsV2 = (
+  nullifiers: GraphNullifierV2[],
 ): Nullifier[] => {
   return nullifiers.map(nullifier => {
     return {
@@ -77,8 +61,8 @@ export const formatGraphNullifierEvents = (
   });
 };
 
-export const formatGraphUnshieldEvents = (
-  unshields: GraphUnshield[],
+export const formatGraphUnshieldEventsV2 = (
+  unshields: GraphUnshieldV2[],
 ): UnshieldStoredEvent[] => {
   return unshields.map(unshield => {
     return {
@@ -99,8 +83,8 @@ export const formatGraphUnshieldEvents = (
   });
 };
 
-export const formatGraphCommitmentEvents = (
-  graphCommitmentBatches: GraphCommitmentBatch[],
+export const formatGraphCommitmentEventsV2 = (
+  graphCommitmentBatches: GraphCommitmentBatchV2[],
 ): CommitmentEvent[] => {
   return graphCommitmentBatches.map(graphCommitmentBatch => {
     return {
@@ -113,51 +97,24 @@ export const formatGraphCommitmentEvents = (
   });
 };
 
-const formatCommitment = (commitment: GraphCommitment): Commitment => {
+const formatCommitment = (commitment: GraphCommitmentV2): Commitment => {
   switch (commitment.commitmentType) {
     case 'LegacyGeneratedCommitment':
       return formatLegacyGeneratedCommitment(
-        commitment as GraphLegacyGeneratedCommitment,
+        commitment as GraphLegacyGeneratedCommitmentV2,
       );
     case 'LegacyEncryptedCommitment':
       return formatLegacyEncryptedCommitment(
-        commitment as GraphLegacyEncryptedCommitment,
+        commitment as GraphLegacyEncryptedCommitmentV2,
       );
     case 'ShieldCommitment':
-      return formatShieldCommitment(commitment as GraphShieldCommitment);
+      return formatShieldCommitment(commitment as GraphShieldCommitmentV2);
     case 'TransactCommitment':
-      return formatTransactCommitment(commitment as GraphTransactCommitment);
+      return formatTransactCommitment(commitment as GraphTransactCommitmentV2);
   }
 };
 
-// const formatToken = (graphToken: GraphToken): TokenData => {
-//   return {
-//     tokenAddress: graphToken.tokenAddress,
-//     tokenType: formatTo20Bytes(
-//       graphTokenTypeToEngineTokenType(graphToken.tokenType).toString(),
-//       true,
-//     ) as unknown as TokenType,
-//     tokenSubID: formatTo20Bytes(graphToken.tokenSubID, true),
-//   };
-// };
-
-const formatSerializedToken = (graphToken: GraphToken): TokenData => {
-  return serializeTokenData(
-    graphToken.tokenAddress,
-    graphTokenTypeToEngineTokenType(graphToken.tokenType),
-    graphToken.tokenSubID,
-  );
-};
-
-const formatPreImage = (graphPreImage: GraphCommitmentPreimage): PreImage => {
-  return serializePreImage(
-    graphPreImage.npk,
-    formatSerializedToken(graphPreImage.token),
-    BigInt(graphPreImage.value),
-  );
-};
-
-const formatCiphertext = (graphCiphertext: GraphCiphertext): Ciphertext => {
+const formatCiphertext = (graphCiphertext: GraphCiphertextV2): Ciphertext => {
   return {
     iv: formatTo16Bytes(graphCiphertext.iv, false),
     tag: formatTo16Bytes(graphCiphertext.tag, false),
@@ -165,16 +122,8 @@ const formatCiphertext = (graphCiphertext: GraphCiphertext): Ciphertext => {
   };
 };
 
-const formatTo16Bytes = (value: string, prefix: boolean) => {
-  return formatToByteLength(value, ByteLength.UINT_128, prefix);
-};
-
-const formatTo32Bytes = (value: string, prefix: boolean) => {
-  return formatToByteLength(value, ByteLength.UINT_256, prefix);
-};
-
 const formatLegacyCommitmentCiphertext = (
-  graphLegacyCommitmentCiphertext: GraphLegacyCommitmentCiphertext,
+  graphLegacyCommitmentCiphertext: GraphLegacyCommitmentCiphertextV2,
 ): LegacyCommitmentCiphertext => {
   return {
     ciphertext: formatCiphertext(graphLegacyCommitmentCiphertext.ciphertext),
@@ -188,7 +137,7 @@ const formatLegacyCommitmentCiphertext = (
 };
 
 const formatCommitmentCiphertext = (
-  graphCommitmentCiphertext: GraphCommitmentCiphertext,
+  graphCommitmentCiphertext: GraphCommitmentCiphertextV2,
 ): CommitmentCiphertextV2 => {
   return {
     ciphertext: formatCiphertext(graphCommitmentCiphertext.ciphertext),
@@ -205,12 +154,8 @@ const formatCommitmentCiphertext = (
   };
 };
 
-const bigIntStringToHex = (bigintString: string): string => {
-  return `0x${BigInt(bigintString).toString(16)}`;
-};
-
 const formatLegacyGeneratedCommitment = (
-  commitment: GraphLegacyGeneratedCommitment,
+  commitment: GraphLegacyGeneratedCommitmentV2,
 ): LegacyGeneratedCommitment => {
   return {
     txid: formatTo32Bytes(commitment.transactionHash, false),
@@ -229,7 +174,7 @@ const formatLegacyGeneratedCommitment = (
 };
 
 const formatLegacyEncryptedCommitment = (
-  commitment: GraphLegacyEncryptedCommitment,
+  commitment: GraphLegacyEncryptedCommitmentV2,
 ): LegacyEncryptedCommitment => {
   return {
     txid: formatTo32Bytes(commitment.transactionHash, false),
@@ -245,7 +190,7 @@ const formatLegacyEncryptedCommitment = (
 };
 
 const formatShieldCommitment = (
-  commitment: GraphShieldCommitment,
+  commitment: GraphShieldCommitmentV2,
 ): ShieldCommitment => {
   const shieldCommitment: ShieldCommitment = {
     txid: formatTo32Bytes(commitment.transactionHash, false),
@@ -259,6 +204,7 @@ const formatShieldCommitment = (
     fee: isDefined(commitment.fee) ? commitment.fee.toString() : undefined,
     utxoTree: commitment.treeNumber,
     utxoIndex: commitment.treePosition,
+    from: undefined,
   };
   if (!isDefined(shieldCommitment.fee)) {
     delete shieldCommitment.fee;
@@ -267,7 +213,7 @@ const formatShieldCommitment = (
 };
 
 const formatTransactCommitment = (
-  commitment: GraphTransactCommitment,
+  commitment: GraphTransactCommitmentV2,
 ): TransactCommitmentV2 => {
   return {
     txid: formatTo32Bytes(commitment.transactionHash, false),

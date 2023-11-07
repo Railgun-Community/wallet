@@ -1,67 +1,60 @@
-import { Chain, CommitmentEvent } from '@railgun-community/engine';
+import { Chain, CommitmentEvent, TXIDVersion } from '@railgun-community/engine';
 import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { getTestTXIDVersion, isV2Test } from '../../../../tests/helper.test';
-import { quickSyncEventsGraph } from '../quick-sync-events';
+import { quickSyncEventsGraph } from '../../quick-sync-events';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const txidVersion = getTestTXIDVersion();
-
-// TODO-V3: When graph is ready on V3, we should change the "0s" below to match the appropriate number of events.
+const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 const ETH_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Ethereum].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_ETH = isV2Test() ? 4400 : 0;
-const EXPECTED_NULLIFIER_EVENTS_ETH = isV2Test() ? 3000 : 0;
-const EXPECTED_UNSHIELD_EVENTS_ETH = isV2Test() ? 1 : 0;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_ETH = 4400;
+const EXPECTED_NULLIFIER_EVENTS_ETH = 3000;
+const EXPECTED_UNSHIELD_EVENTS_ETH = 1;
 
 const POLYGON_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Polygon].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON = isV2Test() ? 5290 : 0;
-const EXPECTED_NULLIFIER_EVENTS_POLYGON = isV2Test() ? 4000 : 0;
-const EXPECTED_UNSHIELD_EVENTS_POLYGON = isV2Test() ? 1 : 0;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON = 5290;
+const EXPECTED_NULLIFIER_EVENTS_POLYGON = 4000;
+const EXPECTED_UNSHIELD_EVENTS_POLYGON = 1;
 
 const BNB_CHAIN: Chain = NETWORK_CONFIG[NetworkName.BNBChain].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_BNB = isV2Test() ? 1850 : 0;
-const EXPECTED_NULLIFIER_EVENTS_BNB = isV2Test() ? 1200 : 0;
-const EXPECTED_UNSHIELD_EVENTS_BNB = isV2Test() ? 1 : 0;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_BNB = 1850;
+const EXPECTED_NULLIFIER_EVENTS_BNB = 1200;
+const EXPECTED_UNSHIELD_EVENTS_BNB = 1;
 
 const POLYGON_MUMBAI_CHAIN: Chain =
   NETWORK_CONFIG[NetworkName.PolygonMumbai].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON_MUMBAI = isV2Test() ? 1000 : 0;
-const EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI = isV2Test() ? 100 : 0;
-const EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI = isV2Test() ? 1 : 0;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON_MUMBAI = 1000;
+const EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI = 100;
+const EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI = 1;
 
 const ARBITRUM_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Arbitrum].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM = isV2Test() ? 150 : 0;
-const EXPECTED_NULLIFIER_EVENTS_ARBITRUM = isV2Test() ? 40 : 0;
-const EXPECTED_UNSHIELD_EVENTS_ARBITRUM = isV2Test() ? 1 : 0;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM = 150;
+const EXPECTED_NULLIFIER_EVENTS_ARBITRUM = 40;
+const EXPECTED_UNSHIELD_EVENTS_ARBITRUM = 1;
 
 const GOERLI_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumGoerli].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_GOERLI = isV2Test() ? 80 : 0;
-const EXPECTED_NULLIFIER_EVENTS_GOERLI = isV2Test() ? 40 : 0;
-const EXPECTED_UNSHIELD_EVENTS_GOERLI = isV2Test() ? 1 : 0;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_GOERLI = 80;
+const EXPECTED_NULLIFIER_EVENTS_GOERLI = 40;
+const EXPECTED_UNSHIELD_EVENTS_GOERLI = 1;
 
 const SEPOLIA_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumSepolia].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = isV2Test() ? 0 : 0; // TODO: Add some here
-const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = isV2Test() ? 0 : 0; // TODO: Add some here
-const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = isV2Test() ? 0 : 0; // TODO: Add some here
+const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0; // TODO: Add some
+const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0; // TODO: Add some
+const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 0; // TODO: Add some
 
 const ARBITRUM_GOERLI_CHAIN: Chain =
   NETWORK_CONFIG[NetworkName.ArbitrumGoerli].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM_GOERLI = isV2Test() ? 80 : 0;
-const EXPECTED_NULLIFIER_EVENTS_ARBITRUM_GOERLI = isV2Test() ? 40 : 0;
-const EXPECTED_UNSHIELD_EVENTS_ARBITRUM_GOERLI = isV2Test() ? 1 : 0;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM_GOERLI = 80;
+const EXPECTED_NULLIFIER_EVENTS_ARBITRUM_GOERLI = 40;
+const EXPECTED_UNSHIELD_EVENTS_ARBITRUM_GOERLI = 1;
 
 const assertContiguousCommitmentEvents = (
   commitmentEvents: CommitmentEvent[],
   shouldThrow: boolean,
 ) => {
-  if (!isV2Test()) {
-    // TODO-V3: Remove this when V3 is ready.
-    return;
-  }
   let nextTreeNumber = commitmentEvents[0].treeNumber;
   let nextStartPosition = commitmentEvents[0].startPosition;
   for (const event of commitmentEvents) {
@@ -93,8 +86,8 @@ const assertContiguousCommitmentEvents = (
   }
 };
 
-describe('quick-sync-events-graph', () => {
-  it('Should make sure Graph query has no data gaps in commitments - Ethereum', async () => {
+describe('quick-sync-events-graph-v2', () => {
+  it('Should make sure Graph V2 query has no data gaps in commitments - Ethereum', async () => {
     // const eventLog = await quickSyncEventsGraph(txidVersion, ETH_CHAIN, 0);
     const eventLog = await quickSyncEventsGraph(
       txidVersion,
@@ -117,7 +110,7 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Polygon', async () => {
+  it('Should make sure Graph V2 query has no data gaps in commitments - Polygon', async () => {
     const eventLog = await quickSyncEventsGraph(txidVersion, POLYGON_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
@@ -138,7 +131,7 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - BNB Smart Chain', async () => {
+  it('Should make sure Graph V2 query has no data gaps in commitments - BNB Smart Chain', async () => {
     const eventLog = await quickSyncEventsGraph(txidVersion, BNB_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
@@ -156,7 +149,7 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Polygon Mumbai', async () => {
+  it('Should make sure Graph V2 query has no data gaps in commitments - Polygon Mumbai', async () => {
     const eventLog = await quickSyncEventsGraph(
       txidVersion,
       POLYGON_MUMBAI_CHAIN,
@@ -178,7 +171,7 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Arbitrum', async () => {
+  it('Should make sure Graph V2 query has no data gaps in commitments - Arbitrum', async () => {
     const eventLog = await quickSyncEventsGraph(txidVersion, ARBITRUM_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
@@ -196,7 +189,7 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Goerli', async () => {
+  it('Should make sure Graph V2 query has no data gaps in commitments - Goerli', async () => {
     const eventLog = await quickSyncEventsGraph(txidVersion, GOERLI_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
@@ -214,7 +207,7 @@ describe('quick-sync-events-graph', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Sepolia', async () => {
+  it('Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async () => {
     const eventLog = await quickSyncEventsGraph(txidVersion, SEPOLIA_CHAIN, 0);
     expect(eventLog).to.be.an('object');
     expect(eventLog.commitmentEvents).to.be.an('array');
@@ -233,7 +226,7 @@ describe('quick-sync-events-graph', () => {
     // assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
 
-  it('Should make sure Graph query has no data gaps in commitments - Arbitrum Goerli', async () => {
+  it('Should make sure Graph V2 query has no data gaps in commitments - Arbitrum Goerli', async () => {
     const eventLog = await quickSyncEventsGraph(
       txidVersion,
       ARBITRUM_GOERLI_CHAIN,
