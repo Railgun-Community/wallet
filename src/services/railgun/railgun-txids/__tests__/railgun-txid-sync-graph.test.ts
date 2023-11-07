@@ -3,6 +3,7 @@ import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
+  getRailgunTransactionDataForUnshieldToAddress,
   getRailgunTxidsForUnshields,
   quickSyncRailgunTransactions,
 } from '../railgun-txid-sync-graph';
@@ -119,6 +120,34 @@ describe('railgun-txid-sync-graph', () => {
 
     expect(unshieldRailgunTxids).to.deep.equal([
       '08fd7312f96ac8b36f2544a0acaeba0ed0ea57eb5bde0452a240c7a0f3640ae3',
+    ]);
+  }).timeout(20000);
+
+  it('Should pull unshield railgun txids for unshield to address - Goerli', async () => {
+    const unshieldRailgunTxids =
+      await getRailgunTransactionDataForUnshieldToAddress(
+        ETH_GOERLI_CHAIN,
+        '0xE251BaFD15A1e011f23F9c68673aAf2Fa00C1D03',
+      );
+    expect(unshieldRailgunTxids).to.deep.equal([
+      {
+        txid: '0x6804db8a9439d54d0c2e93fdf9d94ccdae2605ff69242523a836b327960f9536',
+        railgunTxids: [
+          '2ee7e0b1d8fffaa86be346f18e34f84850a1ddc4928ae8d458576d98c665e441',
+        ],
+      },
+      {
+        txid: '0x930c463cf7231ee76b3048b55f3519f665e9235d976fb0d033ee7bf2044f5ce6',
+        railgunTxids: [
+          '03641108fee0b24318a940335d7632378de2e3dda752696adcbbf842b78ea1f5',
+        ],
+      },
+      {
+        txid: '0x0a06115c7e1dee85ccef2c7ec6d8c7bfe88606ea6256672e9f1cbb2052aa1e58',
+        railgunTxids: [
+          '0bed5fcf04a9aeb990c212bb61de2cb157ce9a207adc2c13f55ed72eab4c4265',
+        ],
+      },
     ]);
   }).timeout(20000);
 });
