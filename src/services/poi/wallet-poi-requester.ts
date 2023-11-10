@@ -5,9 +5,9 @@ import { TXIDVersion, isDefined } from '@railgun-community/shared-models';
 export class WalletPOIRequester {
   private poiNodeRequest: Optional<POINodeRequest>;
 
-  constructor(poiNodeURL?: string) {
-    this.poiNodeRequest = isDefined(poiNodeURL)
-      ? new POINodeRequest(poiNodeURL)
+  constructor(poiNodeURLs?: string[]) {
+    this.poiNodeRequest = isDefined(poiNodeURLs)
+      ? new POINodeRequest(poiNodeURLs)
       : undefined;
   }
 

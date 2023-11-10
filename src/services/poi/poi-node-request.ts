@@ -22,14 +22,17 @@ import { sendErrorMessage } from '../../utils';
 import { LegacyTransactProofData } from '@railgun-community/engine';
 
 export class POINodeRequest {
-  private nodeURL: string;
+  private nodeURLs: string[];
 
-  constructor(nodeURL: string) {
-    this.nodeURL = nodeURL;
+  constructor(nodeURLs: string[]) {
+    this.nodeURLs = nodeURLs;
   }
 
-  private getNodeRouteURL = (route: string): string => {
-    return `${this.nodeURL}/${route}`;
+  private getNodeRouteURL = (
+    route: string,
+    nodeUrlAttemptIndex: number,
+  ): string => {
+    return `${this.nodeURLs[nodeUrlAttemptIndex]}/${route}`;
   };
 
   // private static async getRequest<ResponseData>(
@@ -66,6 +69,41 @@ export class POINodeRequest {
     }
   }
 
+  private async attemptRequestWithFallbacks<Params, ResponseData>(
+    route: string,
+    params: Params,
+    nodeUrlAttemptIndex = 0,
+    finalAttempt = false,
+  ): Promise<ResponseData> {
+    try {
+      const url = this.getNodeRouteURL(route, nodeUrlAttemptIndex);
+      const res = POINodeRequest.postRequest<Params, ResponseData>(url, params);
+      return res;
+    } catch (err) {
+      if (finalAttempt) {
+        throw err;
+      }
+
+      // If nodeUrlAttemptIndex is already at the last index, try one final time with the priority 0 nodeUrl
+      if (nodeUrlAttemptIndex === this.nodeURLs.length - 1) {
+        return this.attemptRequestWithFallbacks(
+          route,
+          params,
+          0, // nodeUrlAttemptIndex
+          true, // finalAttempt
+        );
+      }
+
+      // Retry with next priority node URL.
+      return this.attemptRequestWithFallbacks(
+        route,
+        params,
+        nodeUrlAttemptIndex + 1, // nodeUrlAttemptIndex
+        false, // finalAttempt
+      );
+    }
+  }
+
   validateRailgunTxidMerkleroot = async (
     txidVersion: TXIDVersion,
     chain: Chain,
@@ -74,11 +112,10 @@ export class POINodeRequest {
     merkleroot: string,
   ): Promise<boolean> => {
     const route = `validate-txid-merkleroot/${chain.type}/${chain.id}`;
-    const url = this.getNodeRouteURL(route);
-    const isValid = await POINodeRequest.postRequest<
+    const isValid = await this.attemptRequestWithFallbacks<
       ValidateTxidMerklerootParams,
       boolean
-    >(url, {
+    >(route, {
       txidVersion,
       tree,
       index,
@@ -92,11 +129,10 @@ export class POINodeRequest {
     chain: Chain,
   ): Promise<ValidatedRailgunTxidStatus> => {
     const route = `validated-txid/${chain.type}/${chain.id}`;
-    const url = this.getNodeRouteURL(route);
-    const status = await POINodeRequest.postRequest<
+    const status = await this.attemptRequestWithFallbacks<
       GetLatestValidatedRailgunTxidParams,
       ValidatedRailgunTxidStatus
-    >(url, { txidVersion });
+    >(route, { txidVersion });
     return status;
   };
 
@@ -109,11 +145,10 @@ export class POINodeRequest {
   ): Promise<boolean> => {
     try {
       const route = `validate-poi-merkleroots/${chain.type}/${chain.id}`;
-      const url = this.getNodeRouteURL(route);
-      const validated = await POINodeRequest.postRequest<
+      const validated = await this.attemptRequestWithFallbacks<
         ValidatePOIMerklerootsParams,
         boolean
-      >(url, { txidVersion, listKey, poiMerkleroots });
+      >(route, { txidVersion, listKey, poiMerkleroots });
       return validated;
     } catch (cause) {
       if (retryCount < 3) {
@@ -138,12 +173,11 @@ export class POINodeRequest {
     blindedCommitmentDatas: BlindedCommitmentData[],
   ): Promise<POIsPerListMap> => {
     const route = `pois-per-list/${chain.type}/${chain.id}`;
-    const url = this.getNodeRouteURL(route);
 
-    const poiStatusListMap = await POINodeRequest.postRequest<
+    const poiStatusListMap = await this.attemptRequestWithFallbacks<
       GetPOIsPerListParams,
       POIsPerListMap
-    >(url, {
+    >(route, {
       txidVersion,
       listKeys,
       blindedCommitmentDatas,
@@ -158,12 +192,11 @@ export class POINodeRequest {
     blindedCommitments: string[],
   ): Promise<MerkleProof[]> => {
     const route = `merkle-proofs/${chain.type}/${chain.id}`;
-    const url = this.getNodeRouteURL(route);
 
-    const merkleProofs = await POINodeRequest.postRequest<
+    const merkleProofs = await this.attemptRequestWithFallbacks<
       GetMerkleProofsParams,
       MerkleProof[]
-    >(url, {
+    >(route, {
       txidVersion,
       listKey,
       blindedCommitments,
@@ -178,13 +211,15 @@ export class POINodeRequest {
     transactProofData: TransactProofData,
   ) => {
     const route = `submit-transact-proof/${chain.type}/${chain.id}`;
-    const url = this.getNodeRouteURL(route);
 
-    await POINodeRequest.postRequest<SubmitTransactProofParams, void>(url, {
-      txidVersion,
-      listKey,
-      transactProofData,
-    });
+    await this.attemptRequestWithFallbacks<SubmitTransactProofParams, void>(
+      route,
+      {
+        txidVersion,
+        listKey,
+        transactProofData,
+      },
+    );
   };
 
   submitLegacyTransactProofs = async (
@@ -194,16 +229,15 @@ export class POINodeRequest {
     legacyTransactProofDatas: LegacyTransactProofData[],
   ) => {
     const route = `submit-legacy-transact-proofs/${chain.type}/${chain.id}`;
-    const url = this.getNodeRouteURL(route);
 
-    await POINodeRequest.postRequest<SubmitLegacyTransactProofParams, void>(
-      url,
-      {
-        txidVersion,
-        listKeys,
-        legacyTransactProofDatas,
-      },
-    );
+    await this.attemptRequestWithFallbacks<
+      SubmitLegacyTransactProofParams,
+      void
+    >(route, {
+      txidVersion,
+      listKeys,
+      legacyTransactProofDatas,
+    });
   };
 
   submitSingleCommitmentProof = async (
@@ -212,14 +246,13 @@ export class POINodeRequest {
     singleCommitmentProofsData: SingleCommitmentProofsData,
   ) => {
     const route = `submit-single-commitment-proofs/${chain.type}/${chain.id}`;
-    const url = this.getNodeRouteURL(route);
 
-    await POINodeRequest.postRequest<SubmitSingleCommitmentProofsParams, void>(
-      url,
-      {
-        txidVersion,
-        singleCommitmentProofsData,
-      },
-    );
+    await this.attemptRequestWithFallbacks<
+      SubmitSingleCommitmentProofsParams,
+      void
+    >(route, {
+      txidVersion,
+      singleCommitmentProofsData,
+    });
   };
 }

@@ -18,9 +18,9 @@ export class WalletPOI {
   }
 
   static getPOITxidMerklerootValidator = (
-    poiNodeURL?: string,
+    poiNodeURLs?: string[],
   ): MerklerootValidator => {
-    const poiRequester = new WalletPOIRequester(poiNodeURL);
+    const poiRequester = new WalletPOIRequester(poiNodeURLs);
     const txidMerklerootValidator: MerklerootValidator = (
       txidVersion,
       chain,
@@ -39,9 +39,9 @@ export class WalletPOI {
   };
 
   static getPOILatestValidatedRailgunTxid = (
-    poiNodeURL?: string,
+    poiNodeURLs?: string[],
   ): GetLatestValidatedRailgunTxid => {
-    const poiRequester = new WalletPOIRequester(poiNodeURL);
+    const poiRequester = new WalletPOIRequester(poiNodeURLs);
     const getLatestValidatedRailgunTxid: GetLatestValidatedRailgunTxid = (
       txidVersion,
       chain,
