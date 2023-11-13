@@ -12,7 +12,7 @@ import { getFallbackProviderForNetwork } from '../railgun';
 import { reportAndSanitizeError } from '../../utils/error';
 import {
   GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION,
-  RelayAdaptVersionedSmartContracts,
+  RailgunVersionedSmartContracts,
 } from '@railgun-community/engine';
 import { ContractTransaction } from 'ethers';
 
@@ -62,7 +62,7 @@ const estimateGas = (
   const provider = getFallbackProviderForNetwork(networkName);
   if (isCrossContractCall) {
     // Includes custom error handler for relay-adapt transactions.
-    return RelayAdaptVersionedSmartContracts.estimateGasWithErrorHandler(
+    return RailgunVersionedSmartContracts.estimateGasWithErrorHandler(
       txidVersion,
       provider,
       transaction,

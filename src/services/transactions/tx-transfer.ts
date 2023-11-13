@@ -96,6 +96,7 @@ export const gasEstimateForUnprovenTransfer = async (
           relayerFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          [], // crossContractCallsV3 - unused for transfer
         ),
       (txs: (TransactionStructV2 | TransactionStructV3)[]) =>
         generateTransact(

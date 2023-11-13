@@ -87,6 +87,8 @@ const loadProviderForNetwork = async (
     poseidonMerkleAccumulatorV3Contract,
     poseidonMerkleVerifierV3Contract,
     tokenVaultV3Contract,
+    // TODO-V3: Add RelayAdapt contract address for V3 to shared-models.
+    // poseidonMerkleAdaptV3Contract,
     deploymentBlockPoseidonMerkleAccumulatorV3,
     deploymentBlock,
     publicName,
@@ -101,6 +103,9 @@ const loadProviderForNetwork = async (
       `Could not find Relay Adapt contract for network: ${publicName}`,
     );
   }
+
+  // TODO-V3: Remove this.
+  const poseidonMerkleAdaptV3Contract = '0x1234';
 
   const engine = getEngine();
   if (!engine.isPOINode && isDefined(poi) && !WalletPOI.started) {
@@ -124,6 +129,7 @@ const loadProviderForNetwork = async (
     poseidonMerkleAccumulatorV3Contract,
     poseidonMerkleVerifierV3Contract,
     tokenVaultV3Contract,
+    poseidonMerkleAdaptV3Contract,
     fallbackProvider,
     pollingProvider,
     deploymentBlocks,

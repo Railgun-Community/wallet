@@ -8,7 +8,7 @@ import {
   MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2,
   TransactionStructV2,
   TransactionStructV3,
-  RelayAdaptVersionedSmartContracts,
+  RailgunVersionedSmartContracts,
 } from '@railgun-community/engine';
 import {
   RailgunERC20Amount,
@@ -64,7 +64,7 @@ import { getTestTXIDVersion, isV2Test } from '../../../tests/helper.test';
 let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
-let relayAdaptPopulateCrossContractCalls: SinonStub;
+let relayAdaptPopulateCrossContractCallsV2: SinonStub;
 let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
@@ -196,9 +196,9 @@ describe('tx-cross-contract-calls', () => {
         nullifiers: MOCK_NULLIFIERS,
       },
     ] as (TransactionStructV2 | TransactionStructV3)[]);
-    relayAdaptPopulateCrossContractCalls = Sinon.stub(
-      RelayAdaptVersionedSmartContracts,
-      'populateCrossContractCalls',
+    relayAdaptPopulateCrossContractCallsV2 = Sinon.stub(
+      RailgunVersionedSmartContracts,
+      'populateV2CrossContractCalls',
     ).resolves({ data: '0x0123' } as ContractTransaction);
   });
   afterEach(() => {
@@ -209,7 +209,7 @@ describe('tx-cross-contract-calls', () => {
   after(async () => {
     railProveStub.restore();
     railDummyProveStub.restore();
-    relayAdaptPopulateCrossContractCalls.restore();
+    relayAdaptPopulateCrossContractCallsV2.restore();
     await closeTestEngine();
   });
 

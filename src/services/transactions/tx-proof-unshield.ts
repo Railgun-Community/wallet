@@ -19,7 +19,7 @@ import { assertValidEthAddress } from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
 import {
   AdaptID,
-  RelayAdaptVersionedSmartContracts,
+  RailgunVersionedSmartContracts,
   randomHex,
 } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
@@ -58,6 +58,8 @@ export const generateUnshieldProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
+        // TODO-V3: Is crossContractCallsV3 necessary for V3 unshield base token?
+        [], // crossContractCallsV3
       );
     const transaction = await generateTransact(
       txidVersion,
@@ -122,6 +124,7 @@ export const generateUnshieldToOriginProof = async (
         false, // useDummyProof
         undefined, // overallBatchMinGasPrice
         progressCallback,
+        [], // crossContractCallsV3
         originalShieldTxid,
       );
     const transaction = await generateTransact(
@@ -175,119 +178,174 @@ export const generateUnshieldBaseTokenProof = async (
 
     setCachedProvedTransaction(undefined);
 
-    const erc20AmountRecipients: RailgunERC20AmountRecipient[] = [
-      {
-        ...wrappedERC20Amount,
-        recipientAddress: publicWalletAddress,
-      },
-    ];
+    switch (txidVersion) {
+      case TXIDVersion.V2_PoseidonMerkle:
+        return generateUnshieldBaseTokenProofV2(
+          networkName,
+          publicWalletAddress,
+          railgunWalletID,
+          encryptionKey,
+          wrappedERC20Amount,
+          relayerFeeERC20AmountRecipient,
+          sendWithPublicWallet,
+          overallBatchMinGasPrice,
+          progressCallback,
+        );
+      case TXIDVersion.V3_PoseidonMerkle:
+        return generateUnshieldBaseTokenProofV3(
+          networkName,
+          publicWalletAddress,
+          railgunWalletID,
+          encryptionKey,
+          wrappedERC20Amount,
+          relayerFeeERC20AmountRecipient,
+          sendWithPublicWallet,
+          overallBatchMinGasPrice,
+          progressCallback,
+        );
+    }
+  } catch (err) {
+    throw reportAndSanitizeError(generateUnshieldBaseTokenProof.name, err);
+  }
+};
 
-    const relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[] = [
+const generateUnshieldBaseTokenProofV2 = async (
+  networkName: NetworkName,
+  publicWalletAddress: string,
+  railgunWalletID: string,
+  encryptionKey: string,
+  wrappedERC20Amount: RailgunERC20Amount,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  sendWithPublicWallet: boolean,
+  overallBatchMinGasPrice: Optional<bigint>,
+  progressCallback: GenerateTransactionsProgressCallback,
+): Promise<void> => {
+  const txidVersion = TXIDVersion.V2_PoseidonMerkle;
+
+  const erc20AmountRecipients: RailgunERC20AmountRecipient[] = [
+    {
+      ...wrappedERC20Amount,
+      recipientAddress: publicWalletAddress,
+    },
+  ];
+
+  const relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[] = [
+    wrappedERC20Amount,
+  ];
+
+  const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
+    createRelayAdaptUnshieldERC20AmountRecipients(txidVersion, networkName, [
       wrappedERC20Amount,
-    ];
+    ]);
 
-    const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
-      createRelayAdaptUnshieldERC20AmountRecipients(txidVersion, networkName, [
-        wrappedERC20Amount,
-      ]);
+  // Empty NFT recipients.
+  const nftAmountRecipients: RailgunNFTAmountRecipient[] = [];
+  const relayAdaptUnshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] = [];
 
-    // Empty NFT recipients.
-    const nftAmountRecipients: RailgunNFTAmountRecipient[] = [];
-    const relayAdaptUnshieldNFTAmountRecipients: RailgunNFTAmountRecipient[] =
-      [];
+  // Generate dummy txs for relay adapt params.
+  const dummyTxs = await generateDummyProofTransactions(
+    ProofType.UnshieldBaseToken,
+    networkName,
+    railgunWalletID,
+    txidVersion,
+    encryptionKey,
+    false, // showSenderAddressToRecipient
+    undefined, // memoText
+    relayAdaptUnshieldERC20AmountRecipients,
+    relayAdaptUnshieldNFTAmountRecipients,
+    relayerFeeERC20AmountRecipient,
+    sendWithPublicWallet,
+    overallBatchMinGasPrice,
+    [], // crossContractCallsV3 - unused for unshield
+  );
 
-    // Generate dummy txs for relay adapt params.
-    const dummyTxs = await generateDummyProofTransactions(
+  const { chain } = NETWORK_CONFIG[networkName];
+
+  const relayAdaptParamsRandom = randomHex(31);
+  const relayAdaptParams =
+    await RailgunVersionedSmartContracts.getRelayAdaptV2ParamsUnshieldBaseToken(
+      txidVersion,
+      chain,
+      dummyTxs,
+      publicWalletAddress,
+      relayAdaptParamsRandom,
+    );
+  const relayAdaptContract =
+    RailgunVersionedSmartContracts.getRelayAdaptContract(txidVersion, chain);
+  const relayAdaptID: AdaptID = {
+    contract: relayAdaptContract.address,
+    parameters: relayAdaptParams,
+  };
+
+  const showSenderAddressToRecipient = false;
+  const memoText: Optional<string> = undefined;
+
+  // Generate final txs with relay adapt ID.
+  const { provedTransactions, preTransactionPOIsPerTxidLeafPerList } =
+    await generateProofTransactions(
       ProofType.UnshieldBaseToken,
       networkName,
       railgunWalletID,
       txidVersion,
       encryptionKey,
-      false, // showSenderAddressToRecipient
-      undefined, // memoText
+      showSenderAddressToRecipient,
+      memoText,
       relayAdaptUnshieldERC20AmountRecipients,
       relayAdaptUnshieldNFTAmountRecipients,
       relayerFeeERC20AmountRecipient,
       sendWithPublicWallet,
-      overallBatchMinGasPrice,
-    );
-
-    const { chain } = NETWORK_CONFIG[networkName];
-
-    const relayAdaptParamsRandom = randomHex(31);
-    const relayAdaptParams =
-      await RelayAdaptVersionedSmartContracts.getRelayAdaptParamsUnshieldBaseToken(
-        txidVersion,
-        chain,
-        dummyTxs,
-        publicWalletAddress,
-        relayAdaptParamsRandom,
-      );
-    const relayAdaptContract =
-      RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
-        txidVersion,
-        chain,
-      );
-    const relayAdaptID: AdaptID = {
-      contract: relayAdaptContract.address,
-      parameters: relayAdaptParams,
-    };
-
-    const showSenderAddressToRecipient = false;
-    const memoText: Optional<string> = undefined;
-
-    // Generate final txs with relay adapt ID.
-    const { provedTransactions, preTransactionPOIsPerTxidLeafPerList } =
-      await generateProofTransactions(
-        ProofType.UnshieldBaseToken,
-        networkName,
-        railgunWalletID,
-        txidVersion,
-        encryptionKey,
-        showSenderAddressToRecipient,
-        memoText,
-        relayAdaptUnshieldERC20AmountRecipients,
-        relayAdaptUnshieldNFTAmountRecipients,
-        relayerFeeERC20AmountRecipient,
-        sendWithPublicWallet,
-        relayAdaptID,
-        false, // useDummyProof
-        overallBatchMinGasPrice,
-        progressCallback,
-      );
-
-    const transaction = await generateUnshieldBaseToken(
-      txidVersion,
-      provedTransactions,
-      networkName,
-      publicWalletAddress,
-      relayAdaptParamsRandom,
+      relayAdaptID,
       false, // useDummyProof
+      overallBatchMinGasPrice,
+      progressCallback,
+      [], // crossContractCallsV3 - not used for V2
     );
 
-    const nullifiers = nullifiersForTransactions(provedTransactions);
+  const transaction = await generateUnshieldBaseToken(
+    txidVersion,
+    provedTransactions,
+    networkName,
+    publicWalletAddress,
+    relayAdaptParamsRandom,
+    false, // useDummyProof
+  );
 
-    setCachedProvedTransaction({
-      proofType: ProofType.UnshieldBaseToken,
-      txidVersion,
-      railgunWalletID,
-      showSenderAddressToRecipient,
-      memoText,
-      erc20AmountRecipients,
-      nftAmountRecipients,
-      relayAdaptUnshieldERC20Amounts,
-      relayAdaptUnshieldNFTAmounts: undefined,
-      relayAdaptShieldERC20Recipients: undefined,
-      relayAdaptShieldNFTRecipients: undefined,
-      crossContractCalls: undefined,
-      relayerFeeERC20AmountRecipient,
-      sendWithPublicWallet,
-      transaction,
-      preTransactionPOIsPerTxidLeafPerList,
-      overallBatchMinGasPrice,
-      nullifiers,
-    });
-  } catch (err) {
-    throw reportAndSanitizeError(generateUnshieldBaseTokenProof.name, err);
-  }
+  const nullifiers = nullifiersForTransactions(provedTransactions);
+
+  setCachedProvedTransaction({
+    proofType: ProofType.UnshieldBaseToken,
+    txidVersion,
+    railgunWalletID,
+    showSenderAddressToRecipient,
+    memoText,
+    erc20AmountRecipients,
+    nftAmountRecipients,
+    relayAdaptUnshieldERC20Amounts,
+    relayAdaptUnshieldNFTAmounts: undefined,
+    relayAdaptShieldERC20Recipients: undefined,
+    relayAdaptShieldNFTRecipients: undefined,
+    crossContractCalls: undefined,
+    relayerFeeERC20AmountRecipient,
+    sendWithPublicWallet,
+    transaction,
+    preTransactionPOIsPerTxidLeafPerList,
+    overallBatchMinGasPrice,
+    nullifiers,
+  });
+};
+
+const generateUnshieldBaseTokenProofV3 = async (
+  networkName: NetworkName,
+  publicWalletAddress: string,
+  railgunWalletID: string,
+  encryptionKey: string,
+  wrappedERC20Amount: RailgunERC20Amount,
+  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  sendWithPublicWallet: boolean,
+  overallBatchMinGasPrice: Optional<bigint>,
+  progressCallback: GenerateTransactionsProgressCallback,
+): Promise<void> => {
+  const txidVersion = TXIDVersion.V3_PoseidonMerkle;
+
+  // TODO-V3: Generate unshield base token proof for V3.
 };

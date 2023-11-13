@@ -48,6 +48,7 @@ export const generateTransferProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
+        [], // crossContractCallsV3 - unused for transfers
       );
     const transaction = await generateTransact(
       txidVersion,

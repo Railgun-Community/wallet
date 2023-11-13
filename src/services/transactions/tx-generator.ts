@@ -8,10 +8,9 @@ import {
   ERC721_NOTE_VALUE,
   NFTTokenData,
   PreTransactionPOIsPerTxidLeafPerList,
-  RailgunVersionedSmartContracts,
   TransactionStructV2,
   TransactionStructV3,
-  RelayAdaptVersionedSmartContracts,
+  RailgunVersionedSmartContracts,
 } from '@railgun-community/engine';
 import {
   RailgunERC20Amount,
@@ -59,10 +58,11 @@ export const generateProofTransactions = async (
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  relayAdaptID: Optional<AdaptID>,
+  relayAdaptIDV2: Optional<AdaptID>,
   useDummyProof: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
+  crossContractCallsV3: ContractTransaction[],
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
   provedTransactions: (TransactionStructV2 | TransactionStructV3)[];
@@ -82,10 +82,11 @@ export const generateProofTransactions = async (
     networkName,
     relayerFeeERC20AmountRecipient,
     sendWithPublicWallet,
-    relayAdaptID,
+    relayAdaptIDV2,
     useDummyProof,
     overallBatchMinGasPrice,
     progressCallback,
+    crossContractCallsV3,
     originShieldTxidForSpendabilityOverride,
   );
   return txs;
@@ -120,6 +121,7 @@ export const generateDummyProofTransactions = async (
   relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
+  crossContractCallsV3: ContractTransaction[],
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<(TransactionStructV2 | TransactionStructV3)[]> => {
   if (!relayerFeeERC20Amount && !sendWithPublicWallet) {
@@ -156,6 +158,7 @@ export const generateDummyProofTransactions = async (
       true, // useDummyProof
       overallBatchMinGasPrice,
       () => {}, // progressCallback (not necessary for dummy txs)
+      crossContractCallsV3,
       originShieldTxidForSpendabilityOverride,
     )
   ).provedTransactions;
@@ -196,7 +199,7 @@ export const generateUnshieldBaseToken = async (
   const chain = NETWORK_CONFIG[networkName].chain;
 
   const transaction =
-    await RelayAdaptVersionedSmartContracts.populateUnshieldBaseToken(
+    await RailgunVersionedSmartContracts.populateUnshieldBaseToken(
       txidVersion,
       chain,
       txs,
@@ -224,10 +227,11 @@ const transactionsFromERC20Amounts = async (
   networkName: NetworkName,
   relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
-  relayAdaptID: Optional<AdaptID>,
+  relayAdaptIDV2: Optional<AdaptID>,
   useDummyProof: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
+  crossContractCallsV3: ContractTransaction[],
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
   provedTransactions: (TransactionStructV2 | TransactionStructV3)[];
@@ -249,8 +253,8 @@ const transactionsFromERC20Amounts = async (
     chain,
     validatedOverallBatchMinGasPrice,
   );
-  if (relayAdaptID) {
-    transactionBatch.setAdaptID(relayAdaptID);
+  if (relayAdaptIDV2 && txidVersion === TXIDVersion.V2_PoseidonMerkle) {
+    transactionBatch.setAdaptIDV2(relayAdaptIDV2);
   }
 
   if (relayerFeeERC20AmountRecipient && !sendWithPublicWallet) {
@@ -306,6 +310,7 @@ const transactionsFromERC20Amounts = async (
     useDummyProof,
     progressCallback,
     shouldGeneratePreTransactionPOIs,
+    crossContractCallsV3,
     originShieldTxidForSpendabilityOverride,
   );
   return txBatches;
@@ -470,6 +475,7 @@ const generateAllProofs = async (
   useDummyProof: boolean,
   progressCallback: GenerateTransactionsProgressCallback,
   shouldGeneratePreTransactionPOIs: boolean,
+  crossContractCallsV3: ContractTransaction[],
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<{
   provedTransactions: (TransactionStructV2 | TransactionStructV3)[];
@@ -483,6 +489,7 @@ const generateAllProofs = async (
         railgunWallet,
         txidVersion,
         encryptionKey,
+        crossContractCallsV3,
         originShieldTxidForSpendabilityOverride,
       ),
       preTransactionPOIsPerTxidLeafPerList: {},
@@ -495,6 +502,7 @@ const generateAllProofs = async (
     encryptionKey,
     progressCallback,
     shouldGeneratePreTransactionPOIs,
+    crossContractCallsV3,
     originShieldTxidForSpendabilityOverride,
   );
 };

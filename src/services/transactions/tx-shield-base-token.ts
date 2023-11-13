@@ -18,7 +18,7 @@ import {
   ShieldNoteERC20,
   RailgunEngine,
   hexToBytes,
-  RelayAdaptVersionedSmartContracts,
+  RailgunVersionedSmartContracts,
 } from '@railgun-community/engine';
 import { reportAndSanitizeError } from '../../utils/error';
 import { ContractTransaction } from 'ethers';
@@ -52,7 +52,7 @@ const generateShieldBaseTokenTransaction = async (
 
     const { chain } = NETWORK_CONFIG[networkName];
     const transaction =
-      await RelayAdaptVersionedSmartContracts.populateShieldBaseToken(
+      await RailgunVersionedSmartContracts.populateShieldBaseToken(
         txidVersion,
         chain,
         shieldRequest,

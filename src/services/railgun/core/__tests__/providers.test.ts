@@ -19,10 +19,7 @@ import {
   getUTXOMerkletreeForNetwork,
   getTXIDMerkletreeForNetwork,
 } from '../merkletree';
-import {
-  RailgunVersionedSmartContracts,
-  RelayAdaptVersionedSmartContracts,
-} from '@railgun-community/engine';
+import { RailgunVersionedSmartContracts } from '@railgun-community/engine';
 import { getTestTXIDVersion, isV2Test } from '../../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
@@ -107,7 +104,7 @@ describe('providers', () => {
     if (isV2Test()) {
       // TODO-V3: Remove when ready
       expect(
-        RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
+        RailgunVersionedSmartContracts.getRelayAdaptContract(
           txidVersion,
           chain,
         ),
@@ -117,7 +114,7 @@ describe('providers', () => {
     const { chain: chainEthereumRopsten } =
       NETWORK_CONFIG[NetworkName.EthereumRopsten_DEPRECATED];
     expect(() =>
-      RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
+      RailgunVersionedSmartContracts.getRelayAdaptContract(
         txidVersion,
         chainEthereumRopsten,
       ),

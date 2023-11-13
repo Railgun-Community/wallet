@@ -4,7 +4,6 @@ import Sinon, { SinonStub, SinonSpy } from 'sinon';
 import {
   RailgunWallet,
   TransactionBatch,
-  RelayAdaptVersionedSmartContracts,
   TransactionStructV2,
   TransactionStructV3,
   RailgunVersionedSmartContracts,
@@ -197,7 +196,7 @@ describe('tx-transfer', () => {
       'generateTransact',
     ).resolves({ data: '0x0123' } as ContractTransaction);
     relayAdaptPopulateUnshieldBaseToken = Sinon.stub(
-      RelayAdaptVersionedSmartContracts,
+      RailgunVersionedSmartContracts,
       'populateUnshieldBaseToken',
     ).resolves({ data: '0x0123' } as ContractTransaction);
   });

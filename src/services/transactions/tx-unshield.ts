@@ -160,6 +160,7 @@ export const gasEstimateForUnprovenUnshield = async (
           relayerFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          [], // crossContractCallsV3 - unused for unshield
         ),
       (txs: (TransactionStructV2 | TransactionStructV3)[]) =>
         generateTransact(
@@ -220,6 +221,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           relayerFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          [], // TODO-V3: Do we need crossContractCallsV3 for unshield base token?
         ),
       (txs: (TransactionStructV2 | TransactionStructV3)[]) => {
         const relayAdaptParamsRandom = randomHex(31);
@@ -359,6 +361,7 @@ export const gasEstimateForUnprovenUnshieldToOrigin = async (
       undefined, // relayerFeeERC20Amount
       true, // sendWithPublicWallet
       overallBatchMinGasPrice,
+      [], // crossContractCallsV3 - unused for unshield
       originalShieldTxid, // originShieldTxidForSpendabilityOverride
     );
     const transaction = await generateTransact(
