@@ -476,7 +476,7 @@ export const parseRelayAdaptReturnValue = (
         txidVersion,
         data,
       );
-    if (relayAdaptErrorParsed) {
+    if (isDefined(relayAdaptErrorParsed)) {
       sendErrorMessage(relayAdaptErrorParsed.error);
       return relayAdaptErrorParsed.error;
     }
