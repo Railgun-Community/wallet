@@ -152,7 +152,7 @@ describe('tx-shield', () => {
     ).rejectedWith('test rejection - gas estimate');
   });
 
-  it.only('Should send tx for valid shield - no gas details', async () => {
+  it('Should send tx for valid shield - no gas details', async () => {
     stubSuccess();
     const { transaction } = await populateShield(
       txidVersion,
