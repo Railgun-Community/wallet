@@ -17,7 +17,7 @@ const ETH_GOERLI_CHAIN: Chain =
 
 describe('railgun-txid-sync-graph', () => {
   before(() => {
-    NETWORK_CONFIG[NetworkName.Ethereum].poi = { launchBlock: 1000 };
+    NETWORK_CONFIG[NetworkName.Ethereum].poi = { launchBlock: 1000, launchTimestamp: 1000 };
   });
 
   it('Should pull railgun txs subgraph query - Ethereum', async () => {
