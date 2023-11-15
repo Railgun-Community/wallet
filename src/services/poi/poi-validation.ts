@@ -29,16 +29,24 @@ export class POIValidator {
       throw new Error(`No network found for POI validator.`);
     }
 
-    const verifierAddress = RailgunVersionedSmartContracts.getVerifier(
-      txidVersion,
-      chain,
-    ).address;
+    let contractAddress: string;
+    if (useRelayAdapt) {
+      contractAddress = RailgunVersionedSmartContracts.getRelayAdaptContract(
+        txidVersion,
+        chain,
+      ).address;
+    } else {
+      contractAddress = RailgunVersionedSmartContracts.getVerifier(
+        txidVersion,
+        chain,
+      ).address;
+    }
 
     const wallet = walletForID(railgunWalletID);
     return wallet.isValidSpendableTransaction(
       txidVersion,
       chain,
-      verifierAddress,
+      contractAddress,
       transactionRequest,
       useRelayAdapt,
       pois,
