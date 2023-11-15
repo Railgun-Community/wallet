@@ -1,4 +1,7 @@
-import { ExtractedRailgunTransactionData } from '@railgun-community/engine';
+import {
+  ExtractedRailgunTransactionData,
+  RailgunVersionedSmartContracts,
+} from '@railgun-community/engine';
 import {
   Chain,
   PreTransactionPOIsPerTxidLeafPerList,
@@ -26,15 +29,10 @@ export class POIValidator {
       throw new Error(`No network found for POI validator.`);
     }
 
-    let verifierAddress: string;
-    switch (txidVersion) {
-      case TXIDVersion.V2_PoseidonMerkle:
-        verifierAddress = network.proxyContract;
-        break;
-      case TXIDVersion.V3_PoseidonMerkle:
-        verifierAddress = network.poseidonMerkleVerifierV3Contract;
-        break;
-    }
+    const verifierAddress = RailgunVersionedSmartContracts.getVerifier(
+      txidVersion,
+      chain,
+    ).address;
 
     const wallet = walletForID(railgunWalletID);
     return wallet.isValidSpendableTransaction(
