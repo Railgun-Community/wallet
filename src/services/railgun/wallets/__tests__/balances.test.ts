@@ -72,23 +72,6 @@ describe('balances', () => {
     await closeTestEngine();
   });
 
-  it('Should run wallet scan if active wallet for ID', async () => {
-    const chain: Chain = { type: ChainType.EVM, id: 1 };
-    const response = await scanUpdatesForMerkletreeAndWallets(chain);
-    expect(response).to.be.undefined;
-    expect(walletScanStub.calledOnce).to.be.true;
-    expect(engineScanStub.calledOnce).to.be.true;
-  });
-
-  it('Should throw if no active wallet for ID', async () => {
-    const chain: Chain = { type: ChainType.EVM, id: 1 };
-    await expect(scanUpdatesForMerkletreeAndWallets(chain)).rejectedWith(
-      'No RAILGUN wallet for ID',
-    );
-    expect(walletScanStub.notCalled).to.be.true;
-    expect(engineScanStub.notCalled).to.be.true;
-  });
-
   it('Should scan for updates to merkletree and wallets', async () => {
     const chain: Chain = { type: ChainType.EVM, id: 1 };
     const response = await scanUpdatesForMerkletreeAndWallets(chain);
