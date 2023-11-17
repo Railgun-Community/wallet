@@ -54,6 +54,7 @@ describe('balances-live', () => {
     await loadProvider(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
       networkName,
+      undefined, // walletIdFilter
       10000, // pollingInterval
     );
 
@@ -73,7 +74,10 @@ describe('balances-live', () => {
       return;
     }
 
-    await scanUpdatesForMerkletreeAndWallets(chain);
+    await scanUpdatesForMerkletreeAndWallets(
+      chain,
+      undefined, // walletIdFilter
+    );
 
     const wallet = walletForID(railgunWalletID);
     const balances = await wallet.getTokenBalances(

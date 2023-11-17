@@ -66,6 +66,7 @@ const loadProviderForNetwork = async (
   chain: Chain,
   networkName: NetworkName,
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
+  walletIdFilter: Optional<string[]>,
   pollingInterval: number,
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
@@ -134,7 +135,7 @@ const loadProviderForNetwork = async (
   // NOTE: This is an async call, but we need not await.
   // Let Engine scan events in the background.
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  engine.scanHistory(chain);
+  engine.scanContractHistory(chain, walletIdFilter);
 };
 
 /**
@@ -144,6 +145,7 @@ const loadProviderForNetwork = async (
 export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
+  walletIdFilter: Optional<string[]>,
   pollingInterval = 15000,
 ): Promise<LoadProviderResponse> => {
   try {
@@ -158,6 +160,7 @@ export const loadProvider = async (
       chain,
       networkName,
       fallbackProviderJsonConfig,
+      walletIdFilter,
       pollingInterval,
     );
 
