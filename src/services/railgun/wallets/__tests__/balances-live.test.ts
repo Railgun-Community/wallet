@@ -12,7 +12,7 @@ import {
   pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
 import { createRailgunWallet, walletForID } from '../wallets';
-import { refreshRailgunBalances } from '../balances';
+import { scanUpdatesForMerkletreeAndWallets } from '../balances';
 import {
   Chain,
   NETWORK_CONFIG,
@@ -73,13 +73,7 @@ describe('balances-live', () => {
       return;
     }
 
-    const fullRescan = false;
-    await refreshRailgunBalances(
-      txidVersion,
-      chain,
-      railgunWalletID,
-      fullRescan,
-    );
+    await scanUpdatesForMerkletreeAndWallets(chain);
 
     const wallet = walletForID(railgunWalletID);
     const balances = await wallet.getTokenBalances(
