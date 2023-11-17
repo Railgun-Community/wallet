@@ -5,6 +5,7 @@ import { getEngine } from '../core/engine';
 
 export const scanUpdatesForMerkletreeAndWallets = async (
   chain: Chain,
+  walletIdFilter: Optional<string[]>,
 ): Promise<void> => {
   try {
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
@@ -14,7 +15,7 @@ export const scanUpdatesForMerkletreeAndWallets = async (
     // This will call wallet.scanBalances when it's done, but may take some time.
 
     const engine = getEngine();
-    await engine.scanHistory(chain);
+    await engine.scanContractHistory(chain, walletIdFilter);
   } catch (err) {
     throw reportAndSanitizeError(scanUpdatesForMerkletreeAndWallets.name, err);
   }
@@ -22,10 +23,11 @@ export const scanUpdatesForMerkletreeAndWallets = async (
 
 export const rescanFullUTXOMerkletreesAndWallets = async (
   chain: Chain,
+  walletIdFilter: Optional<string[]>,
 ): Promise<void> => {
   try {
     const engine = getEngine();
-    await engine.fullRescanUTXOMerkletreesAndWallets(chain);
+    await engine.fullRescanUTXOMerkletreesAndWallets(chain, walletIdFilter);
 
     // Wallet will trigger .emit('scanned', {chain}) event when finished,
     // which calls `onBalancesUpdate` (balance-update.ts).
@@ -45,11 +47,17 @@ export const resetFullTXIDMerkletreesV2 = async (
   }
 };
 
-export const fullRescanBalancesAllWallets = async (
+export const decryptBalancesAllWallets = async (
   txidVersion: TXIDVersion,
   chain: Chain,
+  walletIdFilter: Optional<string[]>,
   progressCallback?: (progress: number) => void,
 ): Promise<void> => {
   const engine = getEngine();
-  await engine.scanAllWallets(txidVersion, chain, progressCallback);
+  await engine.decryptBalancesAllWallets(
+    txidVersion,
+    chain,
+    walletIdFilter,
+    progressCallback,
+  );
 };

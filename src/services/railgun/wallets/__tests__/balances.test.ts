@@ -40,17 +40,17 @@ describe('balances', () => {
     knownWalletID = railgunWalletInfo.id;
     walletScanStub = Sinon.stub(
       RailgunWallet.prototype,
-      'scanBalances',
+      'decryptBalances',
     ).resolves();
 
     engineScanStub = Sinon.stub(
       RailgunEngine.prototype,
-      'scanHistory',
+      'scanContractHistory',
     ).resolves();
 
     walletFullScanStub = Sinon.stub(
       RailgunWallet.prototype,
-      'fullRescanBalancesAllTXIDVersions',
+      'fullRedecryptBalancesAllTXIDVersions',
     ).resolves();
 
     engineFullScanStub = Sinon.stub(
@@ -74,14 +74,20 @@ describe('balances', () => {
 
   it('Should scan for updates to merkletree and wallets', async () => {
     const chain: Chain = { type: ChainType.EVM, id: 1 };
-    const response = await scanUpdatesForMerkletreeAndWallets(chain);
+    const response = await scanUpdatesForMerkletreeAndWallets(
+      chain,
+      undefined, // walletIdFilter
+    );
     expect(response).to.be.undefined;
     expect(engineScanStub.calledOnce).to.be.true;
   });
 
   it('Should run full rescan of merkletree and wallets', async () => {
     const chain: Chain = { type: ChainType.EVM, id: 1 };
-    const response = await rescanFullUTXOMerkletreesAndWallets(chain);
+    const response = await rescanFullUTXOMerkletreesAndWallets(
+      chain,
+      undefined, // walletIdFilter
+    );
     expect(response).to.be.undefined;
     expect(engineFullScanStub.calledOnce).to.be.true;
   });

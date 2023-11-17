@@ -27,12 +27,14 @@ import { setEngine, getEngine, hasEngine } from './engine';
 export type EngineDebugger = {
   log: (msg: string) => void;
   error: (error: Error) => void;
+  verboseScanLogging: boolean;
 };
 
-const createEngineDebugger = (): EngineDebugger => {
+const createEngineDebugger = (verboseScanLogging: boolean): EngineDebugger => {
   return {
     log: (msg: string) => sendMessage(msg),
     error: (error: Error) => sendErrorMessage(error),
+    verboseScanLogging,
   };
 };
 
@@ -87,6 +89,7 @@ export const startRailgunEngine = (
   skipMerkletreeScans: boolean,
   poiNodeURL?: string,
   customPOILists?: POIList[],
+  verboseScanLogging = false,
 ): void => {
   if (hasEngine()) {
     return;
@@ -103,7 +106,7 @@ export const startRailgunEngine = (
       quickSyncRailgunTransactionsV2,
       WalletPOI.getPOITxidMerklerootValidator(poiNodeURL),
       WalletPOI.getPOILatestValidatedRailgunTxid(poiNodeURL),
-      shouldDebug ? createEngineDebugger() : undefined,
+      shouldDebug ? createEngineDebugger(verboseScanLogging) : undefined,
       skipMerkletreeScans,
     );
     setEngine(engine);
@@ -134,7 +137,11 @@ export const startRailgunEngineForPOINode = (
       artifactGetterDownloadJustInTime,
       quickSyncEventsGraph,
       quickSyncRailgunTransactionsV2,
-      shouldDebug ? createEngineDebugger() : undefined,
+      shouldDebug
+        ? createEngineDebugger(
+            false, // verboseScanLogging
+          )
+        : undefined,
     );
     setEngine(engine);
   } catch (err) {

@@ -59,6 +59,7 @@ describe('balance-update', () => {
     await loadProvider(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
       NetworkName.EthereumGoerli,
+      undefined, // walletIdFilter
       10000, // pollingInterval
     );
     wallet = fullWalletForID(railgunWalletInfo.id);

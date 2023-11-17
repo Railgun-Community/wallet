@@ -27,7 +27,7 @@ export const awaitWalletScan = (walletID: string, chain: Chain) => {
   const wallet = walletForID(walletID);
   return new Promise((resolve, reject) =>
     wallet.once(
-      EngineEvent.WalletScanComplete,
+      EngineEvent.WalletDecryptBalancesComplete,
       ({ chain: returnedChain }: WalletScannedEventData) =>
         returnedChain.type === chain.type && returnedChain.id === chain.id
           ? resolve(returnedChain)
@@ -77,7 +77,7 @@ export const viewOnlyWalletForID = (id: string): RailgunWallet => {
 
 const subscribeToEvents = (wallet: AbstractWallet) => {
   wallet.on(
-    EngineEvent.WalletScanComplete,
+    EngineEvent.WalletDecryptBalancesComplete,
     ({ txidVersion, chain }: WalletScannedEventData) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       onBalancesUpdate(txidVersion, wallet, chain);

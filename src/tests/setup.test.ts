@@ -163,11 +163,13 @@ export const initTestEngineNetworks = async () => {
   await loadProvider(
     MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     NetworkName.Polygon,
+    undefined, // walletIdFilter
     10000, // pollingInterval
   );
   await loadProvider(
     MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
     NetworkName.Polygon,
+    undefined, // walletIdFilter
     10000, // pollingInterval
   );
 };
