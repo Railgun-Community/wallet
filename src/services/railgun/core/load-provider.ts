@@ -66,7 +66,6 @@ const loadProviderForNetwork = async (
   chain: Chain,
   networkName: NetworkName,
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
-  walletIdFilter: Optional<string[]>,
   pollingInterval: number,
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
@@ -140,7 +139,6 @@ const loadProviderForNetwork = async (
 export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
-  walletIdFilter: Optional<string[]>,
   pollingInterval = 15000,
 ): Promise<LoadProviderResponse> => {
   try {
@@ -155,7 +153,6 @@ export const loadProvider = async (
       chain,
       networkName,
       fallbackProviderJsonConfig,
-      walletIdFilter,
       pollingInterval,
     );
 

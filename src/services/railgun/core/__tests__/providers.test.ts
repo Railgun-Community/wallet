@@ -48,7 +48,6 @@ describe('providers', () => {
       const response = await loadProvider(
         MOCK_FAILING_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
         NetworkName.PolygonMumbai,
-        undefined, // walletIdFilter
         10000, // pollingInterval
       );
       expect(response.feesSerialized).to.deep.equal({
@@ -64,7 +63,6 @@ describe('providers', () => {
     const response = await loadProvider(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
       NetworkName.PolygonMumbai,
-      undefined, // walletIdFilter
       10000, // pollingInterval
     );
     expect(response.feesSerialized).to.deep.equal({
@@ -148,7 +146,6 @@ describe('providers', () => {
       loadProvider(
         { chainId: 55 } as FallbackProviderJsonConfig,
         NetworkName.BNBChain,
-        undefined, // walletIdFilter
         10000, // pollingInterval
       ),
     ).rejectedWith('Invalid chain ID');
@@ -159,7 +156,6 @@ describe('providers', () => {
       loadProvider(
         { chainId: 56 } as FallbackProviderJsonConfig,
         NetworkName.BNBChain,
-        undefined, // walletIdFilter
         10000, // pollingInterval
       ),
     ).rejectedWith(
