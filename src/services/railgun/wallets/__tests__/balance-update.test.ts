@@ -65,6 +65,7 @@ describe('balance-update', () => {
       10000, // pollingInterval
     );
     const { chain } = NETWORK_CONFIG[NetworkName.EthereumGoerli];
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getEngine().scanContractHistory(
       chain,
       undefined, // walletIdFilter
