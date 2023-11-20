@@ -10,6 +10,7 @@ import {
 } from '@railgun-community/engine';
 import Sinon, { SinonStub } from 'sinon';
 import {
+  NETWORK_CONFIG,
   NetworkName,
   POIProofProgressEvent,
   RailgunBalancesEvent,
@@ -31,6 +32,7 @@ import {
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { loadProvider } from '../../core/load-provider';
 import { getTestTXIDVersion } from '../../../../tests/helper.test';
+import { getEngine } from '../../core/engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -61,6 +63,11 @@ describe('balance-update', () => {
       NetworkName.EthereumGoerli,
       undefined, // walletIdFilter
       10000, // pollingInterval
+    );
+    const { chain } = NETWORK_CONFIG[NetworkName.EthereumGoerli];
+    getEngine().scanContractHistory(
+      chain,
+      undefined, // walletIdFilter
     );
     wallet = fullWalletForID(railgunWalletInfo.id);
     const tokenAddress = MOCK_TOKEN_ADDRESS.replace('0x', '');

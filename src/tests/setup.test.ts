@@ -6,6 +6,7 @@ import fs from 'fs';
 import {
   MerkletreeScanStatus,
   MerkletreeScanUpdateEvent,
+  NETWORK_CONFIG,
   NetworkName,
   poll,
 } from '@railgun-community/shared-models';
@@ -165,6 +166,11 @@ export const initTestEngineNetworks = async () => {
     NetworkName.Polygon,
     undefined, // walletIdFilter
     10000, // pollingInterval
+  );
+  const { chain } = NETWORK_CONFIG[NetworkName.Polygon];
+  getEngine().scanContractHistory(
+    chain,
+    undefined, // walletIdFilter
   );
 };
 

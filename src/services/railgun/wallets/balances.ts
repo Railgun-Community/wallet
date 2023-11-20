@@ -3,7 +3,7 @@ import { TXIDVersion } from '@railgun-community/shared-models';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { getEngine } from '../core/engine';
 
-export const scanUpdatesForMerkletreeAndWallets = async (
+export const refreshBalances = async (
   chain: Chain,
   walletIdFilter: Optional<string[]>,
 ): Promise<void> => {
@@ -17,7 +17,7 @@ export const scanUpdatesForMerkletreeAndWallets = async (
     const engine = getEngine();
     await engine.scanContractHistory(chain, walletIdFilter);
   } catch (err) {
-    throw reportAndSanitizeError(scanUpdatesForMerkletreeAndWallets.name, err);
+    throw reportAndSanitizeError(refreshBalances.name, err);
   }
 };
 
@@ -47,7 +47,7 @@ export const resetFullTXIDMerkletreesV2 = async (
   }
 };
 
-export const decryptBalancesAllWallets = async (
+export const decryptBalances = async (
   txidVersion: TXIDVersion,
   chain: Chain,
   walletIdFilter: Optional<string[]>,
