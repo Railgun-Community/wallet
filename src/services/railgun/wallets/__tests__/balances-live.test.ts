@@ -12,7 +12,7 @@ import {
   pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
 import { createRailgunWallet, walletForID } from '../wallets';
-import { scanUpdatesForMerkletreeAndWallets } from '../balances';
+import { refreshBalances } from '../balances';
 import {
   Chain,
   NETWORK_CONFIG,
@@ -22,6 +22,7 @@ import {
 import { loadProvider } from '../../core/load-provider';
 import { getTXIDMerkletreeForNetwork } from '../../core/merkletree';
 import { getTestTXIDVersion, isV2Test } from '../../../../tests/helper.test';
+import { getEngine } from '../../core/engine';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -57,7 +58,11 @@ describe('balances-live', () => {
       undefined, // walletIdFilter
       10000, // pollingInterval
     );
-
+    const { chain } = NETWORK_CONFIG[networkName];
+    getEngine().scanContractHistory(
+      chain,
+      undefined, // walletIdFilter
+    );
     await Promise.all([
       pollUntilUTXOMerkletreeScanned(),
       pollUntilTXIDMerkletreeScanned(),
@@ -74,7 +79,7 @@ describe('balances-live', () => {
       return;
     }
 
-    await scanUpdatesForMerkletreeAndWallets(
+    await refreshBalances(
       chain,
       undefined, // walletIdFilter
     );

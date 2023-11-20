@@ -9,7 +9,7 @@ import {
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { createRailgunWallet } from '../wallets';
 import {
-  scanUpdatesForMerkletreeAndWallets,
+  refreshBalances,
   rescanFullUTXOMerkletreesAndWallets,
 } from '../balances';
 import { Chain, ChainType, isDefined } from '@railgun-community/shared-models';
@@ -74,7 +74,7 @@ describe('balances', () => {
 
   it('Should scan for updates to merkletree and wallets', async () => {
     const chain: Chain = { type: ChainType.EVM, id: 1 };
-    const response = await scanUpdatesForMerkletreeAndWallets(
+    const response = await refreshBalances(
       chain,
       undefined, // walletIdFilter
     );
