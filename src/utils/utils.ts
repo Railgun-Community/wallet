@@ -40,7 +40,9 @@ export const compareContractTransactionArrays = (
     }
   } catch (err) {
     if (!(err instanceof Error)) {
-      throw err;
+      throw new Error('Non-error thrown in compareContractTransactionArrays', {
+        cause: err,
+      });
     }
     sendErrorMessage(
       `Could not compare contract transaction arrays: ${err.message}`,

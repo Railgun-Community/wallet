@@ -64,11 +64,13 @@ const createValidCrossContractCalls = (
       assertNotBlockedAddress(transaction.to);
       return transaction;
     });
-  } catch (err) {
-    if (!(err instanceof Error)) {
-      throw err;
+  } catch (cause) {
+    if (!(cause instanceof Error)) {
+      throw new Error('Non-error thrown from createValidCrossContractCalls', {
+        cause,
+      });
     }
-    throw reportAndSanitizeError(createValidCrossContractCalls.name, err);
+    throw reportAndSanitizeError(createValidCrossContractCalls.name, cause);
   }
 };
 

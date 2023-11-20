@@ -60,11 +60,7 @@ const generateShieldBaseTokenTransaction = async (
 
     return transaction;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      generateShieldBaseTokenTransaction.name,
-      err,
-    );
-    throw sanitizedError;
+    throw reportAndSanitizeError(generateShieldBaseTokenTransaction.name, err);
   }
 };
 

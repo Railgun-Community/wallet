@@ -56,14 +56,13 @@ export class POINodeRequest {
     try {
       const { data }: { data: ResponseData } = await axios.post(url, params);
       return data;
-    } catch (err) {
-      if (!(err instanceof AxiosError)) {
-        throw err;
+    } catch (cause) {
+      if (!(cause instanceof AxiosError)) {
+        throw new Error('Non-error thrown in axios post request.', { cause });
       }
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      const errMessage = `${err.message}: ${err.response?.data}`;
-      sendErrorMessage(`POI REQUEST ERROR ${url} - ${errMessage}`);
-      throw new Error(errMessage);
+      const err = new Error(`POI request error ${url}`, { cause });
+      sendErrorMessage(err);
+      throw err;
     }
   }
 
@@ -116,7 +115,7 @@ export class POINodeRequest {
         boolean
       >(url, { txidVersion, listKey, poiMerkleroots });
       return validated;
-    } catch (err) {
+    } catch (cause) {
       if (retryCount < 3) {
         // Delay 2.5s and try again.
         await delay(2500);
@@ -128,7 +127,7 @@ export class POINodeRequest {
           retryCount + 1,
         );
       }
-      throw err;
+      throw new Error('Failed to validate POI merkleroots.', { cause });
     }
   };
 

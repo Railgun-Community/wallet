@@ -89,11 +89,13 @@ export const populateProvedTransaction = async (
       sendWithPublicWallet,
       overallBatchMinGasPrice,
     );
-  } catch (err) {
-    if (!(err instanceof Error)) {
-      throw err;
+  } catch (cause) {
+    if (!(cause instanceof Error)) {
+      throw new Error('Non-error thrown from populateProvedTransaction', {
+        cause,
+      });
     }
-    throw new Error(`Invalid proof for this transaction. ${err.message}`);
+    throw new Error(`Invalid proof for this transaction`, { cause });
   }
 
   const { transaction, nullifiers, preTransactionPOIsPerTxidLeafPerList } =
