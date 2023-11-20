@@ -131,11 +131,6 @@ const loadProviderForNetwork = async (
     poi?.launchBlock,
     supportsV3,
   );
-
-  // NOTE: This is an async call, but we need not await.
-  // Let Engine scan events in the background.
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  engine.scanContractHistory(chain, walletIdFilter); // TODO-PETE: Maybe remove this. Frontend should initiate this on their own.
 };
 
 /**
