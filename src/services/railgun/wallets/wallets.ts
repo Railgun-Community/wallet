@@ -247,7 +247,7 @@ export const loadWalletByID = async (
     );
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(loadWalletByID.name, err);
-    throw new Error(`Could not load RAILGUN wallet: ${sanitizedError.message}`);
+    throw new Error(`Could not load RAILGUN wallet`, { cause: sanitizedError });
   }
 };
 
@@ -256,7 +256,7 @@ export const unloadWalletByID = (railgunWalletID: string): void => {
     const engine = getEngine();
     engine.unloadWallet(railgunWalletID);
   } catch (err) {
-    throw new Error('Could not unload RAILGUN wallet.');
+    throw new Error('Could not unload RAILGUN wallet.', { cause: err });
   }
 };
 
@@ -267,7 +267,7 @@ export const deleteWalletByID = async (
     const engine = getEngine();
     await engine.deleteWallet(railgunWalletID);
   } catch (err) {
-    throw new Error('Could not delete RAILGUN wallet.');
+    throw new Error('Could not delete RAILGUN wallet.', {cause: err});
   }
 };
 

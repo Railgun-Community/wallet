@@ -14,7 +14,7 @@ export const reportAndSanitizeError = (
     return error;
   }
 
-  const error = new Error('Unknown error.');
+  const error = new Error('Unknown error.', { cause: err });
   sendErrorMessage(error);
   return error;
 };

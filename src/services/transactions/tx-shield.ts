@@ -116,11 +116,7 @@ export const generateShieldTransaction = async (
     );
     return transaction;
   } catch (err) {
-    const sanitizedError = reportAndSanitizeError(
-      generateShieldTransaction.name,
-      err,
-    );
-    throw sanitizedError;
+    throw reportAndSanitizeError(generateShieldTransaction.name, err);
   }
 };
 
