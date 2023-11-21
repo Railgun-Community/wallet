@@ -59,5 +59,6 @@ export const decryptBalances = async (
     chain,
     walletIdFilter,
     progressCallback,
+    false, // deferCompletionEvent
   );
 };

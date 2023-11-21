@@ -25,6 +25,7 @@ import {
 import { sendErrorMessage, sendMessage } from '../../../utils/logger';
 import { parseRailgunTokenAddress } from '../util/bytes';
 import { POIRequired } from '../../poi/poi-required';
+import { getEngine } from '../core/engine';
 
 export type BalancesUpdatedCallback = (
   balancesEvent: RailgunBalancesEvent,
@@ -141,9 +142,11 @@ export const onBalancesUpdate = async (
       return;
     }
     if (!(await POIRequired.isRequiredForNetwork(network.name))) {
+      // POI not required for this network
       return getAllBalancesAsSpendable(txidVersion, wallet, chain);
     }
 
+    // POI required for this network
     const tokenBalancesByBucket = await wallet.getTokenBalancesByBucket(
       txidVersion,
       chain,
