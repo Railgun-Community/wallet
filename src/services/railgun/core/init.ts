@@ -5,6 +5,9 @@ import {
   MerkletreeHistoryScanEventData,
   POIList,
   POIListType,
+  WalletScannedEventData,
+  UTXOScanDecryptBalancesCompleteEventData,
+  AbstractWallet,
 } from '@railgun-community/engine';
 import {
   MerkletreeScanUpdateEvent,
@@ -23,6 +26,7 @@ import { quickSyncRailgunTransactionsV2 } from '../railgun-txids/railgun-txid-sy
 import { WalletPOI } from '../../poi/wallet-poi';
 import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
 import { setEngine, getEngine, hasEngine } from './engine';
+import { onBalancesUpdate } from '../wallets/balance-update';
 
 export type EngineDebugger = {
   log: (msg: string) => void;
@@ -68,6 +72,40 @@ export const setOnTXIDMerkletreeScanCallback = (
   );
 };
 
+const setOnUTXOScanDecryptBalancesCompleteListener = () => {
+  const engine = getEngine();
+  engine.on(
+    EngineEvent.UTXOScanDecryptBalancesComplete,
+    ({
+      txidVersion,
+      chain,
+      walletIdFilter,
+    }: UTXOScanDecryptBalancesCompleteEventData) => {
+      const updateWalletBalances = async () => {
+        let walletsToUpdate: AbstractWallet[] = Object.values(engine.wallets);
+        if (isDefined(walletIdFilter)) {
+          walletsToUpdate = walletsToUpdate.filter(wallet =>
+            walletIdFilter.includes(wallet.id),
+          );
+        }
+
+        // await onBalancesUpdate calls for each wallet
+        await Promise.all(
+          walletsToUpdate.map(wallet =>
+            onBalancesUpdate(txidVersion, wallet, chain),
+          ),
+        );
+
+        // emit event to notify listeners that UTXOMerkletreeHistoryScan is complete
+        engine.emitScanEventHistoryComplete(txidVersion, chain);
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      updateWalletBalances();
+    },
+  );
+};
+
 /**
  *
  * @param walletSource - Name for your wallet implementation. Encrypted and viewable in private transaction history. Maximum of 16 characters, lowercase.
@@ -110,6 +148,8 @@ export const startRailgunEngine = (
       skipMerkletreeScans,
     );
     setEngine(engine);
+
+    setOnUTXOScanDecryptBalancesCompleteListener();
 
     if (isDefined(poiNodeURL)) {
       const poiNodeInterface = new WalletPOINodeInterface(poiNodeURL);
