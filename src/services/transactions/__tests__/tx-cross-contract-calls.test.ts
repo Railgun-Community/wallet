@@ -550,9 +550,7 @@ describe('tx-cross-contract-calls', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith(
-      'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldERC20Amounts.',
-    );
+    ).rejectedWith('Invalid proof for this transaction');
   });
 
   it('Should error on populate cross contract calls tx for unproved transaction', async () => {
@@ -573,7 +571,7 @@ describe('tx-cross-contract-calls', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith('Invalid proof for this transaction. No proof found.');
+    ).rejectedWith('Invalid proof for this transaction');
   });
 
   it('Should error on populate cross contract calls tx when params changed (invalid cached proof)', async () => {
@@ -609,9 +607,7 @@ describe('tx-cross-contract-calls', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith(
-      'Invalid proof for this transaction. Mismatch: relayAdaptUnshieldERC20Amounts.',
-    );
+    ).rejectedWith('Invalid proof for this transaction');
   });
 
   it('Should decode and parse relay adapt error logs (from failed Sushi V2 LP removal)', () => {

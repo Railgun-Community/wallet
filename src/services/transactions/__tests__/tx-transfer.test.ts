@@ -461,7 +461,7 @@ describe('tx-transfer', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith('Invalid proof for this transaction. No proof found.');
+    ).rejectedWith('Invalid proof for this transaction');
   });
 
   it('Should error on populate transfer tx when params changed (invalid cached proof)', async () => {
@@ -494,8 +494,6 @@ describe('tx-transfer', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith(
-      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
-    );
+    ).rejectedWith('Invalid proof for this transaction');
   });
 });

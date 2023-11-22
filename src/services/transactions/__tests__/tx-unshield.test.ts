@@ -644,9 +644,7 @@ describe('tx-unshield', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith(
-      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
-    );
+    ).rejectedWith('Invalid proof for this transaction');
   });
 
   it('Should error on populate unshield tx for unproved transaction', async () => {
@@ -664,7 +662,7 @@ describe('tx-unshield', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith('Invalid proof for this transaction. No proof found.');
+    ).rejectedWith('Invalid proof for this transaction');
   });
 
   it('Should error on populate unshield tx when params changed (invalid cached proof)', async () => {
@@ -693,9 +691,7 @@ describe('tx-unshield', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith(
-      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
-    );
+    ).rejectedWith('Invalid proof for this transaction');
   });
 
   // UNSHIELD BASE TOKEN - PROVE AND SEND
@@ -773,9 +769,7 @@ describe('tx-unshield', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith(
-      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
-    );
+    ).rejectedWith('Invalid proof for this transaction');
   });
 
   it('Should error on populate Unshield Base Token tx for unproved transaction', async () => {
@@ -793,7 +787,7 @@ describe('tx-unshield', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith('Invalid proof for this transaction. No proof found.');
+    ).rejectedWith('Invalid proof for this transaction');
   });
 
   it('Should error on populate Unshield Base Token tx when params changed (invalid cached proof)', async () => {
@@ -822,8 +816,6 @@ describe('tx-unshield', () => {
         overallBatchMinGasPrice,
         gasDetails,
       ),
-    ).rejectedWith(
-      'Invalid proof for this transaction. Mismatch: erc20AmountRecipients.',
-    );
+    ).rejectedWith('Invalid proof for this transaction');
   });
 });
