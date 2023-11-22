@@ -158,8 +158,6 @@ describe('providers', () => {
         NetworkName.BNBChain,
         10000, // pollingInterval
       ),
-    ).rejectedWith(
-      'Invalid fallback provider config for chain 56: Cannot read properties of undefined (reading reduce)',
-    );
+    ).rejectedWith('Invalid fallback provider config for chain 56');
   });
 });

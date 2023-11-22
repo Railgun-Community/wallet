@@ -410,9 +410,7 @@ describe('tx-cross-contract-calls', () => {
         false, // sendWithPublicWallet
         minGasLimit,
       ),
-    ).rejectedWith(
-      'RelayAdapt multicall failed at index UNKNOWN with error: test rejection - gas estimate',
-    );
+    ).rejectedWith('RelayAdapt multicall failed at index UNKNOWN.');
   });
 
   // PROVE AND SEND
