@@ -87,6 +87,13 @@ export const resetRailgunTxidsAfterTxidIndex = async (
   );
 };
 
+export const syncRailgunTransactionsV2 = async (
+  networkName: NetworkName,
+): Promise<void> => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  return getEngine().syncRailgunTransactionsV2(chain, 'manual trigger');
+};
+
 export const getLatestRailgunTxidData = async (
   txidVersion: TXIDVersion,
   networkName: NetworkName,
