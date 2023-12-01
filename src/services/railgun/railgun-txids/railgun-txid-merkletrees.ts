@@ -69,6 +69,13 @@ export const getGlobalUTXOTreePositionForRailgunTransactionCommitment = (
   );
 };
 
+export const syncRailgunTransactionsV2 = async (
+  networkName: NetworkName,
+): Promise<void> => {
+  const chain = NETWORK_CONFIG[networkName].chain;
+  return getEngine().syncRailgunTransactionsV2(chain, 'manual trigger');
+};
+
 export const fullResetTXIDMerkletreesV2 = async (networkName: NetworkName) => {
   const chain = NETWORK_CONFIG[networkName].chain;
   return getEngine().fullResetTXIDMerkletreesV2(chain);
@@ -85,13 +92,6 @@ export const resetRailgunTxidsAfterTxidIndex = async (
     chain,
     txidIndex,
   );
-};
-
-export const syncRailgunTransactionsV2 = async (
-  networkName: NetworkName,
-): Promise<void> => {
-  const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().syncRailgunTransactionsV2(chain, 'manual trigger');
 };
 
 export const getLatestRailgunTxidData = async (
