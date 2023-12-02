@@ -77,7 +77,10 @@ export class POINodeRequest {
   ): Promise<ResponseData> {
     try {
       const url = this.getNodeRouteURL(route, nodeUrlAttemptIndex);
-      const res = POINodeRequest.postRequest<Params, ResponseData>(url, params);
+      const res = await POINodeRequest.postRequest<Params, ResponseData>(
+        url,
+        params,
+      );
       return res;
     } catch (err) {
       if (finalAttempt) {
