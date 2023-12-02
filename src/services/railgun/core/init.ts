@@ -114,7 +114,7 @@ const setOnUTXOScanDecryptBalancesCompleteListener = () => {
  * @param artifactStore - Persistent store for downloading large artifact files. See Wallet SDK Developer Guide for platform implementations.
  * @param useNativeArtifacts - Whether to download native C++ or web-assembly artifacts. TRUE for mobile. FALSE for nodejs and browser.
  * @param skipMerkletreeScans - Whether to skip merkletree syncs and private balance scans. Only set to TRUE in shield-only applications that don't load private wallets or balances.
- * @param poiNodeURL - POI aggregator node URL.
+ * @param poiNodeURLs - List of POI aggregator node URLs, in order of priority.
  * @param customPOILists - POI lists to use for additional wallet protections after default lists.
  * @returns
  */
@@ -125,7 +125,7 @@ export const startRailgunEngine = (
   artifactStore: ArtifactStore,
   useNativeArtifacts: boolean,
   skipMerkletreeScans: boolean,
-  poiNodeURL?: string,
+  poiNodeURLs?: string[],
   customPOILists?: POIList[],
   verboseScanLogging = false,
 ): void => {
@@ -142,8 +142,8 @@ export const startRailgunEngine = (
       artifactGetterDownloadJustInTime,
       quickSyncEventsGraph,
       quickSyncRailgunTransactionsV2,
-      WalletPOI.getPOITxidMerklerootValidator(poiNodeURL),
-      WalletPOI.getPOILatestValidatedRailgunTxid(poiNodeURL),
+      WalletPOI.getPOITxidMerklerootValidator(poiNodeURLs),
+      WalletPOI.getPOILatestValidatedRailgunTxid(poiNodeURLs),
       shouldDebug ? createEngineDebugger(verboseScanLogging) : undefined,
       skipMerkletreeScans,
     );
@@ -151,8 +151,8 @@ export const startRailgunEngine = (
 
     setOnUTXOScanDecryptBalancesCompleteListener();
 
-    if (isDefined(poiNodeURL)) {
-      const poiNodeInterface = new WalletPOINodeInterface(poiNodeURL);
+    if (isDefined(poiNodeURLs)) {
+      const poiNodeInterface = new WalletPOINodeInterface(poiNodeURLs);
       WalletPOI.init(poiNodeInterface, customPOILists ?? []);
     }
   } catch (err) {

@@ -20,9 +20,9 @@ import { POIRequired } from './poi-required';
 export class WalletPOINodeInterface extends POINodeInterface {
   private poiNodeRequest: POINodeRequest;
 
-  constructor(poiNodeURL: string) {
+  constructor(poiNodeURLs: string[]) {
     super();
-    this.poiNodeRequest = new POINodeRequest(poiNodeURL);
+    this.poiNodeRequest = new POINodeRequest(poiNodeURLs);
   }
 
   private static poiStatusToTXOPOIStatus = (
