@@ -1,5 +1,6 @@
 import {
   ExtractedRailgunTransactionData,
+  POIValidation,
   RailgunVersionedSmartContracts,
 } from '@railgun-community/engine';
 import {
@@ -10,6 +11,7 @@ import {
 } from '@railgun-community/shared-models';
 import { ContractTransaction } from 'ethers';
 import { walletForID } from '../railgun/wallets/wallets';
+import { getProver } from '../railgun';
 
 export class POIValidator {
   static async isValidSpendableTransaction(
@@ -50,6 +52,27 @@ export class POIValidator {
       transactionRequest,
       useRelayAdapt,
       pois,
+    );
+  }
+
+  static async assertIsValidSpendableTXID(
+    listKey: string,
+    txidVersion: TXIDVersion,
+    chain: Chain,
+    pois: PreTransactionPOIsPerTxidLeafPerList,
+    railgunTxids: string[],
+    utxoTreesIn: bigint[],
+  ): Promise<boolean> {
+    const prover = getProver();
+
+    return POIValidation.assertIsValidSpendableTXID(
+      txidVersion,
+      listKey,
+      chain,
+      prover,
+      pois,
+      railgunTxids,
+      utxoTreesIn,
     );
   }
 }
