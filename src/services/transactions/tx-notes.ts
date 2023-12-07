@@ -240,3 +240,5 @@ export const compareNFTAmountRecipientArrays = (
   }
   return true;
 };
+
+export { TransactNote };
