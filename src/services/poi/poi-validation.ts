@@ -11,7 +11,7 @@ import {
 } from '@railgun-community/shared-models';
 import { ContractTransaction } from 'ethers';
 import { walletForID } from '../railgun/wallets/wallets';
-import { getProver } from '../railgun';
+import { getProver } from '../railgun/core/prover';
 
 export class POIValidator {
   static async isValidSpendableTransaction(
