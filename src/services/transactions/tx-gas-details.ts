@@ -80,8 +80,6 @@ const shouldRemoveGasLimitForL2GasEstimate = (networkName: NetworkName) => {
     case NetworkName.Arbitrum:
     case NetworkName.ArbitrumGoerli:
       return true;
-    case NetworkName.Railgun:
-      throw new Error('Invalid network for transaction');
     case NetworkName.Ethereum:
     case NetworkName.BNBChain:
     case NetworkName.Polygon:

@@ -17,8 +17,6 @@ export const shouldSetOverallBatchMinGasPriceForNetwork = (
     case NetworkName.ArbitrumGoerli:
       // L2s should not set overallBatchMinGasPrice.
       return false;
-    case NetworkName.Railgun:
-      throw new Error('Invalid network for transaction');
     case NetworkName.Ethereum:
     case NetworkName.BNBChain:
     case NetworkName.Polygon:

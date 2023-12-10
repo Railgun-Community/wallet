@@ -37,7 +37,6 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.Polygon:
     case NetworkName.Arbitrum:
     case NetworkName.ArbitrumGoerli:
-    case NetworkName.Railgun:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.Hardhat:
       throw new Error(

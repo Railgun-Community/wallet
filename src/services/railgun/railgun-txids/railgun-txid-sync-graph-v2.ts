@@ -33,7 +33,6 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.Arbitrum:
     case NetworkName.ArbitrumGoerli:
     case NetworkName.PolygonMumbai:
-    case NetworkName.Railgun:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.Hardhat:
       throw new Error('No railgun-transaction subgraph for this network');

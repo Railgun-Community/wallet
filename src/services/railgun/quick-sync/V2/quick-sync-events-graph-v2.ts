@@ -42,7 +42,6 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
       return 'arbitrum-goerli';
     case NetworkName.PolygonMumbai:
       return 'mumbai';
-    case NetworkName.Railgun:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.Hardhat:
       throw new Error('No Graph API hosted service for this network');
