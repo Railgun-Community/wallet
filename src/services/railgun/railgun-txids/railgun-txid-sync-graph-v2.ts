@@ -64,6 +64,46 @@ export const getRailgunTxidsForUnshields = async (
   return railgunTxidsForUnshields;
 };
 
+export const getRailgunTransactionDataForUnshieldToAddress = async (
+  chain: Chain,
+  unshieldToAddress: string,
+): Promise<{ txid: string; railgunTxids: string[] }[]> => {
+  const network = networkForChain(chain);
+  if (!network) {
+    return [];
+  }
+
+  const sdk = getBuiltGraphSDK(network.name);
+
+  const transactions: GraphRailgunTransactions = (
+    await sdk.GetRailgunTransactionsByUnshieldToAddress({
+      address: unshieldToAddress,
+    })
+  ).transactions;
+  const uniqueTxidMap = new Map<string, string[]>();
+
+  transactions
+    .filter(transaction => transaction.hasUnshield)
+    .forEach(transaction => {
+      const railgunTxid = getRailgunTransactionIDHex(transaction);
+      if (uniqueTxidMap.has(transaction.transactionHash)) {
+        const railgunTxids = uniqueTxidMap.get(
+          transaction.transactionHash,
+        ) as string[];
+        railgunTxids.push(railgunTxid);
+        uniqueTxidMap.set(transaction.transactionHash, railgunTxids);
+      } else {
+        uniqueTxidMap.set(transaction.transactionHash, [railgunTxid]);
+      }
+    });
+  const railgunTxidsForUnshields: { txid: string; railgunTxids: string[] }[] = [];
+  uniqueTxidMap.forEach((railgunTxids, txid) => {
+    railgunTxidsForUnshields.push({ txid, railgunTxids });
+  });
+
+  return railgunTxidsForUnshields;
+};
+
 export const getRailgunTransactionsForTxid = async (
   chain: Chain,
   txid: string,

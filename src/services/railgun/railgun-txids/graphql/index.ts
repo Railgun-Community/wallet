@@ -16,13 +16,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 // @ts-nocheck
-import {
-  GraphQLResolveInfo,
-  SelectionSetNode,
-  FieldNode,
-  GraphQLScalarType,
-  GraphQLScalarTypeConfig,
-} from 'graphql';
+import { GraphQLResolveInfo, SelectionSetNode, FieldNode, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 import { gql } from '@graphql-mesh/utils';
 
@@ -30,41 +24,29 @@ import type { GetMeshOptions } from '@graphql-mesh/runtime';
 import type { YamlConfig } from '@graphql-mesh/types';
 import { PubSub } from '@graphql-mesh/utils';
 import { DefaultLogger } from '@graphql-mesh/utils';
-import MeshCache from '@graphql-mesh/cache-localforage';
+import MeshCache from "@graphql-mesh/cache-localforage";
 import { fetch as fetchFn } from '@whatwg-node/fetch';
 
 import { MeshResolvedSource } from '@graphql-mesh/runtime';
 import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
-import GraphqlHandler from '@graphql-mesh/graphql';
-import StitchingMerger from '@graphql-mesh/merger-stitching';
+import GraphqlHandler from "@graphql-mesh/graphql"
+import StitchingMerger from "@graphql-mesh/merger-stitching";
 import { printWithCache } from '@graphql-mesh/utils';
 import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
-import {
-  getMesh,
-  ExecuteMeshFn,
-  SubscribeMeshFn,
-  MeshContext as BaseMeshContext,
-  MeshInstance,
-} from '@graphql-mesh/runtime';
+import { getMesh, ExecuteMeshFn, SubscribeMeshFn, MeshContext as BaseMeshContext, MeshInstance } from '@graphql-mesh/runtime';
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { TxsGoerliTypes } from './.graphclient/sources/txs-goerli/types';
 import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
+import type { TxsGoerliTypes } from './.graphclient/sources/txs-goerli/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]?: Maybe<T[SubKey]>;
-};
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]: Maybe<T[SubKey]>;
-};
-export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
-  [P in K]-?: NonNullable<T[P]>;
-};
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
+
+
 
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -116,11 +98,13 @@ export type Query = {
   _meta?: Maybe<_Meta_>;
 };
 
+
 export type QuerytokenArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerytokensArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -132,11 +116,13 @@ export type QuerytokensArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerycommitmentPreimageArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerycommitmentPreimagesArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -148,11 +134,13 @@ export type QuerycommitmentPreimagesArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QueryciphertextArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QueryciphertextsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -164,11 +152,13 @@ export type QueryciphertextsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerylegacyCommitmentCiphertextArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerylegacyCommitmentCiphertextsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -180,11 +170,13 @@ export type QuerylegacyCommitmentCiphertextsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerycommitmentCiphertextArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerycommitmentCiphertextsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -196,11 +188,13 @@ export type QuerycommitmentCiphertextsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerycommitmentBatchEventNewArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerycommitmentBatchEventNewsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -212,11 +206,13 @@ export type QuerycommitmentBatchEventNewsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerylegacyGeneratedCommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerylegacyGeneratedCommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -228,11 +224,13 @@ export type QuerylegacyGeneratedCommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerylegacyEncryptedCommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerylegacyEncryptedCommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -244,11 +242,13 @@ export type QuerylegacyEncryptedCommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QueryshieldCommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QueryshieldCommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -260,11 +260,13 @@ export type QueryshieldCommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerytransactCommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerytransactCommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -276,11 +278,13 @@ export type QuerytransactCommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QueryunshieldArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QueryunshieldsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -292,11 +296,13 @@ export type QueryunshieldsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerynullifierArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerynullifiersArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -308,11 +314,13 @@ export type QuerynullifiersArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerytransactionArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerytransactionsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -324,11 +332,13 @@ export type QuerytransactionsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QueryverificationHashArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QueryverificationHashesArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -340,11 +350,13 @@ export type QueryverificationHashesArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerycommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerycommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -356,11 +368,13 @@ export type QuerycommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type QuerytransactionInterfaceArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type QuerytransactionInterfacesArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -371,6 +385,7 @@ export type QuerytransactionInterfacesArgs = {
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type Query_metaArgs = {
   block?: InputMaybe<Block_height>;
@@ -413,11 +428,13 @@ export type Subscription = {
   _meta?: Maybe<_Meta_>;
 };
 
+
 export type SubscriptiontokenArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptiontokensArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -429,11 +446,13 @@ export type SubscriptiontokensArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptioncommitmentPreimageArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptioncommitmentPreimagesArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -445,11 +464,13 @@ export type SubscriptioncommitmentPreimagesArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptionciphertextArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptionciphertextsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -461,11 +482,13 @@ export type SubscriptionciphertextsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptionlegacyCommitmentCiphertextArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptionlegacyCommitmentCiphertextsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -477,11 +500,13 @@ export type SubscriptionlegacyCommitmentCiphertextsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptioncommitmentCiphertextArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptioncommitmentCiphertextsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -493,11 +518,13 @@ export type SubscriptioncommitmentCiphertextsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptioncommitmentBatchEventNewArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptioncommitmentBatchEventNewsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -509,11 +536,13 @@ export type SubscriptioncommitmentBatchEventNewsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptionlegacyGeneratedCommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptionlegacyGeneratedCommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -525,11 +554,13 @@ export type SubscriptionlegacyGeneratedCommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptionlegacyEncryptedCommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptionlegacyEncryptedCommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -541,11 +572,13 @@ export type SubscriptionlegacyEncryptedCommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptionshieldCommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptionshieldCommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -557,11 +590,13 @@ export type SubscriptionshieldCommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptiontransactCommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptiontransactCommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -573,11 +608,13 @@ export type SubscriptiontransactCommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptionunshieldArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptionunshieldsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -589,11 +626,13 @@ export type SubscriptionunshieldsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptionnullifierArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptionnullifiersArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -605,11 +644,13 @@ export type SubscriptionnullifiersArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptiontransactionArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptiontransactionsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -621,11 +662,13 @@ export type SubscriptiontransactionsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptionverificationHashArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptionverificationHashesArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -637,11 +680,13 @@ export type SubscriptionverificationHashesArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptioncommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptioncommitmentsArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -653,11 +698,13 @@ export type SubscriptioncommitmentsArgs = {
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
+
 export type SubscriptiontransactionInterfaceArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type SubscriptiontransactionInterfacesArgs = {
   skip?: InputMaybe<Scalars['Int']>;
@@ -668,6 +715,7 @@ export type SubscriptiontransactionInterfacesArgs = {
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
+
 
 export type Subscription_metaArgs = {
   block?: InputMaybe<Block_height>;
@@ -733,7 +781,11 @@ export type Ciphertext_filter = {
   or?: InputMaybe<Array<InputMaybe<Ciphertext_filter>>>;
 };
 
-export type Ciphertext_orderBy = 'id' | 'iv' | 'tag' | 'data';
+export type Ciphertext_orderBy =
+  | 'id'
+  | 'iv'
+  | 'tag'
+  | 'data';
 
 export type Commitment = {
   id: Scalars['Bytes'];
@@ -1465,7 +1517,9 @@ export type Nullifier_orderBy =
   | 'nullifier';
 
 /** Defines the order direction, either ascending or descending */
-export type OrderDirection = 'asc' | 'desc';
+export type OrderDirection =
+  | 'asc'
+  | 'desc';
 
 export type ShieldCommitment = Commitment & {
   id: Scalars['Bytes'];
@@ -1632,7 +1686,10 @@ export type Token = {
   tokenSubID: Scalars['Bytes'];
 };
 
-export type TokenType = 'ERC20' | 'ERC721' | 'ERC1155';
+export type TokenType =
+  | 'ERC20'
+  | 'ERC721'
+  | 'ERC1155';
 
 export type Token_filter = {
   id?: InputMaybe<Scalars['Bytes']>;
@@ -1675,7 +1732,11 @@ export type Token_filter = {
   or?: InputMaybe<Array<InputMaybe<Token_filter>>>;
 };
 
-export type Token_orderBy = 'id' | 'tokenType' | 'tokenAddress' | 'tokenSubID';
+export type Token_orderBy =
+  | 'id'
+  | 'tokenType'
+  | 'tokenAddress'
+  | 'tokenSubID';
 
 export type TransactCommitment = Commitment & {
   id: Scalars['Bytes'];
@@ -2350,7 +2411,9 @@ export type VerificationHash_filter = {
   or?: InputMaybe<Array<InputMaybe<VerificationHash_filter>>>;
 };
 
-export type VerificationHash_orderBy = 'id' | 'verificationHash';
+export type VerificationHash_orderBy =
+  | 'id'
+  | 'verificationHash';
 
 export type _Block_ = {
   /** The hash of the block */
@@ -2388,6 +2451,7 @@ export type ResolversObject<TObject> = WithIndex<TObject>;
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
+
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
@@ -2401,9 +2465,7 @@ export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
   selectionSet: string | ((fieldNode: FieldNode) => SelectionSetNode);
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
-export type StitchingResolver<TResult, TParent, TContext, TArgs> =
-  | LegacyStitchingResolver<TResult, TParent, TContext, TArgs>
-  | NewStitchingResolver<TResult, TParent, TContext, TArgs>;
+export type StitchingResolver<TResult, TParent, TContext, TArgs> = LegacyStitchingResolver<TResult, TParent, TContext, TArgs> | NewStitchingResolver<TResult, TParent, TContext, TArgs>;
 export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
   | ResolverFn<TResult, TParent, TContext, TArgs>
   | ResolverWithResolve<TResult, TParent, TContext, TArgs>
@@ -2413,42 +2475,26 @@ export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
   args: TArgs,
   context: TContext,
-  info: GraphQLResolveInfo,
+  info: GraphQLResolveInfo
 ) => Promise<TResult> | TResult;
 
 export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
   args: TArgs,
   context: TContext,
-  info: GraphQLResolveInfo,
+  info: GraphQLResolveInfo
 ) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>;
 
 export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
   args: TArgs,
   context: TContext,
-  info: GraphQLResolveInfo,
+  info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
-export interface SubscriptionSubscriberObject<
-  TResult,
-  TKey extends string,
-  TParent,
-  TContext,
-  TArgs,
-> {
-  subscribe: SubscriptionSubscribeFn<
-    { [key in TKey]: TResult },
-    TParent,
-    TContext,
-    TArgs
-  >;
-  resolve?: SubscriptionResolveFn<
-    TResult,
-    { [key in TKey]: TResult },
-    TContext,
-    TArgs
-  >;
+export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
+  subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>;
+  resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>;
 }
 
 export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
@@ -2456,53 +2502,30 @@ export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
   resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
 }
 
-export type SubscriptionObject<
-  TResult,
-  TKey extends string,
-  TParent,
-  TContext,
-  TArgs,
-> =
+export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
   | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
   | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
 
-export type SubscriptionResolver<
-  TResult,
-  TKey extends string,
-  TParent = {},
-  TContext = {},
-  TArgs = {},
-> =
-  | ((
-      ...args: any[]
-    ) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
+  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
   | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
 
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
   parent: TParent,
   context: TContext,
-  info: GraphQLResolveInfo,
+  info: GraphQLResolveInfo
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type IsTypeOfResolverFn<T = {}, TContext = {}> = (
-  obj: T,
-  context: TContext,
-  info: GraphQLResolveInfo,
-) => boolean | Promise<boolean>;
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
-export type DirectiveResolverFn<
-  TResult = {},
-  TParent = {},
-  TContext = {},
-  TArgs = {},
-> = (
+export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
   next: NextResolverFn<TResult>,
   parent: TParent,
   args: TArgs,
   context: TContext,
-  info: GraphQLResolveInfo,
+  info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -2518,11 +2541,7 @@ export type ResolversTypes = ResolversObject<{
   Ciphertext: ResolverTypeWrapper<Ciphertext>;
   Ciphertext_filter: Ciphertext_filter;
   Ciphertext_orderBy: Ciphertext_orderBy;
-  Commitment:
-    | ResolversTypes['LegacyEncryptedCommitment']
-    | ResolversTypes['LegacyGeneratedCommitment']
-    | ResolversTypes['ShieldCommitment']
-    | ResolversTypes['TransactCommitment'];
+  Commitment: ResolversTypes['LegacyEncryptedCommitment'] | ResolversTypes['LegacyGeneratedCommitment'] | ResolversTypes['ShieldCommitment'] | ResolversTypes['TransactCommitment'];
   CommitmentBatchEventNew: ResolverTypeWrapper<CommitmentBatchEventNew>;
   CommitmentBatchEventNew_filter: CommitmentBatchEventNew_filter;
   CommitmentBatchEventNew_orderBy: CommitmentBatchEventNew_orderBy;
@@ -2592,11 +2611,7 @@ export type ResolversParentTypes = ResolversObject<{
   Bytes: Scalars['Bytes'];
   Ciphertext: Ciphertext;
   Ciphertext_filter: Ciphertext_filter;
-  Commitment:
-    | ResolversParentTypes['LegacyEncryptedCommitment']
-    | ResolversParentTypes['LegacyGeneratedCommitment']
-    | ResolversParentTypes['ShieldCommitment']
-    | ResolversParentTypes['TransactCommitment'];
+  Commitment: ResolversParentTypes['LegacyEncryptedCommitment'] | ResolversParentTypes['LegacyGeneratedCommitment'] | ResolversParentTypes['ShieldCommitment'] | ResolversParentTypes['TransactCommitment'];
   CommitmentBatchEventNew: CommitmentBatchEventNew;
   CommitmentBatchEventNew_filter: CommitmentBatchEventNew_filter;
   CommitmentCiphertext: CommitmentCiphertext;
@@ -2635,581 +2650,107 @@ export type ResolversParentTypes = ResolversObject<{
   _Meta_: _Meta_;
 }>;
 
-export type entityDirectiveArgs = {};
+export type entityDirectiveArgs = { };
 
-export type entityDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = MeshContext,
-  Args = entityDirectiveArgs,
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type entityDirectiveResolver<Result, Parent, ContextType = MeshContext, Args = entityDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type subgraphIdDirectiveArgs = {
   id: Scalars['String'];
 };
 
-export type subgraphIdDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = MeshContext,
-  Args = subgraphIdDirectiveArgs,
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type subgraphIdDirectiveResolver<Result, Parent, ContextType = MeshContext, Args = subgraphIdDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type derivedFromDirectiveArgs = {
   field: Scalars['String'];
 };
 
-export type derivedFromDirectiveResolver<
-  Result,
-  Parent,
-  ContextType = MeshContext,
-  Args = derivedFromDirectiveArgs,
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type derivedFromDirectiveResolver<Result, Parent, ContextType = MeshContext, Args = derivedFromDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type QueryResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
-> = ResolversObject<{
-  token?: Resolver<
-    Maybe<ResolversTypes['Token']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerytokenArgs, 'id' | 'subgraphError'>
-  >;
-  tokens?: Resolver<
-    Array<ResolversTypes['Token']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerytokensArgs, 'skip' | 'first' | 'subgraphError'>
-  >;
-  commitmentPreimage?: Resolver<
-    Maybe<ResolversTypes['CommitmentPreimage']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerycommitmentPreimageArgs, 'id' | 'subgraphError'>
-  >;
-  commitmentPreimages?: Resolver<
-    Array<ResolversTypes['CommitmentPreimage']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QuerycommitmentPreimagesArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  ciphertext?: Resolver<
-    Maybe<ResolversTypes['Ciphertext']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryciphertextArgs, 'id' | 'subgraphError'>
-  >;
-  ciphertexts?: Resolver<
-    Array<ResolversTypes['Ciphertext']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryciphertextsArgs, 'skip' | 'first' | 'subgraphError'>
-  >;
-  legacyCommitmentCiphertext?: Resolver<
-    Maybe<ResolversTypes['LegacyCommitmentCiphertext']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerylegacyCommitmentCiphertextArgs, 'id' | 'subgraphError'>
-  >;
-  legacyCommitmentCiphertexts?: Resolver<
-    Array<ResolversTypes['LegacyCommitmentCiphertext']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QuerylegacyCommitmentCiphertextsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  commitmentCiphertext?: Resolver<
-    Maybe<ResolversTypes['CommitmentCiphertext']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerycommitmentCiphertextArgs, 'id' | 'subgraphError'>
-  >;
-  commitmentCiphertexts?: Resolver<
-    Array<ResolversTypes['CommitmentCiphertext']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QuerycommitmentCiphertextsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  commitmentBatchEventNew?: Resolver<
-    Maybe<ResolversTypes['CommitmentBatchEventNew']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerycommitmentBatchEventNewArgs, 'id' | 'subgraphError'>
-  >;
-  commitmentBatchEventNews?: Resolver<
-    Array<ResolversTypes['CommitmentBatchEventNew']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QuerycommitmentBatchEventNewsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  legacyGeneratedCommitment?: Resolver<
-    Maybe<ResolversTypes['LegacyGeneratedCommitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerylegacyGeneratedCommitmentArgs, 'id' | 'subgraphError'>
-  >;
-  legacyGeneratedCommitments?: Resolver<
-    Array<ResolversTypes['LegacyGeneratedCommitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QuerylegacyGeneratedCommitmentsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  legacyEncryptedCommitment?: Resolver<
-    Maybe<ResolversTypes['LegacyEncryptedCommitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerylegacyEncryptedCommitmentArgs, 'id' | 'subgraphError'>
-  >;
-  legacyEncryptedCommitments?: Resolver<
-    Array<ResolversTypes['LegacyEncryptedCommitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QuerylegacyEncryptedCommitmentsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  shieldCommitment?: Resolver<
-    Maybe<ResolversTypes['ShieldCommitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryshieldCommitmentArgs, 'id' | 'subgraphError'>
-  >;
-  shieldCommitments?: Resolver<
-    Array<ResolversTypes['ShieldCommitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QueryshieldCommitmentsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  transactCommitment?: Resolver<
-    Maybe<ResolversTypes['TransactCommitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerytransactCommitmentArgs, 'id' | 'subgraphError'>
-  >;
-  transactCommitments?: Resolver<
-    Array<ResolversTypes['TransactCommitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QuerytransactCommitmentsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  unshield?: Resolver<
-    Maybe<ResolversTypes['Unshield']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryunshieldArgs, 'id' | 'subgraphError'>
-  >;
-  unshields?: Resolver<
-    Array<ResolversTypes['Unshield']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryunshieldsArgs, 'skip' | 'first' | 'subgraphError'>
-  >;
-  nullifier?: Resolver<
-    Maybe<ResolversTypes['Nullifier']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerynullifierArgs, 'id' | 'subgraphError'>
-  >;
-  nullifiers?: Resolver<
-    Array<ResolversTypes['Nullifier']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerynullifiersArgs, 'skip' | 'first' | 'subgraphError'>
-  >;
-  transaction?: Resolver<
-    Maybe<ResolversTypes['Transaction']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerytransactionArgs, 'id' | 'subgraphError'>
-  >;
-  transactions?: Resolver<
-    Array<ResolversTypes['Transaction']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerytransactionsArgs, 'skip' | 'first' | 'subgraphError'>
-  >;
-  verificationHash?: Resolver<
-    Maybe<ResolversTypes['VerificationHash']>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryverificationHashArgs, 'id' | 'subgraphError'>
-  >;
-  verificationHashes?: Resolver<
-    Array<ResolversTypes['VerificationHash']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QueryverificationHashesArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  commitment?: Resolver<
-    Maybe<ResolversTypes['Commitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerycommitmentArgs, 'id' | 'subgraphError'>
-  >;
-  commitments?: Resolver<
-    Array<ResolversTypes['Commitment']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerycommitmentsArgs, 'skip' | 'first' | 'subgraphError'>
-  >;
-  transactionInterface?: Resolver<
-    Maybe<ResolversTypes['TransactionInterface']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerytransactionInterfaceArgs, 'id' | 'subgraphError'>
-  >;
-  transactionInterfaces?: Resolver<
-    Array<ResolversTypes['TransactionInterface']>,
-    ParentType,
-    ContextType,
-    RequireFields<
-      QuerytransactionInterfacesArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  _meta?: Resolver<
-    Maybe<ResolversTypes['_Meta_']>,
-    ParentType,
-    ContextType,
-    Partial<Query_metaArgs>
-  >;
+export type QueryResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  token?: Resolver<Maybe<ResolversTypes['Token']>, ParentType, ContextType, RequireFields<QuerytokenArgs, 'id' | 'subgraphError'>>;
+  tokens?: Resolver<Array<ResolversTypes['Token']>, ParentType, ContextType, RequireFields<QuerytokensArgs, 'skip' | 'first' | 'subgraphError'>>;
+  commitmentPreimage?: Resolver<Maybe<ResolversTypes['CommitmentPreimage']>, ParentType, ContextType, RequireFields<QuerycommitmentPreimageArgs, 'id' | 'subgraphError'>>;
+  commitmentPreimages?: Resolver<Array<ResolversTypes['CommitmentPreimage']>, ParentType, ContextType, RequireFields<QuerycommitmentPreimagesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  ciphertext?: Resolver<Maybe<ResolversTypes['Ciphertext']>, ParentType, ContextType, RequireFields<QueryciphertextArgs, 'id' | 'subgraphError'>>;
+  ciphertexts?: Resolver<Array<ResolversTypes['Ciphertext']>, ParentType, ContextType, RequireFields<QueryciphertextsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  legacyCommitmentCiphertext?: Resolver<Maybe<ResolversTypes['LegacyCommitmentCiphertext']>, ParentType, ContextType, RequireFields<QuerylegacyCommitmentCiphertextArgs, 'id' | 'subgraphError'>>;
+  legacyCommitmentCiphertexts?: Resolver<Array<ResolversTypes['LegacyCommitmentCiphertext']>, ParentType, ContextType, RequireFields<QuerylegacyCommitmentCiphertextsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  commitmentCiphertext?: Resolver<Maybe<ResolversTypes['CommitmentCiphertext']>, ParentType, ContextType, RequireFields<QuerycommitmentCiphertextArgs, 'id' | 'subgraphError'>>;
+  commitmentCiphertexts?: Resolver<Array<ResolversTypes['CommitmentCiphertext']>, ParentType, ContextType, RequireFields<QuerycommitmentCiphertextsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  commitmentBatchEventNew?: Resolver<Maybe<ResolversTypes['CommitmentBatchEventNew']>, ParentType, ContextType, RequireFields<QuerycommitmentBatchEventNewArgs, 'id' | 'subgraphError'>>;
+  commitmentBatchEventNews?: Resolver<Array<ResolversTypes['CommitmentBatchEventNew']>, ParentType, ContextType, RequireFields<QuerycommitmentBatchEventNewsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  legacyGeneratedCommitment?: Resolver<Maybe<ResolversTypes['LegacyGeneratedCommitment']>, ParentType, ContextType, RequireFields<QuerylegacyGeneratedCommitmentArgs, 'id' | 'subgraphError'>>;
+  legacyGeneratedCommitments?: Resolver<Array<ResolversTypes['LegacyGeneratedCommitment']>, ParentType, ContextType, RequireFields<QuerylegacyGeneratedCommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  legacyEncryptedCommitment?: Resolver<Maybe<ResolversTypes['LegacyEncryptedCommitment']>, ParentType, ContextType, RequireFields<QuerylegacyEncryptedCommitmentArgs, 'id' | 'subgraphError'>>;
+  legacyEncryptedCommitments?: Resolver<Array<ResolversTypes['LegacyEncryptedCommitment']>, ParentType, ContextType, RequireFields<QuerylegacyEncryptedCommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  shieldCommitment?: Resolver<Maybe<ResolversTypes['ShieldCommitment']>, ParentType, ContextType, RequireFields<QueryshieldCommitmentArgs, 'id' | 'subgraphError'>>;
+  shieldCommitments?: Resolver<Array<ResolversTypes['ShieldCommitment']>, ParentType, ContextType, RequireFields<QueryshieldCommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  transactCommitment?: Resolver<Maybe<ResolversTypes['TransactCommitment']>, ParentType, ContextType, RequireFields<QuerytransactCommitmentArgs, 'id' | 'subgraphError'>>;
+  transactCommitments?: Resolver<Array<ResolversTypes['TransactCommitment']>, ParentType, ContextType, RequireFields<QuerytransactCommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  unshield?: Resolver<Maybe<ResolversTypes['Unshield']>, ParentType, ContextType, RequireFields<QueryunshieldArgs, 'id' | 'subgraphError'>>;
+  unshields?: Resolver<Array<ResolversTypes['Unshield']>, ParentType, ContextType, RequireFields<QueryunshieldsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  nullifier?: Resolver<Maybe<ResolversTypes['Nullifier']>, ParentType, ContextType, RequireFields<QuerynullifierArgs, 'id' | 'subgraphError'>>;
+  nullifiers?: Resolver<Array<ResolversTypes['Nullifier']>, ParentType, ContextType, RequireFields<QuerynullifiersArgs, 'skip' | 'first' | 'subgraphError'>>;
+  transaction?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, RequireFields<QuerytransactionArgs, 'id' | 'subgraphError'>>;
+  transactions?: Resolver<Array<ResolversTypes['Transaction']>, ParentType, ContextType, RequireFields<QuerytransactionsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  verificationHash?: Resolver<Maybe<ResolversTypes['VerificationHash']>, ParentType, ContextType, RequireFields<QueryverificationHashArgs, 'id' | 'subgraphError'>>;
+  verificationHashes?: Resolver<Array<ResolversTypes['VerificationHash']>, ParentType, ContextType, RequireFields<QueryverificationHashesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  commitment?: Resolver<Maybe<ResolversTypes['Commitment']>, ParentType, ContextType, RequireFields<QuerycommitmentArgs, 'id' | 'subgraphError'>>;
+  commitments?: Resolver<Array<ResolversTypes['Commitment']>, ParentType, ContextType, RequireFields<QuerycommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  transactionInterface?: Resolver<Maybe<ResolversTypes['TransactionInterface']>, ParentType, ContextType, RequireFields<QuerytransactionInterfaceArgs, 'id' | 'subgraphError'>>;
+  transactionInterfaces?: Resolver<Array<ResolversTypes['TransactionInterface']>, ParentType, ContextType, RequireFields<QuerytransactionInterfacesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  _meta?: Resolver<Maybe<ResolversTypes['_Meta_']>, ParentType, ContextType, Partial<Query_metaArgs>>;
 }>;
 
-export type SubscriptionResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription'],
-> = ResolversObject<{
-  token?: SubscriptionResolver<
-    Maybe<ResolversTypes['Token']>,
-    'token',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptiontokenArgs, 'id' | 'subgraphError'>
-  >;
-  tokens?: SubscriptionResolver<
-    Array<ResolversTypes['Token']>,
-    'tokens',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptiontokensArgs, 'skip' | 'first' | 'subgraphError'>
-  >;
-  commitmentPreimage?: SubscriptionResolver<
-    Maybe<ResolversTypes['CommitmentPreimage']>,
-    'commitmentPreimage',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptioncommitmentPreimageArgs, 'id' | 'subgraphError'>
-  >;
-  commitmentPreimages?: SubscriptionResolver<
-    Array<ResolversTypes['CommitmentPreimage']>,
-    'commitmentPreimages',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptioncommitmentPreimagesArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  ciphertext?: SubscriptionResolver<
-    Maybe<ResolversTypes['Ciphertext']>,
-    'ciphertext',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionciphertextArgs, 'id' | 'subgraphError'>
-  >;
-  ciphertexts?: SubscriptionResolver<
-    Array<ResolversTypes['Ciphertext']>,
-    'ciphertexts',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionciphertextsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  legacyCommitmentCiphertext?: SubscriptionResolver<
-    Maybe<ResolversTypes['LegacyCommitmentCiphertext']>,
-    'legacyCommitmentCiphertext',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionlegacyCommitmentCiphertextArgs,
-      'id' | 'subgraphError'
-    >
-  >;
-  legacyCommitmentCiphertexts?: SubscriptionResolver<
-    Array<ResolversTypes['LegacyCommitmentCiphertext']>,
-    'legacyCommitmentCiphertexts',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionlegacyCommitmentCiphertextsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  commitmentCiphertext?: SubscriptionResolver<
-    Maybe<ResolversTypes['CommitmentCiphertext']>,
-    'commitmentCiphertext',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptioncommitmentCiphertextArgs, 'id' | 'subgraphError'>
-  >;
-  commitmentCiphertexts?: SubscriptionResolver<
-    Array<ResolversTypes['CommitmentCiphertext']>,
-    'commitmentCiphertexts',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptioncommitmentCiphertextsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  commitmentBatchEventNew?: SubscriptionResolver<
-    Maybe<ResolversTypes['CommitmentBatchEventNew']>,
-    'commitmentBatchEventNew',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptioncommitmentBatchEventNewArgs,
-      'id' | 'subgraphError'
-    >
-  >;
-  commitmentBatchEventNews?: SubscriptionResolver<
-    Array<ResolversTypes['CommitmentBatchEventNew']>,
-    'commitmentBatchEventNews',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptioncommitmentBatchEventNewsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  legacyGeneratedCommitment?: SubscriptionResolver<
-    Maybe<ResolversTypes['LegacyGeneratedCommitment']>,
-    'legacyGeneratedCommitment',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionlegacyGeneratedCommitmentArgs,
-      'id' | 'subgraphError'
-    >
-  >;
-  legacyGeneratedCommitments?: SubscriptionResolver<
-    Array<ResolversTypes['LegacyGeneratedCommitment']>,
-    'legacyGeneratedCommitments',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionlegacyGeneratedCommitmentsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  legacyEncryptedCommitment?: SubscriptionResolver<
-    Maybe<ResolversTypes['LegacyEncryptedCommitment']>,
-    'legacyEncryptedCommitment',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionlegacyEncryptedCommitmentArgs,
-      'id' | 'subgraphError'
-    >
-  >;
-  legacyEncryptedCommitments?: SubscriptionResolver<
-    Array<ResolversTypes['LegacyEncryptedCommitment']>,
-    'legacyEncryptedCommitments',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionlegacyEncryptedCommitmentsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  shieldCommitment?: SubscriptionResolver<
-    Maybe<ResolversTypes['ShieldCommitment']>,
-    'shieldCommitment',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionshieldCommitmentArgs, 'id' | 'subgraphError'>
-  >;
-  shieldCommitments?: SubscriptionResolver<
-    Array<ResolversTypes['ShieldCommitment']>,
-    'shieldCommitments',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionshieldCommitmentsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  transactCommitment?: SubscriptionResolver<
-    Maybe<ResolversTypes['TransactCommitment']>,
-    'transactCommitment',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptiontransactCommitmentArgs, 'id' | 'subgraphError'>
-  >;
-  transactCommitments?: SubscriptionResolver<
-    Array<ResolversTypes['TransactCommitment']>,
-    'transactCommitments',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptiontransactCommitmentsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  unshield?: SubscriptionResolver<
-    Maybe<ResolversTypes['Unshield']>,
-    'unshield',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionunshieldArgs, 'id' | 'subgraphError'>
-  >;
-  unshields?: SubscriptionResolver<
-    Array<ResolversTypes['Unshield']>,
-    'unshields',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionunshieldsArgs, 'skip' | 'first' | 'subgraphError'>
-  >;
-  nullifier?: SubscriptionResolver<
-    Maybe<ResolversTypes['Nullifier']>,
-    'nullifier',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionnullifierArgs, 'id' | 'subgraphError'>
-  >;
-  nullifiers?: SubscriptionResolver<
-    Array<ResolversTypes['Nullifier']>,
-    'nullifiers',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionnullifiersArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  transaction?: SubscriptionResolver<
-    Maybe<ResolversTypes['Transaction']>,
-    'transaction',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptiontransactionArgs, 'id' | 'subgraphError'>
-  >;
-  transactions?: SubscriptionResolver<
-    Array<ResolversTypes['Transaction']>,
-    'transactions',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptiontransactionsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  verificationHash?: SubscriptionResolver<
-    Maybe<ResolversTypes['VerificationHash']>,
-    'verificationHash',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptionverificationHashArgs, 'id' | 'subgraphError'>
-  >;
-  verificationHashes?: SubscriptionResolver<
-    Array<ResolversTypes['VerificationHash']>,
-    'verificationHashes',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptionverificationHashesArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  commitment?: SubscriptionResolver<
-    Maybe<ResolversTypes['Commitment']>,
-    'commitment',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptioncommitmentArgs, 'id' | 'subgraphError'>
-  >;
-  commitments?: SubscriptionResolver<
-    Array<ResolversTypes['Commitment']>,
-    'commitments',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptioncommitmentsArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  transactionInterface?: SubscriptionResolver<
-    Maybe<ResolversTypes['TransactionInterface']>,
-    'transactionInterface',
-    ParentType,
-    ContextType,
-    RequireFields<SubscriptiontransactionInterfaceArgs, 'id' | 'subgraphError'>
-  >;
-  transactionInterfaces?: SubscriptionResolver<
-    Array<ResolversTypes['TransactionInterface']>,
-    'transactionInterfaces',
-    ParentType,
-    ContextType,
-    RequireFields<
-      SubscriptiontransactionInterfacesArgs,
-      'skip' | 'first' | 'subgraphError'
-    >
-  >;
-  _meta?: SubscriptionResolver<
-    Maybe<ResolversTypes['_Meta_']>,
-    '_meta',
-    ParentType,
-    ContextType,
-    Partial<Subscription_metaArgs>
-  >;
+export type SubscriptionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
+  token?: SubscriptionResolver<Maybe<ResolversTypes['Token']>, "token", ParentType, ContextType, RequireFields<SubscriptiontokenArgs, 'id' | 'subgraphError'>>;
+  tokens?: SubscriptionResolver<Array<ResolversTypes['Token']>, "tokens", ParentType, ContextType, RequireFields<SubscriptiontokensArgs, 'skip' | 'first' | 'subgraphError'>>;
+  commitmentPreimage?: SubscriptionResolver<Maybe<ResolversTypes['CommitmentPreimage']>, "commitmentPreimage", ParentType, ContextType, RequireFields<SubscriptioncommitmentPreimageArgs, 'id' | 'subgraphError'>>;
+  commitmentPreimages?: SubscriptionResolver<Array<ResolversTypes['CommitmentPreimage']>, "commitmentPreimages", ParentType, ContextType, RequireFields<SubscriptioncommitmentPreimagesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  ciphertext?: SubscriptionResolver<Maybe<ResolversTypes['Ciphertext']>, "ciphertext", ParentType, ContextType, RequireFields<SubscriptionciphertextArgs, 'id' | 'subgraphError'>>;
+  ciphertexts?: SubscriptionResolver<Array<ResolversTypes['Ciphertext']>, "ciphertexts", ParentType, ContextType, RequireFields<SubscriptionciphertextsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  legacyCommitmentCiphertext?: SubscriptionResolver<Maybe<ResolversTypes['LegacyCommitmentCiphertext']>, "legacyCommitmentCiphertext", ParentType, ContextType, RequireFields<SubscriptionlegacyCommitmentCiphertextArgs, 'id' | 'subgraphError'>>;
+  legacyCommitmentCiphertexts?: SubscriptionResolver<Array<ResolversTypes['LegacyCommitmentCiphertext']>, "legacyCommitmentCiphertexts", ParentType, ContextType, RequireFields<SubscriptionlegacyCommitmentCiphertextsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  commitmentCiphertext?: SubscriptionResolver<Maybe<ResolversTypes['CommitmentCiphertext']>, "commitmentCiphertext", ParentType, ContextType, RequireFields<SubscriptioncommitmentCiphertextArgs, 'id' | 'subgraphError'>>;
+  commitmentCiphertexts?: SubscriptionResolver<Array<ResolversTypes['CommitmentCiphertext']>, "commitmentCiphertexts", ParentType, ContextType, RequireFields<SubscriptioncommitmentCiphertextsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  commitmentBatchEventNew?: SubscriptionResolver<Maybe<ResolversTypes['CommitmentBatchEventNew']>, "commitmentBatchEventNew", ParentType, ContextType, RequireFields<SubscriptioncommitmentBatchEventNewArgs, 'id' | 'subgraphError'>>;
+  commitmentBatchEventNews?: SubscriptionResolver<Array<ResolversTypes['CommitmentBatchEventNew']>, "commitmentBatchEventNews", ParentType, ContextType, RequireFields<SubscriptioncommitmentBatchEventNewsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  legacyGeneratedCommitment?: SubscriptionResolver<Maybe<ResolversTypes['LegacyGeneratedCommitment']>, "legacyGeneratedCommitment", ParentType, ContextType, RequireFields<SubscriptionlegacyGeneratedCommitmentArgs, 'id' | 'subgraphError'>>;
+  legacyGeneratedCommitments?: SubscriptionResolver<Array<ResolversTypes['LegacyGeneratedCommitment']>, "legacyGeneratedCommitments", ParentType, ContextType, RequireFields<SubscriptionlegacyGeneratedCommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  legacyEncryptedCommitment?: SubscriptionResolver<Maybe<ResolversTypes['LegacyEncryptedCommitment']>, "legacyEncryptedCommitment", ParentType, ContextType, RequireFields<SubscriptionlegacyEncryptedCommitmentArgs, 'id' | 'subgraphError'>>;
+  legacyEncryptedCommitments?: SubscriptionResolver<Array<ResolversTypes['LegacyEncryptedCommitment']>, "legacyEncryptedCommitments", ParentType, ContextType, RequireFields<SubscriptionlegacyEncryptedCommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  shieldCommitment?: SubscriptionResolver<Maybe<ResolversTypes['ShieldCommitment']>, "shieldCommitment", ParentType, ContextType, RequireFields<SubscriptionshieldCommitmentArgs, 'id' | 'subgraphError'>>;
+  shieldCommitments?: SubscriptionResolver<Array<ResolversTypes['ShieldCommitment']>, "shieldCommitments", ParentType, ContextType, RequireFields<SubscriptionshieldCommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  transactCommitment?: SubscriptionResolver<Maybe<ResolversTypes['TransactCommitment']>, "transactCommitment", ParentType, ContextType, RequireFields<SubscriptiontransactCommitmentArgs, 'id' | 'subgraphError'>>;
+  transactCommitments?: SubscriptionResolver<Array<ResolversTypes['TransactCommitment']>, "transactCommitments", ParentType, ContextType, RequireFields<SubscriptiontransactCommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  unshield?: SubscriptionResolver<Maybe<ResolversTypes['Unshield']>, "unshield", ParentType, ContextType, RequireFields<SubscriptionunshieldArgs, 'id' | 'subgraphError'>>;
+  unshields?: SubscriptionResolver<Array<ResolversTypes['Unshield']>, "unshields", ParentType, ContextType, RequireFields<SubscriptionunshieldsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  nullifier?: SubscriptionResolver<Maybe<ResolversTypes['Nullifier']>, "nullifier", ParentType, ContextType, RequireFields<SubscriptionnullifierArgs, 'id' | 'subgraphError'>>;
+  nullifiers?: SubscriptionResolver<Array<ResolversTypes['Nullifier']>, "nullifiers", ParentType, ContextType, RequireFields<SubscriptionnullifiersArgs, 'skip' | 'first' | 'subgraphError'>>;
+  transaction?: SubscriptionResolver<Maybe<ResolversTypes['Transaction']>, "transaction", ParentType, ContextType, RequireFields<SubscriptiontransactionArgs, 'id' | 'subgraphError'>>;
+  transactions?: SubscriptionResolver<Array<ResolversTypes['Transaction']>, "transactions", ParentType, ContextType, RequireFields<SubscriptiontransactionsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  verificationHash?: SubscriptionResolver<Maybe<ResolversTypes['VerificationHash']>, "verificationHash", ParentType, ContextType, RequireFields<SubscriptionverificationHashArgs, 'id' | 'subgraphError'>>;
+  verificationHashes?: SubscriptionResolver<Array<ResolversTypes['VerificationHash']>, "verificationHashes", ParentType, ContextType, RequireFields<SubscriptionverificationHashesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  commitment?: SubscriptionResolver<Maybe<ResolversTypes['Commitment']>, "commitment", ParentType, ContextType, RequireFields<SubscriptioncommitmentArgs, 'id' | 'subgraphError'>>;
+  commitments?: SubscriptionResolver<Array<ResolversTypes['Commitment']>, "commitments", ParentType, ContextType, RequireFields<SubscriptioncommitmentsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  transactionInterface?: SubscriptionResolver<Maybe<ResolversTypes['TransactionInterface']>, "transactionInterface", ParentType, ContextType, RequireFields<SubscriptiontransactionInterfaceArgs, 'id' | 'subgraphError'>>;
+  transactionInterfaces?: SubscriptionResolver<Array<ResolversTypes['TransactionInterface']>, "transactionInterfaces", ParentType, ContextType, RequireFields<SubscriptiontransactionInterfacesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  _meta?: SubscriptionResolver<Maybe<ResolversTypes['_Meta_']>, "_meta", ParentType, ContextType, Partial<Subscription_metaArgs>>;
 }>;
 
-export interface BigDecimalScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['BigDecimal'], any> {
+export interface BigDecimalScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['BigDecimal'], any> {
   name: 'BigDecimal';
 }
 
-export interface BigIntScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['BigInt'], any> {
+export interface BigIntScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['BigInt'], any> {
   name: 'BigInt';
 }
 
-export interface BytesScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['Bytes'], any> {
+export interface BytesScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Bytes'], any> {
   name: 'Bytes';
 }
 
-export type CiphertextResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['Ciphertext'] = ResolversParentTypes['Ciphertext'],
-> = ResolversObject<{
+export type CiphertextResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Ciphertext'] = ResolversParentTypes['Ciphertext']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   iv?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   tag?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
@@ -3217,76 +2758,37 @@ export type CiphertextResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type CommitmentResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['Commitment'] = ResolversParentTypes['Commitment'],
-> = ResolversObject<{
-  __resolveType: TypeResolveFn<
-    | 'LegacyEncryptedCommitment'
-    | 'LegacyGeneratedCommitment'
-    | 'ShieldCommitment'
-    | 'TransactCommitment',
-    ParentType,
-    ContextType
-  >;
+export type CommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Commitment'] = ResolversParentTypes['Commitment']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'LegacyEncryptedCommitment' | 'LegacyGeneratedCommitment' | 'ShieldCommitment' | 'TransactCommitment', ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
-    ParentType,
-    ContextType
-  >;
+  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<
-    ResolversTypes['CommitmentType'],
-    ParentType,
-    ContextType
-  >;
+  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
   hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
 }>;
 
-export type CommitmentBatchEventNewResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['CommitmentBatchEventNew'] = ResolversParentTypes['CommitmentBatchEventNew'],
-> = ResolversObject<{
+export type CommitmentBatchEventNewResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentBatchEventNew'] = ResolversParentTypes['CommitmentBatchEventNew']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['BigInt'],
-    ParentType,
-    ContextType
-  >;
+  batchStartTreePosition?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type CommitmentCiphertextResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['CommitmentCiphertext'] = ResolversParentTypes['CommitmentCiphertext'],
-> = ResolversObject<{
+export type CommitmentCiphertextResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentCiphertext'] = ResolversParentTypes['CommitmentCiphertext']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   ciphertext?: Resolver<ResolversTypes['Ciphertext'], ParentType, ContextType>;
-  blindedSenderViewingKey?: Resolver<
-    ResolversTypes['Bytes'],
-    ParentType,
-    ContextType
-  >;
-  blindedReceiverViewingKey?: Resolver<
-    ResolversTypes['Bytes'],
-    ParentType,
-    ContextType
-  >;
+  blindedSenderViewingKey?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  blindedReceiverViewingKey?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   annotationData?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   memo?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type CommitmentPreimageResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['CommitmentPreimage'] = ResolversParentTypes['CommitmentPreimage'],
-> = ResolversObject<{
+export type CommitmentPreimageResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentPreimage'] = ResolversParentTypes['CommitmentPreimage']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   npk?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   token?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
@@ -3294,93 +2796,48 @@ export type CommitmentPreimageResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export interface Int8ScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['Int8'], any> {
+export interface Int8ScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Int8'], any> {
   name: 'Int8';
 }
 
-export type LegacyCommitmentCiphertextResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['LegacyCommitmentCiphertext'] = ResolversParentTypes['LegacyCommitmentCiphertext'],
-> = ResolversObject<{
+export type LegacyCommitmentCiphertextResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyCommitmentCiphertext'] = ResolversParentTypes['LegacyCommitmentCiphertext']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   ciphertext?: Resolver<ResolversTypes['Ciphertext'], ParentType, ContextType>;
-  ephemeralKeys?: Resolver<
-    Array<ResolversTypes['Bytes']>,
-    ParentType,
-    ContextType
-  >;
+  ephemeralKeys?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
   memo?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type LegacyEncryptedCommitmentResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['LegacyEncryptedCommitment'] = ResolversParentTypes['LegacyEncryptedCommitment'],
-> = ResolversObject<{
+export type LegacyEncryptedCommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyEncryptedCommitment'] = ResolversParentTypes['LegacyEncryptedCommitment']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
-    ParentType,
-    ContextType
-  >;
+  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<
-    ResolversTypes['CommitmentType'],
-    ParentType,
-    ContextType
-  >;
+  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
   hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  ciphertext?: Resolver<
-    ResolversTypes['LegacyCommitmentCiphertext'],
-    ParentType,
-    ContextType
-  >;
+  ciphertext?: Resolver<ResolversTypes['LegacyCommitmentCiphertext'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type LegacyGeneratedCommitmentResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['LegacyGeneratedCommitment'] = ResolversParentTypes['LegacyGeneratedCommitment'],
-> = ResolversObject<{
+export type LegacyGeneratedCommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyGeneratedCommitment'] = ResolversParentTypes['LegacyGeneratedCommitment']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
-    ParentType,
-    ContextType
-  >;
+  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<
-    ResolversTypes['CommitmentType'],
-    ParentType,
-    ContextType
-  >;
+  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
   hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  preimage?: Resolver<
-    ResolversTypes['CommitmentPreimage'],
-    ParentType,
-    ContextType
-  >;
-  encryptedRandom?: Resolver<
-    Array<ResolversTypes['Bytes']>,
-    ParentType,
-    ContextType
-  >;
+  preimage?: Resolver<ResolversTypes['CommitmentPreimage'], ParentType, ContextType>;
+  encryptedRandom?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type NullifierResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['Nullifier'] = ResolversParentTypes['Nullifier'],
-> = ResolversObject<{
+export type NullifierResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Nullifier'] = ResolversParentTypes['Nullifier']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
@@ -3390,46 +2847,24 @@ export type NullifierResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type ShieldCommitmentResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['ShieldCommitment'] = ResolversParentTypes['ShieldCommitment'],
-> = ResolversObject<{
+export type ShieldCommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['ShieldCommitment'] = ResolversParentTypes['ShieldCommitment']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
-    ParentType,
-    ContextType
-  >;
+  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<
-    ResolversTypes['CommitmentType'],
-    ParentType,
-    ContextType
-  >;
+  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
   hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  preimage?: Resolver<
-    ResolversTypes['CommitmentPreimage'],
-    ParentType,
-    ContextType
-  >;
-  encryptedBundle?: Resolver<
-    Array<ResolversTypes['Bytes']>,
-    ParentType,
-    ContextType
-  >;
+  preimage?: Resolver<ResolversTypes['CommitmentPreimage'], ParentType, ContextType>;
+  encryptedBundle?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
   shieldKey?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   fee?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type TokenResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['Token'] = ResolversParentTypes['Token'],
-> = ResolversObject<{
+export type TokenResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Token'] = ResolversParentTypes['Token']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   tokenType?: Resolver<ResolversTypes['TokenType'], ParentType, ContextType>;
   tokenAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
@@ -3437,117 +2872,61 @@ export type TokenResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type TransactCommitmentResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['TransactCommitment'] = ResolversParentTypes['TransactCommitment'],
-> = ResolversObject<{
+export type TransactCommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TransactCommitment'] = ResolversParentTypes['TransactCommitment']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<
-    ResolversTypes['Int'],
-    ParentType,
-    ContextType
-  >;
+  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<
-    ResolversTypes['CommitmentType'],
-    ParentType,
-    ContextType
-  >;
+  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
   hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  ciphertext?: Resolver<
-    ResolversTypes['CommitmentCiphertext'],
-    ParentType,
-    ContextType
-  >;
+  ciphertext?: Resolver<ResolversTypes['CommitmentCiphertext'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type TransactionResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction'],
-> = ResolversObject<{
+export type TransactionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   merkleRoot?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  nullifiers?: Resolver<
-    Array<ResolversTypes['Bytes']>,
-    ParentType,
-    ContextType
-  >;
-  commitments?: Resolver<
-    Array<ResolversTypes['Bytes']>,
-    ParentType,
-    ContextType
-  >;
+  nullifiers?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  commitments?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
   boundParamsHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   hasUnshield?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   utxoTreeIn?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   utxoTreeOut?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  utxoBatchStartPositionOut?: Resolver<
-    ResolversTypes['BigInt'],
-    ParentType,
-    ContextType
-  >;
+  utxoBatchStartPositionOut?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   unshieldToken?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
-  unshieldToAddress?: Resolver<
-    ResolversTypes['Bytes'],
-    ParentType,
-    ContextType
-  >;
+  unshieldToAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   unshieldValue?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   verificationHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type TransactionInterfaceResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['TransactionInterface'] = ResolversParentTypes['TransactionInterface'],
-> = ResolversObject<{
+export type TransactionInterfaceResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TransactionInterface'] = ResolversParentTypes['TransactionInterface']> = ResolversObject<{
   __resolveType: TypeResolveFn<'Transaction', ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   merkleRoot?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  nullifiers?: Resolver<
-    Array<ResolversTypes['Bytes']>,
-    ParentType,
-    ContextType
-  >;
-  commitments?: Resolver<
-    Array<ResolversTypes['Bytes']>,
-    ParentType,
-    ContextType
-  >;
+  nullifiers?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
+  commitments?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
   boundParamsHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   hasUnshield?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   utxoTreeIn?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   utxoTreeOut?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  utxoBatchStartPositionOut?: Resolver<
-    ResolversTypes['BigInt'],
-    ParentType,
-    ContextType
-  >;
+  utxoBatchStartPositionOut?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   unshieldToken?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
-  unshieldToAddress?: Resolver<
-    ResolversTypes['Bytes'],
-    ParentType,
-    ContextType
-  >;
+  unshieldToAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   unshieldValue?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   verificationHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
 }>;
 
-export type UnshieldResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['Unshield'] = ResolversParentTypes['Unshield'],
-> = ResolversObject<{
+export type UnshieldResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Unshield'] = ResolversParentTypes['Unshield']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
@@ -3560,36 +2939,23 @@ export type UnshieldResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type VerificationHashResolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['VerificationHash'] = ResolversParentTypes['VerificationHash'],
-> = ResolversObject<{
+export type VerificationHashResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['VerificationHash'] = ResolversParentTypes['VerificationHash']> = ResolversObject<{
   id?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   verificationHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type _Block_Resolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['_Block_'] = ResolversParentTypes['_Block_'],
-> = ResolversObject<{
+export type _Block_Resolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['_Block_'] = ResolversParentTypes['_Block_']> = ResolversObject<{
   hash?: Resolver<Maybe<ResolversTypes['Bytes']>, ParentType, ContextType>;
   number?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   timestamp?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type _Meta_Resolvers<
-  ContextType = MeshContext,
-  ParentType extends ResolversParentTypes['_Meta_'] = ResolversParentTypes['_Meta_'],
-> = ResolversObject<{
+export type _Meta_Resolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['_Meta_'] = ResolversParentTypes['_Meta_']> = ResolversObject<{
   block?: Resolver<ResolversTypes['_Block_'], ParentType, ContextType>;
   deployment?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  hasIndexingErrors?: Resolver<
-    ResolversTypes['Boolean'],
-    ParentType,
-    ContextType
-  >;
+  hasIndexingErrors?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3626,117 +2992,90 @@ export type DirectiveResolvers<ContextType = MeshContext> = ResolversObject<{
   derivedFrom?: derivedFromDirectiveResolver<any, any, ContextType>;
 }>;
 
-export type MeshContext = TxsEthereumTypes.Context &
-  TxsGoerliTypes.Context &
-  BaseMeshContext;
+export type MeshContext = TxsGoerliTypes.Context & TxsEthereumTypes.Context & BaseMeshContext;
 
-const baseDir = pathModule.join(
-  typeof __dirname === 'string' ? __dirname : '/',
-  '..',
-);
+
+const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
 
 const importFn: ImportFn = <T>(moduleId: string) => {
-  const relativeModuleId = (
-    pathModule.isAbsolute(moduleId)
-      ? pathModule.relative(baseDir, moduleId)
-      : moduleId
-  )
-    .split('\\')
-    .join('/')
-    .replace(baseDir + '/', '');
-  switch (relativeModuleId) {
-    case '.graphclient/sources/txs-ethereum/introspectionSchema':
-      return import(
-        './.graphclient/sources/txs-ethereum/introspectionSchema'
-      ) as T;
-
-    case '.graphclient/sources/txs-goerli/introspectionSchema':
-      return import(
-        './.graphclient/sources/txs-goerli/introspectionSchema'
-      ) as T;
-
+  const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(baseDir + '/', '');
+  switch(relativeModuleId) {
+    case ".graphclient/sources/txs-goerli/introspectionSchema":
+      return import("./.graphclient/sources/txs-goerli/introspectionSchema") as T;
+    
+    case ".graphclient/sources/txs-ethereum/introspectionSchema":
+      return import("./.graphclient/sources/txs-ethereum/introspectionSchema") as T;
+    
     default:
-      return Promise.reject(
-        new Error(`Cannot find module '${relativeModuleId}'.`),
-      );
+      return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
   }
 };
 
-const rootStore = new MeshStore(
-  '.graphclient',
-  new FsStoreStorageAdapter({
-    cwd: baseDir,
-    importFn,
-    fileType: 'ts',
-  }),
-  {
-    readonly: true,
-    validate: false,
-  },
-);
+const rootStore = new MeshStore('.graphclient', new FsStoreStorageAdapter({
+  cwd: baseDir,
+  importFn,
+  fileType: "ts",
+}), {
+  readonly: true,
+  validate: false
+});
 
-export const rawServeConfig: YamlConfig.Config['serve'] = undefined as any;
+export const rawServeConfig: YamlConfig.Config['serve'] = undefined as any
 export async function getMeshOptions(): Promise<GetMeshOptions> {
-  const pubsub = new PubSub();
-  const sourcesStore = rootStore.child('sources');
-  const logger = new DefaultLogger('GraphClient');
-  const cache = new (MeshCache as any)({
-    ...({} as any),
-    importFn,
-    store: rootStore.child('cache'),
-    pubsub,
-    logger,
-  } as any);
+const pubsub = new PubSub();
+const sourcesStore = rootStore.child('sources');
+const logger = new DefaultLogger("GraphClient");
+const cache = new (MeshCache as any)({
+      ...({} as any),
+      importFn,
+      store: rootStore.child('cache'),
+      pubsub,
+      logger,
+    } as any)
 
-  const sources: MeshResolvedSource[] = [];
-  const transforms: MeshTransform[] = [];
-  const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
-  const txsEthereumTransforms = [];
-  const txsGoerliTransforms = [];
-  const additionalTypeDefs = [] as any[];
-  const txsEthereumHandler = new GraphqlHandler({
-    name: 'txs-ethereum',
-    config: {
-      endpoint:
-        'https://api.thegraph.com/subgraphs/name/ekrembal/railgun-ethereum-v2-txids',
-    },
-    baseDir,
-    cache,
-    pubsub,
-    store: sourcesStore.child('txs-ethereum'),
-    logger: logger.child('txs-ethereum'),
-    importFn,
-  });
-  const txsGoerliHandler = new GraphqlHandler({
-    name: 'txs-goerli',
-    config: {
-      endpoint:
-        'https://api.thegraph.com/subgraphs/name/ekrembal/railgun-goerli-v2-txids',
-    },
-    baseDir,
-    cache,
-    pubsub,
-    store: sourcesStore.child('txs-goerli'),
-    logger: logger.child('txs-goerli'),
-    importFn,
-  });
-  sources[0] = {
-    name: 'txs-ethereum',
-    handler: txsEthereumHandler,
-    transforms: txsEthereumTransforms,
-  };
-  sources[1] = {
-    name: 'txs-goerli',
-    handler: txsGoerliHandler,
-    transforms: txsGoerliTransforms,
-  };
-  const additionalResolvers = [] as any[];
-  const merger = new (StitchingMerger as any)({
-    cache,
-    pubsub,
-    logger: logger.child('stitchingMerger'),
-    store: rootStore.child('stitchingMerger'),
-  });
+const sources: MeshResolvedSource[] = [];
+const transforms: MeshTransform[] = [];
+const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
+const txsEthereumTransforms = [];
+const txsGoerliTransforms = [];
+const additionalTypeDefs = [] as any[];
+const txsEthereumHandler = new GraphqlHandler({
+              name: "txs-ethereum",
+              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/ekrembal/railgun-ethereum-v2-txids"},
+              baseDir,
+              cache,
+              pubsub,
+              store: sourcesStore.child("txs-ethereum"),
+              logger: logger.child("txs-ethereum"),
+              importFn,
+            });
+const txsGoerliHandler = new GraphqlHandler({
+              name: "txs-goerli",
+              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/ekrembal/railgun-goerli-v2-txids"},
+              baseDir,
+              cache,
+              pubsub,
+              store: sourcesStore.child("txs-goerli"),
+              logger: logger.child("txs-goerli"),
+              importFn,
+            });
+sources[0] = {
+          name: 'txs-ethereum',
+          handler: txsEthereumHandler,
+          transforms: txsEthereumTransforms
+        }
+sources[1] = {
+          name: 'txs-goerli',
+          handler: txsGoerliHandler,
+          transforms: txsGoerliTransforms
+        }
+const additionalResolvers = [] as any[]
+const merger = new(StitchingMerger as any)({
+        cache,
+        pubsub,
+        logger: logger.child('stitchingMerger'),
+        store: rootStore.child('stitchingMerger')
+      })
 
   return {
     sources,
@@ -3750,214 +3089,184 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
     additionalEnvelopPlugins,
     get documents() {
       return [
-        {
-          document: GetRailgunTransactionsAfterGraphIdDocument,
-          get rawSDL() {
-            return printWithCache(GetRailgunTransactionsAfterGraphIdDocument);
-          },
-          location: 'GetRailgunTransactionsAfterGraphIdDocument.graphql',
+      {
+        document: GetRailgunTransactionsAfterGraphIdDocument,
+        get rawSDL() {
+          return printWithCache(GetRailgunTransactionsAfterGraphIdDocument);
         },
-        {
-          document: GetRailgunTransactionsByTxidDocument,
-          get rawSDL() {
-            return printWithCache(GetRailgunTransactionsByTxidDocument);
-          },
-          location: 'GetRailgunTransactionsByTxidDocument.graphql',
+        location: 'GetRailgunTransactionsAfterGraphIdDocument.graphql'
+      },{
+        document: GetRailgunTransactionsByTxidDocument,
+        get rawSDL() {
+          return printWithCache(GetRailgunTransactionsByTxidDocument);
         },
-      ];
+        location: 'GetRailgunTransactionsByTxidDocument.graphql'
+      },{
+        document: GetRailgunTransactionsByUnshieldToAddressDocument,
+        get rawSDL() {
+          return printWithCache(GetRailgunTransactionsByUnshieldToAddressDocument);
+        },
+        location: 'GetRailgunTransactionsByUnshieldToAddressDocument.graphql'
+      }
+    ];
     },
     fetchFn,
   };
 }
 
-export function createBuiltMeshHTTPHandler<
-  TServerContext = {},
->(): MeshHTTPHandler<TServerContext> {
+export function createBuiltMeshHTTPHandler<TServerContext = {}>(): MeshHTTPHandler<TServerContext> {
   return createMeshHTTPHandler<TServerContext>({
     baseDir,
     getBuiltMesh: getBuiltGraphClient,
     rawServeConfig: undefined,
-  });
+  })
 }
+
 
 let meshInstance$: Promise<MeshInstance> | undefined;
 
 export function getBuiltGraphClient(): Promise<MeshInstance> {
   if (meshInstance$ == null) {
-    meshInstance$ = getMeshOptions()
-      .then(meshOptions => getMesh(meshOptions))
-      .then(mesh => {
-        const id = mesh.pubsub.subscribe('destroy', () => {
-          meshInstance$ = undefined;
-          mesh.pubsub.unsubscribe(id);
-        });
-        return mesh;
+    meshInstance$ = getMeshOptions().then(meshOptions => getMesh(meshOptions)).then(mesh => {
+      const id = mesh.pubsub.subscribe('destroy', () => {
+        meshInstance$ = undefined;
+        mesh.pubsub.unsubscribe(id);
       });
+      return mesh;
+    });
   }
   return meshInstance$;
 }
 
-export const execute: ExecuteMeshFn = (...args) =>
-  getBuiltGraphClient().then(({ execute }) => execute(...args));
+export const execute: ExecuteMeshFn = (...args) => getBuiltGraphClient().then(({ execute }) => execute(...args));
 
-export const subscribe: SubscribeMeshFn = (...args) =>
-  getBuiltGraphClient().then(({ subscribe }) => subscribe(...args));
-export function getBuiltGraphSDK<TGlobalContext = any, TOperationContext = any>(
-  globalContext?: TGlobalContext,
-) {
-  const sdkRequester$ = getBuiltGraphClient().then(({ sdkRequesterFactory }) =>
-    sdkRequesterFactory(globalContext),
-  );
-  return getSdk<TOperationContext, TGlobalContext>((...args) =>
-    sdkRequester$.then(sdkRequester => sdkRequester(...args)),
-  );
+export const subscribe: SubscribeMeshFn = (...args) => getBuiltGraphClient().then(({ subscribe }) => subscribe(...args));
+export function getBuiltGraphSDK<TGlobalContext = any, TOperationContext = any>(globalContext?: TGlobalContext) {
+  const sdkRequester$ = getBuiltGraphClient().then(({ sdkRequesterFactory }) => sdkRequesterFactory(globalContext));
+  return getSdk<TOperationContext, TGlobalContext>((...args) => sdkRequester$.then(sdkRequester => sdkRequester(...args)));
 }
 export type GetRailgunTransactionsAfterGraphIDQueryVariables = Exact<{
   idLow?: InputMaybe<Scalars['Bytes']>;
 }>;
 
-export type GetRailgunTransactionsAfterGraphIDQuery = {
-  transactions: Array<
-    Pick<
-      Transaction,
-      | 'id'
-      | 'nullifiers'
-      | 'commitments'
-      | 'transactionHash'
-      | 'boundParamsHash'
-      | 'blockNumber'
-      | 'utxoTreeIn'
-      | 'utxoTreeOut'
-      | 'utxoBatchStartPositionOut'
-      | 'hasUnshield'
-      | 'unshieldToAddress'
-      | 'unshieldValue'
-      | 'blockTimestamp'
-      | 'verificationHash'
-    > & {
-      unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'>;
-    }
-  >;
-};
+
+export type GetRailgunTransactionsAfterGraphIDQuery = { transactions: Array<(
+    Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
+    & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
+  )> };
 
 export type GetRailgunTransactionsByTxidQueryVariables = Exact<{
   txid?: InputMaybe<Scalars['Bytes']>;
 }>;
 
-export type GetRailgunTransactionsByTxidQuery = {
-  transactions: Array<
-    Pick<
-      Transaction,
-      | 'id'
-      | 'nullifiers'
-      | 'commitments'
-      | 'transactionHash'
-      | 'boundParamsHash'
-      | 'blockNumber'
-      | 'utxoTreeIn'
-      | 'utxoTreeOut'
-      | 'utxoBatchStartPositionOut'
-      | 'hasUnshield'
-      | 'unshieldToAddress'
-      | 'unshieldValue'
-      | 'blockTimestamp'
-      | 'verificationHash'
-    > & {
-      unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'>;
-    }
-  >;
-};
+
+export type GetRailgunTransactionsByTxidQuery = { transactions: Array<(
+    Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
+    & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
+  )> };
+
+export type GetRailgunTransactionsByUnshieldToAddressQueryVariables = Exact<{
+  address?: InputMaybe<Scalars['Bytes']>;
+}>;
+
+
+export type GetRailgunTransactionsByUnshieldToAddressQuery = { transactions: Array<(
+    Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
+    & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
+  )> };
+
 
 export const GetRailgunTransactionsAfterGraphIDDocument = gql`
-  query GetRailgunTransactionsAfterGraphID($idLow: Bytes = "0x00") {
-    transactions(orderBy: id, first: 1000, where: { id_gt: $idLow }) {
-      id
-      nullifiers
-      commitments
-      transactionHash
-      boundParamsHash
-      blockNumber
-      utxoTreeIn
-      utxoTreeOut
-      utxoBatchStartPositionOut
-      hasUnshield
-      unshieldToken {
-        tokenType
-        tokenSubID
-        tokenAddress
-      }
-      unshieldToAddress
-      unshieldValue
-      blockTimestamp
-      verificationHash
+    query GetRailgunTransactionsAfterGraphID($idLow: Bytes = "0x00") {
+  transactions(orderBy: id, first: 1000, where: {id_gt: $idLow}) {
+    id
+    nullifiers
+    commitments
+    transactionHash
+    boundParamsHash
+    blockNumber
+    utxoTreeIn
+    utxoTreeOut
+    utxoBatchStartPositionOut
+    hasUnshield
+    unshieldToken {
+      tokenType
+      tokenSubID
+      tokenAddress
     }
+    unshieldToAddress
+    unshieldValue
+    blockTimestamp
+    verificationHash
   }
-` as unknown as DocumentNode<
-  GetRailgunTransactionsAfterGraphIDQuery,
-  GetRailgunTransactionsAfterGraphIDQueryVariables
->;
+}
+    ` as unknown as DocumentNode<GetRailgunTransactionsAfterGraphIDQuery, GetRailgunTransactionsAfterGraphIDQueryVariables>;
 export const GetRailgunTransactionsByTxidDocument = gql`
-  query GetRailgunTransactionsByTxid($txid: Bytes) {
-    transactions(where: { transactionHash: $txid }) {
-      id
-      nullifiers
-      commitments
-      transactionHash
-      boundParamsHash
-      blockNumber
-      utxoTreeIn
-      utxoTreeOut
-      utxoBatchStartPositionOut
-      hasUnshield
-      unshieldToken {
-        tokenType
-        tokenSubID
-        tokenAddress
-      }
-      unshieldToAddress
-      unshieldValue
-      blockTimestamp
-      verificationHash
+    query GetRailgunTransactionsByTxid($txid: Bytes) {
+  transactions(where: {transactionHash: $txid}) {
+    id
+    nullifiers
+    commitments
+    transactionHash
+    boundParamsHash
+    blockNumber
+    utxoTreeIn
+    utxoTreeOut
+    utxoBatchStartPositionOut
+    hasUnshield
+    unshieldToken {
+      tokenType
+      tokenSubID
+      tokenAddress
     }
+    unshieldToAddress
+    unshieldValue
+    blockTimestamp
+    verificationHash
   }
-` as unknown as DocumentNode<
-  GetRailgunTransactionsByTxidQuery,
-  GetRailgunTransactionsByTxidQueryVariables
->;
+}
+    ` as unknown as DocumentNode<GetRailgunTransactionsByTxidQuery, GetRailgunTransactionsByTxidQueryVariables>;
+export const GetRailgunTransactionsByUnshieldToAddressDocument = gql`
+    query GetRailgunTransactionsByUnshieldToAddress($address: Bytes) {
+  transactions(orderBy: id, first: 1000, where: {unshieldToAddress: $address}) {
+    id
+    nullifiers
+    commitments
+    transactionHash
+    boundParamsHash
+    blockNumber
+    utxoTreeIn
+    utxoTreeOut
+    utxoBatchStartPositionOut
+    hasUnshield
+    unshieldToken {
+      tokenType
+      tokenSubID
+      tokenAddress
+    }
+    unshieldToAddress
+    unshieldValue
+    blockTimestamp
+    verificationHash
+  }
+}
+    ` as unknown as DocumentNode<GetRailgunTransactionsByUnshieldToAddressQuery, GetRailgunTransactionsByUnshieldToAddressQueryVariables>;
 
-export type Requester<C = {}, E = unknown> = <R, V>(
-  doc: DocumentNode,
-  vars?: V,
-  options?: C,
-) => Promise<R> | AsyncIterable<R>;
+
+
+
+export type Requester<C = {}, E = unknown> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R> | AsyncIterable<R>
 export function getSdk<C, E>(requester: Requester<C, E>) {
   return {
-    GetRailgunTransactionsAfterGraphID(
-      variables?: GetRailgunTransactionsAfterGraphIDQueryVariables,
-      options?: C,
-    ): Promise<GetRailgunTransactionsAfterGraphIDQuery> {
-      return requester<
-        GetRailgunTransactionsAfterGraphIDQuery,
-        GetRailgunTransactionsAfterGraphIDQueryVariables
-      >(
-        GetRailgunTransactionsAfterGraphIDDocument,
-        variables,
-        options,
-      ) as Promise<GetRailgunTransactionsAfterGraphIDQuery>;
+    GetRailgunTransactionsAfterGraphID(variables?: GetRailgunTransactionsAfterGraphIDQueryVariables, options?: C): Promise<GetRailgunTransactionsAfterGraphIDQuery> {
+      return requester<GetRailgunTransactionsAfterGraphIDQuery, GetRailgunTransactionsAfterGraphIDQueryVariables>(GetRailgunTransactionsAfterGraphIDDocument, variables, options) as Promise<GetRailgunTransactionsAfterGraphIDQuery>;
     },
-    GetRailgunTransactionsByTxid(
-      variables?: GetRailgunTransactionsByTxidQueryVariables,
-      options?: C,
-    ): Promise<GetRailgunTransactionsByTxidQuery> {
-      return requester<
-        GetRailgunTransactionsByTxidQuery,
-        GetRailgunTransactionsByTxidQueryVariables
-      >(
-        GetRailgunTransactionsByTxidDocument,
-        variables,
-        options,
-      ) as Promise<GetRailgunTransactionsByTxidQuery>;
+    GetRailgunTransactionsByTxid(variables?: GetRailgunTransactionsByTxidQueryVariables, options?: C): Promise<GetRailgunTransactionsByTxidQuery> {
+      return requester<GetRailgunTransactionsByTxidQuery, GetRailgunTransactionsByTxidQueryVariables>(GetRailgunTransactionsByTxidDocument, variables, options) as Promise<GetRailgunTransactionsByTxidQuery>;
     },
+    GetRailgunTransactionsByUnshieldToAddress(variables?: GetRailgunTransactionsByUnshieldToAddressQueryVariables, options?: C): Promise<GetRailgunTransactionsByUnshieldToAddressQuery> {
+      return requester<GetRailgunTransactionsByUnshieldToAddressQuery, GetRailgunTransactionsByUnshieldToAddressQueryVariables>(GetRailgunTransactionsByUnshieldToAddressDocument, variables, options) as Promise<GetRailgunTransactionsByUnshieldToAddressQuery>;
+    }
   };
 }
 export type Sdk = ReturnType<typeof getSdk>;

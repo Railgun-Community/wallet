@@ -5,6 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 import {
   getRailgunTxidsForUnshields,
   quickSyncRailgunTransactionsV2,
+  getRailgunTransactionDataForUnshieldToAddress,
 } from '../railgun-txid-sync-graph-v2';
 
 chai.use(chaiAsPromised);
@@ -17,7 +18,10 @@ const ETH_GOERLI_CHAIN: Chain =
 
 describe('railgun-txid-sync-graph', () => {
   before(() => {
-    NETWORK_CONFIG[NetworkName.Ethereum].poi = { launchBlock: 1000, launchTimestamp: 1000 };
+    NETWORK_CONFIG[NetworkName.Ethereum].poi = {
+      launchBlock: 1000,
+      launchTimestamp: 1000,
+    };
   });
 
   it('Should pull railgun txs subgraph query - Ethereum', async () => {
@@ -115,6 +119,52 @@ describe('railgun-txid-sync-graph', () => {
 
     expect(unshieldRailgunTxids).to.deep.equal([
       '08fd7312f96ac8b36f2544a0acaeba0ed0ea57eb5bde0452a240c7a0f3640ae3',
+    ]);
+  }).timeout(20000);
+
+  it('Should pull unshield railgun txids for unshield to address - Goerli', async () => {
+    const unshieldRailgunTxids =
+      await getRailgunTransactionDataForUnshieldToAddress(
+        ETH_GOERLI_CHAIN,
+        '0xE251BaFD15A1e011f23F9c68673aAf2Fa00C1D03',
+      );
+    expect(unshieldRailgunTxids).to.deep.equal([
+      {
+        txid: '0x6804db8a9439d54d0c2e93fdf9d94ccdae2605ff69242523a836b327960f9536',
+        railgunTxids: [
+          '2ee7e0b1d8fffaa86be346f18e34f84850a1ddc4928ae8d458576d98c665e441',
+        ],
+      },
+      {
+        txid: '0x930c463cf7231ee76b3048b55f3519f665e9235d976fb0d033ee7bf2044f5ce6',
+        railgunTxids: [
+          '03641108fee0b24318a940335d7632378de2e3dda752696adcbbf842b78ea1f5',
+        ],
+      },
+      {
+        txid: '0x0a06115c7e1dee85ccef2c7ec6d8c7bfe88606ea6256672e9f1cbb2052aa1e58',
+        railgunTxids: [
+          '0bed5fcf04a9aeb990c212bb61de2cb157ce9a207adc2c13f55ed72eab4c4265',
+        ],
+      },
+      {
+        txid: '0x09955c6ae061272c55b4dbbe95fb3e6fc6a9472aea99a38ea1c0f8640ab3da52',
+        railgunTxids: [
+          '029478e1613880c7a737e21de66beb824a9c5d0263b316f8b100c2b24381124f',
+        ],
+      },
+      {
+        txid: '0xe93c93ec832fefe90c3d6352f310b2a10c84c75d98108a6aa790915fd26a04c3',
+        railgunTxids: [
+          '253f19b4a5f27f87c2eac90357983acc6e5df453bb8f83de350934122da74c3f',
+        ],
+      },
+      {
+        txid: '0x54a3f652214e8bc9d03e8ef07c1b3baf1fd1a065f95570325880de93f5cbf237',
+        railgunTxids: [
+          '0194abe03a90e212bf9e34d708aa9776bff9d220c4b6db930e2ce34059b8978c',
+        ],
+      },
     ]);
   }).timeout(20000);
 });
