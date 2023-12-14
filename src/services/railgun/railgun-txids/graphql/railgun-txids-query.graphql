@@ -47,3 +47,32 @@ query GetRailgunTransactionsByTxid($txid: Bytes) {
     verificationHash
   }
 }
+
+query GetRailgunTransactionsByUnshieldToAddress($address: Bytes) {
+  transactions(
+    orderBy: id
+    first: 1000
+    where: { unshieldToAddress: $address }
+  ) {
+    # Make sure types match in both queries.
+    id
+    nullifiers
+    commitments
+    transactionHash
+    boundParamsHash
+    blockNumber
+    utxoTreeIn
+    utxoTreeOut
+    utxoBatchStartPositionOut
+    hasUnshield
+    unshieldToken {
+      tokenType
+      tokenSubID
+      tokenAddress
+    }
+    unshieldToAddress
+    unshieldValue
+    blockTimestamp
+    verificationHash
+  }
+}
