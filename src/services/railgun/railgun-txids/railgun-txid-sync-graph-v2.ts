@@ -39,6 +39,40 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   }
 };
 
+export const getRailgunTxDataForUnshields = async (
+  chain: Chain,
+  txid: string,
+): Promise<
+  {
+    railgunTransaction: RailgunTransactionV2;
+    railgunTxid: string;
+  }[]
+> => {
+  const network = networkForChain(chain);
+  if (!network) {
+    return [];
+  }
+
+  const sdk = getBuiltGraphSDK(network.name);
+
+  const transactions: GraphRailgunTransactions = (
+    await sdk.GetRailgunTransactionsByTxid({ txid })
+  ).transactions;
+
+  const railgunTxidsForUnshields: {
+    railgunTransaction: RailgunTransactionV2;
+    railgunTxid: string;
+  }[] = transactions
+    .filter(transaction => transaction.hasUnshield)
+    .map(transaction => {
+      const railgunTransaction = formatRailgunTransactions([transaction])[0];
+      const railgunTxid = getRailgunTransactionIDHex(transaction);
+      return { railgunTxid, railgunTransaction };
+    });
+
+  return railgunTxidsForUnshields;
+};
+
 export const getRailgunTxidsForUnshields = async (
   chain: Chain,
   txid: string,
@@ -67,7 +101,15 @@ export const getRailgunTxidsForUnshields = async (
 export const getRailgunTransactionDataForUnshieldToAddress = async (
   chain: Chain,
   unshieldToAddress: string,
-): Promise<{ txid: string; railgunTxids: string[] }[]> => {
+): Promise<
+  {
+    txid: string;
+    transactionDatas: {
+      railgunTransaction: RailgunTransactionV2;
+      railgunTxid: string;
+    }[];
+  }[]
+> => {
   const network = networkForChain(chain);
   if (!network) {
     return [];
@@ -81,11 +123,16 @@ export const getRailgunTransactionDataForUnshieldToAddress = async (
     })
   ).transactions;
   const uniqueTxidMap = new Map<string, string[]>();
+  const railgunTxidToTransactionMap = new Map<string, RailgunTransactionV2>();
 
   transactions
     .filter(transaction => transaction.hasUnshield)
     .forEach(transaction => {
       const railgunTxid = getRailgunTransactionIDHex(transaction);
+      railgunTxidToTransactionMap.set(
+        railgunTxid,
+        formatRailgunTransactions([transaction])[0],
+      );
       if (uniqueTxidMap.has(transaction.transactionHash)) {
         const railgunTxids = uniqueTxidMap.get(
           transaction.transactionHash,
@@ -96,9 +143,26 @@ export const getRailgunTransactionDataForUnshieldToAddress = async (
         uniqueTxidMap.set(transaction.transactionHash, [railgunTxid]);
       }
     });
-  const railgunTxidsForUnshields: { txid: string; railgunTxids: string[] }[] = [];
+  const railgunTxidsForUnshields: {
+    txid: string;
+    transactionDatas: {
+      railgunTransaction: RailgunTransactionV2;
+      railgunTxid: string;
+    }[];
+  }[] = [];
   uniqueTxidMap.forEach((railgunTxids, txid) => {
-    railgunTxidsForUnshields.push({ txid, railgunTxids });
+    railgunTxidsForUnshields.push({
+      txid,
+      transactionDatas: railgunTxids.map(railgunTxid => {
+        const railgunTransaction = railgunTxidToTransactionMap.get(railgunTxid);
+        if (!railgunTransaction) {
+          throw new Error(
+            `Could not find railgun transaction for txid ${txid}`,
+          );
+        }
+        return { railgunTransaction, railgunTxid };
+      }),
+    });
   });
 
   return railgunTxidsForUnshields;
