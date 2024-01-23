@@ -2,7 +2,7 @@ query Nullifiers($blockNumber: BigInt = 0) {
   nullifiers(
     orderBy: blockNumber
     where: { blockNumber_gte: $blockNumber }
-    first: 1000
+    first: 10000
   ) {
     id
     blockNumber
@@ -17,7 +17,7 @@ query Unshields($blockNumber: BigInt = 0) {
   unshields(
     orderBy: blockNumber
     where: { blockNumber_gte: $blockNumber }
-    first: 1000
+    first: 10000
   ) {
     id
     blockNumber
@@ -40,7 +40,7 @@ query Commitments($blockNumber: BigInt = 0) {
   commitments(
     orderBy: blockNumber
     where: { blockNumber_gte: $blockNumber }
-    first: 1000
+    first: 10000
   ) {
     id
     treeNumber
@@ -97,7 +97,7 @@ query RailgunTransactions($blockNumber: BigInt = 0) {
   railgunTransactions(
     orderBy: blockNumber
     where: { blockNumber_gte: $blockNumber }
-    first: 1000
+    first: 10000
   ) {
     id
     blockNumber

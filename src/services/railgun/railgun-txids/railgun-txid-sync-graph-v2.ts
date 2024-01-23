@@ -174,7 +174,7 @@ const autoPaginatingQuery = async <ReturnType extends { id: string }>(
   const overLimit = totalResults.length >= MAX_QUERY_RESULTS;
   const lastResult = totalResults[totalResults.length - 1];
 
-  const shouldQueryMore = newResults.length === 1000;
+  const shouldQueryMore = newResults.length === 10_000;
   if (!overLimit && shouldQueryMore) {
     return autoPaginatingQuery(query, lastResult.id, totalResults);
   }

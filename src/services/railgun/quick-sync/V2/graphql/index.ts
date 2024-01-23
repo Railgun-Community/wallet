@@ -3236,7 +3236,7 @@ export const NullifiersDocument = gql`
     nullifiers(
       orderBy: blockNumber
       where: { blockNumber_gte: $blockNumber }
-      first: 1000
+      first: 10000
     ) {
       id
       blockNumber
@@ -3252,7 +3252,7 @@ export const UnshieldsDocument = gql`
     unshields(
       orderBy: blockNumber
       where: { blockNumber_gte: $blockNumber }
-      first: 1000
+      first: 10000
     ) {
       id
       blockNumber
@@ -3276,7 +3276,7 @@ export const CommitmentsDocument = gql`
     commitments(
       orderBy: blockNumber
       where: { blockNumber_gte: $blockNumber }
-      first: 1000
+      first: 10000
     ) {
       id
       treeNumber

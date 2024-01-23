@@ -3002,10 +3002,10 @@ const importFn: ImportFn = <T>(moduleId: string) => {
   switch(relativeModuleId) {
     case ".graphclient/sources/txs-goerli/introspectionSchema":
       return import("./.graphclient/sources/txs-goerli/introspectionSchema") as T;
-    
+
     case ".graphclient/sources/txs-ethereum/introspectionSchema":
       return import("./.graphclient/sources/txs-ethereum/introspectionSchema") as T;
-    
+
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
   }
@@ -3178,7 +3178,7 @@ export type GetRailgunTransactionsByUnshieldToAddressQuery = { transactions: Arr
 
 export const GetRailgunTransactionsAfterGraphIDDocument = gql`
     query GetRailgunTransactionsAfterGraphID($idLow: Bytes = "0x00") {
-  transactions(orderBy: id, first: 1000, where: {id_gt: $idLow}) {
+  transactions(orderBy: id, first: 10000, where: {id_gt: $idLow}) {
     id
     nullifiers
     commitments
@@ -3228,7 +3228,7 @@ export const GetRailgunTransactionsByTxidDocument = gql`
     ` as unknown as DocumentNode<GetRailgunTransactionsByTxidQuery, GetRailgunTransactionsByTxidQueryVariables>;
 export const GetRailgunTransactionsByUnshieldToAddressDocument = gql`
     query GetRailgunTransactionsByUnshieldToAddress($address: Bytes) {
-  transactions(orderBy: id, first: 1000, where: {unshieldToAddress: $address}) {
+  transactions(orderBy: id, first: 10000, where: {unshieldToAddress: $address}) {
     id
     nullifiers
     commitments

@@ -29,7 +29,7 @@ export const autoPaginatingQuery = async <
   const overLimit = totalResults.length >= maxQueryResults;
   const lastResult = totalResults[totalResults.length - 1];
 
-  const shouldQueryMore = newResults.length === 1000;
+  const shouldQueryMore = newResults.length === 10_000;
   if (!overLimit && shouldQueryMore) {
     return autoPaginatingQuery(
       query,
