@@ -44,6 +44,8 @@ import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
 import { reportAndSanitizeError } from '../../utils/error';
 import { ContractTransaction } from 'ethers';
+import { isDecimalStr } from '../../utils';
+import { bigIntStringToHex } from '../railgun/quick-sync/shared-formatters';
 
 const createValidCrossContractCalls = (
   crossContractCalls: ContractTransaction[],
@@ -109,6 +111,8 @@ export const createRelayAdaptUnshieldNFTAmountRecipients = (
 export const createNFTTokenDataFromRailgunNFTAmount = (
   nftAmount: RailgunNFTAmount,
 ): NFTTokenData => {
+  const tokenSubIDHex = isDecimalStr(nftAmount.tokenSubID) ? bigIntStringToHex(nftAmount.tokenSubID) : nftAmount.tokenSubID;
+
   return {
     tokenAddress: formatToByteLength(
       nftAmount.nftAddress,
@@ -117,7 +121,7 @@ export const createNFTTokenDataFromRailgunNFTAmount = (
     ),
     tokenType: nftAmount.nftTokenType as 1 | 2,
     tokenSubID: formatToByteLength(
-      nftAmount.tokenSubID,
+      tokenSubIDHex,
       ByteLength.UINT_256,
       true,
     ),

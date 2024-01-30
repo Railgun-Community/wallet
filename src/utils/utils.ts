@@ -52,3 +52,8 @@ export const compareContractTransactionArrays = (
 
   return true;
 };
+
+export const isDecimalStr = (str: string): boolean => {
+  const decimalPattern = /^[-+]?(\d+(\.\d*)?|\.\d+)$/;
+  return decimalPattern.test(str);
+}
