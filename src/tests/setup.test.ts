@@ -103,7 +103,7 @@ export const clearAllMerkletreeScanStatus = () => {
   currentTXIDMerkletreeScanStatus = undefined;
 };
 
-export const initTestEngine = (useNativeArtifacts = false) => {
+export const initTestEngine = async (useNativeArtifacts = false) => {
   // SETUP TEST WALLET POI REQUESTER
   const testPOIRequester = new TestWalletPOIRequester();
   const txidMerklerootValidator: MerklerootValidator = (
@@ -135,7 +135,7 @@ export const initTestEngine = (useNativeArtifacts = false) => {
     setLoggers(console.log, console.error);
   }
 
-  startRailgunEngine(
+  await startRailgunEngine(
     TEST_WALLET_SOURCE,
     db,
     shouldDebug,

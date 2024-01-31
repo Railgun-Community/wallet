@@ -61,7 +61,7 @@ const stubFailure = () => {
 describe('tx-shield-base-token', () => {
   before(async function run() {
     this.timeout(5000);
-    initTestEngine();
+    await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,

@@ -38,7 +38,7 @@ describe('balances-live', () => {
   before(async function run() {
     this.timeout(60000);
 
-    initTestEngine();
+    await initTestEngine();
 
     const mnemonic = MOCK_MNEMONIC;
 
