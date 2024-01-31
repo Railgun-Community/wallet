@@ -118,7 +118,7 @@ const setOnUTXOScanDecryptBalancesCompleteListener = () => {
  * @param customPOILists - POI lists to use for additional wallet protections after default lists.
  * @returns
  */
-export const startRailgunEngine = (
+export const startRailgunEngine = async (
   walletSource: string,
   db: AbstractLevelDOWN,
   shouldDebug: boolean,
@@ -128,7 +128,7 @@ export const startRailgunEngine = (
   poiNodeURLs?: string[],
   customPOILists?: POIList[],
   verboseScanLogging = false,
-): void => {
+): Promise<void> => {
   if (hasEngine()) {
     return;
   }
@@ -136,7 +136,7 @@ export const startRailgunEngine = (
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(useNativeArtifacts);
 
-    const engine = RailgunEngine.initForWallet(
+    const engine = await RailgunEngine.initForWallet(
       walletSource,
       db,
       artifactGetterDownloadJustInTime,
@@ -160,11 +160,11 @@ export const startRailgunEngine = (
   }
 };
 
-export const startRailgunEngineForPOINode = (
+export const startRailgunEngineForPOINode = async (
   db: AbstractLevelDOWN,
   shouldDebug: boolean,
   artifactStore: ArtifactStore,
-): void => {
+): Promise<void> => {
   if (hasEngine()) {
     return;
   }
@@ -172,7 +172,7 @@ export const startRailgunEngineForPOINode = (
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(false);
 
-    const engine = RailgunEngine.initForPOINode(
+    const engine = await RailgunEngine.initForPOINode(
       db,
       artifactGetterDownloadJustInTime,
       quickSyncEventsGraph,

@@ -49,7 +49,7 @@ let railgunWalletID: string;
 describe('tx-notes', () => {
   before(async function run() {
     this.timeout(10000);
-    initTestEngine();
+    await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,

@@ -9,8 +9,8 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('engine', () => {
-  beforeEach(() => {
-    initTestEngine();
+  beforeEach(async () => {
+    await initTestEngine();
   });
   afterEach(async () => {
     await closeTestEngine();

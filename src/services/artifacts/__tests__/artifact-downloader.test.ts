@@ -17,9 +17,9 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('artifact-downloader', () => {
-  before(() => {
+  before(async () => {
     const useNativeArtifacts = false;
-    initTestEngine(useNativeArtifacts);
+    await initTestEngine(useNativeArtifacts);
   });
 
   it('Should set and get artifacts', async () => {

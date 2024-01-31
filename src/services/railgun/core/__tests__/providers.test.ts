@@ -36,7 +36,7 @@ const txidVersion = getTestTXIDVersion();
 describe('providers', () => {
   before(async () => {
     await closeTestEngine();
-    initTestEngine();
+    await initTestEngine();
   });
   after(async () => {
     await closeTestEngine();
