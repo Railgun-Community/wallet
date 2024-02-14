@@ -5,7 +5,6 @@ import {
   MerkletreeHistoryScanEventData,
   POIList,
   POIListType,
-  WalletScannedEventData,
   UTXOScanDecryptBalancesCompleteEventData,
   AbstractWallet,
 } from '@railgun-community/engine';
@@ -164,6 +163,8 @@ export const startRailgunEngineForPOINode = async (
   db: AbstractLevelDOWN,
   shouldDebug: boolean,
   artifactStore: ArtifactStore,
+  poiNodeURLs: string[],
+  customPOILists: POIList[],
 ): Promise<void> => {
   if (hasEngine()) {
     return;
@@ -184,6 +185,10 @@ export const startRailgunEngineForPOINode = async (
         : undefined,
     );
     setEngine(engine);
+
+    // Initialize WalletPOI with POI node interface and custom lists
+    const poiNodeInterface = new WalletPOINodeInterface(poiNodeURLs);
+    WalletPOI.init(poiNodeInterface, customPOILists ?? []);
   } catch (err) {
     throw reportAndSanitizeError(startRailgunEngineForPOINode.name, err);
   }
