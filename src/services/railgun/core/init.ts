@@ -8,6 +8,7 @@ import {
   WalletScannedEventData,
   UTXOScanDecryptBalancesCompleteEventData,
   AbstractWallet,
+  POIMerklerootsValidator,
 } from '@railgun-community/engine';
 import {
   MerkletreeScanUpdateEvent,
@@ -27,6 +28,7 @@ import { WalletPOI } from '../../poi/wallet-poi';
 import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
 import { setEngine, getEngine, hasEngine } from './engine';
 import { onBalancesUpdate } from '../wallets/balance-update';
+import { POIValidator } from '../../poi';
 
 export type EngineDebugger = {
   log: (msg: string) => void;
@@ -164,6 +166,7 @@ export const startRailgunEngineForPOINode = async (
   db: AbstractLevelDOWN,
   shouldDebug: boolean,
   artifactStore: ArtifactStore,
+  validatePOIMerkleroots: POIMerklerootsValidator,
 ): Promise<void> => {
   if (hasEngine()) {
     return;
@@ -171,6 +174,8 @@ export const startRailgunEngineForPOINode = async (
   try {
     setArtifactStore(artifactStore);
     setUseNativeArtifacts(false);
+
+    POIValidator.initForPOINode(validatePOIMerkleroots);
 
     const engine = await RailgunEngine.initForPOINode(
       db,

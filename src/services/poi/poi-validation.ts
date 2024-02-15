@@ -1,5 +1,6 @@
 import {
   ExtractedRailgunTransactionData,
+  POIMerklerootsValidator,
   POIValidation,
   RailgunVersionedSmartContracts,
 } from '@railgun-community/engine';
@@ -14,6 +15,10 @@ import { walletForID } from '../railgun/wallets/wallets';
 import { getProver } from '../railgun/core/prover';
 
 export class POIValidator {
+  static initForPOINode(validatePOIMerkleroots: POIMerklerootsValidator) {
+    POIValidation.initForPOINode(validatePOIMerkleroots);
+  }
+
   static async isValidSpendableTransaction(
     railgunWalletID: string,
     txidVersion: TXIDVersion,
