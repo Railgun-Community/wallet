@@ -22,6 +22,11 @@ export const getAllShields = async (
 ): Promise<ShieldData[]> => {
   const shieldsForEachTxidVersion = await Promise.all(
     ACTIVE_TXID_VERSIONS.map(async txidVersion => {
+      // TODO: Remove this and fix properly from POI node side
+      if (txidVersion !== TXIDVersion.V2_PoseidonMerkle) {
+        return [];
+      }
+
       const shields = await getShieldsForTXIDVersion(
         txidVersion,
         networkName,
