@@ -5,7 +5,6 @@ import {
   MerkletreeHistoryScanEventData,
   POIList,
   POIListType,
-  WalletScannedEventData,
   UTXOScanDecryptBalancesCompleteEventData,
   AbstractWallet,
   POIMerklerootsValidator,
