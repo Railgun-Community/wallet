@@ -1,19 +1,19 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { mnemonicToPKey } from '../ethers-util';
+import { mnemonicTo0xPKey } from '../ethers-util';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('ethers-util', () => {
   it('Should convert mnemonic to pkey', () => {
-    const pKey = mnemonicToPKey(
+    const pKey = mnemonicTo0xPKey(
       'test test test test test test test test test test test junk',
     );
     expect(pKey).to.equal(
       '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
     );
-    const pKeyIndex1 = mnemonicToPKey(
+    const pKeyIndex1 = mnemonicTo0xPKey(
       'test test test test test test test test test test test junk',
       1,
     );

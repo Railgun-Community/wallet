@@ -1,5 +1,8 @@
-import { mnemonicToPrivateKey } from '@railgun-community/engine';
+import { mnemonicTo0xPrivateKey } from '@railgun-community/engine';
 
-export const mnemonicToPKey = (mnemonic: string, derivationIndex?: number) => {
-  return `0x${mnemonicToPrivateKey(mnemonic, derivationIndex)}`;
+export const mnemonicTo0xPKey = (
+  mnemonic: string,
+  derivationIndex?: number,
+) => {
+  return `0x${mnemonicTo0xPrivateKey(mnemonic, derivationIndex)}`;
 };
