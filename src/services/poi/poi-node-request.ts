@@ -16,10 +16,12 @@ import {
   SingleCommitmentProofsData,
   SubmitSingleCommitmentProofsParams,
   delay,
+  POIJSONRPCMethod,
 } from '@railgun-community/shared-models';
 import axios, { AxiosError } from 'axios';
 import { sendErrorMessage } from '../../utils';
 import { LegacyTransactProofData } from '@railgun-community/engine';
+import { JsonRpcError, JsonRpcPayload, JsonRpcResult } from 'ethers';
 
 export class POINodeRequest {
   private nodeURLs: string[];
@@ -28,37 +30,38 @@ export class POINodeRequest {
     this.nodeURLs = nodeURLs;
   }
 
-  private getNodeRouteURL = (
-    route: string,
-    nodeUrlAttemptIndex: number,
-  ): string => {
-    return `${this.nodeURLs[nodeUrlAttemptIndex]}/${route}`;
+  private getNodeURL = (nodeUrlAttemptIndex: number): string => {
+    return `${this.nodeURLs[nodeUrlAttemptIndex]}`;
   };
 
-  // private static async getRequest<ResponseData>(
-  //   url: string,
-  // ): Promise<ResponseData> {
-  //   try {
-  //     const { data }: { data: ResponseData } = await axios.get(url);
-  //     return data;
-  //   } catch (err) {
-  //     if (!(err instanceof AxiosError)) {
-  //       throw err;
-  //     }
-  //     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  //     const errMessage = `${err.message}: ${err.response?.data}`;
-  //     sendErrorMessage(`POI REQUEST ERROR ${url} - ${errMessage}`);
-  //     throw new Error(errMessage);
-  //   }
-  // }
-
-  private static async postRequest<Params, ResponseData>(
+  private static async jsonRpcRequest<
+    Params extends any[] | Record<string, any>,
+    ResponseData,
+  >(
     url: string,
+    method: POIJSONRPCMethod,
     params: Params,
   ): Promise<ResponseData> {
+    const payload: JsonRpcPayload = {
+      jsonrpc: '2.0',
+      method,
+      params,
+      id: Date.now(),
+    };
+
     try {
-      const { data }: { data: ResponseData } = await axios.post(url, params);
-      return data;
+      const { data }: { data: JsonRpcResult | JsonRpcError } = await axios.post(
+        url,
+        payload,
+      );
+
+      // Check if the response contains an error
+      if ('error' in data) {
+        throw new Error(data.error.message);
+      }
+
+      // Assume the result will always be in the expected ResponseData format
+      return data.result as ResponseData;
     } catch (cause) {
       if (!(cause instanceof AxiosError)) {
         throw new Error('Non-error thrown in axios post request.', { cause });
@@ -69,18 +72,23 @@ export class POINodeRequest {
     }
   }
 
-  private async attemptRequestWithFallbacks<Params, ResponseData>(
-    route: string,
+  private async attemptRequestWithFallbacks<
+    Params extends any[] | Record<string, any>,
+    ResponseData,
+  >(
+    method: POIJSONRPCMethod,
     params: Params,
     nodeUrlAttemptIndex = 0,
     finalAttempt = false,
   ): Promise<ResponseData> {
     try {
-      const url = this.getNodeRouteURL(route, nodeUrlAttemptIndex);
-      const res = await POINodeRequest.postRequest<Params, ResponseData>(
+      const url = this.getNodeURL(nodeUrlAttemptIndex);
+      const res = await POINodeRequest.jsonRpcRequest<Params, ResponseData>(
         url,
+        method,
         params,
       );
+
       return res;
     } catch (err) {
       if (finalAttempt) {
@@ -90,7 +98,7 @@ export class POINodeRequest {
       // If nodeUrlAttemptIndex is already at the last index, try one final time with the priority 0 nodeUrl
       if (nodeUrlAttemptIndex === this.nodeURLs.length - 1) {
         return this.attemptRequestWithFallbacks(
-          route,
+          method,
           params,
           0, // nodeUrlAttemptIndex
           true, // finalAttempt
@@ -99,7 +107,7 @@ export class POINodeRequest {
 
       // Retry with next priority node URL.
       return this.attemptRequestWithFallbacks(
-        route,
+        method,
         params,
         nodeUrlAttemptIndex + 1, // nodeUrlAttemptIndex
         false, // finalAttempt
@@ -114,11 +122,13 @@ export class POINodeRequest {
     index: number,
     merkleroot: string,
   ): Promise<boolean> => {
-    const route = `validate-txid-merkleroot/${chain.type}/${chain.id}`;
+    const method = POIJSONRPCMethod.ValidateTXIDMerkleroot;
     const isValid = await this.attemptRequestWithFallbacks<
       ValidateTxidMerklerootParams,
       boolean
-    >(route, {
+    >(method, {
+      chainType: chain.type.toString(),
+      chainID: chain.id.toString(),
       txidVersion,
       tree,
       index,
@@ -131,11 +141,15 @@ export class POINodeRequest {
     txidVersion: TXIDVersion,
     chain: Chain,
   ): Promise<ValidatedRailgunTxidStatus> => {
-    const route = `validated-txid/${chain.type}/${chain.id}`;
+    const method = POIJSONRPCMethod.ValidatedTXID;
     const status = await this.attemptRequestWithFallbacks<
       GetLatestValidatedRailgunTxidParams,
       ValidatedRailgunTxidStatus
-    >(route, { txidVersion });
+    >(method, {
+      chainType: chain.type.toString(),
+      chainID: chain.id.toString(),
+      txidVersion,
+    });
     return status;
   };
 
@@ -147,11 +161,17 @@ export class POINodeRequest {
     retryCount = 0,
   ): Promise<boolean> => {
     try {
-      const route = `validate-poi-merkleroots/${chain.type}/${chain.id}`;
+      const method = POIJSONRPCMethod.ValidatePOIMerkleroots;
       const validated = await this.attemptRequestWithFallbacks<
         ValidatePOIMerklerootsParams,
         boolean
-      >(route, { txidVersion, listKey, poiMerkleroots });
+      >(method, {
+        chainType: chain.type.toString(),
+        chainID: chain.id.toString(),
+        txidVersion,
+        listKey,
+        poiMerkleroots,
+      });
       return validated;
     } catch (cause) {
       if (retryCount < 3) {
@@ -175,12 +195,13 @@ export class POINodeRequest {
     listKeys: string[],
     blindedCommitmentDatas: BlindedCommitmentData[],
   ): Promise<POIsPerListMap> => {
-    const route = `pois-per-list/${chain.type}/${chain.id}`;
-
+    const method = POIJSONRPCMethod.POIsPerList;
     const poiStatusListMap = await this.attemptRequestWithFallbacks<
       GetPOIsPerListParams,
       POIsPerListMap
-    >(route, {
+    >(method, {
+      chainType: chain.type.toString(),
+      chainID: chain.id.toString(),
       txidVersion,
       listKeys,
       blindedCommitmentDatas,
@@ -194,12 +215,14 @@ export class POINodeRequest {
     listKey: string,
     blindedCommitments: string[],
   ): Promise<MerkleProof[]> => {
-    const route = `merkle-proofs/${chain.type}/${chain.id}`;
+    const method = POIJSONRPCMethod.MerkleProofs;
 
     const merkleProofs = await this.attemptRequestWithFallbacks<
       GetMerkleProofsParams,
       MerkleProof[]
-    >(route, {
+    >(method, {
+      chainType: chain.type.toString(),
+      chainID: chain.id.toString(),
       txidVersion,
       listKey,
       blindedCommitments,
@@ -213,11 +236,13 @@ export class POINodeRequest {
     listKey: string,
     transactProofData: TransactProofData,
   ) => {
-    const route = `submit-transact-proof/${chain.type}/${chain.id}`;
+    const method = POIJSONRPCMethod.SubmitTransactProof;
 
     await this.attemptRequestWithFallbacks<SubmitTransactProofParams, void>(
-      route,
+      method,
       {
+        chainType: chain.type.toString(),
+        chainID: chain.id.toString(),
         txidVersion,
         listKey,
         transactProofData,
@@ -231,12 +256,14 @@ export class POINodeRequest {
     listKeys: string[],
     legacyTransactProofDatas: LegacyTransactProofData[],
   ) => {
-    const route = `submit-legacy-transact-proofs/${chain.type}/${chain.id}`;
+    const method = POIJSONRPCMethod.SubmitLegacyTransactProofs;
 
     await this.attemptRequestWithFallbacks<
       SubmitLegacyTransactProofParams,
       void
-    >(route, {
+    >(method, {
+      chainType: chain.type.toString(),
+      chainID: chain.id.toString(),
       txidVersion,
       listKeys,
       legacyTransactProofDatas,
@@ -248,12 +275,14 @@ export class POINodeRequest {
     chain: Chain,
     singleCommitmentProofsData: SingleCommitmentProofsData,
   ) => {
-    const route = `submit-single-commitment-proofs/${chain.type}/${chain.id}`;
+    const method = POIJSONRPCMethod.SubmitSingleCommitmentProofs;
 
     await this.attemptRequestWithFallbacks<
       SubmitSingleCommitmentProofsParams,
       void
-    >(route, {
+    >(method, {
+      chainType: chain.type.toString(),
+      chainID: chain.id.toString(),
       txidVersion,
       singleCommitmentProofsData,
     });
