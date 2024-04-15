@@ -141,7 +141,7 @@ const spyOnNFTNote = () => {
 
 describe('tx-transfer', () => {
   before(async function run() {
-    this.timeout(5000);
+    this.timeout(5_000);
     await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
@@ -250,7 +250,7 @@ describe('tx-transfer', () => {
     );
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
-  }).timeout(10000);
+  }).timeout(10_000);
 
   it('Should get gas estimates for valid erc20 transfer: public wallet', async () => {
     stubGasEstimateSuccess();
@@ -274,7 +274,7 @@ describe('tx-transfer', () => {
     expect(rsp.relayerFeeCommitment).to.be.undefined;
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
-  }).timeout(10000);
+  }).timeout(10_000);
 
   it('Should error on gas estimates for invalid erc20 transfer', async () => {
     stubGasEstimateSuccess();
@@ -343,7 +343,7 @@ describe('tx-transfer', () => {
     );
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
-  }).timeout(10000);
+  }).timeout(10_000);
 
   it('Should get gas estimates for valid NFT transfer: public wallet', async () => {
     stubGasEstimateSuccess();
@@ -367,7 +367,7 @@ describe('tx-transfer', () => {
     expect(rsp.relayerFeeCommitment).to.be.undefined;
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
-  }).timeout(10000);
+  }).timeout(10_000);
 
   it('Should error on gas estimates for invalid NFT transfer', async () => {
     stubGasEstimateSuccess();

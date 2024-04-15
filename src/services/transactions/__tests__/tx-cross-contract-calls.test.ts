@@ -146,7 +146,7 @@ const spyOnSetUnshield = () => {
 
 describe('tx-cross-contract-calls', () => {
   before(async function run() {
-    this.timeout(60000);
+    this.timeout(60_000);
     await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
@@ -309,7 +309,7 @@ describe('tx-cross-contract-calls', () => {
     // Add 9000 for the dummy tx variance
     // expect(rsp.gasEstimate).to.equal(9000n + 280n);
     expect(rsp.gasEstimate).to.equal(3_200_000n); // Cross Contract Minimum
-  }).timeout(10000);
+  }).timeout(10_000);
 
   it('Should get gas estimates for valid cross contract calls, public wallet', async () => {
     stubGasEstimateSuccess();
@@ -369,7 +369,7 @@ describe('tx-cross-contract-calls', () => {
     // Add 9000 for the dummy tx variance
     // expect(rsp.gasEstimate).to.equal(9000n + 280n);
     expect(rsp.gasEstimate).to.equal(3_200_000n); // Cross Contract Minimum
-  }).timeout(10000);
+  }).timeout(10_000);
 
   it('Should error on gas estimates for invalid cross contract calls', async () => {
     stubGasEstimateSuccess();

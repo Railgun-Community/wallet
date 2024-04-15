@@ -48,7 +48,7 @@ let railgunWalletID: string;
 
 describe('tx-notes', () => {
   before(async function run() {
-    this.timeout(10000);
+    this.timeout(10_000);
     await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(

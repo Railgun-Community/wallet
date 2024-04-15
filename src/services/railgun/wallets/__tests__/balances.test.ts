@@ -13,18 +13,14 @@ import {
   rescanFullUTXOMerkletreesAndWallets,
 } from '../balances';
 import { Chain, ChainType, isDefined } from '@railgun-community/shared-models';
-import { getTestTXIDVersion } from '../../../../tests/helper.test';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
-
-const txidVersion = getTestTXIDVersion();
 
 let walletScanStub: SinonStub;
 let walletFullScanStub: SinonStub;
 let engineScanStub: SinonStub;
 let engineFullScanStub: SinonStub;
-let knownWalletID: string;
 
 describe('balances', () => {
   before(async () => {
@@ -37,7 +33,6 @@ describe('balances', () => {
     if (!isDefined(railgunWalletInfo)) {
       return;
     }
-    knownWalletID = railgunWalletInfo.id;
     walletScanStub = Sinon.stub(
       RailgunWallet.prototype,
       'decryptBalances',

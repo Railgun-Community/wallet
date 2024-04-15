@@ -58,7 +58,7 @@ describe('railgun-txid-sync-graph', () => {
     expect(railgunTxs[0].verificationHash).to.equal(
       '0x099cd3ebcadaf6ff470d16bc0186fb5f26cd4103e9970effc9b6679478e11c72',
     );
-  }).timeout(20000);
+  }).timeout(20_000);
 
   it('Should pull unshield railgun txids - Ethereum', async () => {
     const unshieldRailgunTxids: string[] = await getRailgunTxidsForUnshields(
@@ -69,7 +69,7 @@ describe('railgun-txid-sync-graph', () => {
     expect(unshieldRailgunTxids).to.deep.equal([
       '065bcb1a9d4cfa110f05b480f79f27fe2ad672868d3d1bdec05df2ddaec8333d',
     ]);
-  }).timeout(20000);
+  }).timeout(20_000);
 
   it('Should pull railgun txs subgraph query - Goerli', async () => {
     const railgunTxs: RailgunTransactionV2[] =
@@ -110,7 +110,7 @@ describe('railgun-txid-sync-graph', () => {
     expect(railgunTxs[2].unshield?.tokenData?.tokenAddress).to.equal(
       '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     );
-  }).timeout(20000);
+  }).timeout(20_000);
 
   it('Should pull unshield railgun txids - Goerli', async () => {
     const unshieldRailgunTxids: string[] = await getRailgunTxidsForUnshields(
@@ -121,7 +121,7 @@ describe('railgun-txid-sync-graph', () => {
     expect(unshieldRailgunTxids).to.deep.equal([
       '08fd7312f96ac8b36f2544a0acaeba0ed0ea57eb5bde0452a240c7a0f3640ae3',
     ]);
-  }).timeout(20000);
+  }).timeout(20_000);
 
   it('Should pull unshield railgun txids for unshield to address - Goerli', async () => {
     const unshieldRailgunTxids =
@@ -131,7 +131,7 @@ describe('railgun-txid-sync-graph', () => {
       );
     expect(unshieldRailgunTxids[1].txid).to.deep.equal('0x930c463cf7231ee76b3048b55f3519f665e9235d976fb0d033ee7bf2044f5ce6');
     expect(unshieldRailgunTxids[1].transactionDatas[0].railgunTxid).to.deep.equal('03641108fee0b24318a940335d7632378de2e3dda752696adcbbf842b78ea1f5');
-  }).timeout(20000);
+  }).timeout(20_000);
 
   it('Should pull unshield railgun tx data for txid - Goerli', async () => {
     const unshieldRailgunTxids =
@@ -140,5 +140,5 @@ describe('railgun-txid-sync-graph', () => {
         '0x930c463cf7231ee76b3048b55f3519f665e9235d976fb0d033ee7bf2044f5ce6',
       );
     expect(unshieldRailgunTxids[0].railgunTxid).to.deep.equal('03641108fee0b24318a940335d7632378de2e3dda752696adcbbf842b78ea1f5');
-  }).timeout(20000);
+  }).timeout(20_000);
 });

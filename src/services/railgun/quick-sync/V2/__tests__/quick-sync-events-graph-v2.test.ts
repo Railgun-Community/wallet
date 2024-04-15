@@ -11,46 +11,46 @@ const { expect } = chai;
 const txidVersion = TXIDVersion.V2_PoseidonMerkle;
 
 const ETH_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Ethereum].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_ETH = 4400;
-const EXPECTED_NULLIFIER_EVENTS_ETH = 3000;
-const EXPECTED_UNSHIELD_EVENTS_ETH = 1;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_ETH = 20_000;
+const EXPECTED_NULLIFIER_EVENTS_ETH = 27_000;
+const EXPECTED_UNSHIELD_EVENTS_ETH = 10_000;
 
 const POLYGON_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Polygon].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON = 5290;
-const EXPECTED_NULLIFIER_EVENTS_POLYGON = 4000;
-const EXPECTED_UNSHIELD_EVENTS_POLYGON = 1;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON = 20_000;
+const EXPECTED_NULLIFIER_EVENTS_POLYGON = 30_000;
+const EXPECTED_UNSHIELD_EVENTS_POLYGON = 10_000;
 
 const BNB_CHAIN: Chain = NETWORK_CONFIG[NetworkName.BNBChain].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_BNB = 1850;
-const EXPECTED_NULLIFIER_EVENTS_BNB = 1200;
-const EXPECTED_UNSHIELD_EVENTS_BNB = 1;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_BNB = 9_000;
+const EXPECTED_NULLIFIER_EVENTS_BNB = 12_000;
+const EXPECTED_UNSHIELD_EVENTS_BNB = 4_000;
 
 const POLYGON_MUMBAI_CHAIN: Chain =
   NETWORK_CONFIG[NetworkName.PolygonMumbai].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON_MUMBAI = 1000;
-const EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI = 100;
-const EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI = 1;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON_MUMBAI = 1_000;
+const EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI = 700;
+const EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI = 300;
 
 const ARBITRUM_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Arbitrum].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM = 150;
-const EXPECTED_NULLIFIER_EVENTS_ARBITRUM = 40;
-const EXPECTED_UNSHIELD_EVENTS_ARBITRUM = 1;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM = 17_000;
+const EXPECTED_NULLIFIER_EVENTS_ARBITRUM = 22_000;
+const EXPECTED_UNSHIELD_EVENTS_ARBITRUM = 9_000;
 
 const GOERLI_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumGoerli].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_GOERLI = 80;
-const EXPECTED_NULLIFIER_EVENTS_GOERLI = 40;
-const EXPECTED_UNSHIELD_EVENTS_GOERLI = 1;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_GOERLI = 3_000;
+const EXPECTED_NULLIFIER_EVENTS_GOERLI = 3_000;
+const EXPECTED_UNSHIELD_EVENTS_GOERLI = 1_000;
 
 const SEPOLIA_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumSepolia].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0; // TODO: Add some
-const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0; // TODO: Add some
-const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 0; // TODO: Add some
+const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0;
+const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0;
+const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 0;
 
 const ARBITRUM_GOERLI_CHAIN: Chain =
   NETWORK_CONFIG[NetworkName.ArbitrumGoerli].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM_GOERLI = 80;
-const EXPECTED_NULLIFIER_EVENTS_ARBITRUM_GOERLI = 40;
-const EXPECTED_UNSHIELD_EVENTS_ARBITRUM_GOERLI = 1;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM_GOERLI = 100;
+const EXPECTED_NULLIFIER_EVENTS_ARBITRUM_GOERLI = 100;
+const EXPECTED_UNSHIELD_EVENTS_ARBITRUM_GOERLI = 40;
 
 const assertContiguousCommitmentEvents = (
   commitmentEvents: CommitmentEvent[],
@@ -94,7 +94,6 @@ describe('quick-sync-events-graph-v2', () => {
       return;
     }
 
-    // const eventLog = await quickSyncEventsGraph(txidVersion, ETH_CHAIN, 0);
     const eventLog = await quickSyncEventsGraph(
       txidVersion,
       ETH_CHAIN,
@@ -114,7 +113,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Polygon', async function run() {
     if (!isV2Test()) {
@@ -140,7 +139,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - BNB Smart Chain', async function run() {
     if (!isV2Test()) {
@@ -163,7 +162,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Polygon Mumbai', async function run() {
     if (!isV2Test()) {
@@ -190,7 +189,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Arbitrum', async function run() {
     if (!isV2Test()) {
@@ -213,7 +212,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Goerli', async function run() {
     if (!isV2Test()) {
@@ -236,7 +235,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async function run() {
     if (!isV2Test()) {
@@ -260,7 +259,7 @@ describe('quick-sync-events-graph-v2', () => {
     // TODO: Add when there are events
     // const shouldThrow = true;
     // assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Arbitrum Goerli', async function run() {
     if (!isV2Test()) {
@@ -287,7 +286,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(90_000);
 
   it('[V2] Should run live Railgun Event Log fetch for Polygon with high starting block', async function run() {
     if (!isV2Test()) {
@@ -306,5 +305,5 @@ describe('quick-sync-events-graph-v2', () => {
     expect(eventLog.commitmentEvents.length).to.equal(0);
     expect(eventLog.nullifierEvents.length).to.equal(0);
     expect(eventLog.unshieldEvents.length).to.equal(0);
-  }).timeout(45000);
+  }).timeout(90_000);
 });

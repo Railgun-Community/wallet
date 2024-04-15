@@ -81,5 +81,5 @@ describe('quick-sync-events-graph-v3', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(45_000);
 });
