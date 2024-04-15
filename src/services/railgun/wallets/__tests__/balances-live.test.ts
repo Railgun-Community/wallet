@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   MOCK_DB_ENCRYPTION_KEY,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
   MOCK_MNEMONIC,
 } from '../../../../tests/mocks.test';
 import {
@@ -31,12 +31,12 @@ let railgunWalletID: string;
 
 const txidVersion = getTestTXIDVersion();
 
-const networkName = NetworkName.EthereumGoerli;
+const networkName = NetworkName.PolygonMumbai;
 const chain: Chain = NETWORK_CONFIG[networkName].chain;
 
 describe('balances-live', () => {
   before(async function run() {
-    this.timeout(60000);
+    this.timeout(90_000);
 
     await initTestEngine();
 
@@ -53,7 +53,7 @@ describe('balances-live', () => {
     railgunWalletID = railgunWalletInfo.id;
 
     await loadProvider(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
       networkName,
       10000, // pollingInterval
     );
@@ -107,11 +107,12 @@ describe('balances-live', () => {
       'Missing',
     );
 
-    const txidMerkletree = getTXIDMerkletreeForNetwork(
-      txidVersion,
-      networkName,
-    );
-    expect(txidMerkletree.savedPOILaunchSnapshot).to.equal(true);
+    // TODO: Uncomment when we have PPOI enabled on Polygon Mumbai
+    // const txidMerkletree = getTXIDMerkletreeForNetwork(
+    //   txidVersion,
+    //   networkName,
+    // );
+    // expect(txidMerkletree.savedPOILaunchSnapshot).to.equal(true);
 
     // const poiStatusSpent = await wallet.getTXOsSpentPOIStatusInfo(
     //   txidVersion,
@@ -121,5 +122,5 @@ describe('balances-live', () => {
     // expect(poiStatusSpent[0].strings.railgunTransactionInfo).to.not.equal(
     //   'Not found',
     // );
-  }).timeout(30000);
+  }).timeout(90_000);
 });

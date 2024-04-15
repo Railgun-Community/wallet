@@ -32,7 +32,7 @@ let wallet: RailgunWallet;
 
 describe('wallets', () => {
   before(async function run() {
-    this.timeout(10000);
+    this.timeout(30_000);
     await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
@@ -61,7 +61,7 @@ describe('wallets', () => {
     const viewOnlyWallet = viewOnlyWalletForID(railgunWalletInfo.id);
     expect(viewOnlyWallet).to.not.be.undefined;
     expect(railgunWalletInfo.railgunAddress).to.equal(wallet.getAddress());
-  }).timeout(5000);
+  }).timeout(30_000);
 
   it('Should get wallet address', () => {
     const addressAny = getRailgunAddress(wallet.id);

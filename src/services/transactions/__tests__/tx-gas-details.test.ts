@@ -90,7 +90,7 @@ describe('tx-gas', () => {
       isGasEstimateWithDummyProof,
     );
     expect(rsp.gasEstimate).to.not.be.undefined;
-  }).timeout(10000);
+  }).timeout(10_000);
 
   it('Should pull gas estimate for basic transaction - relayer', async () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
@@ -118,24 +118,24 @@ describe('tx-gas', () => {
       isGasEstimateWithDummyProof,
     );
     expect(rsp.gasEstimate).to.not.be.undefined;
-  }).timeout(10000);
+  }).timeout(10_000);
 
   it('Should set gas details for populated tx', () => {
     const transaction = {} as ContractTransaction;
     const gasDetailsType0: TransactionGasDetails = {
       evmGasType: EVMGasType.Type0,
-      gasEstimate: 100000n,
+      gasEstimate: 100_000n,
       gasPrice: 500n,
     };
     const gasDetailsType1: TransactionGasDetails = {
       evmGasType: EVMGasType.Type1,
-      gasEstimate: 100000n,
+      gasEstimate: 100_000n,
       gasPrice: 500n,
     };
     const gasDetailsType2: TransactionGasDetails = {
       evmGasType: EVMGasType.Type2,
-      gasEstimate: 120000n,
-      maxFeePerGas: 10000n,
+      gasEstimate: 120_000n,
+      maxFeePerGas: 10_000n,
       maxPriorityFeePerGas: 500n,
     };
     // Polygon - self-sign
@@ -146,9 +146,9 @@ describe('tx-gas', () => {
       true, // sendWithPublicWallet
     );
     expect(transaction.type).to.equal(2);
-    expect(transaction.gasLimit).to.equal(144000n);
+    expect(transaction.gasLimit).to.equal(144_000n);
     expect(transaction.gasPrice).to.be.undefined;
-    expect(transaction.maxFeePerGas).to.equal(10000n);
+    expect(transaction.maxFeePerGas).to.equal(10_000n);
     expect(transaction.maxPriorityFeePerGas).to.equal(500n);
     // Polygon - Relayer
     setGasDetailsForTransaction(

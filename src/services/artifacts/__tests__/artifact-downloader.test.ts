@@ -118,7 +118,7 @@ describe('artifact-downloader', () => {
     expect(cached?.zkey).to.not.be.undefined;
     expect(cached?.wasm).to.not.be.undefined;
     expect(cached?.dat).to.be.undefined;
-  }).timeout(30000);
+  }).timeout(30_000);
 
   it('Should download artifacts - poi native', async () => {
     setUseNativeArtifacts(true);
@@ -148,7 +148,7 @@ describe('artifact-downloader', () => {
     expect(cached?.zkey).to.not.be.undefined;
     expect(cached?.wasm).to.be.undefined;
     expect(cached?.dat).to.not.be.undefined;
-  }).timeout(30000);
+  }).timeout(30_000);
 
   it('Should download artifacts - snarkjs', async () => {
     setUseNativeArtifacts(false);
@@ -186,7 +186,7 @@ describe('artifact-downloader', () => {
     expect(cached?.zkey).to.not.be.undefined;
     expect(cached?.wasm).to.not.be.undefined;
     expect(cached?.dat).to.be.undefined;
-  }).timeout(30000);
+  }).timeout(30_000);
 
   it('Should download artifacts - native', async () => {
     setUseNativeArtifacts(true);
@@ -222,7 +222,7 @@ describe('artifact-downloader', () => {
     expect(cached?.zkey).to.not.be.undefined;
     expect(cached?.wasm).to.be.undefined;
     expect(cached?.dat).to.not.be.undefined;
-  }).timeout(30000);
+  }).timeout(30_000);
 
   // Skipped because we don't want to run this on every build.
   it.skip('Should download ALL artifacts - native and nodejs', async () => {
@@ -286,5 +286,5 @@ describe('artifact-downloader', () => {
         expect(artifacts.dat).to.be.undefined;
       }
     }
-  }).timeout(30000);
+  }).timeout(30_000);
 });

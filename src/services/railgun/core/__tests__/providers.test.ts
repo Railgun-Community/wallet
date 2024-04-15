@@ -57,7 +57,7 @@ describe('providers', () => {
         unshieldFeeV3: '25',
       });
     },
-  ).timeout(20000);
+  ).timeout(20_000);
 
   it('Should load provider with json, pull fees, and check created objects', async () => {
     const response = await loadProvider(
@@ -139,7 +139,7 @@ describe('providers', () => {
         NETWORK_CONFIG[NetworkName.PolygonMumbai].chain,
       ),
     ).to.not.be.undefined;
-  }).timeout(15000);
+  }).timeout(15_000);
 
   it('Should fail with invalid chain ID', async () => {
     await expect(

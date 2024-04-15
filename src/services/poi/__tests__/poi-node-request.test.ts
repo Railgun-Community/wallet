@@ -19,7 +19,7 @@ describe('poi-node-request', () => {
   before(() => {
     postRequestStub = Sinon.stub(
       POINodeRequest,
-      'postRequest' as any,
+      'jsonRpcRequest' as any,
     ).callsFake(async (url: any) => {
       if ((url as string).includes('400')) {
         throw new Error('400');
@@ -48,7 +48,7 @@ describe('poi-node-request', () => {
 
     expect(isValid).to.be.true;
     expect(postRequestStub.callCount).to.be.equal(2);
-  }).timeout(20000);
+  }).timeout(20_000);
 
   it('Should return error if all nodeUrls fail', async () => {
     const nodeRequest = new POINodeRequest(['400', '400']);
@@ -68,5 +68,5 @@ describe('poi-node-request', () => {
 
     expect(rejection).to.be.true;
     expect(postRequestStub.callCount).to.be.equal(3);
-  }).timeout(20000);
+  }).timeout(20_000);
 });
