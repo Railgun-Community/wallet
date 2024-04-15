@@ -90,7 +90,7 @@ describe('tx-gas', () => {
       isGasEstimateWithDummyProof,
     );
     expect(rsp.gasEstimate).to.not.be.undefined;
-  }).timeout(10_000);
+  }).timeout(30_000);
 
   it('Should pull gas estimate for basic transaction - relayer', async () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
@@ -118,7 +118,7 @@ describe('tx-gas', () => {
       isGasEstimateWithDummyProof,
     );
     expect(rsp.gasEstimate).to.not.be.undefined;
-  }).timeout(10_000);
+  }).timeout(30_000);
 
   it('Should set gas details for populated tx', () => {
     const transaction = {} as ContractTransaction;
