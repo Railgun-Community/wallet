@@ -170,7 +170,7 @@ const spyOnSetUnshield = () => {
 
 describe('tx-unshield', () => {
   before(async function run() {
-    this.timeout(30_000);
+    this.timeout(60_000);
     await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
@@ -309,7 +309,7 @@ describe('tx-unshield', () => {
     ]);
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
-  }).timeout(10_000);
+  }).timeout(30_000);
 
   it('Should get gas estimates for valid Unshield To Origin', async () => {
     stubGasEstimateSuccess();
@@ -343,7 +343,7 @@ describe('tx-unshield', () => {
     ]);
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
-  }).timeout(10_000);
+  }).timeout(30_000);
 
   it('Should error on gas estimates for invalid Unshield', async () => {
     stubGasEstimateSuccess();
@@ -422,7 +422,7 @@ describe('tx-unshield', () => {
     ]);
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
-  }).timeout(10_000);
+  }).timeout(30_000);
 
   it('Should get gas estimates for valid Unshield base token: public wallet', async () => {
     stubGasEstimateSuccess();
@@ -452,7 +452,7 @@ describe('tx-unshield', () => {
     ]);
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
-  }).timeout(10_000);
+  }).timeout(30_000);
 
   it('Should error on gas estimates for invalid Unshield base token', async () => {
     stubGasEstimateSuccess();

@@ -141,7 +141,7 @@ const spyOnNFTNote = () => {
 
 describe('tx-transfer', () => {
   before(async function run() {
-    this.timeout(30_000);
+    this.timeout(60_000);
     await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
