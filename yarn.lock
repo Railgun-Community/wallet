@@ -2272,17 +2272,17 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@7.3.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-7.3.0.tgz#8c61d04c104651d3e77ff9db1489c5c444caa263"
-  integrity sha512-iVSRBVO7ZKyvDo6JxgqQkzoWpk14jJp2b0LDHisAAG6H/D0l37frxWuq+dBqXOnD2cT85HgP4KWAk1RnUzCN/g==
+"@railgun-community/engine@7.3.1":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-7.3.1.tgz#9779b1209eb3b8ba9f83e392b544ac9eb27231ed"
+  integrity sha512-7yb2josEAxDKd5RwPmSmEPJkBPZZcXL9q7F4kzuWe+CvQRqvdBzaxZz5OmFykVAbYRe91LxLLgmW6Rj0AgB0wA==
   dependencies:
     "@noble/ciphers" "^0.4.0"
     "@noble/ed25519" "^1.7.1"
     "@noble/hashes" "^1.3.2"
     "@railgun-community/circomlibjs" "0.0.8"
     "@railgun-community/curve25519-scalarmult-wasm" "0.1.5"
-    "@railgun-community/poseidon-hash-wasm" "1.0.0"
+    "@railgun-community/poseidon-hash-wasm" "1.0.1"
     "@scure/base" "^1.1.1"
     abstract-leveldown "^7.2.0"
     bn.js "^5.2.1"
@@ -2303,10 +2303,10 @@
   dependencies:
     big-integer "^1.6.48"
 
-"@railgun-community/poseidon-hash-wasm@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@railgun-community/poseidon-hash-wasm/-/poseidon-hash-wasm-1.0.0.tgz#5b3b77c832055b51b0865f5b5f569ff105dc5a08"
-  integrity sha512-X9qFW6kYKz85eTlzoJBgbv7HjT8+T93yXAVNLUu3wSv7PSoWFef6bS7HRTdWBSSVxFawLaTMtmhoC20T9Zzi5A==
+"@railgun-community/poseidon-hash-wasm@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@railgun-community/poseidon-hash-wasm/-/poseidon-hash-wasm-1.0.1.tgz#bfd3b3f915391a59486d8c9d632069f029e152d6"
+  integrity sha512-zDAbMu095ZjMqsKIoyOnuKR4Zofnqqx4eTCtnA6qYglnexX5cadxItvJa3ozhDDTmFkDGAidDssQ7Pzl3wwLDA==
 
 "@railgun-community/shared-models@6.4.0":
   version "6.4.0"
