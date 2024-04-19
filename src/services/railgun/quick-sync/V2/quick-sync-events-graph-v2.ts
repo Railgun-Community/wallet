@@ -27,8 +27,6 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
   switch (networkName) {
     case NetworkName.Ethereum:
       return 'ethereum';
-    case NetworkName.EthereumGoerli:
-      return 'goerli';
     case NetworkName.EthereumSepolia:
       // return 'sepolia';
       throw new Error('No Graph API hosted service for Sepolia');
@@ -42,6 +40,7 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
       return 'arbitrum-goerli';
     case NetworkName.PolygonMumbai:
       return 'mumbai';
+    case NetworkName.EthereumGoerli_DEPRECATED:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.Hardhat:
       throw new Error('No Graph API hosted service for this network');
