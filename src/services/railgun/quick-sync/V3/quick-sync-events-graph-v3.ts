@@ -31,12 +31,12 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.PolygonMumbai:
       return 'mumbai';
     case NetworkName.Ethereum:
-    case NetworkName.EthereumGoerli:
     case NetworkName.EthereumSepolia:
     case NetworkName.BNBChain:
     case NetworkName.Polygon:
     case NetworkName.Arbitrum:
     case NetworkName.ArbitrumGoerli:
+    case NetworkName.EthereumGoerli_DEPRECATED:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.Hardhat:
       throw new Error(

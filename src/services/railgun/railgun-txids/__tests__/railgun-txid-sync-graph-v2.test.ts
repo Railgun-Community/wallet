@@ -14,9 +14,6 @@ const { expect } = chai;
 
 const ETH_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Ethereum].chain;
 
-const ETH_GOERLI_CHAIN: Chain =
-  NETWORK_CONFIG[NetworkName.EthereumGoerli].chain;
-
 describe('railgun-txid-sync-graph', () => {
   before(() => {
     NETWORK_CONFIG[NetworkName.Ethereum].poi = {
@@ -71,74 +68,29 @@ describe('railgun-txid-sync-graph', () => {
     ]);
   }).timeout(20_000);
 
-  it('Should pull railgun txs subgraph query - Goerli', async () => {
-    const railgunTxs: RailgunTransactionV2[] =
-      await quickSyncRailgunTransactionsV2(ETH_GOERLI_CHAIN, undefined);
-
-    expect(railgunTxs).to.be.an('array');
-    expect(railgunTxs.length).to.be.greaterThan(1000);
-
-    expect(railgunTxs[0].commitments).to.deep.equal([
-      '0x0f6104cf7b8f304e8a5fe224f3c291dedc7ff7f0865edb154171bcfa0d299e67',
-      '0x165bf0d1cc1061ee5efa4037fbb9217e70f2c681f4b0d013adbcb115722709e2',
-      '0x285a55d56266817bbf781452979e472a5fcca7fc5bb4582a33e4a7572b6f3e46',
-    ]);
-    expect(railgunTxs[0].nullifiers).to.deep.equal([
-      '0x1e52cee52f67c37a468458671cddde6b56390dcbdc4cf3b770badc0e78d66401',
-    ]);
-    expect(railgunTxs[0].graphID).to.equal(
-      '0x0000000000000000000000000000000000000000000000000000000000776be700000000000000000000000000000000000000000000000000000000000000290000000000000000000000000000000000000000000000000000000000000000',
-    );
-    expect(railgunTxs[0].boundParamsHash).to.equal(
-      '0x0241df5c3ddca93c4bc340a10f628c7dff4acb0657469836836a2e824a4a000b',
-    );
-    expect(railgunTxs[0].txid).to.equal(
-      'cb7f6aae245502117c440a52a587afcb5e14d89665c9bda0a8e6bdf780b7f6f5',
-    );
-    expect(railgunTxs[0].utxoTreeIn).to.equal(0);
-    expect(railgunTxs[0].utxoTreeOut).to.equal(0);
-    expect(railgunTxs[0].utxoBatchStartPositionOut).to.equal(2);
-    expect(railgunTxs[0].unshield).to.equal(undefined);
-    expect(railgunTxs[0].blockNumber).to.equal(7826407);
-    expect(railgunTxs[0].unshield?.tokenData?.tokenAddress).to.equal(undefined);
-    expect(railgunTxs[0].verificationHash).to.equal(
-      '0x099cd3ebcadaf6ff470d16bc0186fb5f26cd4103e9970effc9b6679478e11c72',
-    );
-
-    // Test transaction with unshield
-    expect(railgunTxs[2].unshield).to.be.an('object');
-    expect(railgunTxs[2].unshield?.tokenData?.tokenAddress).to.equal(
-      '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
-    );
-  }).timeout(20_000);
-
-  it('Should pull unshield railgun txids - Goerli', async () => {
-    const unshieldRailgunTxids: string[] = await getRailgunTxidsForUnshields(
-      ETH_GOERLI_CHAIN,
-      '0x3f0648eec7be61c7154013f5ecdf01cec48f0b0161f235b240c0f1ae94c3bbc1',
-    );
-
-    expect(unshieldRailgunTxids).to.deep.equal([
-      '08fd7312f96ac8b36f2544a0acaeba0ed0ea57eb5bde0452a240c7a0f3640ae3',
-    ]);
-  }).timeout(20_000);
-
-  it('Should pull unshield railgun txids for unshield to address - Goerli', async () => {
+  it('Should pull unshield railgun txids for unshield to address - Ethereum', async () => {
     const unshieldRailgunTxids =
       await getRailgunTransactionDataForUnshieldToAddress(
-        ETH_GOERLI_CHAIN,
+        ETH_CHAIN,
         '0xE251BaFD15A1e011f23F9c68673aAf2Fa00C1D03',
       );
-    expect(unshieldRailgunTxids[1].txid).to.deep.equal('0x930c463cf7231ee76b3048b55f3519f665e9235d976fb0d033ee7bf2044f5ce6');
-    expect(unshieldRailgunTxids[1].transactionDatas[0].railgunTxid).to.deep.equal('03641108fee0b24318a940335d7632378de2e3dda752696adcbbf842b78ea1f5');
+    expect(unshieldRailgunTxids[1].txid).to.deep.equal(
+      '0x2d4bc718a244d6ee07bc4683dda6f4a484caa4cd269f7c1912d65f19779f6864',
+    );
+    expect(
+      unshieldRailgunTxids[1].transactionDatas[0].railgunTxid,
+    ).to.deep.equal(
+      '1ebd03bc2705ecd3db31e261f54fbab362572dc413cf10e9457f28d68578e325',
+    );
   }).timeout(20_000);
 
-  it('Should pull unshield railgun tx data for txid - Goerli', async () => {
-    const unshieldRailgunTxids =
-      await getRailgunTxDataForUnshields(
-        ETH_GOERLI_CHAIN,
-        '0x930c463cf7231ee76b3048b55f3519f665e9235d976fb0d033ee7bf2044f5ce6',
-      );
-    expect(unshieldRailgunTxids[0].railgunTxid).to.deep.equal('03641108fee0b24318a940335d7632378de2e3dda752696adcbbf842b78ea1f5');
+  it('Should pull unshield railgun tx data for txid - Ethereum', async () => {
+    const unshieldRailgunTxids = await getRailgunTxDataForUnshields(
+      ETH_CHAIN,
+      '0x0b3b7179df1377c0a13058508e7dff2dbe8f73c39d68f569bc90b1c8b277082e',
+    );
+    expect(unshieldRailgunTxids[0].railgunTxid).to.deep.equal(
+      '065bcb1a9d4cfa110f05b480f79f27fe2ad672868d3d1bdec05df2ddaec8333d',
+    );
   }).timeout(20_000);
 });

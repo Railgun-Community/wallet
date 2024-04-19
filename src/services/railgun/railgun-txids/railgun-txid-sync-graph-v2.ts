@@ -25,14 +25,13 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   switch (networkName) {
     case NetworkName.Ethereum:
       return 'txs-ethereum';
-    case NetworkName.EthereumGoerli:
-      return 'txs-goerli';
     case NetworkName.EthereumSepolia:
     case NetworkName.BNBChain:
     case NetworkName.Polygon:
     case NetworkName.Arbitrum:
     case NetworkName.ArbitrumGoerli:
     case NetworkName.PolygonMumbai:
+    case NetworkName.EthereumGoerli_DEPRECATED:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.Hardhat:
       throw new Error('No railgun-transaction subgraph for this network');

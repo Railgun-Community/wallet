@@ -223,7 +223,7 @@ const MOCKED_UNKNOWN_SWAP_TRX: TransactionHistoryItem = {
 
 describe('transaction-history', () => {
   before(async function run() {
-    this.timeout(120_000);
+    this.timeout(6 * 60_000); // The scanning nowadays can take a long time
     await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(

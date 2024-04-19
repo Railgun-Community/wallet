@@ -36,11 +36,6 @@ const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM = 17_000;
 const EXPECTED_NULLIFIER_EVENTS_ARBITRUM = 22_000;
 const EXPECTED_UNSHIELD_EVENTS_ARBITRUM = 9_000;
 
-const GOERLI_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumGoerli].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_GOERLI = 3_000;
-const EXPECTED_NULLIFIER_EVENTS_GOERLI = 3_000;
-const EXPECTED_UNSHIELD_EVENTS_GOERLI = 1_000;
-
 const SEPOLIA_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumSepolia].chain;
 const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0;
 const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0;
@@ -208,29 +203,6 @@ describe('quick-sync-events-graph-v2', () => {
     );
     expect(eventLog.unshieldEvents.length).to.be.at.least(
       EXPECTED_UNSHIELD_EVENTS_ARBITRUM,
-    );
-
-    const shouldThrow = true;
-    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(90_000);
-
-  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Goerli', async function run() {
-    if (!isV2Test()) {
-      this.skip();
-      return;
-    }
-
-    const eventLog = await quickSyncEventsGraph(txidVersion, GOERLI_CHAIN, 0);
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_GROUP_EVENTS_GOERLI,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_GOERLI,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_GOERLI,
     );
 
     const shouldThrow = true;
