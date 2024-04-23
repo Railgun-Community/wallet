@@ -70,7 +70,7 @@ describe('railgun-txid-sync-graph', () => {
       '065bcb1a9d4cfa110f05b480f79f27fe2ad672868d3d1bdec05df2ddaec8333d',
     ]);
   }).timeout(20000);
-
+  /*
   it('Should pull railgun txs subgraph query - Goerli', async () => {
     const railgunTxs: RailgunTransactionV2[] =
       await quickSyncRailgunTransactionsV2(ETH_GOERLI_CHAIN, undefined);
@@ -111,7 +111,6 @@ describe('railgun-txid-sync-graph', () => {
       '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
     );
   }).timeout(20000);
-
   it('Should pull unshield railgun txids - Goerli', async () => {
     const unshieldRailgunTxids: string[] = await getRailgunTxidsForUnshields(
       ETH_GOERLI_CHAIN,
@@ -141,4 +140,5 @@ describe('railgun-txid-sync-graph', () => {
       );
     expect(unshieldRailgunTxids[0].railgunTxid).to.deep.equal('03641108fee0b24318a940335d7632378de2e3dda752696adcbbf842b78ea1f5');
   }).timeout(20000);
+  */
 });

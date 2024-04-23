@@ -1,5 +1,5 @@
-query GetRailgunTransactionsAfterGraphID($idLow: Bytes = "0x00") {
-  transactions(orderBy: id, first: 1000, where: { id_gt: $idLow }) {
+query GetRailgunTransactionsAfterGraphID($idLow: String = "0x00") {
+  transactions(orderBy: id_ASC, limit: 1000, where: { id_gt: $idLow }) {
     # Make sure types match in both queries.
     id
     nullifiers
@@ -24,7 +24,7 @@ query GetRailgunTransactionsAfterGraphID($idLow: Bytes = "0x00") {
 }
 
 query GetRailgunTransactionsByTxid($txid: Bytes) {
-  transactions(where: { transactionHash: $txid }) {
+  transactions(where: { transactionHash_eq: $txid }) {
     # Make sure types match in both queries.
     id
     nullifiers
@@ -50,9 +50,9 @@ query GetRailgunTransactionsByTxid($txid: Bytes) {
 
 query GetRailgunTransactionsByUnshieldToAddress($address: Bytes) {
   transactions(
-    orderBy: id
-    first: 1000
-    where: { unshieldToAddress: $address }
+    orderBy: id_ASC
+    limit: 1000
+    where: { unshieldToAddress_eq: $address }
   ) {
     # Make sure types match in both queries.
     id

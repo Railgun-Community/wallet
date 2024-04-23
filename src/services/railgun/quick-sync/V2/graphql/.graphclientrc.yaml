@@ -3,36 +3,36 @@ sources:
   - name: ethereum
     handler:
       graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-ethereum
-  - name: goerli
-    handler:
-      graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-goerli
+        endpoint: https://rail-squid.squids.live/squid-railgun-ethereum-v2/v/v1/graphql
+  #- name: goerli
+  #  handler:
+  #    graphql:
+  #      endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-goerli
   - name: bsc
     handler:
       graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-bsc
+        endpoint: https://rail-squid.squids.live/squid-railgun-bsc-v2/v/v1/graphql
   - name: matic
     handler:
       graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-polygon
-  - name: mumbai
-    handler:
-      graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-mumbai
+        endpoint: https://rail-squid.squids.live/squid-railgun-polygon-v2/v/v1/graphql
+  #- name: mumbai
+  #  handler:
+  #    graphql:
+  #      endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-mumbai
   - name: arbitrum-one
     handler:
       graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum
-  - name: arbitrum-goerli
-    handler:
-      graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum-goerli
+        endpoint: https://rail-squid.squids.live/squid-railgun-arbitrum-v2/v/v1/graphql
+  #- name: arbitrum-goerli
+  #  handler:
+  #    graphql:
+  #      endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum-goerli
   # NOTE: Not supported by hosted service yet.
-  - name: sepolia
-    handler:
-      graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-sepolia
+  #- name: sepolia
+  #  handler:
+  #    graphql:
+  #     endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-sepolia
 
 documents:
   - ./quick-sync-query-V2.graphql

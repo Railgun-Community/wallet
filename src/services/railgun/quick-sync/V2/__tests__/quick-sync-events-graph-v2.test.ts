@@ -114,7 +114,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(200_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Polygon', async function run() {
     if (!isV2Test()) {
@@ -140,7 +140,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(200_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - BNB Smart Chain', async function run() {
     if (!isV2Test()) {
@@ -163,8 +163,8 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
-
+  }).timeout(200_000);
+  /*
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Polygon Mumbai', async function run() {
     if (!isV2Test()) {
       this.skip();
@@ -191,7 +191,7 @@ describe('quick-sync-events-graph-v2', () => {
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(45000);
-
+  */
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Arbitrum', async function run() {
     if (!isV2Test()) {
       this.skip();
@@ -213,8 +213,8 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
-
+  }).timeout(200_000);
+  /*
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Goerli', async function run() {
     if (!isV2Test()) {
       this.skip();
@@ -307,4 +307,5 @@ describe('quick-sync-events-graph-v2', () => {
     expect(eventLog.nullifierEvents.length).to.equal(0);
     expect(eventLog.unshieldEvents.length).to.equal(0);
   }).timeout(45000);
+  */
 });
