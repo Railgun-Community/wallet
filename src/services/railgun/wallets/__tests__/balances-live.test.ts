@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   MOCK_DB_ENCRYPTION_KEY,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
   MOCK_MNEMONIC,
 } from '../../../../tests/mocks.test';
 import {
@@ -31,12 +31,12 @@ let railgunWalletID: string;
 
 const txidVersion = getTestTXIDVersion();
 
-const networkName = NetworkName.PolygonMumbai;
+const networkName = NetworkName.Polygon;
 const chain: Chain = NETWORK_CONFIG[networkName].chain;
 
 describe('balances-live', () => {
   before(async function run() {
-    this.timeout(90_000);
+    this.timeout(390_000);
 
     await initTestEngine();
 
@@ -53,7 +53,7 @@ describe('balances-live', () => {
     railgunWalletID = railgunWalletInfo.id;
 
     await loadProvider(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
       networkName,
       10000, // pollingInterval
     );
@@ -65,7 +65,8 @@ describe('balances-live', () => {
     );
     await Promise.all([
       pollUntilUTXOMerkletreeScanned(),
-      pollUntilTXIDMerkletreeScanned(),
+      // Enable this when running on a network supporting PPOI:
+      // pollUntilTXIDMerkletreeScanned(),
     ]);
   });
 
@@ -107,7 +108,7 @@ describe('balances-live', () => {
       'Missing',
     );
 
-    // TODO: Uncomment when we have PPOI enabled on Polygon Mumbai
+    // TODO: Uncomment when we have PPOI enabled on the testnet of choice
     // const txidMerkletree = getTXIDMerkletreeForNetwork(
     //   txidVersion,
     //   networkName,
