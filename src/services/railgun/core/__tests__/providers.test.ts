@@ -9,7 +9,7 @@ import {
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_FAILING_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { getFallbackProviderForNetwork } from '../providers';
@@ -47,7 +47,7 @@ describe('providers', () => {
     async () => {
       const response = await loadProvider(
         MOCK_FAILING_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
-        NetworkName.PolygonMumbai,
+        NetworkName.PolygonMumbai_DEPRECATED,
         10000, // pollingInterval
       );
       expect(response.feesSerialized).to.deep.equal({
@@ -61,24 +61,24 @@ describe('providers', () => {
 
   it('Should load provider with json, pull fees, and check created objects', async () => {
     const response = await loadProvider(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
-      NetworkName.PolygonMumbai,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
+      NetworkName.Polygon,
       10000, // pollingInterval
     );
     expect(response.feesSerialized).to.deep.equal({
       shieldFeeV2: '25',
       unshieldFeeV2: '25',
-      shieldFeeV3: '25',
-      unshieldFeeV3: '25',
+      shieldFeeV3: undefined,
+      unshieldFeeV3: undefined,
     });
 
-    expect(getFallbackProviderForNetwork(NetworkName.PolygonMumbai)).to.not.be
+    expect(getFallbackProviderForNetwork(NetworkName.Polygon)).to.not.be
       .undefined;
     expect(() =>
       getFallbackProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
     ).to.throw;
 
-    expect(getUTXOMerkletreeForNetwork(txidVersion, NetworkName.PolygonMumbai))
+    expect(getUTXOMerkletreeForNetwork(txidVersion, NetworkName.Polygon))
       .to.not.be.undefined;
     expect(() =>
       getUTXOMerkletreeForNetwork(
@@ -96,7 +96,7 @@ describe('providers', () => {
       ),
     ).to.throw;
 
-    const { chain } = NETWORK_CONFIG[NetworkName.PolygonMumbai];
+    const { chain } = NETWORK_CONFIG[NetworkName.Polygon];
     expect(
       RailgunVersionedSmartContracts.getShieldApprovalContract(
         txidVersion,
@@ -136,7 +136,7 @@ describe('providers', () => {
     expect(
       wallet.getUTXOMerkletree(
         txidVersion,
-        NETWORK_CONFIG[NetworkName.PolygonMumbai].chain,
+        NETWORK_CONFIG[NetworkName.Polygon].chain,
       ),
     ).to.not.be.undefined;
   }).timeout(15_000);

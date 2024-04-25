@@ -25,12 +25,6 @@ const EXPECTED_COMMITMENT_GROUP_EVENTS_BNB = 9_000;
 const EXPECTED_NULLIFIER_EVENTS_BNB = 12_000;
 const EXPECTED_UNSHIELD_EVENTS_BNB = 4_000;
 
-const POLYGON_MUMBAI_CHAIN: Chain =
-  NETWORK_CONFIG[NetworkName.PolygonMumbai].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON_MUMBAI = 1_000;
-const EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI = 700;
-const EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI = 300;
-
 const ARBITRUM_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Arbitrum].chain;
 const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM = 17_000;
 const EXPECTED_NULLIFIER_EVENTS_ARBITRUM = 22_000;
@@ -40,12 +34,6 @@ const SEPOLIA_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumSepolia].chain;
 const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0;
 const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0;
 const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 0;
-
-const ARBITRUM_GOERLI_CHAIN: Chain =
-  NETWORK_CONFIG[NetworkName.ArbitrumGoerli].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM_GOERLI = 100;
-const EXPECTED_NULLIFIER_EVENTS_ARBITRUM_GOERLI = 100;
-const EXPECTED_UNSHIELD_EVENTS_ARBITRUM_GOERLI = 40;
 
 const assertContiguousCommitmentEvents = (
   commitmentEvents: CommitmentEvent[],
@@ -159,33 +147,6 @@ describe('quick-sync-events-graph-v2', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(90_000);
 
-  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Polygon Mumbai', async function run() {
-    if (!isV2Test()) {
-      this.skip();
-      return;
-    }
-
-    const eventLog = await quickSyncEventsGraph(
-      txidVersion,
-      POLYGON_MUMBAI_CHAIN,
-      0,
-    );
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON_MUMBAI,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI,
-    );
-
-    const shouldThrow = true;
-    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(90_000);
-
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Arbitrum', async function run() {
     if (!isV2Test()) {
       this.skip();
@@ -231,33 +192,6 @@ describe('quick-sync-events-graph-v2', () => {
     // TODO: Add when there are events
     // const shouldThrow = true;
     // assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(90_000);
-
-  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Arbitrum Goerli', async function run() {
-    if (!isV2Test()) {
-      this.skip();
-      return;
-    }
-
-    const eventLog = await quickSyncEventsGraph(
-      txidVersion,
-      ARBITRUM_GOERLI_CHAIN,
-      0,
-    );
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_GROUP_EVENTS_ARBITRUM_GOERLI,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_ARBITRUM_GOERLI,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_ARBITRUM_GOERLI,
-    );
-
-    const shouldThrow = true;
-    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(90_000);
 
   it('[V2] Should run live Railgun Event Log fetch for Polygon with high starting block', async function run() {

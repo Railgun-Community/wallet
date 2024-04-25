@@ -14,16 +14,16 @@ export const shouldSetOverallBatchMinGasPriceForNetwork = (
   }
   switch (networkName) {
     case NetworkName.Arbitrum:
-    case NetworkName.ArbitrumGoerli:
       // L2s should not set overallBatchMinGasPrice.
       return false;
     case NetworkName.Ethereum:
     case NetworkName.BNBChain:
     case NetworkName.Polygon:
+    case NetworkName.ArbitrumGoerli_DEPRECATED:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.EthereumGoerli_DEPRECATED:
+    case NetworkName.PolygonMumbai_DEPRECATED:
     case NetworkName.EthereumSepolia:
-    case NetworkName.PolygonMumbai:
     case NetworkName.Hardhat:
       return true;
   }

@@ -78,15 +78,15 @@ const estimateGas = (
 const shouldRemoveGasLimitForL2GasEstimate = (networkName: NetworkName) => {
   switch (networkName) {
     case NetworkName.Arbitrum:
-    case NetworkName.ArbitrumGoerli:
       return true;
     case NetworkName.Ethereum:
     case NetworkName.BNBChain:
     case NetworkName.Polygon:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.EthereumGoerli_DEPRECATED:
+    case NetworkName.ArbitrumGoerli_DEPRECATED:
+    case NetworkName.PolygonMumbai_DEPRECATED:
     case NetworkName.EthereumSepolia:
-    case NetworkName.PolygonMumbai:
     case NetworkName.Hardhat:
       return false;
   }

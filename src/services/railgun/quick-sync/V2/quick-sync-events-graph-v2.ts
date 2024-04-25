@@ -36,12 +36,10 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
       return 'matic';
     case NetworkName.Arbitrum:
       return 'arbitrum-one';
-    case NetworkName.ArbitrumGoerli:
-      return 'arbitrum-goerli';
-    case NetworkName.PolygonMumbai:
-      return 'mumbai';
+    case NetworkName.ArbitrumGoerli_DEPRECATED:
     case NetworkName.EthereumGoerli_DEPRECATED:
     case NetworkName.EthereumRopsten_DEPRECATED:
+    case NetworkName.PolygonMumbai_DEPRECATED:
     case NetworkName.Hardhat:
       throw new Error('No Graph API hosted service for this network');
   }

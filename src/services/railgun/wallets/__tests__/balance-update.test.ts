@@ -26,7 +26,7 @@ import {
 import { createRailgunWallet, fullWalletForID } from '../wallets';
 import {
   MOCK_DB_ENCRYPTION_KEY,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
   MOCK_MNEMONIC,
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
@@ -59,11 +59,11 @@ describe('balance-update', () => {
       throw new Error('Expected railgunWalletInfo');
     }
     await loadProvider(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
-      NetworkName.PolygonMumbai,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
+      NetworkName.Polygon,
       10000, // pollingInterval
     );
-    const { chain } = NETWORK_CONFIG[NetworkName.PolygonMumbai];
+    const { chain } = NETWORK_CONFIG[NetworkName.Polygon];
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getEngine().scanContractHistory(
       chain,
