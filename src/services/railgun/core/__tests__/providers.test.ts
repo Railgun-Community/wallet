@@ -9,7 +9,7 @@ import {
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_FAILING_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
 import { getFallbackProviderForNetwork } from '../providers';
@@ -61,9 +61,9 @@ describe('providers', () => {
 
   it('Should load provider with json, pull fees, and check created objects', async () => {
     const response = await loadProvider(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
-      NetworkName.Polygon,
-      10000, // pollingInterval
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
+      NetworkName.EthereumSepolia,
+      10_000, // pollingInterval
     );
     expect(response.feesSerialized).to.deep.equal({
       shieldFeeV2: '25',
@@ -72,13 +72,13 @@ describe('providers', () => {
       unshieldFeeV3: undefined,
     });
 
-    expect(getFallbackProviderForNetwork(NetworkName.Polygon)).to.not.be
+    expect(getFallbackProviderForNetwork(NetworkName.EthereumSepolia)).to.not.be
       .undefined;
     expect(() =>
       getFallbackProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
     ).to.throw;
 
-    expect(getUTXOMerkletreeForNetwork(txidVersion, NetworkName.Polygon))
+    expect(getUTXOMerkletreeForNetwork(txidVersion, NetworkName.EthereumSepolia))
       .to.not.be.undefined;
     expect(() =>
       getUTXOMerkletreeForNetwork(
@@ -87,7 +87,7 @@ describe('providers', () => {
       ),
     ).to.throw;
 
-    // expect(getTXIDMerkletreeForNetwork(txidVersion, NetworkName.PolygonMumbai))
+    // expect(getTXIDMerkletreeForNetwork(txidVersion, NetworkName.EthereumSepolia))
     //   .to.be.undefined; // Until poi.launchBlock is defined.
     expect(() =>
       getTXIDMerkletreeForNetwork(
@@ -96,7 +96,7 @@ describe('providers', () => {
       ),
     ).to.throw;
 
-    const { chain } = NETWORK_CONFIG[NetworkName.Polygon];
+    const { chain } = NETWORK_CONFIG[NetworkName.EthereumSepolia];
     expect(
       RailgunVersionedSmartContracts.getShieldApprovalContract(
         txidVersion,
@@ -136,7 +136,7 @@ describe('providers', () => {
     expect(
       wallet.getUTXOMerkletree(
         txidVersion,
-        NETWORK_CONFIG[NetworkName.Polygon].chain,
+        NETWORK_CONFIG[NetworkName.EthereumSepolia].chain,
       ),
     ).to.not.be.undefined;
   }).timeout(15_000);
