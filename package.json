@@ -1,6 +1,6 @@
 {
   "name": "@railgun-community/wallet",
-  "version": "7.4.1",
+  "version": "7.4.7",
   "description": "RAILGUN Wallet SDK, compatible with mobile, browser and nodejs environments.",
   "main": "dist/index.js",
   "license": "MIT",
@@ -42,8 +42,8 @@
     "@graphql-mesh/types": "^0.91.14",
     "@graphql-mesh/utils": "^0.43.22",
     "@noble/ed25519": "^1.7.1",
-    "@railgun-community/engine": "7.3.0",
-    "@railgun-community/shared-models": "6.4.0",
+    "@railgun-community/engine": "7.3.2",
+    "@railgun-community/shared-models": "6.4.3",
     "@whatwg-node/fetch": "^0.8.4",
     "assert": "2.0.0",
     "axios": "0.27.2",

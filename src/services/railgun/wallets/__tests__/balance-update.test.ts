@@ -26,7 +26,7 @@ import {
 import { createRailgunWallet, fullWalletForID } from '../wallets';
 import {
   MOCK_DB_ENCRYPTION_KEY,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
   MOCK_MNEMONIC,
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
@@ -59,11 +59,11 @@ describe('balance-update', () => {
       throw new Error('Expected railgunWalletInfo');
     }
     await loadProvider(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI,
-      NetworkName.EthereumGoerli,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
+      NetworkName.Polygon,
       10000, // pollingInterval
     );
-    const { chain } = NETWORK_CONFIG[NetworkName.EthereumGoerli];
+    const { chain } = NETWORK_CONFIG[NetworkName.Polygon];
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getEngine().scanContractHistory(
       chain,
@@ -119,9 +119,11 @@ describe('balance-update', () => {
       formattedBalances = balancesFormatted;
     };
     setOnBalanceUpdateCallback(callback);
-    const chain: Chain = { type: ChainType.EVM, id: 5 };
+    const chain: Chain = { type: ChainType.EVM, id: 80001 };
     await expect(onBalancesUpdate(txidVersion, wallet, chain)).to.be.fulfilled;
-    expect(walletBalancesByBucketStub.calledOnce).to.be.true;
+    // TODO: enable this assertion once we have PPOI on PolygonMumbai
+    // because `onBalancesUpdate` only runs it if PPOI is required:
+    // expect(walletBalancesByBucketStub.calledOnce).to.be.true;
     expect(formattedBalances.balanceBucket).to.deep.equal(
       RailgunWalletBalanceBucket.Spendable,
     );

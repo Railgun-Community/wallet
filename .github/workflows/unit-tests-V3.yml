@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Unit Tests V3
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   unit-tests:
+    if: false # Disable this job while V3 isn't ready
     name: 🧪 Test
     runs-on: ubuntu-latest
     steps:

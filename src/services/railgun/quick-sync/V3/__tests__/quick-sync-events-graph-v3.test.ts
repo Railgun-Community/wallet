@@ -11,7 +11,7 @@ const { expect } = chai;
 const txidVersion = TXIDVersion.V3_PoseidonMerkle;
 
 const POLYGON_MUMBAI_CHAIN: Chain =
-  NETWORK_CONFIG[NetworkName.PolygonMumbai].chain;
+  NETWORK_CONFIG[NetworkName.PolygonMumbai_DEPRECATED].chain;
 const EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON_MUMBAI = 1;
 const EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI = 1;
 const EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI = 1;
@@ -81,5 +81,5 @@ describe('quick-sync-events-graph-v3', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
+  }).timeout(45_000);
 });

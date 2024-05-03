@@ -28,16 +28,15 @@ const MAX_QUERY_RESULTS = 100000;
 
 const sourceNameForNetwork = (networkName: NetworkName): string => {
   switch (networkName) {
-    case NetworkName.PolygonMumbai:
-      return 'mumbai';
     case NetworkName.Ethereum:
-    case NetworkName.EthereumGoerli:
     case NetworkName.EthereumSepolia:
     case NetworkName.BNBChain:
     case NetworkName.Polygon:
     case NetworkName.Arbitrum:
-    case NetworkName.ArbitrumGoerli:
+    case NetworkName.ArbitrumGoerli_DEPRECATED:
+    case NetworkName.EthereumGoerli_DEPRECATED:
     case NetworkName.EthereumRopsten_DEPRECATED:
+    case NetworkName.PolygonMumbai_DEPRECATED:
     case NetworkName.Hardhat:
       throw new Error(
         'No Graph API hosted service for this network on RAILGUN V3',

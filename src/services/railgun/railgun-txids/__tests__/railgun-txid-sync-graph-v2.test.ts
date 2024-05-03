@@ -14,9 +14,6 @@ const { expect } = chai;
 
 const ETH_CHAIN: Chain = NETWORK_CONFIG[NetworkName.Ethereum].chain;
 
-const ETH_GOERLI_CHAIN: Chain =
-  NETWORK_CONFIG[NetworkName.EthereumGoerli].chain;
-
 describe('railgun-txid-sync-graph', () => {
   before(() => {
     NETWORK_CONFIG[NetworkName.Ethereum].poi = {
@@ -58,7 +55,7 @@ describe('railgun-txid-sync-graph', () => {
     expect(railgunTxs[0].verificationHash).to.equal(
       '0x099cd3ebcadaf6ff470d16bc0186fb5f26cd4103e9970effc9b6679478e11c72',
     );
-  }).timeout(20000);
+  }).timeout(20_000);
 
   it('Should pull unshield railgun txids - Ethereum', async () => {
     const unshieldRailgunTxids: string[] = await getRailgunTxidsForUnshields(
@@ -125,12 +122,18 @@ describe('railgun-txid-sync-graph', () => {
   it('Should pull unshield railgun txids for unshield to address - Goerli', async () => {
     const unshieldRailgunTxids =
       await getRailgunTransactionDataForUnshieldToAddress(
-        ETH_GOERLI_CHAIN,
+        ETH_CHAIN,
         '0xE251BaFD15A1e011f23F9c68673aAf2Fa00C1D03',
       );
-    expect(unshieldRailgunTxids[1].txid).to.deep.equal('0x930c463cf7231ee76b3048b55f3519f665e9235d976fb0d033ee7bf2044f5ce6');
-    expect(unshieldRailgunTxids[1].transactionDatas[0].railgunTxid).to.deep.equal('03641108fee0b24318a940335d7632378de2e3dda752696adcbbf842b78ea1f5');
-  }).timeout(20000);
+    expect(unshieldRailgunTxids[1].txid).to.deep.equal(
+      '0x2d4bc718a244d6ee07bc4683dda6f4a484caa4cd269f7c1912d65f19779f6864',
+    );
+    expect(
+      unshieldRailgunTxids[1].transactionDatas[0].railgunTxid,
+    ).to.deep.equal(
+      '1ebd03bc2705ecd3db31e261f54fbab362572dc413cf10e9457f28d68578e325',
+    );
+  }).timeout(20_000);
 
   it('Should pull unshield railgun tx data for txid - Goerli', async () => {
     const unshieldRailgunTxids =

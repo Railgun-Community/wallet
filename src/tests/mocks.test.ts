@@ -237,23 +237,17 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG: FallbackProviderJsonConfig = {
   ],
 };
 
-export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI: FallbackProviderJsonConfig =
+export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON: FallbackProviderJsonConfig =
   {
-    chainId: 80001,
+    chainId: 137,
     providers: [
       {
-        provider: 'https://polygon-mumbai-bor.publicnode.com',
+        provider: 'https://polygon-bor-rpc.publicnode.com',
         priority: 1,
         weight: 2,
         maxLogsPerBatch: 10,
         stallTimeout: 2500,
-      },
-      {
-        provider: 'https://rpc-mumbai.maticvigil.com',
-        priority: 1,
-        weight: 2,
-        maxLogsPerBatch: 10,
-      },
+      }
     ],
   };
 
