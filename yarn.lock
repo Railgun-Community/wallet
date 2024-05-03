@@ -2272,7 +2272,7 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@7.3.2":
+"@railgun-community/engine@~7.3.2":
   version "7.3.2"
   resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-7.3.2.tgz#4534c4da54f578fb70fd54721c74f1558fed6fb8"
   integrity sha512-t+Euqm+Hoyl3twp/mHSy6U1D3Y8IqG5Os46asxicYGf1ZjDg/e45t1IAky7VI4cRE3ahUwGd5zMhh/3gc430JQ==
@@ -2308,7 +2308,7 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/poseidon-hash-wasm/-/poseidon-hash-wasm-1.0.1.tgz#bfd3b3f915391a59486d8c9d632069f029e152d6"
   integrity sha512-zDAbMu095ZjMqsKIoyOnuKR4Zofnqqx4eTCtnA6qYglnexX5cadxItvJa3ozhDDTmFkDGAidDssQ7Pzl3wwLDA==
 
-"@railgun-community/shared-models@6.4.3":
+"@railgun-community/shared-models@~6.4.3":
   version "6.4.3"
   resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-6.4.3.tgz#7d9b4e57f0b507f3612f97dba780f638f1954f05"
   integrity sha512-eGC3gDBJKAFOwSuriSfXEdY82xkrT/AAzeuWSOnsC2jwFw7fGPNdWAKA3yPDM3Nrdo/4EgPO8ezqydeweOFUzw==
