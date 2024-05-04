@@ -10,7 +10,7 @@ import {
 } from '@railgun-community/shared-models';
 import {
   MOCK_ETH_WALLET_ADDRESS,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
 } from '../../../tests/mocks.test';
 import {
   gasEstimateResponse,
@@ -41,7 +41,7 @@ describe('tx-gas', () => {
 
     const transaction = {} as ContractTransaction;
     const fallbackProvider = createFallbackProviderFromJsonConfig(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
     setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
     const gasEstimate = await getGasEstimate(
@@ -66,7 +66,7 @@ describe('tx-gas', () => {
 
   it('Should pull gas estimate for basic transaction - self-signed', async () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
     setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
     const tx: ContractTransaction = {
@@ -94,7 +94,7 @@ describe('tx-gas', () => {
 
   it('Should pull gas estimate for basic transaction - relayer', async () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
     setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
     const tx: ContractTransaction = {
