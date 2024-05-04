@@ -47,7 +47,7 @@ let walletBalanceStub: SinonStub;
 let walletBalancesByBucketStub: SinonStub;
 let walletTokenBalanceStub: SinonStub;
 
-describe('balance-update', () => {
+describe('balances-update', () => {
   before(async function run() {
     this.timeout(60_000);
     await initTestEngine();
