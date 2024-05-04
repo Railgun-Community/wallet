@@ -8,7 +8,6 @@ import {
 } from '@railgun-community/shared-models';
 import {
   MOCK_DB_ENCRYPTION_KEY,
-  MOCK_FAILING_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
@@ -41,23 +40,6 @@ describe('providers', () => {
   after(async () => {
     await closeTestEngine();
   });
-
-  it.skip(
-    '[FAILING] Should load provider with json, pull fees, and check created objects',
-    async () => {
-      const response = await loadProvider(
-        MOCK_FAILING_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI,
-        NetworkName.PolygonMumbai_DEPRECATED,
-        10000, // pollingInterval
-      );
-      expect(response.feesSerialized).to.deep.equal({
-        shieldFeeV2: '25',
-        unshieldFeeV2: '25',
-        shieldFeeV3: '25',
-        unshieldFeeV3: '25',
-      });
-    },
-  ).timeout(20_000);
 
   it('Should load provider with json, pull fees, and check created objects', async () => {
     const response = await loadProvider(
