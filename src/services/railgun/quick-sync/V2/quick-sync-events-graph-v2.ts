@@ -28,8 +28,8 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.Ethereum:
       return 'ethereum';
     case NetworkName.EthereumSepolia:
-      return 'sepolia';
-      // throw new Error('No Graph API hosted service for Sepolia');
+      // return 'sepolia';
+      throw new Error('No Graph API hosted service for Sepolia');
     case NetworkName.BNBChain:
       return 'bsc';
     case NetworkName.Polygon:

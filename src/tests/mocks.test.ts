@@ -256,26 +256,6 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA: FallbackProviderJsonCon
     ],
   };
 
-export const MOCK_FAILING_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI: FallbackProviderJsonConfig =
-  {
-    chainId: 80001,
-    providers: [
-      {
-        provider: 'https://polygon-mumbai-bor.publicnode.com',
-        priority: 1,
-        weight: 2,
-        maxLogsPerBatch: 10,
-        stallTimeout: 2500,
-      },
-      {
-        provider: 'https://endpoints.omniatech.io/v1/matic/mumbai/public',
-        priority: 1,
-        weight: 2,
-        maxLogsPerBatch: 10,
-      },
-    ],
-  };
-
 export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_ETHEREUM: FallbackProviderJsonConfig =
   {
     chainId: 1,
