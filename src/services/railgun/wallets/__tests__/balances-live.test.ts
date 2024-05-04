@@ -11,7 +11,7 @@ import {
   pollUntilTXIDMerkletreeScanned,
   pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
-import { createRailgunWallet, walletForID } from '../wallets';
+import { createRailgunWallet, fullWalletForID } from '../wallets';
 import { refreshBalances } from '../balances';
 import {
   Chain,
@@ -36,26 +36,22 @@ const chain: Chain = NETWORK_CONFIG[networkName].chain;
 
 describe('balances-live', () => {
   before(async function run() {
-    this.timeout(390_000);
-
+    this.timeout(360_000);
     await initTestEngine();
-
-    const mnemonic = MOCK_MNEMONIC;
-
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
-      mnemonic,
+      MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
     if (!isDefined(railgunWalletInfo)) {
-      return;
+      throw new Error('Expected railgunWalletInfo');
     }
     railgunWalletID = railgunWalletInfo.id;
 
     await loadProvider(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
       networkName,
-      10000, // pollingInterval
+      10_000, // pollingInterval
     );
     const { chain } = NETWORK_CONFIG[networkName];
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -85,7 +81,7 @@ describe('balances-live', () => {
       undefined, // walletIdFilter
     );
 
-    const wallet = walletForID(railgunWalletID);
+    const wallet = fullWalletForID(railgunWalletID);
     const balances = await wallet.getTokenBalances(
       txidVersion,
       chain,

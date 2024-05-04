@@ -36,6 +36,7 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
       return 'matic';
     case NetworkName.Arbitrum:
       return 'arbitrum-one';
+    case NetworkName.PolygonAmoy:
     case NetworkName.ArbitrumGoerli_DEPRECATED:
     case NetworkName.EthereumGoerli_DEPRECATED:
     case NetworkName.EthereumRopsten_DEPRECATED:

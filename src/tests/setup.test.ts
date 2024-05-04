@@ -12,7 +12,7 @@ import {
 } from '@railgun-community/shared-models';
 import {
   MOCK_BALANCES_UPDATE_CALLBACK,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
   MOCK_POI_PROOF_PROGRESS_CALLBACK_CALLBACK,
   TEST_WALLET_SOURCE,
 } from './mocks.test';
@@ -128,8 +128,8 @@ export const initTestEngine = async (useNativeArtifacts = false) => {
   WalletPOI.getPOILatestValidatedRailgunTxid = () =>
     getLatestValidatedRailgunTxid;
 
-  // Set 'true' to debug tests
-  const shouldDebug = false;
+  // Set the environment variable "VERBOSE" to enable debug logs
+  const shouldDebug = typeof process.env.VERBOSE !== 'undefined';
 
   if (shouldDebug) {
     setLoggers(console.log, console.error);
@@ -162,11 +162,11 @@ export const initTestEngine = async (useNativeArtifacts = false) => {
 export const initTestEngineNetworks = async () => {
   // Don't wait for async. It will try to load historical events, which takes a while.
   await loadProvider(
-    MOCK_FALLBACK_PROVIDER_JSON_CONFIG,
-    NetworkName.Polygon,
-    10000, // pollingInterval
+    MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
+    NetworkName.EthereumSepolia,
+    10_000, // pollingInterval
   );
-  const { chain } = NETWORK_CONFIG[NetworkName.Polygon];
+  const { chain } = NETWORK_CONFIG[NetworkName.EthereumSepolia];
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   getEngine().scanContractHistory(
     chain,
@@ -185,7 +185,7 @@ export const pollUntilUTXOMerkletreeScanned = async () => {
     async () => currentUTXOMerkletreeScanStatus,
     status => status === MerkletreeScanStatus.Complete,
     50,
-    90_000 / 50, // 90 sec.
+    360_000 / 50, // 360 sec.
   );
   if (status !== MerkletreeScanStatus.Complete) {
     throw new Error(`UTXO merkletree scan should be completed - timed out`);
@@ -197,7 +197,7 @@ export const pollUntilTXIDMerkletreeScanned = async () => {
     async () => currentTXIDMerkletreeScanStatus,
     status => status === MerkletreeScanStatus.Complete,
     50,
-    90_000 / 50, // 90 sec.
+    360_000 / 50, // 360 sec.
   );
   if (status !== MerkletreeScanStatus.Complete) {
     throw new Error(`TXID merkletree scan should be completed - timed out`);
