@@ -4,10 +4,6 @@ sources:
     handler:
       graphql:
         endpoint: https://rail-squid.squids.live/squid-railgun-ethereum-v2/v/v1/graphql
-  #- name: goerli
-  #  handler:
-  #    graphql:
-  #      endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-goerli
   - name: bsc
     handler:
       graphql:
@@ -16,18 +12,10 @@ sources:
     handler:
       graphql:
         endpoint: https://rail-squid.squids.live/squid-railgun-polygon-v2/v/v1/graphql
-  #- name: mumbai
-  #  handler:
-  #    graphql:
-  #      endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-mumbai
   - name: arbitrum-one
     handler:
       graphql:
         endpoint: https://rail-squid.squids.live/squid-railgun-arbitrum-v2/v/v1/graphql
-  #- name: arbitrum-goerli
-  #  handler:
-  #    graphql:
-  #      endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-arbitrum-goerli
   # NOTE: Not supported by hosted service yet.
   #- name: sepolia
   #  handler:

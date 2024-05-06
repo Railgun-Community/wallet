@@ -2,9 +2,8 @@
  * TO UPDATE:
  * 1. Find all places that are "MODIFIED", move them into the new built index.ts (in .graphclient)
  * 2. add these comments (including eslint disables)
- * 3. move the modified index file to quick-sync/graphql/
+ * 3. move the modified index file to quick-sync/graphql/ (NOTE: MAKE SURE TO DRAG AND DROP IN VSCODE SO THE SOURCE LOCATIONS CHANGE!)
  */
-
 // @ts-nocheck
 import { GraphQLResolveInfo, SelectionSetNode, FieldNode, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
@@ -20,17 +19,14 @@ import { fetch as fetchFn } from '@whatwg-node/fetch';
 import { MeshResolvedSource } from '@graphql-mesh/runtime';
 import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
 import GraphqlHandler from "@graphql-mesh/graphql"
-import StitchingMerger from "@graphql-mesh/merger-stitching";
+import BareMerger from "@graphql-mesh/merger-bare";
 import { printWithCache } from '@graphql-mesh/utils';
 import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
 import { getMesh, ExecuteMeshFn, SubscribeMeshFn, MeshContext as BaseMeshContext, MeshInstance } from '@graphql-mesh/runtime';
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
-import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
-import type { BscTypes } from './.graphclient/sources/bsc/types';
-import type { MaticTypes } from './.graphclient/sources/matic/types';
+import type { TxsEthereumTypes } from './sources/txs-ethereum/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -1240,7 +1236,7 @@ export type LegacyEncryptedCommitment = Commitment & {
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
-  legacyCiphertext: LegacyCommitmentCiphertext; // MODIFIED
+  ciphertext: LegacyCommitmentCiphertext;
 };
 
 export type LegacyEncryptedCommitmentWhereInput = {
@@ -3107,7 +3103,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
 }>;
 
 
-export type MeshContext = EthereumTypes.Context & ArbitrumOneTypes.Context & BscTypes.Context & MaticTypes.Context & BaseMeshContext;
+export type MeshContext = TxsEthereumTypes.Context & BaseMeshContext;
 
 
 const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
@@ -3115,17 +3111,8 @@ const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/',
 const importFn: ImportFn = <T>(moduleId: string) => {
   const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(baseDir + '/', '');
   switch(relativeModuleId) {
-    case ".graphclient/sources/ethereum/introspectionSchema":
-      return import("./.graphclient/sources/ethereum/introspectionSchema") as T;
-    
-    case ".graphclient/sources/arbitrum-one/introspectionSchema":
-      return import("./.graphclient/sources/arbitrum-one/introspectionSchema") as T;
-    
-    case ".graphclient/sources/bsc/introspectionSchema":
-      return import("./.graphclient/sources/bsc/introspectionSchema") as T;
-    
-    case ".graphclient/sources/matic/introspectionSchema":
-      return import("./.graphclient/sources/matic/introspectionSchema") as T;
+    case ".graphclient/sources/txs-ethereum/introspectionSchema":
+      return import("./sources/txs-ethereum/introspectionSchema") as T;
     
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
@@ -3157,77 +3144,29 @@ const cache = new (MeshCache as any)({
 const sources: MeshResolvedSource[] = [];
 const transforms: MeshTransform[] = [];
 const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
-const ethereumTransforms = [];
-const bscTransforms = [];
-const maticTransforms = [];
-const arbitrumOneTransforms = [];
+const txsEthereumTransforms = [];
 const additionalTypeDefs = [] as any[];
-const ethereumHandler = new GraphqlHandler({
-              name: "ethereum",
+const txsEthereumHandler = new GraphqlHandler({
+              name: "txs-ethereum",
               config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-ethereum-v2/v/v1/graphql"},
               baseDir,
               cache,
               pubsub,
-              store: sourcesStore.child("ethereum"),
-              logger: logger.child("ethereum"),
-              importFn,
-            });
-const bscHandler = new GraphqlHandler({
-              name: "bsc",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-bsc-v2/v/v1/graphql"},
-              baseDir,
-              cache,
-              pubsub,
-              store: sourcesStore.child("bsc"),
-              logger: logger.child("bsc"),
-              importFn,
-            });
-const maticHandler = new GraphqlHandler({
-              name: "matic",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-polygon-v2/v/v1/graphql"},
-              baseDir,
-              cache,
-              pubsub,
-              store: sourcesStore.child("matic"),
-              logger: logger.child("matic"),
-              importFn,
-            });
-const arbitrumOneHandler = new GraphqlHandler({
-              name: "arbitrum-one",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-arbitrum-v2/v/v1/graphql"},
-              baseDir,
-              cache,
-              pubsub,
-              store: sourcesStore.child("arbitrum-one"),
-              logger: logger.child("arbitrum-one"),
+              store: sourcesStore.child("txs-ethereum"),
+              logger: logger.child("txs-ethereum"),
               importFn,
             });
 sources[0] = {
-          name: 'ethereum',
-          handler: ethereumHandler,
-          transforms: ethereumTransforms
-        }
-sources[1] = {
-          name: 'bsc',
-          handler: bscHandler,
-          transforms: bscTransforms
-        }
-sources[2] = {
-          name: 'matic',
-          handler: maticHandler,
-          transforms: maticTransforms
-        }
-sources[3] = {
-          name: 'arbitrum-one',
-          handler: arbitrumOneHandler,
-          transforms: arbitrumOneTransforms
+          name: 'txs-ethereum',
+          handler: txsEthereumHandler,
+          transforms: txsEthereumTransforms
         }
 const additionalResolvers = [] as any[]
-const merger = new(StitchingMerger as any)({
+const merger = new(BareMerger as any)({
         cache,
         pubsub,
-        logger: logger.child('stitchingMerger'),
-        store: rootStore.child('stitchingMerger')
+        logger: logger.child('bareMerger'),
+        store: rootStore.child('bareMerger')
       })
 
   return {
@@ -3243,23 +3182,23 @@ const merger = new(StitchingMerger as any)({
     get documents() {
       return [
       {
-        document: NullifiersDocument,
+        document: GetRailgunTransactionsAfterGraphIdDocument,
         get rawSDL() {
-          return printWithCache(NullifiersDocument);
+          return printWithCache(GetRailgunTransactionsAfterGraphIdDocument);
         },
-        location: 'NullifiersDocument.graphql'
+        location: 'GetRailgunTransactionsAfterGraphIdDocument.graphql'
       },{
-        document: UnshieldsDocument,
+        document: GetRailgunTransactionsByTxidDocument,
         get rawSDL() {
-          return printWithCache(UnshieldsDocument);
+          return printWithCache(GetRailgunTransactionsByTxidDocument);
         },
-        location: 'UnshieldsDocument.graphql'
+        location: 'GetRailgunTransactionsByTxidDocument.graphql'
       },{
-        document: CommitmentsDocument,
+        document: GetRailgunTransactionsByUnshieldToAddressDocument,
         get rawSDL() {
-          return printWithCache(CommitmentsDocument);
+          return printWithCache(GetRailgunTransactionsByUnshieldToAddressDocument);
         },
-        location: 'CommitmentsDocument.graphql'
+        location: 'GetRailgunTransactionsByUnshieldToAddressDocument.graphql'
       }
     ];
     },
@@ -3298,208 +3237,116 @@ export function getBuiltGraphSDK<TGlobalContext = any, TOperationContext = any>(
   const sdkRequester$ = getBuiltGraphClient().then(({ sdkRequesterFactory }) => sdkRequesterFactory(globalContext));
   return getSdk<TOperationContext, TGlobalContext>((...args) => sdkRequester$.then(sdkRequester => sdkRequester(...args)));
 }
-export type NullifiersQueryVariables = Exact<{
-  blockNumber?: InputMaybe<Scalars['BigInt']>;
+export type GetRailgunTransactionsAfterGraphIDQueryVariables = Exact<{
+  idLow?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type NullifiersQuery = { nullifiers: Array<Pick<Nullifier, 'id' | 'blockNumber' | 'nullifier' | 'transactionHash' | 'blockTimestamp' | 'treeNumber'>> };
-
-export type UnshieldsQueryVariables = Exact<{
-  blockNumber?: InputMaybe<Scalars['BigInt']>;
-}>;
-
-
-export type UnshieldsQuery = { unshields: Array<(
-    Pick<Unshield, 'id' | 'blockNumber' | 'to' | 'transactionHash' | 'fee' | 'blockTimestamp' | 'amount' | 'eventLogIndex'>
-    & { token: Pick<Token, 'id' | 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
+export type GetRailgunTransactionsAfterGraphIDQuery = { transactions: Array<(
+    Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
+    & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
   )> };
 
-export type CommitmentsQueryVariables = Exact<{
-  blockNumber?: InputMaybe<Scalars['BigInt']>;
+export type GetRailgunTransactionsByTxidQueryVariables = Exact<{
+  txid?: InputMaybe<Scalars['Bytes']>;
 }>;
 
 
-export type CommitmentsQuery = { commitments: Array<(
-    Pick<LegacyGeneratedCommitment, 'id' | 'treeNumber' | 'batchStartTreePosition' | 'treePosition' | 'blockNumber' | 'transactionHash' | 'blockTimestamp' | 'commitmentType' | 'hash' | 'encryptedRandom'>
-    & { preimage: (
-      Pick<CommitmentPreimage, 'id' | 'npk' | 'value'>
-      & { token: Pick<Token, 'id' | 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
-    ) }
-  ) | (
-    Pick<LegacyEncryptedCommitment, 'id' | 'blockNumber' | 'blockTimestamp' | 'transactionHash' | 'treeNumber' | 'batchStartTreePosition' | 'treePosition' | 'commitmentType' | 'hash'>
-    & { legacyCiphertext: (
-      Pick<LegacyCommitmentCiphertext, 'id' | 'ephemeralKeys' | 'memo'>
-      & { ciphertext: Pick<Ciphertext, 'id' | 'iv' | 'tag' | 'data'> }
-    ) }
-  ) | (
-    Pick<ShieldCommitment, 'id' | 'blockNumber' | 'blockTimestamp' | 'transactionHash' | 'treeNumber' | 'batchStartTreePosition' | 'treePosition' | 'commitmentType' | 'hash' | 'shieldKey' | 'fee' | 'encryptedBundle'>
-    & { preimage: (
-      Pick<CommitmentPreimage, 'id' | 'npk' | 'value'>
-      & { token: Pick<Token, 'id' | 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
-    ) }
-  ) | (
-    Pick<TransactCommitment, 'id' | 'blockNumber' | 'blockTimestamp' | 'transactionHash' | 'treeNumber' | 'batchStartTreePosition' | 'treePosition' | 'commitmentType' | 'hash'>
-    & { ciphertext: (
-      Pick<CommitmentCiphertext, 'id' | 'blindedSenderViewingKey' | 'blindedReceiverViewingKey' | 'annotationData' | 'memo'>
-      & { ciphertext: Pick<Ciphertext, 'id' | 'iv' | 'tag' | 'data'> }
-    ) }
+export type GetRailgunTransactionsByTxidQuery = { transactions: Array<(
+    Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
+    & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
+  )> };
+
+export type GetRailgunTransactionsByUnshieldToAddressQueryVariables = Exact<{
+  address?: InputMaybe<Scalars['Bytes']>;
+}>;
+
+
+export type GetRailgunTransactionsByUnshieldToAddressQuery = { transactions: Array<(
+    Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
+    & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
   )> };
 
 
-export const NullifiersDocument = gql`
-    query Nullifiers($blockNumber: BigInt = 0) {
-  nullifiers(
-    orderBy: blockNumber_ASC
-    where: {blockNumber_gte: $blockNumber}
-    limit: 1000
-  ) {
+export const GetRailgunTransactionsAfterGraphIDDocument = gql`
+    query GetRailgunTransactionsAfterGraphID($idLow: String = "0x00") {
+  transactions(orderBy: id_ASC, limit: 1000, where: {id_gt: $idLow}) {
     id
-    blockNumber
-    nullifier
+    nullifiers
+    commitments
     transactionHash
-    blockTimestamp
-    treeNumber
-  }
-}
-    ` as unknown as DocumentNode<NullifiersQuery, NullifiersQueryVariables>;
-export const UnshieldsDocument = gql`
-    query Unshields($blockNumber: BigInt = 0) {
-  unshields(
-    orderBy: blockNumber_ASC
-    where: {blockNumber_gte: $blockNumber}
-    limit: 1000
-  ) {
-    id
+    boundParamsHash
     blockNumber
-    to
-    transactionHash
-    fee
-    blockTimestamp
-    amount
-    eventLogIndex
-    token {
-      id
+    utxoTreeIn
+    utxoTreeOut
+    utxoBatchStartPositionOut
+    hasUnshield
+    unshieldToken {
       tokenType
       tokenSubID
       tokenAddress
     }
+    unshieldToAddress
+    unshieldValue
+    blockTimestamp
+    verificationHash
   }
 }
-    ` as unknown as DocumentNode<UnshieldsQuery, UnshieldsQueryVariables>;
-export const CommitmentsDocument = gql`
-    query Commitments($blockNumber: BigInt = 0) {
-  commitments(
-    orderBy: blockNumber_ASC
-    where: {blockNumber_gte: $blockNumber}
+    ` as unknown as DocumentNode<GetRailgunTransactionsAfterGraphIDQuery, GetRailgunTransactionsAfterGraphIDQueryVariables>;
+export const GetRailgunTransactionsByTxidDocument = gql`
+    query GetRailgunTransactionsByTxid($txid: Bytes) {
+  transactions(where: {transactionHash_eq: $txid}) {
+    id
+    nullifiers
+    commitments
+    transactionHash
+    boundParamsHash
+    blockNumber
+    utxoTreeIn
+    utxoTreeOut
+    utxoBatchStartPositionOut
+    hasUnshield
+    unshieldToken {
+      tokenType
+      tokenSubID
+      tokenAddress
+    }
+    unshieldToAddress
+    unshieldValue
+    blockTimestamp
+    verificationHash
+  }
+}
+    ` as unknown as DocumentNode<GetRailgunTransactionsByTxidQuery, GetRailgunTransactionsByTxidQueryVariables>;
+export const GetRailgunTransactionsByUnshieldToAddressDocument = gql`
+    query GetRailgunTransactionsByUnshieldToAddress($address: Bytes) {
+  transactions(
+    orderBy: id_ASC
     limit: 1000
+    where: {unshieldToAddress_eq: $address}
   ) {
     id
-    treeNumber
-    batchStartTreePosition
-    treePosition
-    blockNumber
+    nullifiers
+    commitments
     transactionHash
+    boundParamsHash
+    blockNumber
+    utxoTreeIn
+    utxoTreeOut
+    utxoBatchStartPositionOut
+    hasUnshield
+    unshieldToken {
+      tokenType
+      tokenSubID
+      tokenAddress
+    }
+    unshieldToAddress
+    unshieldValue
     blockTimestamp
-    commitmentType
-    hash
-    ... on LegacyGeneratedCommitment {
-      id
-      treeNumber
-      batchStartTreePosition
-      treePosition
-      blockNumber
-      transactionHash
-      blockTimestamp
-      commitmentType
-      hash
-      encryptedRandom
-      preimage {
-        id
-        npk
-        value
-        token {
-          id
-          tokenType
-          tokenSubID
-          tokenAddress
-        }
-      }
-    }
-    ... on LegacyEncryptedCommitment {
-      id
-      blockNumber
-      blockTimestamp
-      transactionHash
-      treeNumber
-      batchStartTreePosition
-      treePosition
-      commitmentType
-      hash
-      legacyCiphertext: ciphertext {
-        id
-        ciphertext {
-          id
-          iv
-          tag
-          data
-        }
-        ephemeralKeys
-        memo
-      }
-    }
-    ... on ShieldCommitment {
-      id
-      blockNumber
-      blockTimestamp
-      transactionHash
-      treeNumber
-      batchStartTreePosition
-      treePosition
-      commitmentType
-      hash
-      shieldKey
-      fee
-      encryptedBundle
-      preimage {
-        id
-        npk
-        value
-        token {
-          id
-          tokenType
-          tokenSubID
-          tokenAddress
-        }
-      }
-    }
-    ... on TransactCommitment {
-      id
-      blockNumber
-      blockTimestamp
-      transactionHash
-      treeNumber
-      batchStartTreePosition
-      treePosition
-      commitmentType
-      hash
-      ciphertext {
-        id
-        ciphertext {
-          id
-          iv
-          tag
-          data
-        }
-        blindedSenderViewingKey
-        blindedReceiverViewingKey
-        annotationData
-        memo
-      }
-    }
+    verificationHash
   }
 }
-    ` as unknown as DocumentNode<CommitmentsQuery, CommitmentsQueryVariables>;
+    ` as unknown as DocumentNode<GetRailgunTransactionsByUnshieldToAddressQuery, GetRailgunTransactionsByUnshieldToAddressQueryVariables>;
 
 
 
@@ -3507,14 +3354,14 @@ export const CommitmentsDocument = gql`
 export type Requester<C = {}, E = unknown> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R> | AsyncIterable<R>
 export function getSdk<C, E>(requester: Requester<C, E>) {
   return {
-    Nullifiers(variables?: NullifiersQueryVariables, options?: C): Promise<NullifiersQuery> {
-      return requester<NullifiersQuery, NullifiersQueryVariables>(NullifiersDocument, variables, options) as Promise<NullifiersQuery>;
+    GetRailgunTransactionsAfterGraphID(variables?: GetRailgunTransactionsAfterGraphIDQueryVariables, options?: C): Promise<GetRailgunTransactionsAfterGraphIDQuery> {
+      return requester<GetRailgunTransactionsAfterGraphIDQuery, GetRailgunTransactionsAfterGraphIDQueryVariables>(GetRailgunTransactionsAfterGraphIDDocument, variables, options) as Promise<GetRailgunTransactionsAfterGraphIDQuery>;
     },
-    Unshields(variables?: UnshieldsQueryVariables, options?: C): Promise<UnshieldsQuery> {
-      return requester<UnshieldsQuery, UnshieldsQueryVariables>(UnshieldsDocument, variables, options) as Promise<UnshieldsQuery>;
+    GetRailgunTransactionsByTxid(variables?: GetRailgunTransactionsByTxidQueryVariables, options?: C): Promise<GetRailgunTransactionsByTxidQuery> {
+      return requester<GetRailgunTransactionsByTxidQuery, GetRailgunTransactionsByTxidQueryVariables>(GetRailgunTransactionsByTxidDocument, variables, options) as Promise<GetRailgunTransactionsByTxidQuery>;
     },
-    Commitments(variables?: CommitmentsQueryVariables, options?: C): Promise<CommitmentsQuery> {
-      return requester<CommitmentsQuery, CommitmentsQueryVariables>(CommitmentsDocument, variables, options) as Promise<CommitmentsQuery>;
+    GetRailgunTransactionsByUnshieldToAddress(variables?: GetRailgunTransactionsByUnshieldToAddressQueryVariables, options?: C): Promise<GetRailgunTransactionsByUnshieldToAddressQuery> {
+      return requester<GetRailgunTransactionsByUnshieldToAddressQuery, GetRailgunTransactionsByUnshieldToAddressQueryVariables>(GetRailgunTransactionsByUnshieldToAddressDocument, variables, options) as Promise<GetRailgunTransactionsByUnshieldToAddressQuery>;
     }
   };
 }

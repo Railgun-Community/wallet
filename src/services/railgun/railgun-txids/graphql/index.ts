@@ -7,26 +7,27 @@
 // @ts-nocheck
 import { GraphQLResolveInfo, SelectionSetNode, FieldNode, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-import { gql } from '@graphql-mesh/utils';
+import { gql , PubSub , DefaultLogger , printWithCache } from '@graphql-mesh/utils';
 
 import type { GetMeshOptions } from '@graphql-mesh/runtime';
 import type { YamlConfig } from '@graphql-mesh/types';
-import { PubSub } from '@graphql-mesh/utils';
-import { DefaultLogger } from '@graphql-mesh/utils';
+
+
 import MeshCache from "@graphql-mesh/cache-localforage";
 import { fetch as fetchFn } from '@whatwg-node/fetch';
 
-import { MeshResolvedSource } from '@graphql-mesh/runtime';
-import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
+import { MeshResolvedSource , getMesh, ExecuteMeshFn, SubscribeMeshFn, MeshContext as BaseMeshContext, MeshInstance } from '@graphql-mesh/runtime';
+import { MeshTransform, MeshPlugin , ImportFn } from '@graphql-mesh/types';
 import GraphqlHandler from "@graphql-mesh/graphql"
 import BareMerger from "@graphql-mesh/merger-bare";
-import { printWithCache } from '@graphql-mesh/utils';
+
 import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
-import { getMesh, ExecuteMeshFn, SubscribeMeshFn, MeshContext as BaseMeshContext, MeshInstance } from '@graphql-mesh/runtime';
+
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
-import { ImportFn } from '@graphql-mesh/types';
+
 import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
+
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -3109,7 +3110,7 @@ export type MeshContext = TxsEthereumTypes.Context & BaseMeshContext;
 const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
 
 const importFn: ImportFn = <T>(moduleId: string) => {
-  const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(baseDir + '/', '');
+  const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(`${baseDir  }/`, '');
   switch (relativeModuleId) {
     case ".graphclient/sources/txs-ethereum/introspectionSchema":
       return import("./.graphclient/sources/txs-ethereum/introspectionSchema") as T;
@@ -3139,7 +3140,7 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
     store: rootStore.child('cache'),
     pubsub,
     logger,
-  } as any)
+  } )
 
   const sources: MeshResolvedSource[] = [];
   const transforms: MeshTransform[] = [];

@@ -146,34 +146,7 @@ describe('quick-sync-events-graph-v2', () => {
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(200_000);
-  /*
-  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Polygon Mumbai', async function run() {
-    if (!isV2Test()) {
-      this.skip();
-      return;
-    }
 
-    const eventLog = await quickSyncEventsGraph(
-      txidVersion,
-      POLYGON_MUMBAI_CHAIN,
-      0,
-    );
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_GROUP_EVENTS_POLYGON_MUMBAI,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_POLYGON_MUMBAI,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_POLYGON_MUMBAI,
-    );
-
-    const shouldThrow = true;
-    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
-  */
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Arbitrum', async function run() {
     if (!isV2Test()) {
       this.skip();
@@ -196,31 +169,9 @@ describe('quick-sync-events-graph-v2', () => {
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(200_000);
+
   /*
-  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Goerli', async function run() {
-    if (!isV2Test()) {
-      this.skip();
-      return;
-    }
-
-    const eventLog = await quickSyncEventsGraph(txidVersion, GOERLI_CHAIN, 0);
-    expect(eventLog).to.be.an('object');
-    expect(eventLog.commitmentEvents).to.be.an('array');
-    expect(eventLog.commitmentEvents.length).to.be.at.least(
-      EXPECTED_COMMITMENT_GROUP_EVENTS_GOERLI,
-    );
-    expect(eventLog.nullifierEvents.length).to.be.at.least(
-      EXPECTED_NULLIFIER_EVENTS_GOERLI,
-    );
-    expect(eventLog.unshieldEvents.length).to.be.at.least(
-      EXPECTED_UNSHIELD_EVENTS_GOERLI,
-    );
-
-    const shouldThrow = true;
-    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(45000);
-
-  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async function run() {
+    it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async function run() {
     if (!isV2Test()) {
       this.skip();
       return;
@@ -243,7 +194,7 @@ describe('quick-sync-events-graph-v2', () => {
     // const shouldThrow = true;
     // assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(90_000);
-
+  */
   it('[V2] Should run live Railgun Event Log fetch for Polygon with high starting block', async function run() {
     if (!isV2Test()) {
       this.skip();
@@ -261,6 +212,5 @@ describe('quick-sync-events-graph-v2', () => {
     expect(eventLog.commitmentEvents.length).to.equal(0);
     expect(eventLog.nullifierEvents.length).to.equal(0);
     expect(eventLog.unshieldEvents.length).to.equal(0);
-  }).timeout(45000);
-  */
+  }).timeout(200_000);
 });

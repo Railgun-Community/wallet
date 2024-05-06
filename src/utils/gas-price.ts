@@ -27,4 +27,5 @@ export const shouldSetOverallBatchMinGasPriceForNetwork = (
     case NetworkName.Hardhat:
       return true;
   }
+  throw new Error('Undefined networkName');
 };
