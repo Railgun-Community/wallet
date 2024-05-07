@@ -2,14 +2,11 @@ import {
   Nullifier,
   UnshieldStoredEvent,
   CommitmentEvent,
-  formatShieldEventV3,
-  formatTransactEventV3,
-  formatUnshieldEventV3,
+  V3Events,
   getNoteHash,
   serializeTokenData,
   ByteLength,
-  nToHex,
-  formatRailgunTransactionEventV3,
+  ByteUtils,
 } from '@railgun-community/engine';
 import {
   Nullifier as GraphNullifierV3,
@@ -33,7 +30,7 @@ export const formatGraphRailgunTransactionEventsV3 = (
   railgunTransactions: GraphRailgunTransactionV3[],
 ) => {
   return railgunTransactions.map(railgunTransaction => {
-    return formatRailgunTransactionEventV3(
+    return V3Events.formatRailgunTransactionEvent(
       railgunTransaction.transactionHash,
       Number(railgunTransaction.blockNumber),
       railgunTransaction.commitments,
@@ -93,7 +90,7 @@ export const formatGraphUnshieldEventsV3 = (
   railgunTxidMap: RailgunTxidMapV3,
 ): UnshieldStoredEvent[] => {
   return unshields.map(unshield => {
-    const unshieldCommitmentHash = nToHex(
+    const unshieldCommitmentHash = ByteUtils.nToHex(
       getUnshieldCommitmentHash(
         unshield.to,
         unshield.token.tokenAddress,
@@ -107,7 +104,7 @@ export const formatGraphUnshieldEventsV3 = (
     const railgunTxid = getRailgunTxid(railgunTxidMap, [
       unshieldCommitmentHash,
     ]);
-    return formatUnshieldEventV3(
+    return V3Events.formatUnshieldEvent(
       unshield.transactionHash,
       Number(unshield.blockNumber),
       {
@@ -180,7 +177,7 @@ const getRailgunTxid = (
 const formatShieldCommitmentEvent = (
   commitment: GraphShieldCommitmentV3,
 ): CommitmentEvent => {
-  return formatShieldEventV3(
+  return V3Events.formatShieldEvent(
     commitment.transactionHash,
     Number(commitment.blockNumber),
     commitment.from,
@@ -209,7 +206,7 @@ const formatTransactCommitmentEvent = (
   commitment: GraphTransactCommitmentV3,
   railgunTxid: string,
 ): CommitmentEvent => {
-  return formatTransactEventV3(
+  return V3Events.formatTransactEvent(
     commitment.transactionHash,
     Number(commitment.blockNumber),
     commitment.hashes,

@@ -13,8 +13,7 @@ import {
   ShieldNote,
   RailgunEngine,
   ShieldRequestStruct,
-  randomHex,
-  hexToBytes,
+  ByteUtils,
   ShieldNoteERC20,
   ShieldNoteNFT,
   ERC721_NOTE_VALUE,
@@ -53,7 +52,7 @@ const generateERC20ShieldRequests = async (
     erc20AmountRecipient.amount,
     erc20AmountRecipient.tokenAddress,
   );
-  return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
+  return shield.serialize(ByteUtils.hexToBytes(shieldPrivateKey), viewingPublicKey);
 };
 
 const generateNFTShieldRequests = async (
@@ -82,7 +81,7 @@ const generateNFTShieldRequests = async (
     value,
     nftTokenData,
   );
-  return shield.serialize(hexToBytes(shieldPrivateKey), viewingPublicKey);
+  return shield.serialize(ByteUtils.hexToBytes(shieldPrivateKey), viewingPublicKey);
 };
 
 export const generateShieldTransaction = async (
@@ -93,7 +92,7 @@ export const generateShieldTransaction = async (
   nftAmountRecipients: RailgunNFTAmountRecipient[],
 ): Promise<ContractTransaction> => {
   try {
-    const random = randomHex(16);
+    const random = ByteUtils.randomHex(16);
 
     const shieldInputs: ShieldRequestStruct[] = await Promise.all([
       ...erc20AmountRecipients.map(erc20AmountRecipient =>

@@ -1,21 +1,19 @@
 import * as ed from '@noble/ed25519';
 import {
-  arrayify,
-  hexlify,
-  hexStringToBytes,
+  ByteUtils,
   encryptJSONDataWithSharedKey,
   tryDecryptJSONDataWithSharedKey,
   getPublicViewingKey,
   verifyED25519,
   EncryptedData,
   ViewingKeyPair,
-  isReactNative,
 } from '@railgun-community/engine';
 import { EncryptDataWithSharedKeyResponse } from '@railgun-community/shared-models';
 import { getRandomBytes } from './bytes';
 import { promisify } from 'util';
 import { pbkdf2 as NodePbkdf2 } from 'crypto';
 import { pbkdf2 as JSpbkdf2 } from 'ethereum-cryptography/pbkdf2';
+import { isReactNative } from './runtime';
 
 export const verifyRelayerSignature = (
   signature: string | Uint8Array,
@@ -29,9 +27,9 @@ export const encryptDataWithSharedKey = async (
   data: object,
   externalPubKey: Uint8Array,
 ): Promise<EncryptDataWithSharedKeyResponse> => {
-  const randomPrivKey = hexStringToBytes(getRandomBytes(32));
+  const randomPrivKey = ByteUtils.hexStringToBytes(getRandomBytes(32));
   const randomPubKeyUint8Array = await getPublicViewingKey(randomPrivKey);
-  const randomPubKey = hexlify(randomPubKeyUint8Array);
+  const randomPubKey = ByteUtils.hexlify(randomPubKeyUint8Array);
   const sharedKey = await ed.getSharedSecret(randomPrivKey, externalPubKey);
   const encryptedData = encryptJSONDataWithSharedKey(data, sharedKey);
   return { encryptedData, randomPubKey, sharedKey };
@@ -63,8 +61,8 @@ export const pbkdf2 = async (
   iterations: number,
 ): Promise<string> => {
   const secretBuffer = Buffer.from(secret, 'utf-8');
-  const secretFormatted = new Uint8Array(arrayify(secretBuffer));
-  const saltFormatted = new Uint8Array(arrayify(salt));
+  const secretFormatted = new Uint8Array(ByteUtils.arrayify(secretBuffer));
+  const saltFormatted = new Uint8Array(ByteUtils.arrayify(salt));
 
   const keyLength = 32; // Bytes
   const digest = 'sha256';
@@ -87,7 +85,7 @@ export const pbkdf2 = async (
       digest,
     );
   }
-  return hexlify(key);
+  return ByteUtils.hexlify(key);
 };
 
 export {

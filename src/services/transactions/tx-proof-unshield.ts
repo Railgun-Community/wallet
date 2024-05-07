@@ -20,7 +20,7 @@ import { setCachedProvedTransaction } from './proof-cache';
 import {
   AdaptID,
   RelayAdaptVersionedSmartContracts,
-  randomHex,
+  ByteUtils,
 } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
@@ -214,7 +214,7 @@ export const generateUnshieldBaseTokenProof = async (
 
     const { chain } = NETWORK_CONFIG[networkName];
 
-    const relayAdaptParamsRandom = randomHex(31);
+    const relayAdaptParamsRandom = ByteUtils.randomHex(31);
     const relayAdaptParams =
       await RelayAdaptVersionedSmartContracts.getRelayAdaptParamsUnshieldBaseToken(
         txidVersion,

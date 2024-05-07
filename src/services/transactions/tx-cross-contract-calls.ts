@@ -29,10 +29,8 @@ import { sendErrorMessage } from '../../utils/logger';
 import {
   RelayAdaptHelper,
   AdaptID,
-  hexlify,
-  randomHex,
   NFTTokenData,
-  formatToByteLength,
+  ByteUtils,
   ByteLength,
   MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2,
   RelayAdaptShieldNFTRecipient,
@@ -61,7 +59,7 @@ const createValidCrossContractCalls = (
       const transaction: ContractTransaction = {
         to: transactionRequest.to,
         value: transactionRequest.value,
-        data: hexlify(transactionRequest.data, true),
+        data: ByteUtils.hexlify(transactionRequest.data, true),
       };
       assertNotBlockedAddress(transaction.to);
       return transaction;
@@ -111,16 +109,18 @@ export const createRelayAdaptUnshieldNFTAmountRecipients = (
 export const createNFTTokenDataFromRailgunNFTAmount = (
   nftAmount: RailgunNFTAmount,
 ): NFTTokenData => {
-  const tokenSubIDHex = isDecimalStr(nftAmount.tokenSubID) ? bigIntStringToHex(nftAmount.tokenSubID) : nftAmount.tokenSubID;
+  const tokenSubIDHex = isDecimalStr(nftAmount.tokenSubID)
+    ? bigIntStringToHex(nftAmount.tokenSubID)
+    : nftAmount.tokenSubID;
 
   return {
-    tokenAddress: formatToByteLength(
+    tokenAddress: ByteUtils.formatToByteLength(
       nftAmount.nftAddress,
       ByteLength.Address,
       true,
     ),
     tokenType: nftAmount.nftTokenType as 1 | 2,
-    tokenSubID: formatToByteLength(
+    tokenSubID: ByteUtils.formatToByteLength(
       tokenSubIDHex,
       ByteLength.UINT_256,
       true,
@@ -224,7 +224,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
         relayAdaptUnshieldNFTAmounts,
       );
 
-    const shieldRandom = randomHex(16);
+    const shieldRandom = ByteUtils.randomHex(16);
     const relayShieldRequests =
       await RelayAdaptHelper.generateRelayShieldRequests(
         shieldRandom,
@@ -253,7 +253,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           overallBatchMinGasPrice,
         ),
       async (txs: (TransactionStructV2 | TransactionStructV3)[]) => {
-        const relayAdaptParamsRandom = randomHex(31);
+        const relayAdaptParamsRandom = ByteUtils.randomHex(31);
 
         // TODO: We should add the relay adapt contract gas limit here.
         const transaction =
@@ -352,7 +352,7 @@ export const generateCrossContractCallsProof = async (
     );
 
     // Generate relay adapt params from dummy transactions.
-    const shieldRandom = randomHex(16);
+    const shieldRandom = ByteUtils.randomHex(16);
 
     const relayShieldRequests =
       await RelayAdaptHelper.generateRelayShieldRequests(
@@ -368,7 +368,7 @@ export const generateCrossContractCallsProof = async (
     const { chain } = NETWORK_CONFIG[networkName];
 
     const isRelayerTransaction = !sendWithPublicWallet;
-    const relayAdaptParamsRandom = randomHex(31);
+    const relayAdaptParamsRandom = ByteUtils.randomHex(31);
     const relayAdaptParams =
       await RelayAdaptVersionedSmartContracts.getRelayAdaptParamsCrossContractCalls(
         txidVersion,

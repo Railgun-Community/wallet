@@ -1,7 +1,7 @@
 import {
   OutputType,
   ByteLength,
-  padToLength,
+  ByteUtils,
   RailgunEngine,
 } from '@railgun-community/engine';
 import chai from 'chai';
@@ -37,7 +37,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const padTo32BytesUnHex = (str: string) => {
-  return padToLength(str.replace('0x', ''), ByteLength.UINT_256);
+  return ByteUtils.padToLength(ByteUtils.strip0x(str), ByteLength.UINT_256);
 };
 
 const formatAmountString = (erc20Amount: RailgunERC20Amount) => {
