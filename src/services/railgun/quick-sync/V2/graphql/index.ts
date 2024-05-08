@@ -27,8 +27,8 @@ import { getMesh, ExecuteMeshFn, SubscribeMeshFn, MeshContext as BaseMeshContext
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
 import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
+import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
 import type { BscTypes } from './.graphclient/sources/bsc/types';
 import type { MaticTypes } from './.graphclient/sources/matic/types';
 export type Maybe<T> = T | null;
@@ -47,8 +47,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Bytes: string;  // MODIFIED
-  BigInt: string; // MODIFIED
+  Bytes: string; //MODIFIED
+  BigInt: string; //MODIFIED
 };
 
 export type Query = {
@@ -1240,7 +1240,7 @@ export type LegacyEncryptedCommitment = Commitment & {
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
-  legacyCiphertext: LegacyCommitmentCiphertext; // MODIFIED
+  legacyCiphertext: LegacyCommitmentCiphertext; //MODIFIED
 };
 
 export type LegacyEncryptedCommitmentWhereInput = {
@@ -3107,7 +3107,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
 }>;
 
 
-export type MeshContext = EthereumTypes.Context & ArbitrumOneTypes.Context & BscTypes.Context & MaticTypes.Context & BaseMeshContext;
+export type MeshContext = EthereumTypes.Context & ArbitrumOneTypes.Context & MaticTypes.Context & BscTypes.Context & BaseMeshContext;
 
 
 const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
@@ -3121,11 +3121,11 @@ const importFn: ImportFn = <T>(moduleId: string) => {
     case ".graphclient/sources/arbitrum-one/introspectionSchema":
       return import("./.graphclient/sources/arbitrum-one/introspectionSchema") as T;
     
-    case ".graphclient/sources/bsc/introspectionSchema":
-      return import("./.graphclient/sources/bsc/introspectionSchema") as T;
-    
     case ".graphclient/sources/matic/introspectionSchema":
       return import("./.graphclient/sources/matic/introspectionSchema") as T;
+    
+    case ".graphclient/sources/bsc/introspectionSchema":
+      return import("./.graphclient/sources/bsc/introspectionSchema") as T;
     
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
@@ -3350,7 +3350,7 @@ export type CommitmentsQuery = { commitments: Array<(
 export const NullifiersDocument = gql`
     query Nullifiers($blockNumber: BigInt = 0) {
   nullifiers(
-    orderBy: blockNumber_ASC
+    orderBy: [blockNumber_ASC, nullifier_DESC]
     where: {blockNumber_gte: $blockNumber}
     limit: 1000
   ) {
@@ -3366,7 +3366,7 @@ export const NullifiersDocument = gql`
 export const UnshieldsDocument = gql`
     query Unshields($blockNumber: BigInt = 0) {
   unshields(
-    orderBy: blockNumber_ASC
+    orderBy: [blockNumber_ASC, eventLogIndex_ASC]
     where: {blockNumber_gte: $blockNumber}
     limit: 1000
   ) {
@@ -3390,7 +3390,7 @@ export const UnshieldsDocument = gql`
 export const CommitmentsDocument = gql`
     query Commitments($blockNumber: BigInt = 0) {
   commitments(
-    orderBy: blockNumber_ASC
+    orderBy: [blockNumber_ASC, treePosition_ASC]
     where: {blockNumber_gte: $blockNumber}
     limit: 1000
   ) {
