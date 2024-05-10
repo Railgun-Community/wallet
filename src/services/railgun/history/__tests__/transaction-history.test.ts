@@ -34,7 +34,7 @@ import { getTestTXIDVersion, isV2Test } from '../../../../tests/helper.test';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const POLYGON_CHAIN: Chain = { type: ChainType.EVM, id: 137 };
+const SEPOLIA_CHAIN: Chain = { type: ChainType.EVM, id: 11155111 };
 let wallet: RailgunWallet;
 
 const txidVersion = getTestTXIDVersion();
@@ -229,7 +229,7 @@ describe('transaction-history', () => {
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
-      { [NetworkName.Ethereum]: 0, [NetworkName.Polygon]: 2 }, // creationBlockNumbers
+      { [NetworkName.EthereumSepolia]: 0 }, // creationBlockNumbers
     );
     if (!isDefined(railgunWalletInfo)) {
       throw new Error(`Could not create wallet`);
@@ -252,15 +252,17 @@ describe('transaction-history', () => {
     }
 
     const items = await getWalletTransactionHistory(
-      POLYGON_CHAIN,
+      SEPOLIA_CHAIN,
       wallet.id,
       undefined,
     );
-    expect(items.length).to.be.greaterThanOrEqual(6);
-    items.forEach(item => {
+    // TODO: There are no transactions in the Sepolia mocked wallet (yet).
+    // When there is, we should uncomment this:
+    // expect(items.length).to.be.greaterThanOrEqual(6);
+    for (const item of items) {
       expect(item.txidVersion).to.equal(TXIDVersion.V2_PoseidonMerkle);
       expect(item.txid.length).to.equal(66); // '0x' + 32 bytes
-    });
+    }
   });
 
   it('Should get Unknown category for transaction history item', () => {

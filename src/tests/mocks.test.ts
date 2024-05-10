@@ -211,7 +211,7 @@ export const MOCK_POI_PROOF_PROGRESS_CALLBACK_CALLBACK: POIProofProgressCallback
     // noop
   };
 
-export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG: FallbackProviderJsonConfig = {
+export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON: FallbackProviderJsonConfig = {
   chainId: 137,
   providers: [
     {
@@ -222,7 +222,7 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG: FallbackProviderJsonConfig = {
       stallTimeout: 2500,
     },
     {
-      provider: 'https://polygon-bor.publicnode.com',
+      provider: 'https://polygon-bor-rpc.publicnode.com',
       priority: 1,
       weight: 2,
       maxLogsPerBatch: 10,
@@ -237,54 +237,19 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG: FallbackProviderJsonConfig = {
   ],
 };
 
-export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON: FallbackProviderJsonConfig =
+export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA: FallbackProviderJsonConfig =
   {
-    chainId: 137,
+    chainId: 11155111,
     providers: [
       {
-        provider: 'https://polygon-bor-rpc.publicnode.com',
+        provider: 'https://rpc.sepolia.org/',
         priority: 1,
         weight: 2,
-        maxLogsPerBatch: 10,
-        stallTimeout: 2500,
-      }
-    ],
-  };
-
-export const MOCK_FAILING_FALLBACK_PROVIDER_JSON_CONFIG_MUMBAI: FallbackProviderJsonConfig =
-  {
-    chainId: 80001,
-    providers: [
-      {
-        provider: 'https://polygon-mumbai-bor.publicnode.com',
-        priority: 1,
-        weight: 2,
-        maxLogsPerBatch: 10,
         stallTimeout: 2500,
       },
       {
-        provider: 'https://endpoints.omniatech.io/v1/matic/mumbai/public',
-        priority: 1,
-        weight: 2,
-        maxLogsPerBatch: 10,
-      },
-    ],
-  };
-
-export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_GOERLI: FallbackProviderJsonConfig =
-  {
-    chainId: 5,
-    providers: [
-      {
-        provider: 'https://ethereum-goerli.publicnode.com',
-        priority: 1,
-        weight: 2,
-        maxLogsPerBatch: 10,
-        stallTimeout: 2500,
-      },
-      {
-        provider: 'https://rpc.ankr.com/eth_goerli',
-        priority: 1,
+        provider: 'https://ethereum-sepolia-rpc.publicnode.com',
+        priority: 2,
         weight: 2,
         maxLogsPerBatch: 10,
       },

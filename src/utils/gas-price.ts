@@ -19,6 +19,7 @@ export const shouldSetOverallBatchMinGasPriceForNetwork = (
     case NetworkName.Ethereum:
     case NetworkName.BNBChain:
     case NetworkName.Polygon:
+    case NetworkName.PolygonAmoy:
     case NetworkName.ArbitrumGoerli_DEPRECATED:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.EthereumGoerli_DEPRECATED:

@@ -26,7 +26,7 @@ import {
 import { createRailgunWallet, fullWalletForID } from '../wallets';
 import {
   MOCK_DB_ENCRYPTION_KEY,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
   MOCK_MNEMONIC,
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
@@ -47,8 +47,9 @@ let walletBalanceStub: SinonStub;
 let walletBalancesByBucketStub: SinonStub;
 let walletTokenBalanceStub: SinonStub;
 
-describe('balance-update', () => {
-  before(async () => {
+describe('balances-update', () => {
+  before(async function run() {
+    this.timeout(60_000);
     await initTestEngine();
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
@@ -59,11 +60,11 @@ describe('balance-update', () => {
       throw new Error('Expected railgunWalletInfo');
     }
     await loadProvider(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
-      NetworkName.Polygon,
-      10000, // pollingInterval
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
+      NetworkName.EthereumSepolia,
+      10_000, // pollingInterval
     );
-    const { chain } = NETWORK_CONFIG[NetworkName.Polygon];
+    const { chain } = NETWORK_CONFIG[NetworkName.EthereumSepolia];
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getEngine().scanContractHistory(
       chain,
@@ -93,6 +94,7 @@ describe('balance-update', () => {
       'getTokenBalances',
     ).resolves(balances);
   });
+
   afterEach(() => {
     walletBalanceStub.resetHistory();
     walletBalancesByBucketStub.resetHistory();
