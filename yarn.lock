@@ -2272,10 +2272,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@~7.3.2":
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-7.3.2.tgz#4534c4da54f578fb70fd54721c74f1558fed6fb8"
-  integrity sha512-t+Euqm+Hoyl3twp/mHSy6U1D3Y8IqG5Os46asxicYGf1ZjDg/e45t1IAky7VI4cRE3ahUwGd5zMhh/3gc430JQ==
+"@railgun-community/engine@~8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-8.0.0.tgz#436d01f048d4afd9e348f734dcd895f01ca36b45"
+  integrity sha512-qwYI5EGXo6E2Y/Zc2KtOuCW8/bnFmdYQYzRxicQ3Jv+u9ooyhEkSQdlxsHIfIGyUl1s1cZNuCMnd8BIPPqBunQ==
   dependencies:
     "@noble/ciphers" "^0.4.0"
     "@noble/ed25519" "^1.7.1"
@@ -2285,7 +2285,6 @@
     "@railgun-community/poseidon-hash-wasm" "1.0.1"
     "@scure/base" "^1.1.1"
     abstract-leveldown "^7.2.0"
-    bn.js "^5.2.1"
     browserify-aes "^1.2.0"
     buffer-xor "^2.0.2"
     chai-as-promised "^7.1.1"
