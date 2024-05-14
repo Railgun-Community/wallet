@@ -27,5 +27,7 @@ export const shouldSetOverallBatchMinGasPriceForNetwork = (
     case NetworkName.EthereumSepolia:
     case NetworkName.Hardhat:
       return true;
+    default:
+      throw new Error('Undefined networkName');
   }
 };
