@@ -3,7 +3,7 @@ import {
   PreImage,
   TokenData,
   TokenType,
-  formatToByteLength,
+  ByteUtils,
   serializePreImage,
   serializeTokenData,
 } from '@railgun-community/engine';
@@ -52,11 +52,11 @@ export const formatPreImage = (
 };
 
 export const formatTo16Bytes = (value: string, prefix: boolean) => {
-  return formatToByteLength(value, ByteLength.UINT_128, prefix);
+  return ByteUtils.formatToByteLength(value, ByteLength.UINT_128, prefix);
 };
 
 export const formatTo32Bytes = (value: string, prefix: boolean) => {
-  return formatToByteLength(value, ByteLength.UINT_256, prefix);
+  return ByteUtils.formatToByteLength(value, ByteLength.UINT_256, prefix);
 };
 
 export const bigIntStringToHex = (bigintString: string): string => {

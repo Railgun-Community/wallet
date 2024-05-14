@@ -14,10 +14,9 @@ import {
 } from './tx-gas-details';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
 import {
-  randomHex,
   ShieldNoteERC20,
   RailgunEngine,
-  hexToBytes,
+  ByteUtils,
   RelayAdaptVersionedSmartContracts,
 } from '@railgun-community/engine';
 import { reportAndSanitizeError } from '../../utils/error';
@@ -34,7 +33,7 @@ const generateShieldBaseTokenTransaction = async (
   try {
     const { masterPublicKey, viewingPublicKey } =
       RailgunEngine.decodeAddress(railgunAddress);
-    const random = randomHex(16);
+    const random = ByteUtils.randomHex(16);
 
     const { amount, tokenAddress } = wrappedERC20Amount;
 
@@ -46,7 +45,7 @@ const generateShieldBaseTokenTransaction = async (
     );
 
     const shieldRequest = await shield.serialize(
-      hexToBytes(shieldPrivateKey),
+      ByteUtils.hexToBytes(shieldPrivateKey),
       viewingPublicKey,
     );
 

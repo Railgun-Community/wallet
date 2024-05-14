@@ -2,7 +2,6 @@ import {
   OutputType,
   TransactNote,
   Prover,
-  formatToByteLength,
   AbstractWallet,
   RailgunWallet,
   ByteLength,
@@ -10,7 +9,7 @@ import {
   TreeBalance,
   AddressData,
   CommitmentType,
-  ZERO_32_BYTE_VALUE,
+  ByteUtils,
 } from '@railgun-community/engine';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sinon, { SinonStub } from 'sinon';
@@ -21,6 +20,8 @@ let verifyProofStub: SinonStub;
 
 export const MOCK_SHIELD_TXID_FOR_BALANCES = '123';
 export const MOCK_TOKEN_BALANCE = BigInt('1000000000000000000000');
+const ZERO_32_BYTE_VALUE =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const getMockBalanceData = async (
   addressData: AddressData,
@@ -77,7 +78,7 @@ export const createEngineWalletTreeBalancesStub = async (
   tokenAddress: string,
   tree: number,
 ) => {
-  const formattedTokenAddress = formatToByteLength(
+  const formattedTokenAddress = ByteUtils.formatToByteLength(
     tokenAddress.replace('0x', ''),
     ByteLength.UINT_256,
   );

@@ -2,7 +2,7 @@ import {
   ByteLength,
   RailgunTransactionV2,
   RailgunTransactionVersion,
-  formatToByteLength,
+  ByteUtils,
 } from '@railgun-community/engine';
 import { GetRailgunTransactionsAfterGraphIDQuery } from './graphql';
 import { getAddress } from 'ethers';
@@ -33,12 +33,12 @@ export const formatRailgunTransactions = (
       version: RailgunTransactionVersion.V2,
       graphID: tx.id,
       commitments: tx.commitments.map(commitment =>
-        formatToByteLength(commitment, ByteLength.UINT_256, true),
+        ByteUtils.formatToByteLength(commitment, ByteLength.UINT_256, true),
       ),
       nullifiers: tx.nullifiers.map(nullifier =>
-        formatToByteLength(nullifier, ByteLength.UINT_256, true),
+        ByteUtils.formatToByteLength(nullifier, ByteLength.UINT_256, true),
       ),
-      boundParamsHash: formatToByteLength(
+      boundParamsHash: ByteUtils.formatToByteLength(
         tx.boundParamsHash,
         ByteLength.UINT_256,
         true,
@@ -48,9 +48,13 @@ export const formatRailgunTransactions = (
       utxoTreeIn: Number(tx.utxoTreeIn),
       utxoTreeOut: Number(tx.utxoTreeOut),
       utxoBatchStartPositionOut: Number(tx.utxoBatchStartPositionOut),
-      txid: formatToByteLength(tx.transactionHash, ByteLength.UINT_256, false),
+      txid: ByteUtils.formatToByteLength(
+        tx.transactionHash,
+        ByteLength.UINT_256,
+        false,
+      ),
       unshield,
-      verificationHash: formatToByteLength(
+      verificationHash: ByteUtils.formatToByteLength(
         tx.verificationHash,
         ByteLength.UINT_256,
         true,

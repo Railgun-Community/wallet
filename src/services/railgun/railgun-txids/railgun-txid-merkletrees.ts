@@ -6,7 +6,7 @@ import {
 } from '@railgun-community/shared-models';
 import { getEngine, getTXIDMerkletreeForNetwork } from '../core';
 
-export const validateRailgunTxidMerkleroot = (
+export const validateRailgunTxidMerkleroot = async (
   txidVersion: TXIDVersion,
   networkName: NetworkName,
   tree: number,
@@ -14,13 +14,13 @@ export const validateRailgunTxidMerkleroot = (
   merkleroot: string,
 ): Promise<boolean> => {
   const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().validateHistoricalRailgunTxidMerkleroot(
-    txidVersion,
-    chain,
+  const engine = getEngine();
+  const txidMerkletree = engine.getTXIDMerkletree(txidVersion, chain);
+  const historicalMerkleroot = await txidMerkletree.getHistoricalMerkleroot(
     tree,
     index,
-    merkleroot,
   );
+  return historicalMerkleroot === merkleroot;
 };
 
 export const validateRailgunTxidOccurredBeforeBlockNumber = (
@@ -31,9 +31,9 @@ export const validateRailgunTxidOccurredBeforeBlockNumber = (
   blockNumber: number,
 ): Promise<boolean> => {
   const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().validateRailgunTxidOccurredBeforeBlockNumber(
-    txidVersion,
-    chain,
+  const engine = getEngine();
+  const txidMerkletree = engine.getTXIDMerkletree(txidVersion, chain);
+  return txidMerkletree.railgunTxidOccurredBeforeBlockNumber(
     tree,
     index,
     blockNumber,
@@ -60,9 +60,9 @@ export const getGlobalUTXOTreePositionForRailgunTransactionCommitment = (
   commitmentHash: string,
 ): Promise<number> => {
   const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().getGlobalUTXOTreePositionForRailgunTransactionCommitment(
-    txidVersion,
-    chain,
+  const engine = getEngine();
+  const txidMerkletree = engine.getTXIDMerkletree(txidVersion, chain);
+  return txidMerkletree.getGlobalUTXOTreePositionForRailgunTransactionCommitment(
     tree,
     index,
     commitmentHash,
@@ -112,10 +112,11 @@ export const getRailgunTxidMerkleroot = async (
   index: number,
 ) => {
   const chain = NETWORK_CONFIG[networkName].chain;
-  return getEngine().getHistoricalRailgunTxidMerkleroot(
-    txidVersion,
-    chain,
+  const engine = getEngine();
+  const txidMerkletree = engine.getTXIDMerkletree(txidVersion, chain);
+  const historicalMerkleroot = await txidMerkletree.getHistoricalMerkleroot(
     tree,
     index,
   );
+  return historicalMerkleroot;
 };

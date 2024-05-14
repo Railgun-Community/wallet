@@ -1,9 +1,3 @@
-import {
-  getBlindedCommitmentForShieldOrTransact,
-  getBlindedCommitmentForUnshield,
-} from '@railgun-community/engine';
+import { BlindedCommitment } from '@railgun-community/engine';
 
-export {
-  getBlindedCommitmentForShieldOrTransact,
-  getBlindedCommitmentForUnshield,
-};
+export { BlindedCommitment };

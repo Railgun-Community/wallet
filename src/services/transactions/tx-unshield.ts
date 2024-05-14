@@ -19,7 +19,7 @@ import {
 } from './tx-generator';
 import { populateProvedTransaction } from './proof-cache';
 import {
-  randomHex,
+  ByteUtils,
   TransactionStructV2,
   TransactionStructV3,
 } from '@railgun-community/engine';
@@ -222,7 +222,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           overallBatchMinGasPrice,
         ),
       (txs: (TransactionStructV2 | TransactionStructV3)[]) => {
-        const relayAdaptParamsRandom = randomHex(31);
+        const relayAdaptParamsRandom = ByteUtils.randomHex(31);
         return generateUnshieldBaseToken(
           txidVersion,
           txs,

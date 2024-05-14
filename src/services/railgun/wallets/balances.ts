@@ -46,19 +46,3 @@ export const resetFullTXIDMerkletreesV2 = async (
     throw reportAndSanitizeError(resetFullTXIDMerkletreesV2.name, err);
   }
 };
-
-export const decryptBalances = async (
-  txidVersion: TXIDVersion,
-  chain: Chain,
-  walletIdFilter: Optional<string[]>,
-  progressCallback?: (progress: number) => void,
-): Promise<void> => {
-  const engine = getEngine();
-  await engine.decryptBalancesAllWallets(
-    txidVersion,
-    chain,
-    walletIdFilter,
-    progressCallback,
-    false, // deferCompletionEvent
-  );
-};

@@ -3,11 +3,8 @@ import { ArtifactName, isDefined } from '@railgun-community/shared-models';
 import { sha256 } from 'ethereum-cryptography/sha256.js';
 import { sendErrorMessage } from '../../utils/logger';
 import ARTIFACT_V2_HASHES from './json/artifact-v2-hashes.json';
-import {
-  hexStringToBytes,
-  hexlify,
-  isReactNative,
-} from '@railgun-community/engine';
+import { ByteUtils } from '@railgun-community/engine';
+import { isReactNative } from '../railgun/util/runtime';
 
 type ArtifactHashesJson = Record<
   string,
@@ -44,7 +41,7 @@ const getDataBytes = (data: Uint8Array | Buffer | string): Uint8Array => {
   if (Buffer.isBuffer(data)) {
     return data.buffer as Uint8Array;
   }
-  return hexStringToBytes(data);
+  return ByteUtils.hexStringToBytes(data);
 };
 
 export const validateArtifactDownload = async (
@@ -57,7 +54,7 @@ export const validateArtifactDownload = async (
   }
   const dataBytes = getDataBytes(data);
   const hash = isReactNative
-    ? hexlify(sha256(dataBytes))
+    ? ByteUtils.hexlify(sha256(dataBytes))
     : createHash('sha256').update(dataBytes).digest('hex');
   const expectedHash = getExpectedArtifactHash(
     artifactName,

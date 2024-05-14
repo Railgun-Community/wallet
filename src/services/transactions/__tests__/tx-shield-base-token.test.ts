@@ -22,7 +22,7 @@ import {
   gasEstimateForShieldBaseToken,
 } from '../tx-shield-base-token';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
-import { randomHex } from '@railgun-community/engine';
+import { ByteUtils } from '@railgun-community/engine';
 import { FallbackProvider } from 'ethers';
 import { getTestTXIDVersion } from '../../../tests/helper.test';
 
@@ -32,7 +32,7 @@ let railgunAddress: string;
 
 const txidVersion = getTestTXIDVersion();
 
-const shieldPrivateKey = randomHex(32);
+const shieldPrivateKey = ByteUtils.randomHex(32);
 
 chai.use(chaiAsPromised);
 const { expect } = chai;

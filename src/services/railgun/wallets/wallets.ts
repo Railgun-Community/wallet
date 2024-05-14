@@ -6,8 +6,7 @@ import {
   WalletData,
   AddressData,
   RailgunEngine,
-  hexlify,
-  hexStringToBytes,
+  ByteUtils,
   POICurrentProofEventData,
   ViewOnlyWallet,
 } from '@railgun-community/engine';
@@ -267,7 +266,7 @@ export const deleteWalletByID = async (
     const engine = getEngine();
     await engine.deleteWallet(railgunWalletID);
   } catch (err) {
-    throw new Error('Could not delete RAILGUN wallet.', {cause: err});
+    throw new Error('Could not delete RAILGUN wallet.', { cause: err });
   }
 };
 
@@ -306,8 +305,10 @@ export const signWithWalletViewingKey = async (
   message: string,
 ): Promise<string> => {
   const wallet = walletForID(railgunWalletID);
-  const signature = await wallet.signWithViewingKey(hexStringToBytes(message));
-  return hexlify(signature);
+  const signature = await wallet.signWithViewingKey(
+    ByteUtils.hexStringToBytes(message),
+  );
+  return ByteUtils.hexlify(signature);
 };
 
 export const assertValidRailgunAddress = (address: string): void => {
