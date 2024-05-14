@@ -5,29 +5,39 @@
  * 3. move the modified index file to quick-sync/graphql/ (NOTE: MAKE SURE TO DRAG AND DROP IN VSCODE SO THE SOURCE LOCATIONS CHANGE!)
  */
 // @ts-nocheck
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable import/no-duplicates */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+/* eslint-disable import/newline-after-import */
+/* eslint-disable prefer-template */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import { GraphQLResolveInfo, SelectionSetNode, FieldNode, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-import { gql , PubSub , DefaultLogger , printWithCache } from '@graphql-mesh/utils';
+import { gql } from '@graphql-mesh/utils';
 
 import type { GetMeshOptions } from '@graphql-mesh/runtime';
 import type { YamlConfig } from '@graphql-mesh/types';
-
-
+import { PubSub } from '@graphql-mesh/utils';
+import { DefaultLogger } from '@graphql-mesh/utils';
 import MeshCache from "@graphql-mesh/cache-localforage";
 import { fetch as fetchFn } from '@whatwg-node/fetch';
 
-import { MeshResolvedSource , getMesh, ExecuteMeshFn, SubscribeMeshFn, MeshContext as BaseMeshContext, MeshInstance } from '@graphql-mesh/runtime';
-import { MeshTransform, MeshPlugin , ImportFn } from '@graphql-mesh/types';
+import { MeshResolvedSource } from '@graphql-mesh/runtime';
+import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
 import GraphqlHandler from "@graphql-mesh/graphql"
 import BareMerger from "@graphql-mesh/merger-bare";
-
+import { printWithCache } from '@graphql-mesh/utils';
 import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
-
+import { getMesh, ExecuteMeshFn, SubscribeMeshFn, MeshContext as BaseMeshContext, MeshInstance } from '@graphql-mesh/runtime';
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
-
+import { ImportFn } from '@graphql-mesh/types';
 import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
-
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -44,7 +54,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Bytes: string; // MODIFIED
+  Bytes: string;  // MODIFIED
   BigInt: string; // MODIFIED
 };
 
@@ -3110,11 +3120,11 @@ export type MeshContext = TxsEthereumTypes.Context & BaseMeshContext;
 const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
 
 const importFn: ImportFn = <T>(moduleId: string) => {
-  const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(`${baseDir  }/`, '');
-  switch (relativeModuleId) {
+  const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(baseDir + '/', '');
+  switch(relativeModuleId) {
     case ".graphclient/sources/txs-ethereum/introspectionSchema":
       return import("./.graphclient/sources/txs-ethereum/introspectionSchema") as T;
-
+    
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
   }
@@ -3131,44 +3141,44 @@ const rootStore = new MeshStore('.graphclient', new FsStoreStorageAdapter({
 
 export const rawServeConfig: YamlConfig.Config['serve'] = undefined as any
 export async function getMeshOptions(): Promise<GetMeshOptions> {
-  const pubsub = new PubSub();
-  const sourcesStore = rootStore.child('sources');
-  const logger = new DefaultLogger("GraphClient");
-  const cache = new (MeshCache as any)({
-    ...({} as any),
-    importFn,
-    store: rootStore.child('cache'),
-    pubsub,
-    logger,
-  } )
+const pubsub = new PubSub();
+const sourcesStore = rootStore.child('sources');
+const logger = new DefaultLogger("GraphClient");
+const cache = new (MeshCache as any)({
+      ...({} as any),
+      importFn,
+      store: rootStore.child('cache'),
+      pubsub,
+      logger,
+    } as any)
 
-  const sources: MeshResolvedSource[] = [];
-  const transforms: MeshTransform[] = [];
-  const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
-  const txsEthereumTransforms = [];
-  const additionalTypeDefs = [] as any[];
-  const txsEthereumHandler = new GraphqlHandler({
-    name: "txs-ethereum",
-    config: { "endpoint": "https://rail-squid.squids.live/squid-railgun-ethereum-v2/v/v1/graphql" },
-    baseDir,
-    cache,
-    pubsub,
-    store: sourcesStore.child("txs-ethereum"),
-    logger: logger.child("txs-ethereum"),
-    importFn,
-  });
-  sources[0] = {
-    name: 'txs-ethereum',
-    handler: txsEthereumHandler,
-    transforms: txsEthereumTransforms
-  }
-  const additionalResolvers = [] as any[]
-  const merger = new (BareMerger as any)({
-    cache,
-    pubsub,
-    logger: logger.child('bareMerger'),
-    store: rootStore.child('bareMerger')
-  })
+const sources: MeshResolvedSource[] = [];
+const transforms: MeshTransform[] = [];
+const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
+const txsEthereumTransforms = [];
+const additionalTypeDefs = [] as any[];
+const txsEthereumHandler = new GraphqlHandler({
+              name: "txs-ethereum",
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-ethereum-v2/graphql"},
+              baseDir,
+              cache,
+              pubsub,
+              store: sourcesStore.child("txs-ethereum"),
+              logger: logger.child("txs-ethereum"),
+              importFn,
+            });
+sources[0] = {
+          name: 'txs-ethereum',
+          handler: txsEthereumHandler,
+          transforms: txsEthereumTransforms
+        }
+const additionalResolvers = [] as any[]
+const merger = new(BareMerger as any)({
+        cache,
+        pubsub,
+        logger: logger.child('bareMerger'),
+        store: rootStore.child('bareMerger')
+      })
 
   return {
     sources,
@@ -3182,26 +3192,26 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
     additionalEnvelopPlugins,
     get documents() {
       return [
-        {
-          document: GetRailgunTransactionsAfterGraphIdDocument,
-          get rawSDL() {
-            return printWithCache(GetRailgunTransactionsAfterGraphIdDocument);
-          },
-          location: 'GetRailgunTransactionsAfterGraphIdDocument.graphql'
-        }, {
-          document: GetRailgunTransactionsByTxidDocument,
-          get rawSDL() {
-            return printWithCache(GetRailgunTransactionsByTxidDocument);
-          },
-          location: 'GetRailgunTransactionsByTxidDocument.graphql'
-        }, {
-          document: GetRailgunTransactionsByUnshieldToAddressDocument,
-          get rawSDL() {
-            return printWithCache(GetRailgunTransactionsByUnshieldToAddressDocument);
-          },
-          location: 'GetRailgunTransactionsByUnshieldToAddressDocument.graphql'
-        }
-      ];
+      {
+        document: GetRailgunTransactionsAfterGraphIdDocument,
+        get rawSDL() {
+          return printWithCache(GetRailgunTransactionsAfterGraphIdDocument);
+        },
+        location: 'GetRailgunTransactionsAfterGraphIdDocument.graphql'
+      },{
+        document: GetRailgunTransactionsByTxidDocument,
+        get rawSDL() {
+          return printWithCache(GetRailgunTransactionsByTxidDocument);
+        },
+        location: 'GetRailgunTransactionsByTxidDocument.graphql'
+      },{
+        document: GetRailgunTransactionsByUnshieldToAddressDocument,
+        get rawSDL() {
+          return printWithCache(GetRailgunTransactionsByUnshieldToAddressDocument);
+        },
+        location: 'GetRailgunTransactionsByUnshieldToAddressDocument.graphql'
+      }
+    ];
     },
     fetchFn,
   };
@@ -3243,36 +3253,30 @@ export type GetRailgunTransactionsAfterGraphIDQueryVariables = Exact<{
 }>;
 
 
-export type GetRailgunTransactionsAfterGraphIDQuery = {
-  transactions: Array<(
+export type GetRailgunTransactionsAfterGraphIDQuery = { transactions: Array<(
     Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
     & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
-  )>
-};
+  )> };
 
 export type GetRailgunTransactionsByTxidQueryVariables = Exact<{
   txid?: InputMaybe<Scalars['Bytes']>;
 }>;
 
 
-export type GetRailgunTransactionsByTxidQuery = {
-  transactions: Array<(
+export type GetRailgunTransactionsByTxidQuery = { transactions: Array<(
     Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
     & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
-  )>
-};
+  )> };
 
 export type GetRailgunTransactionsByUnshieldToAddressQueryVariables = Exact<{
   address?: InputMaybe<Scalars['Bytes']>;
 }>;
 
 
-export type GetRailgunTransactionsByUnshieldToAddressQuery = {
-  transactions: Array<(
+export type GetRailgunTransactionsByUnshieldToAddressQuery = { transactions: Array<(
     Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
     & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
-  )>
-};
+  )> };
 
 
 export const GetRailgunTransactionsAfterGraphIDDocument = gql`

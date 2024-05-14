@@ -4,8 +4,18 @@
  * 2. add these comments (including eslint disables)
  * 3. move the modified index file to quick-sync/graphql/
  */
-
 // @ts-nocheck
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable import/no-duplicates */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+/* eslint-disable import/newline-after-import */
+/* eslint-disable prefer-template */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import { GraphQLResolveInfo, SelectionSetNode, FieldNode, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 import { gql } from '@graphql-mesh/utils';
@@ -27,9 +37,10 @@ import { getMesh, ExecuteMeshFn, SubscribeMeshFn, MeshContext as BaseMeshContext
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
 import type { ArbitrumOneTypes } from './.graphclient/sources/arbitrum-one/types';
+import type { SepoliaTypes } from './.graphclient/sources/sepolia/types';
 import type { BscTypes } from './.graphclient/sources/bsc/types';
+import type { EthereumTypes } from './.graphclient/sources/ethereum/types';
 import type { MaticTypes } from './.graphclient/sources/matic/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -47,8 +58,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Bytes: string; //MODIFIED
-  BigInt: string; //MODIFIED
+  Bytes: string; // MODIFIED
+  BigInt: string; // MODIFIED
 };
 
 export type Query = {
@@ -1240,7 +1251,7 @@ export type LegacyEncryptedCommitment = Commitment & {
   treePosition: Scalars['Int'];
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
-  legacyCiphertext: LegacyCommitmentCiphertext; //MODIFIED
+  legacyCiphertext: LegacyCommitmentCiphertext; // MODIFIED
 };
 
 export type LegacyEncryptedCommitmentWhereInput = {
@@ -3107,7 +3118,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
 }>;
 
 
-export type MeshContext = EthereumTypes.Context & ArbitrumOneTypes.Context & MaticTypes.Context & BscTypes.Context & BaseMeshContext;
+export type MeshContext = ArbitrumOneTypes.Context & SepoliaTypes.Context & BscTypes.Context & EthereumTypes.Context & MaticTypes.Context & BaseMeshContext;
 
 
 const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
@@ -3115,17 +3126,20 @@ const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/',
 const importFn: ImportFn = <T>(moduleId: string) => {
   const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(baseDir + '/', '');
   switch(relativeModuleId) {
-    case ".graphclient/sources/ethereum/introspectionSchema":
-      return import("./.graphclient/sources/ethereum/introspectionSchema") as T;
-    
     case ".graphclient/sources/arbitrum-one/introspectionSchema":
       return import("./.graphclient/sources/arbitrum-one/introspectionSchema") as T;
     
-    case ".graphclient/sources/matic/introspectionSchema":
-      return import("./.graphclient/sources/matic/introspectionSchema") as T;
+    case ".graphclient/sources/sepolia/introspectionSchema":
+      return import("./.graphclient/sources/sepolia/introspectionSchema") as T;
     
     case ".graphclient/sources/bsc/introspectionSchema":
       return import("./.graphclient/sources/bsc/introspectionSchema") as T;
+    
+    case ".graphclient/sources/ethereum/introspectionSchema":
+      return import("./.graphclient/sources/ethereum/introspectionSchema") as T;
+    
+    case ".graphclient/sources/matic/introspectionSchema":
+      return import("./.graphclient/sources/matic/introspectionSchema") as T;
     
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
@@ -3161,10 +3175,11 @@ const ethereumTransforms = [];
 const bscTransforms = [];
 const maticTransforms = [];
 const arbitrumOneTransforms = [];
+const sepoliaTransforms = [];
 const additionalTypeDefs = [] as any[];
 const ethereumHandler = new GraphqlHandler({
               name: "ethereum",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-ethereum-v2/v/v1/graphql"},
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-ethereum-v2/graphql"},
               baseDir,
               cache,
               pubsub,
@@ -3174,7 +3189,7 @@ const ethereumHandler = new GraphqlHandler({
             });
 const bscHandler = new GraphqlHandler({
               name: "bsc",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-bsc-v2/v/v1/graphql"},
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-bsc-v2/graphql"},
               baseDir,
               cache,
               pubsub,
@@ -3184,7 +3199,7 @@ const bscHandler = new GraphqlHandler({
             });
 const maticHandler = new GraphqlHandler({
               name: "matic",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-polygon-v2/v/v1/graphql"},
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-polygon-v2/graphql"},
               baseDir,
               cache,
               pubsub,
@@ -3194,12 +3209,22 @@ const maticHandler = new GraphqlHandler({
             });
 const arbitrumOneHandler = new GraphqlHandler({
               name: "arbitrum-one",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-arbitrum-v2/v/v1/graphql"},
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-arbitrum-v2/graphql"},
               baseDir,
               cache,
               pubsub,
               store: sourcesStore.child("arbitrum-one"),
               logger: logger.child("arbitrum-one"),
+              importFn,
+            });
+const sepoliaHandler = new GraphqlHandler({
+              name: "sepolia",
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-eth-sepolia-v2/graphql"},
+              baseDir,
+              cache,
+              pubsub,
+              store: sourcesStore.child("sepolia"),
+              logger: logger.child("sepolia"),
               importFn,
             });
 sources[0] = {
@@ -3221,6 +3246,11 @@ sources[3] = {
           name: 'arbitrum-one',
           handler: arbitrumOneHandler,
           transforms: arbitrumOneTransforms
+        }
+sources[4] = {
+          name: 'sepolia',
+          handler: sepoliaHandler,
+          transforms: sepoliaTransforms
         }
 const additionalResolvers = [] as any[]
 const merger = new(StitchingMerger as any)({

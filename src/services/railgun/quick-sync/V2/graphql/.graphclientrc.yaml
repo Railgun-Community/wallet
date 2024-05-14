@@ -3,24 +3,23 @@ sources:
   - name: ethereum
     handler:
       graphql:
-        endpoint: https://rail-squid.squids.live/squid-railgun-ethereum-v2/v/v1/graphql
+        endpoint: https://rail-squid.squids.live/squid-railgun-ethereum-v2/graphql
   - name: bsc
     handler:
       graphql:
-        endpoint: https://rail-squid.squids.live/squid-railgun-bsc-v2/v/v1/graphql
+        endpoint: https://rail-squid.squids.live/squid-railgun-bsc-v2/graphql
   - name: matic
     handler:
       graphql:
-        endpoint: https://rail-squid.squids.live/squid-railgun-polygon-v2/v/v1/graphql
+        endpoint: https://rail-squid.squids.live/squid-railgun-polygon-v2/graphql
   - name: arbitrum-one
     handler:
       graphql:
-        endpoint: https://rail-squid.squids.live/squid-railgun-arbitrum-v2/v/v1/graphql
-  # NOTE: Not supported by hosted service yet.
-  #- name: sepolia
-  #  handler:
-  #    graphql:
-  #     endpoint: https://api.thegraph.com/subgraphs/name/railgun-community/railgun-v2-sepolia
+        endpoint: https://rail-squid.squids.live/squid-railgun-arbitrum-v2/graphql
+  - name: sepolia
+    handler:
+      graphql:
+        endpoint: https://rail-squid.squids.live/squid-railgun-eth-sepolia-v2/graphql
 
 documents:
   - ./quick-sync-query-V2.graphql

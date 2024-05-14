@@ -170,8 +170,8 @@ describe('quick-sync-events-graph-v2', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(200_000);
 
-  /*
-    it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async function run() {
+
+  it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async function run() {
     if (!isV2Test()) {
       this.skip();
       return;
@@ -194,7 +194,7 @@ describe('quick-sync-events-graph-v2', () => {
     // const shouldThrow = true;
     // assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(90_000);
-  */
+
   it('[V2] Should run live Railgun Event Log fetch for Polygon with high starting block', async function run() {
     if (!isV2Test()) {
       this.skip();
