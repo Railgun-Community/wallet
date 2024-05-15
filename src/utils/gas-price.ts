@@ -9,7 +9,7 @@ export const shouldSetOverallBatchMinGasPriceForNetwork = (
   networkName: NetworkName,
 ) => {
   if (sendWithPublicWallet) {
-    // Only Relayer transactions require overallBatchMinGasPrice.
+    // Only Broadcaster transactions require overallBatchMinGasPrice.
     return false;
   }
   switch (networkName) {

@@ -56,7 +56,7 @@ describe('tx-gas', () => {
     const isGasEstimateWithDummyProof = false;
     const rsp = gasEstimateResponse(
       gasEstimate,
-      undefined, // relayerFeeCommitment
+      undefined, // broadcasterFeeCommitment
       isGasEstimateWithDummyProof,
     );
 
@@ -86,13 +86,13 @@ describe('tx-gas', () => {
     const isGasEstimateWithDummyProof = true;
     const rsp = gasEstimateResponse(
       gasEstimate,
-      undefined, // relayerFeeCommitment
+      undefined, // broadcasterFeeCommitment
       isGasEstimateWithDummyProof,
     );
     expect(rsp.gasEstimate).to.not.be.undefined;
   }).timeout(60_000);
 
-  it('Should pull gas estimate for basic transaction - relayer', async () => {
+  it('Should pull gas estimate for basic transaction - broadcaster', async () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
@@ -150,7 +150,7 @@ describe('tx-gas', () => {
     expect(transaction.gasPrice).to.be.undefined;
     expect(transaction.maxFeePerGas).to.equal(10_000n);
     expect(transaction.maxPriorityFeePerGas).to.equal(500n);
-    // Polygon - Relayer
+    // Polygon - Broadcaster
     setGasDetailsForTransaction(
       NetworkName.Polygon,
       transaction,
@@ -164,7 +164,7 @@ describe('tx-gas', () => {
       gasDetailsType0,
       true, // sendWithPublicWallet
     );
-    // BNB - Relayer
+    // BNB - Broadcaster
     setGasDetailsForTransaction(
       NetworkName.BNBChain,
       transaction,

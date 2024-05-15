@@ -30,8 +30,8 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FEE_TOKEN_DETAILS,
-  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2,
-  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
+  MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2,
+  MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
   MOCK_MEMO,
   MOCK_MNEMONIC,
   MOCK_NFT_AMOUNT_RECIPIENTS,
@@ -67,7 +67,7 @@ let erc20NoteSpy: SinonSpy;
 let nftNoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
+let broadcasterFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -154,20 +154,20 @@ describe('tx-transfer', () => {
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
 
-    const relayerWalletInfo = await createRailgunWallet(
+    const broadcasterWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!isDefined(relayerWalletInfo)) {
-      throw new Error('Expected relayerWalletInfo');
+    if (!isDefined(broadcasterWalletInfo)) {
+      throw new Error('Expected broadcasterWalletInfo');
     }
 
-    const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
+    const broadcasterRailgunAddress = broadcasterWalletInfo.railgunAddress;
 
-    relayerFeeERC20AmountRecipient = {
+    broadcasterFeeERC20AmountRecipient = {
       ...MOCK_TOKEN_FEE,
-      recipientAddress: relayerRailgunAddress,
+      recipientAddress: broadcasterRailgunAddress,
     };
 
     railProveStub = Sinon.stub(
@@ -233,20 +233,20 @@ describe('tx-transfer', () => {
       false, // sendWithPublicWallet
     );
     expect(erc20NoteSpy.called).to.be.true;
-    expect(erc20NoteSpy.args.length).to.equal(6); // Number of calls - 3 for each of 2 relayer fee iterations
-    expect(erc20NoteSpy.args[0][0].amount).to.equal(BigInt('0x00')); // original relayer fee
+    expect(erc20NoteSpy.args.length).to.equal(6); // Number of calls - 3 for each of 2 broadcaster fee iterations
+    expect(erc20NoteSpy.args[0][0].amount).to.equal(BigInt('0x00')); // original broadcaster fee
     expect(erc20NoteSpy.args[1][0].amount).to.equal(BigInt('0x100')); // token1
     expect(erc20NoteSpy.args[2][0].amount).to.equal(BigInt('0x200')); // token2
     expect(erc20NoteSpy.args[3][0].amount).to.equal(
       BigInt('0x0275a61bf8737eb4'),
-    ); // New estimated Relayer Fee
+    ); // New estimated Broadcaster Fee
     expect(erc20NoteSpy.args[4][0].amount).to.equal(BigInt('0x100')); // token1
     expect(erc20NoteSpy.args[5][0].amount).to.equal(BigInt('0x200')); // token2
-    expect(rsp.relayerFeeCommitment).to.not.be.undefined;
-    expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
+    expect(rsp.broadcasterFeeCommitment).to.not.be.undefined;
+    expect(rsp.broadcasterFeeCommitment?.commitmentCiphertext).to.deep.equal(
       isV2Test()
-        ? MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2
-        : MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
+        ? MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2
+        : MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
     );
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
@@ -268,10 +268,10 @@ describe('tx-transfer', () => {
       true, // sendWithPublicWallet
     );
     expect(erc20NoteSpy.called).to.be.true;
-    expect(erc20NoteSpy.args.length).to.equal(2); // Number of calls (without relayer fees)
+    expect(erc20NoteSpy.args.length).to.equal(2); // Number of calls (without broadcaster fees)
     expect(erc20NoteSpy.args[0][0].amount).to.equal(BigInt('0x100')); // token1
     expect(erc20NoteSpy.args[1][0].amount).to.equal(BigInt('0x200')); // token2
-    expect(rsp.relayerFeeCommitment).to.be.undefined;
+    expect(rsp.broadcasterFeeCommitment).to.be.undefined;
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
   }).timeout(10_000);
@@ -330,16 +330,16 @@ describe('tx-transfer', () => {
       false, // sendWithPublicWallet
     );
     expect(nftNoteSpy.called).to.be.true;
-    expect(nftNoteSpy.args.length).to.equal(4); // Number of calls - 2 for each of 2 relayer fee iterations
+    expect(nftNoteSpy.args.length).to.equal(4); // Number of calls - 2 for each of 2 broadcaster fee iterations
     expect(nftNoteSpy.args[0][0].tokenSubID).to.equal('0x01'); // nft1
     expect(nftNoteSpy.args[1][0].tokenSubID).to.equal('0x02'); // nft2
     expect(nftNoteSpy.args[2][0].tokenSubID).to.equal('0x01'); // nft1
     expect(nftNoteSpy.args[3][0].tokenSubID).to.equal('0x02'); // nft2
-    expect(rsp.relayerFeeCommitment).to.not.be.undefined;
-    expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
+    expect(rsp.broadcasterFeeCommitment).to.not.be.undefined;
+    expect(rsp.broadcasterFeeCommitment?.commitmentCiphertext).to.deep.equal(
       isV2Test()
-        ? MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2
-        : MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
+        ? MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2
+        : MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
     );
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
@@ -361,10 +361,10 @@ describe('tx-transfer', () => {
       true, // sendWithPublicWallet
     );
     expect(nftNoteSpy.called).to.be.true;
-    expect(nftNoteSpy.args.length).to.equal(2); // Number of calls (without relayer fees)
+    expect(nftNoteSpy.args.length).to.equal(2); // Number of calls (without broadcaster fees)
     expect(nftNoteSpy.args[0][0].tokenSubID).to.equal('0x01'); // nft1
     expect(nftNoteSpy.args[1][0].tokenSubID).to.equal('0x02'); // nft2
-    expect(rsp.relayerFeeCommitment).to.be.undefined;
+    expect(rsp.broadcasterFeeCommitment).to.be.undefined;
     // Add 9000 for the dummy tx variance
     expect(rsp.gasEstimate).to.equal(9000n + 200n);
   }).timeout(10_000);
@@ -403,7 +403,7 @@ describe('tx-transfer', () => {
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -422,7 +422,7 @@ describe('tx-transfer', () => {
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetails,
@@ -456,7 +456,7 @@ describe('tx-transfer', () => {
         MOCK_MEMO,
         MOCK_TOKEN_AMOUNT_RECIPIENTS,
         MOCK_NFT_AMOUNT_RECIPIENTS,
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,
@@ -475,7 +475,7 @@ describe('tx-transfer', () => {
       MOCK_MEMO,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -489,7 +489,7 @@ describe('tx-transfer', () => {
         MOCK_MEMO,
         MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
         MOCK_NFT_AMOUNT_RECIPIENTS,
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,

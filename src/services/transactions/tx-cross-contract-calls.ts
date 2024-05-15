@@ -39,7 +39,7 @@ import {
   RelayAdaptVersionedSmartContracts,
 } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
+import { gasEstimateResponseDummyProofIterativeBroadcasterFee } from './tx-gas-broadcaster-fee-estimator';
 import { reportAndSanitizeError } from '../../utils/error';
 import { ContractTransaction } from 'ethers';
 import { isDecimalStr } from '../../utils';
@@ -148,7 +148,7 @@ export const populateProvedCrossContractCalls = async (
   relayAdaptShieldERC20Recipients: RailgunERC20Recipient[],
   relayAdaptShieldNFTRecipients: RailgunNFTAmountRecipient[],
   crossContractCalls: ContractTransaction[],
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   gasDetails: TransactionGasDetails,
@@ -169,7 +169,7 @@ export const populateProvedCrossContractCalls = async (
         relayAdaptShieldERC20Recipients,
         relayAdaptShieldNFTRecipients,
         crossContractCalls,
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
         gasDetails,
@@ -236,8 +236,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
     const minimumGasLimit =
       minGasLimit ?? MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2;
 
-    const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
-      (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
+    const response = await gasEstimateResponseDummyProofIterativeBroadcasterFee(
+      (broadcasterFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.CrossContractCalls,
           networkName,
@@ -248,7 +248,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           undefined, // memoText
           relayAdaptUnshieldERC20AmountRecipients,
           relayAdaptUnshieldNFTAmountRecipients,
-          relayerFeeERC20Amount,
+          broadcasterFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
@@ -265,7 +265,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
             relayShieldRequests,
             relayAdaptParamsRandom,
             true, // isGasEstimate
-            !sendWithPublicWallet, // isRelayerTransaction
+            !sendWithPublicWallet, // isBroadcasterTransaction
             minimumGasLimit,
           );
         // Remove gasLimit, we'll set to the minimum below.
@@ -310,7 +310,7 @@ export const generateCrossContractCallsProof = async (
   relayAdaptShieldERC20Recipients: RailgunERC20Recipient[],
   relayAdaptShieldNFTRecipients: RailgunNFTAmountRecipient[],
   crossContractCalls: ContractTransaction[],
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   minGasLimit: Optional<bigint>,
@@ -346,7 +346,7 @@ export const generateCrossContractCallsProof = async (
       undefined, // memoText
       relayAdaptUnshieldERC20AmountRecipients,
       relayAdaptUnshieldNFTAmountRecipients,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
     );
@@ -367,7 +367,7 @@ export const generateCrossContractCallsProof = async (
 
     const { chain } = NETWORK_CONFIG[networkName];
 
-    const isRelayerTransaction = !sendWithPublicWallet;
+    const isBroadcasterTransaction = !sendWithPublicWallet;
     const relayAdaptParamsRandom = ByteUtils.randomHex(31);
     const relayAdaptParams =
       await RelayAdaptVersionedSmartContracts.getRelayAdaptParamsCrossContractCalls(
@@ -377,7 +377,7 @@ export const generateCrossContractCallsProof = async (
         validCrossContractCalls,
         relayShieldRequests,
         relayAdaptParamsRandom,
-        isRelayerTransaction,
+        isBroadcasterTransaction,
         minimumGasLimit,
       );
     const relayAdaptContract =
@@ -402,7 +402,7 @@ export const generateCrossContractCallsProof = async (
         undefined, // memoText
         relayAdaptUnshieldERC20AmountRecipients,
         relayAdaptUnshieldNFTAmountRecipients,
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         sendWithPublicWallet,
         relayAdaptID,
         false, // useDummyProof
@@ -421,7 +421,7 @@ export const generateCrossContractCallsProof = async (
         relayShieldRequests,
         relayAdaptParamsRandom,
         false, // isGasEstimate
-        isRelayerTransaction,
+        isBroadcasterTransaction,
         minimumGasLimit,
       );
     delete transaction.from;
@@ -439,7 +439,7 @@ export const generateCrossContractCallsProof = async (
       relayAdaptShieldERC20Recipients,
       relayAdaptShieldNFTRecipients,
       crossContractCalls: validCrossContractCalls,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       sendWithPublicWallet,
       transaction,
       preTransactionPOIsPerTxidLeafPerList,

@@ -15,7 +15,7 @@ import { pbkdf2 as NodePbkdf2 } from 'crypto';
 import { pbkdf2 as JSpbkdf2 } from 'ethereum-cryptography/pbkdf2';
 import { isReactNative } from './runtime';
 
-export const verifyRelayerSignature = (
+export const verifyBroadcasterSignature = (
   signature: string | Uint8Array,
   data: string | Uint8Array,
   signingKey: Uint8Array,

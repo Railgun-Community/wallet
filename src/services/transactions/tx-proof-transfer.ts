@@ -23,7 +23,7 @@ export const generateTransferProof = async (
   memoText: Optional<string>,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
@@ -42,7 +42,7 @@ export const generateTransferProof = async (
         memoText,
         erc20AmountRecipients,
         nftAmountRecipients,
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         sendWithPublicWallet,
         undefined, // relayAdaptID
         false, // useDummyProof
@@ -70,7 +70,7 @@ export const generateTransferProof = async (
       relayAdaptShieldERC20Recipients: undefined,
       relayAdaptShieldNFTRecipients: undefined,
       crossContractCalls: undefined,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       sendWithPublicWallet,
       transaction,
       preTransactionPOIsPerTxidLeafPerList,

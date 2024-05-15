@@ -19,7 +19,7 @@ import {
   TransactionStructV2,
   TransactionStructV3,
 } from '@railgun-community/engine';
-import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
+import { gasEstimateResponseDummyProofIterativeBroadcasterFee } from './tx-gas-broadcaster-fee-estimator';
 import { reportAndSanitizeError } from '../../utils/error';
 
 export const populateProvedTransfer = async (
@@ -30,7 +30,7 @@ export const populateProvedTransfer = async (
   memoText: Optional<string>,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   gasDetails: TransactionGasDetails,
@@ -51,7 +51,7 @@ export const populateProvedTransfer = async (
         undefined, // relayAdaptShieldERC20Recipients
         undefined, // relayAdaptShieldNFTRecipients
         undefined, // crossContractCalls
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
         gasDetails,
@@ -81,8 +81,8 @@ export const gasEstimateForUnprovenTransfer = async (
   try {
     const overallBatchMinGasPrice = 0n;
 
-    const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
-      (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
+    const response = await gasEstimateResponseDummyProofIterativeBroadcasterFee(
+      (broadcasterFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.Transfer,
           networkName,
@@ -93,7 +93,7 @@ export const gasEstimateForUnprovenTransfer = async (
           memoText,
           erc20AmountRecipients,
           nftAmountRecipients,
-          relayerFeeERC20Amount,
+          broadcasterFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),

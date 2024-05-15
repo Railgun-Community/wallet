@@ -57,7 +57,7 @@ export const generateProofTransactions = async (
   memoText: Optional<string>,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   relayAdaptID: Optional<AdaptID>,
   useDummyProof: boolean,
@@ -80,7 +80,7 @@ export const generateProofTransactions = async (
     showSenderAddressToRecipient,
     memoText,
     networkName,
-    relayerFeeERC20AmountRecipient,
+    broadcasterFeeERC20AmountRecipient,
     sendWithPublicWallet,
     relayAdaptID,
     useDummyProof,
@@ -99,12 +99,12 @@ export const nullifiersForTransactions = (
     .flat() as string[];
 };
 
-export const createDummyRelayerFeeERC20Amount = (feeTokenAddress: string) => {
-  const relayerFeeERC20Amount: RailgunERC20Amount = {
+export const createDummyBroadcasterFeeERC20Amount = (feeTokenAddress: string) => {
+  const broadcasterFeeERC20Amount: RailgunERC20Amount = {
     tokenAddress: feeTokenAddress,
     amount: DUMMY_AMOUNT,
   };
-  return relayerFeeERC20Amount;
+  return broadcasterFeeERC20Amount;
 };
 
 export const generateDummyProofTransactions = async (
@@ -117,25 +117,25 @@ export const generateDummyProofTransactions = async (
   memoText: Optional<string>,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
+  broadcasterFeeERC20Amount: Optional<RailgunERC20Amount>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   originShieldTxidForSpendabilityOverride?: string,
 ): Promise<(TransactionStructV2 | TransactionStructV3)[]> => {
-  if (!relayerFeeERC20Amount && !sendWithPublicWallet) {
-    throw new Error('Must send with relayer or public wallet.');
+  if (!broadcasterFeeERC20Amount && !sendWithPublicWallet) {
+    throw new Error('Must send with broadcaster or public wallet.');
   }
 
   const railgunWallet = walletForID(railgunWalletID);
 
-  // Use self-wallet as dummy relayer address.
-  const relayerRailgunAddress = railgunWallet.getAddress(undefined);
+  // Use self-wallet as dummy broadcaster address.
+  const broadcasterRailgunAddress = railgunWallet.getAddress(undefined);
 
-  const relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient> =
-    relayerFeeERC20Amount
+  const broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient> =
+    broadcasterFeeERC20Amount
       ? {
-          ...relayerFeeERC20Amount,
-          recipientAddress: relayerRailgunAddress,
+          ...broadcasterFeeERC20Amount,
+          recipientAddress: broadcasterRailgunAddress,
         }
       : undefined;
 
@@ -150,7 +150,7 @@ export const generateDummyProofTransactions = async (
       memoText,
       erc20AmountRecipients,
       nftAmountRecipients,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       sendWithPublicWallet,
       undefined, // relayAdaptID
       true, // useDummyProof
@@ -222,7 +222,7 @@ const transactionsFromERC20Amounts = async (
   showSenderAddressToRecipient: boolean,
   memoText: Optional<string>,
   networkName: NetworkName,
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   relayAdaptID: Optional<AdaptID>,
   useDummyProof: boolean,
@@ -236,7 +236,7 @@ const transactionsFromERC20Amounts = async (
   const network = NETWORK_CONFIG[networkName];
   const { chain } = network;
 
-  // Removes overallBatchMinGasPrice for L2 networks and non-Relayer transactions.
+  // Removes overallBatchMinGasPrice for L2 networks and non-Broadcaster transactions.
   const validatedOverallBatchMinGasPrice =
     shouldSetOverallBatchMinGasPriceForNetwork(
       sendWithPublicWallet,
@@ -253,16 +253,16 @@ const transactionsFromERC20Amounts = async (
     transactionBatch.setAdaptID(relayAdaptID);
   }
 
-  if (relayerFeeERC20AmountRecipient && !sendWithPublicWallet) {
-    assertValidRailgunAddress(relayerFeeERC20AmountRecipient.recipientAddress);
+  if (broadcasterFeeERC20AmountRecipient && !sendWithPublicWallet) {
+    assertValidRailgunAddress(broadcasterFeeERC20AmountRecipient.recipientAddress);
 
-    // Add Relayer Fee - must be first transaction in the batch, and first output for the transaction.
+    // Add Broadcaster Fee - must be first transaction in the batch, and first output for the transaction.
     transactionBatch.addOutput(
       erc20NoteFromERC20AmountRecipient(
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         railgunWallet,
-        OutputType.RelayerFee,
-        false, // showSenderAddressToRecipient - never show sender for Relayer fees
+        OutputType.BroadcasterFee,
+        false, // showSenderAddressToRecipient - never show sender for Broadcaster fees
         undefined, // memoText
       ),
     );

@@ -32,8 +32,8 @@ import {
   MOCK_ERC20_RECIPIENTS,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FEE_TOKEN_DETAILS,
-  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2,
-  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
+  MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2,
+  MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
   MOCK_MNEMONIC,
   MOCK_NFT_AMOUNTS,
   MOCK_NFT_AMOUNT_RECIPIENTS,
@@ -69,7 +69,7 @@ let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
+let broadcasterFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
 
 const polygonRelayAdaptContract =
   NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
@@ -159,19 +159,19 @@ describe('tx-cross-contract-calls', () => {
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
 
-    const relayerWalletInfo = await createRailgunWallet(
+    const broadcasterWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!isDefined(relayerWalletInfo)) {
-      throw new Error('Expected relayerWalletInfo');
+    if (!isDefined(broadcasterWalletInfo)) {
+      throw new Error('Expected broadcasterWalletInfo');
     }
-    const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
+    const broadcasterRailgunAddress = broadcasterWalletInfo.railgunAddress;
 
-    relayerFeeERC20AmountRecipient = {
+    broadcasterFeeERC20AmountRecipient = {
       ...MOCK_TOKEN_FEE,
-      recipientAddress: relayerRailgunAddress,
+      recipientAddress: broadcasterRailgunAddress,
     };
 
     railProveStub = Sinon.stub(
@@ -233,11 +233,11 @@ describe('tx-cross-contract-calls', () => {
       false, // sendWithPublicWallet
       minGasLimit,
     );
-    expect(rsp.relayerFeeCommitment).to.not.be.undefined;
-    expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
+    expect(rsp.broadcasterFeeCommitment).to.not.be.undefined;
+    expect(rsp.broadcasterFeeCommitment?.commitmentCiphertext).to.deep.equal(
       isV2Test()
-        ? MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2
-        : MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
+        ? MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2
+        : MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
     );
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
@@ -330,7 +330,7 @@ describe('tx-cross-contract-calls', () => {
       minGasLimit,
     );
 
-    expect(rsp.relayerFeeCommitment).to.be.undefined;
+    expect(rsp.broadcasterFeeCommitment).to.be.undefined;
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [
@@ -429,7 +429,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_ERC20_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
       mockCrossContractCalls,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       minGasLimit,
@@ -511,7 +511,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_ERC20_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
       mockCrossContractCalls,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetails, // gasDetails
@@ -545,7 +545,7 @@ describe('tx-cross-contract-calls', () => {
         MOCK_ERC20_RECIPIENTS,
         MOCK_NFT_AMOUNT_RECIPIENTS,
         [{ data: '123' } as ContractTransaction], // Invalid
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,
@@ -566,7 +566,7 @@ describe('tx-cross-contract-calls', () => {
         MOCK_ERC20_RECIPIENTS,
         MOCK_NFT_AMOUNT_RECIPIENTS,
         mockCrossContractCalls,
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,
@@ -586,7 +586,7 @@ describe('tx-cross-contract-calls', () => {
       MOCK_ERC20_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS,
       mockCrossContractCalls,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       minGasLimit,
@@ -602,7 +602,7 @@ describe('tx-cross-contract-calls', () => {
         MOCK_ERC20_RECIPIENTS,
         MOCK_NFT_AMOUNT_RECIPIENTS,
         mockCrossContractCalls,
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,

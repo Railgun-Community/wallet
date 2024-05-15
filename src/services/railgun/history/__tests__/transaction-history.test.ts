@@ -199,7 +199,7 @@ const MOCKED_UNKNOWN_SWAP_TRX: TransactionHistoryItem = {
   txid: '0xf12496efa5966edb39308b424038a2fec0235a01a2cb469908bc0b4bda7e1cbe',
   blockNumber: 100,
   transferERC20Amounts: [],
-  relayerFeeERC20Amount: {
+  broadcasterFeeERC20Amount: {
     tokenAddress: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
     amount: BigInt('0x14b8daefd04c0000'),
     hasValidPOIForActiveLists: true,
