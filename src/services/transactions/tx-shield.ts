@@ -185,7 +185,7 @@ export const gasEstimateForShield = async (
         sendWithPublicWallet,
         false, // isCrossContractCall
       ),
-      undefined, // relayerFeeCommitment
+      undefined, // broadcasterFeeCommitment
       isGasEstimateWithDummyProof,
     );
   } catch (err) {

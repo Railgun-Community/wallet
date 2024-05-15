@@ -23,7 +23,7 @@ import {
   TransactionStructV2,
   TransactionStructV3,
 } from '@railgun-community/engine';
-import { gasEstimateResponseDummyProofIterativeRelayerFee } from './tx-gas-relayer-fee-estimator';
+import { gasEstimateResponseDummyProofIterativeBroadcasterFee } from './tx-gas-broadcaster-fee-estimator';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
 import { gasEstimateResponse, getGasEstimate } from './tx-gas-details';
@@ -40,7 +40,7 @@ export const populateProvedUnshield = async (
   railgunWalletID: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   gasDetails: TransactionGasDetails,
@@ -61,7 +61,7 @@ export const populateProvedUnshield = async (
         undefined, // relayAdaptShieldERC20Recipients
         undefined, // relayAdaptShieldNFTRecipients
         undefined, // crossContractCalls
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
         gasDetails,
@@ -82,7 +82,7 @@ export const populateProvedUnshieldBaseToken = async (
   publicWalletAddress: string,
   railgunWalletID: string,
   wrappedERC20Amount: RailgunERC20Amount,
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   gasDetails: TransactionGasDetails,
@@ -116,7 +116,7 @@ export const populateProvedUnshieldBaseToken = async (
         undefined, // relayAdaptShieldERC20Recipients
         undefined, // relayAdaptShieldNFTRecipients
         undefined, // crossContractCalls
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         sendWithPublicWallet,
         overallBatchMinGasPrice,
         gasDetails,
@@ -145,8 +145,8 @@ export const gasEstimateForUnprovenUnshield = async (
   try {
     const overallBatchMinGasPrice = 0n;
 
-    const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
-      (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
+    const response = await gasEstimateResponseDummyProofIterativeBroadcasterFee(
+      (broadcasterFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.Unshield,
           networkName,
@@ -157,7 +157,7 @@ export const gasEstimateForUnprovenUnshield = async (
           undefined, // memoText
           erc20AmountRecipients,
           nftAmountRecipients,
-          relayerFeeERC20Amount,
+          broadcasterFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
@@ -205,8 +205,8 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
 
     const overallBatchMinGasPrice = 0n;
 
-    const response = await gasEstimateResponseDummyProofIterativeRelayerFee(
-      (relayerFeeERC20Amount: Optional<RailgunERC20Amount>) =>
+    const response = await gasEstimateResponseDummyProofIterativeBroadcasterFee(
+      (broadcasterFeeERC20Amount: Optional<RailgunERC20Amount>) =>
         generateDummyProofTransactions(
           ProofType.UnshieldBaseToken,
           networkName,
@@ -217,7 +217,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           undefined, // memoText
           relayAdaptUnshieldERC20AmountRecipients,
           nftAmountRecipients,
-          relayerFeeERC20Amount,
+          broadcasterFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
         ),
@@ -316,7 +316,7 @@ export const populateProvedUnshieldToOrigin = async (
         undefined, // relayAdaptShieldERC20Recipients
         undefined, // relayAdaptShieldNFTRecipients
         undefined, // crossContractCalls
-        undefined, // relayerFeeERC20AmountRecipient
+        undefined, // broadcasterFeeERC20AmountRecipient
         true, // sendWithPublicWallet
         undefined, // overallBatchMinGasPrice
         gasDetails,
@@ -356,7 +356,7 @@ export const gasEstimateForUnprovenUnshieldToOrigin = async (
       undefined, // memoText
       erc20AmountRecipients,
       nftAmountRecipients,
-      undefined, // relayerFeeERC20Amount
+      undefined, // broadcasterFeeERC20Amount
       true, // sendWithPublicWallet
       overallBatchMinGasPrice,
       originalShieldTxid, // originShieldTxidForSpendabilityOverride
@@ -379,7 +379,7 @@ export const gasEstimateForUnprovenUnshieldToOrigin = async (
 
     return gasEstimateResponse(
       gasEstimate,
-      undefined, // relayerFeeCommitment
+      undefined, // broadcasterFeeCommitment
       true, // isGasEstimateWithDummyProof
     );
   } catch (err) {

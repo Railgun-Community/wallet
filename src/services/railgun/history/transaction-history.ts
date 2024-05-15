@@ -235,9 +235,9 @@ const serializeTransactionHistory = (
       transferERC20Amounts: historyEntry.transferTokenAmounts
         .filter(filterERC20)
         .map(transactionHistoryTransferTokenAmountToRailgunERC20Amount),
-      relayerFeeERC20Amount: historyEntry.relayerFeeTokenAmount
+      broadcasterFeeERC20Amount: historyEntry.broadcasterFeeTokenAmount
         ? transactionHistoryTokenAmountToRailgunERC20Amount(
-            historyEntry.relayerFeeTokenAmount,
+            historyEntry.broadcasterFeeTokenAmount,
           )
         : undefined,
       changeERC20Amounts: historyEntry.changeTokenAmounts

@@ -38,7 +38,7 @@ export type ProvedTransaction = {
   relayAdaptShieldERC20Recipients: Optional<RailgunERC20Recipient[]>;
   relayAdaptShieldNFTRecipients: Optional<RailgunNFTAmount[]>;
   crossContractCalls: Optional<ContractTransaction[]>;
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>;
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>;
   sendWithPublicWallet: boolean;
   overallBatchMinGasPrice: Optional<bigint>;
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
@@ -61,7 +61,7 @@ export const populateProvedTransaction = async (
   relayAdaptShieldERC20Recipients: Optional<RailgunERC20Recipient[]>,
   relayAdaptShieldNFTRecipients: Optional<RailgunNFTAmount[]>,
   crossContractCalls: Optional<ContractTransaction[]>,
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   gasDetails: TransactionGasDetails,
@@ -85,7 +85,7 @@ export const populateProvedTransaction = async (
       relayAdaptShieldERC20Recipients,
       relayAdaptShieldNFTRecipients,
       crossContractCalls,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
     );
@@ -173,7 +173,7 @@ export const validateCachedProvedTransaction = (
   relayAdaptShieldERC20Recipients: Optional<RailgunERC20Recipient[]>,
   relayAdaptShieldNFTRecipients: Optional<RailgunNFTAmount[]>,
   crossContractCalls: Optional<ContractTransaction[]>,
-  relayerFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
+  broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient>,
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
 ): void => {
@@ -253,11 +253,11 @@ export const validateCachedProvedTransaction = (
     throw new Error('Mismatch: crossContractCalls.');
   } else if (
     !compareERC20AmountRecipients(
-      cachedProvedTransaction.relayerFeeERC20AmountRecipient,
-      relayerFeeERC20AmountRecipient,
+      cachedProvedTransaction.broadcasterFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
     )
   ) {
-    throw new Error('Mismatch: relayerFeeERC20AmountRecipient.');
+    throw new Error('Mismatch: broadcasterFeeERC20AmountRecipient.');
   } else if (
     sendWithPublicWallet !== cachedProvedTransaction.sendWithPublicWallet
   ) {

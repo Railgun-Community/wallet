@@ -4,7 +4,7 @@ export * from './tx-shield-base-token';
 export * from './tx-shield';
 export * from './tx-notes';
 export * from './tx-gas-details';
-export * from './tx-gas-relayer-fee-estimator';
+export * from './tx-gas-broadcaster-fee-estimator';
 export * from './tx-generator';
 export * from './tx-proof-transfer';
 export * from './tx-proof-unshield';

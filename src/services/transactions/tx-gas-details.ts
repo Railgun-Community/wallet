@@ -95,7 +95,7 @@ const shouldRemoveGasLimitForL2GasEstimate = (networkName: NetworkName) => {
 
 export const gasEstimateResponse = (
   gasEstimate: bigint,
-  relayerFeeCommitment: Optional<CommitmentSummary>,
+  broadcasterFeeCommitment: Optional<CommitmentSummary>,
   isGasEstimateWithDummyProof: boolean,
 ): RailgunTransactionGasEstimateResponse => {
   // TODO: This variance will be different on L2s.
@@ -106,7 +106,7 @@ export const gasEstimateResponse = (
 
   const response: RailgunTransactionGasEstimateResponse = {
     gasEstimate: gasEstimateWithDummyProofVariance,
-    relayerFeeCommitment,
+    broadcasterFeeCommitment,
   };
   return response;
 };
@@ -128,7 +128,7 @@ export const setGasDetailsForTransaction = (
   );
 
   if (gasDetails.evmGasType !== evmGasType) {
-    const transactionType = sendWithPublicWallet ? 'self-signed' : 'Relayer';
+    const transactionType = sendWithPublicWallet ? 'self-signed' : 'Broadcaster';
     throw new Error(
       `Invalid evmGasType for ${networkName} (${transactionType}): expected Type${evmGasType}, received Type${gasDetails.evmGasType} in gasDetails. Retrieve appropriate gas type with getEVMGasTypeForTransaction (@railgun-community/shared-models).`,
     );

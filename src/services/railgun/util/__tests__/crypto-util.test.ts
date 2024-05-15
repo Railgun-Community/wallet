@@ -5,7 +5,7 @@ import {
   decryptAESGCM256,
   encryptDataWithSharedKey,
   pbkdf2,
-  verifyRelayerSignature,
+  verifyBroadcasterSignature,
 } from '../crypto';
 import { bytesToHex } from '../bytes';
 
@@ -19,14 +19,14 @@ describe('crypto-util', () => {
     const publicKey = await ed.getPublicKey(privateKey);
     const signature = await ed.sign(data, privateKey);
 
-    const isValidBytes = await verifyRelayerSignature(
+    const isValidBytes = await verifyBroadcasterSignature(
       signature,
       data,
       publicKey,
     );
     expect(isValidBytes).to.be.true;
 
-    const isValidHex = await verifyRelayerSignature(
+    const isValidHex = await verifyBroadcasterSignature(
       bytesToHex(signature),
       bytesToHex(data),
       publicKey,

@@ -32,8 +32,8 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ETH_WALLET_ADDRESS,
   MOCK_FEE_TOKEN_DETAILS,
-  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2,
-  MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
+  MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2,
+  MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
   MOCK_MNEMONIC,
   MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
   MOCK_NULLIFIERS,
@@ -80,7 +80,7 @@ let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
 let railgunWallet: RailgunWallet;
-let relayerFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
+let broadcasterFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
 
 const polygonRelayAdaptContract =
   NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
@@ -183,19 +183,19 @@ describe('tx-unshield', () => {
     }
     railgunWallet = fullWalletForID(railgunWalletInfo.id);
 
-    const relayerWalletInfo = await createRailgunWallet(
+    const broadcasterWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
       undefined, // creationBlockNumbers
     );
-    if (!isDefined(relayerWalletInfo)) {
-      throw new Error('Expected relayerWalletInfo');
+    if (!isDefined(broadcasterWalletInfo)) {
+      throw new Error('Expected broadcasterWalletInfo');
     }
-    const relayerRailgunAddress = relayerWalletInfo.railgunAddress;
+    const broadcasterRailgunAddress = broadcasterWalletInfo.railgunAddress;
 
-    relayerFeeERC20AmountRecipient = {
+    broadcasterFeeERC20AmountRecipient = {
       ...MOCK_TOKEN_FEE,
-      recipientAddress: relayerRailgunAddress,
+      recipientAddress: broadcasterRailgunAddress,
     };
 
     railProveStub = Sinon.stub(
@@ -266,11 +266,11 @@ describe('tx-unshield', () => {
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
     );
-    expect(rsp.relayerFeeCommitment).to.not.be.undefined;
-    expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
+    expect(rsp.broadcasterFeeCommitment).to.not.be.undefined;
+    expect(rsp.broadcasterFeeCommitment?.commitmentCiphertext).to.deep.equal(
       isV2Test()
-        ? MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2
-        : MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
+        ? MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2
+        : MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
     );
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
@@ -329,7 +329,7 @@ describe('tx-unshield', () => {
       ],
       [], // nftAmountRecipients
     );
-    expect(rsp.relayerFeeCommitment).to.be.undefined;
+    expect(rsp.broadcasterFeeCommitment).to.be.undefined;
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [
@@ -395,11 +395,11 @@ describe('tx-unshield', () => {
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
     );
-    expect(rsp.relayerFeeCommitment).to.not.be.undefined;
-    expect(rsp.relayerFeeCommitment?.commitmentCiphertext).to.deep.equal(
+    expect(rsp.broadcasterFeeCommitment).to.not.be.undefined;
+    expect(rsp.broadcasterFeeCommitment?.commitmentCiphertext).to.deep.equal(
       isV2Test()
-        ? MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2
-        : MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3,
+        ? MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2
+        : MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
     );
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
@@ -438,7 +438,7 @@ describe('tx-unshield', () => {
       MOCK_FEE_TOKEN_DETAILS,
       true, // sendWithPublicWallet
     );
-    expect(rsp.relayerFeeCommitment).to.be.undefined;
+    expect(rsp.broadcasterFeeCommitment).to.be.undefined;
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [
@@ -501,7 +501,7 @@ describe('tx-unshield', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -547,7 +547,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetails,
@@ -639,7 +639,7 @@ describe('tx-unshield', () => {
         railgunWallet.id,
         MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
         MOCK_NFT_AMOUNT_RECIPIENTS_UNSHIELD,
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,
@@ -657,7 +657,7 @@ describe('tx-unshield', () => {
         railgunWallet.id,
         MOCK_TOKEN_AMOUNT_RECIPIENTS,
         [], // nftAmountRecipients
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,
@@ -674,7 +674,7 @@ describe('tx-unshield', () => {
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNT_RECIPIENTS,
       [], // nftAmountRecipients
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -686,7 +686,7 @@ describe('tx-unshield', () => {
         railgunWallet.id,
         MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT,
         [], // nftAmountRecipients
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,
@@ -707,7 +707,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS[0],
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -737,7 +737,7 @@ describe('tx-unshield', () => {
       MOCK_ETH_WALLET_ADDRESS,
       railgunWallet.id,
       MOCK_TOKEN_AMOUNTS[0],
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       gasDetails,
@@ -764,7 +764,7 @@ describe('tx-unshield', () => {
         MOCK_ETH_WALLET_ADDRESS,
         railgunWallet.id,
         MOCK_TOKEN_AMOUNTS_DIFFERENT[1],
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,
@@ -782,7 +782,7 @@ describe('tx-unshield', () => {
         railgunWallet.id,
         MOCK_ETH_WALLET_ADDRESS,
         MOCK_TOKEN_AMOUNTS[0],
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,
@@ -799,7 +799,7 @@ describe('tx-unshield', () => {
       railgunWallet.id,
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_TOKEN_AMOUNTS[1],
-      relayerFeeERC20AmountRecipient,
+      broadcasterFeeERC20AmountRecipient,
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       () => {}, // progressCallback
@@ -811,7 +811,7 @@ describe('tx-unshield', () => {
         MOCK_ETH_WALLET_ADDRESS,
         railgunWallet.id,
         MOCK_TOKEN_AMOUNTS_DIFFERENT[1],
-        relayerFeeERC20AmountRecipient,
+        broadcasterFeeERC20AmountRecipient,
         false, // sendWithPublicWallet
         overallBatchMinGasPrice,
         gasDetails,

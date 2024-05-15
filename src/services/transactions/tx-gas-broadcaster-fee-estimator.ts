@@ -16,16 +16,16 @@ import {
 } from '@railgun-community/shared-models';
 import {
   DUMMY_FROM_ADDRESS,
-  createDummyRelayerFeeERC20Amount,
+  createDummyBroadcasterFeeERC20Amount,
 } from './tx-generator';
 import { getGasEstimate, gasEstimateResponse } from './tx-gas-details';
 import { balanceForERC20Token } from '../railgun/wallets/balance-update';
 import { ContractTransaction } from 'ethers';
 import { walletForID } from '../railgun/wallets/wallets';
 
-const MAX_ITERATIONS_RELAYER_FEE_REESTIMATION = 5;
+const MAX_ITERATIONS_BROADCASTER_FEE_REESTIMATION = 5;
 
-export const calculateRelayerFeeERC20Amount = (
+export const calculateBroadcasterFeeERC20Amount = (
   feeTokenDetails: FeeTokenDetails,
   gasDetails: TransactionGasDetails,
 ): RailgunERC20Amount => {
@@ -39,21 +39,21 @@ export const calculateRelayerFeeERC20Amount = (
   };
 };
 
-const getRelayerFeeCommitment = (
+const getBroadcasterFeeCommitment = (
   transactionStructs: (TransactionStructV2 | TransactionStructV3)[],
 ): CommitmentSummary => {
   const transactionIndex = 0;
-  const relayerFeeCommitment = transactionStructs[transactionIndex];
-  const relayerFeeCommitmentIndex = 0;
+  const broadcasterFeeCommitment = transactionStructs[transactionIndex];
+  const broadcasterFeeCommitmentIndex = 0;
   return convertTransactionStructToCommitmentSummary(
-    relayerFeeCommitment,
-    relayerFeeCommitmentIndex,
+    broadcasterFeeCommitment,
+    broadcasterFeeCommitmentIndex,
   );
 };
 
-export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
-  generateDummyTransactionStructsWithRelayerFee: (
-    relayerFeeERC20Amount: Optional<RailgunERC20Amount>,
+export const gasEstimateResponseDummyProofIterativeBroadcasterFee = async (
+  generateDummyTransactionStructsWithBroadcasterFee: (
+    broadcasterFeeERC20Amount: Optional<RailgunERC20Amount>,
   ) => Promise<(TransactionStructV2 | TransactionStructV3)[]>,
   generateTransaction: (
     serializedTransactions: (TransactionStructV2 | TransactionStructV3)[],
@@ -74,12 +74,12 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
 
   const isGasEstimateWithDummyProof = true;
 
-  const dummyRelayerFee = feeTokenDetails
-    ? createDummyRelayerFeeERC20Amount(feeTokenDetails.tokenAddress)
+  const dummyBroadcasterFee = feeTokenDetails
+    ? createDummyBroadcasterFeeERC20Amount(feeTokenDetails.tokenAddress)
     : undefined;
 
   let serializedTransactions =
-    await generateDummyTransactionStructsWithRelayerFee(dummyRelayerFee);
+    await generateDummyTransactionStructsWithBroadcasterFee(dummyBroadcasterFee);
   let transaction = await generateTransaction(serializedTransactions);
 
   let gasEstimate = await getGasEstimate(
@@ -94,26 +94,26 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
   if (sendWithPublicWallet) {
     return gasEstimateResponse(
       gasEstimate,
-      undefined, // relayerFeeCommitment
+      undefined, // broadcasterFeeCommitment
       isGasEstimateWithDummyProof,
     );
   }
 
   if (!feeTokenDetails) {
     throw new Error(
-      'Must have Relayer Fee details or sendWithPublicWallet field.',
+      'Must have Broadcaster Fee details or sendWithPublicWallet field.',
     );
   }
 
-  // Find any erc20Amount in transfer that matches token of relayer fee, if exists.
-  const relayerFeeMatchingSendingERC20Amount = erc20AmountRecipients.find(
+  // Find any erc20Amount in transfer that matches token of broadcaster fee, if exists.
+  const broadcasterFeeMatchingSendingERC20Amount = erc20AmountRecipients.find(
     erc20AmountRecipient =>
       erc20AmountRecipient.tokenAddress.toLowerCase() ===
       feeTokenDetails.tokenAddress.toLowerCase(),
   );
 
   // Get private balance of matching token.
-  const balanceForRelayerFeeERC20 = await balanceForERC20Token(
+  const balanceForBroadcasterFeeERC20 = await balanceForERC20Token(
     txidVersion,
     wallet,
     networkName,
@@ -121,39 +121,39 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
     true,
   );
 
-  let relayerFeeCommitment = getRelayerFeeCommitment(serializedTransactions);
+  let broadcasterFeeCommitment = getBroadcasterFeeCommitment(serializedTransactions);
 
-  // Iteratively calculate new relayer fee and estimate new gas amount.
-  // This change if the number of circuits changes because of the additional Relayer Fees.
-  for (let i = 0; i < MAX_ITERATIONS_RELAYER_FEE_REESTIMATION; i += 1) {
+  // Iteratively calculate new broadcaster fee and estimate new gas amount.
+  // This change if the number of circuits changes because of the additional Broadcaster Fees.
+  for (let i = 0; i < MAX_ITERATIONS_BROADCASTER_FEE_REESTIMATION; i += 1) {
     const updatedGasDetails: TransactionGasDetails = {
       ...originalGasDetails,
       gasEstimate,
     };
-    const updatedRelayerFee: RailgunERC20Amount =
-      calculateRelayerFeeERC20Amount(feeTokenDetails, updatedGasDetails);
+    const updatedBroadcasterFee: RailgunERC20Amount =
+      calculateBroadcasterFeeERC20Amount(feeTokenDetails, updatedGasDetails);
 
-    // If Relayer fee causes overflow with the token balance,
-    // then use the MAX amount for Relayer Fee, which is BALANCE - SENDING AMOUNT.
+    // If Broadcaster fee causes overflow with the token balance,
+    // then use the MAX amount for Broadcaster Fee, which is BALANCE - SENDING AMOUNT.
     if (
-      balanceForRelayerFeeERC20 > 0n &&
-      relayerFeeMatchingSendingERC20Amount &&
+      balanceForBroadcasterFeeERC20 > 0n &&
+      broadcasterFeeMatchingSendingERC20Amount &&
       // eslint-disable-next-line no-await-in-loop
-      (await relayerFeeWillOverflowBalance(
-        balanceForRelayerFeeERC20,
-        relayerFeeMatchingSendingERC20Amount,
-        updatedRelayerFee,
+      (await broadcasterFeeWillOverflowBalance(
+        balanceForBroadcasterFeeERC20,
+        broadcasterFeeMatchingSendingERC20Amount,
+        updatedBroadcasterFee,
       ))
     ) {
-      updatedRelayerFee.amount =
-        balanceForRelayerFeeERC20 - relayerFeeMatchingSendingERC20Amount.amount;
+      updatedBroadcasterFee.amount =
+        balanceForBroadcasterFeeERC20 - broadcasterFeeMatchingSendingERC20Amount.amount;
     }
 
     const newSerializedTransactions =
       // eslint-disable-next-line no-await-in-loop
-      await generateDummyTransactionStructsWithRelayerFee(updatedRelayerFee);
+      await generateDummyTransactionStructsWithBroadcasterFee(updatedBroadcasterFee);
 
-    relayerFeeCommitment = getRelayerFeeCommitment(newSerializedTransactions);
+    broadcasterFeeCommitment = getBroadcasterFeeCommitment(newSerializedTransactions);
 
     if (
       compareCircuitSizesTransactionStructs(
@@ -164,7 +164,7 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
       // Same circuit sizes, no need to run further gas estimates.
       return gasEstimateResponse(
         gasEstimate,
-        relayerFeeCommitment,
+        broadcasterFeeCommitment,
         isGasEstimateWithDummyProof,
       );
     }
@@ -187,7 +187,7 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
     if (newGasEstimate === gasEstimate) {
       return gasEstimateResponse(
         newGasEstimate,
-        relayerFeeCommitment,
+        broadcasterFeeCommitment,
         isGasEstimateWithDummyProof,
       );
     }
@@ -196,7 +196,7 @@ export const gasEstimateResponseDummyProofIterativeRelayerFee = async (
 
   return gasEstimateResponse(
     gasEstimate,
-    relayerFeeCommitment,
+    broadcasterFeeCommitment,
     isGasEstimateWithDummyProof,
   );
 };
@@ -221,13 +221,13 @@ const compareCircuitSizesTransactionStructs = (
   return true;
 };
 
-const relayerFeeWillOverflowBalance = async (
+const broadcasterFeeWillOverflowBalance = async (
   tokenBalance: bigint,
   sendingERC20Amount: RailgunERC20Amount,
-  relayerFeeERC20Amount: RailgunERC20Amount,
+  broadcasterFeeERC20Amount: RailgunERC20Amount,
 ) => {
   const sendingAmount = sendingERC20Amount.amount;
-  const relayerFeeAmount = relayerFeeERC20Amount.amount;
+  const broadcasterFeeAmount = broadcasterFeeERC20Amount.amount;
 
-  return sendingAmount + relayerFeeAmount > tokenBalance;
+  return sendingAmount + broadcasterFeeAmount > tokenBalance;
 };

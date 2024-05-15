@@ -138,7 +138,7 @@ export const MOCK_BOUND_PARAMS_V3 = {
 export const MOCK_COMMITMENT_HASH =
   '0x2b13bccd4974c797df42a89221ed6e19e50c32055058cdcc5a8ea836233e4cab';
 
-export const MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2: CommitmentCiphertextV2 =
+export const MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2: CommitmentCiphertextV2 =
   {
     annotationData:
       '0xfaeb57df19481f9ad59b8619a5687b2623aa2280d0df93aa77258326df9e6657bbdb72d305e1373906a47c6e684c34c2553c7e061baac1f744e8ece042c6',
@@ -158,7 +158,7 @@ export const MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V2: CommitmentCiph
     memo: '0x',
   };
 
-export const MOCK_FORMATTED_RELAYER_FEE_COMMITMENT_CIPHERTEXT_V3: CommitmentCiphertextV3 =
+export const MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3: CommitmentCiphertextV3 =
   {
     blindedReceiverViewingKey:
       '898bc07d416014a2854f756b9f8873bde925b043e9e01ea6d97183b91217b5b6',
