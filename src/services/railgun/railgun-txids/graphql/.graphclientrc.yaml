@@ -3,6 +3,11 @@ sources:
   - name: txs-ethereum
     handler:
       graphql:
-        endpoint: https://rail-squid.squids.live/squid-railgun-ethereum-v2/graphql
+        endpoint: https://api.thegraph.com/subgraphs/name/ekrembal/railgun-ethereum-v2-txids
+  - name: txs-goerli
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/ekrembal/railgun-goerli-v2-txids
+
 documents:
   - ./railgun-txids-query.graphql

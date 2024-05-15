@@ -96,7 +96,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(200_000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Polygon', async function run() {
     if (!isV2Test()) {
@@ -122,7 +122,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(200_000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - BNB Smart Chain', async function run() {
     if (!isV2Test()) {
@@ -145,7 +145,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(200_000);
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Arbitrum', async function run() {
     if (!isV2Test()) {
@@ -168,8 +168,7 @@ describe('quick-sync-events-graph-v2', () => {
 
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
-  }).timeout(200_000);
-
+  }).timeout(90_000);
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async function run() {
     if (!isV2Test()) {
@@ -212,5 +211,5 @@ describe('quick-sync-events-graph-v2', () => {
     expect(eventLog.commitmentEvents.length).to.equal(0);
     expect(eventLog.nullifierEvents.length).to.equal(0);
     expect(eventLog.unshieldEvents.length).to.equal(0);
-  }).timeout(200_000);
+  }).timeout(90_000);
 });

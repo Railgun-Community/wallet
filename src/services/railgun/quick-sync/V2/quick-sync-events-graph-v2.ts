@@ -42,7 +42,6 @@ const sourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.PolygonMumbai_DEPRECATED:
     case NetworkName.Hardhat:
-    default:
       throw new Error('No Graph API hosted service for this network');
   }
 };

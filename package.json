@@ -22,7 +22,7 @@
     "test-V2": "npm run compile-test && env V2_TEST=1 mocha 'src/**/__tests__/*.test.ts'",
     "tsc": "tsc && tsc-alias",
     "check-circular-deps": "madge --circular .",
-    "eslint": "eslint src/**/* --ext .ts,.tsx --ignore-pattern **/*.graphql --fix",
+    "eslint": "eslint src/**/* --ext .ts,.tsx --fix",
     "lint": "npm run check-circular-deps && npm run eslint && npm run tsc && npm run tsc-test",
     "prepare": "npm run compile",
     "postinstall": "node postinstall.js",

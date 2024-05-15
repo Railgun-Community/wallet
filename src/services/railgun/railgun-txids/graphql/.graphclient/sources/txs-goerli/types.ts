@@ -3,7 +3,7 @@
 import { InContextSdkMethod } from '@graphql-mesh/types';
 import { MeshContext } from '@graphql-mesh/runtime';
 
-export namespace SepoliaTypes {
+export namespace TxsGoerliTypes {
   export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -99,6 +99,50 @@ export type Commitment = {
   commitmentType: CommitmentType;
   hash: Scalars['BigInt'];
 };
+
+export type CommitmentBatchEventNew = {
+  id: Scalars['Bytes'];
+  treeNumber: Scalars['BigInt'];
+  batchStartTreePosition: Scalars['BigInt'];
+};
+
+export type CommitmentBatchEventNew_filter = {
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_gt?: InputMaybe<Scalars['Bytes']>;
+  id_lt?: InputMaybe<Scalars['Bytes']>;
+  id_gte?: InputMaybe<Scalars['Bytes']>;
+  id_lte?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  treeNumber?: InputMaybe<Scalars['BigInt']>;
+  treeNumber_not?: InputMaybe<Scalars['BigInt']>;
+  treeNumber_gt?: InputMaybe<Scalars['BigInt']>;
+  treeNumber_lt?: InputMaybe<Scalars['BigInt']>;
+  treeNumber_gte?: InputMaybe<Scalars['BigInt']>;
+  treeNumber_lte?: InputMaybe<Scalars['BigInt']>;
+  treeNumber_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  treeNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  batchStartTreePosition?: InputMaybe<Scalars['BigInt']>;
+  batchStartTreePosition_not?: InputMaybe<Scalars['BigInt']>;
+  batchStartTreePosition_gt?: InputMaybe<Scalars['BigInt']>;
+  batchStartTreePosition_lt?: InputMaybe<Scalars['BigInt']>;
+  batchStartTreePosition_gte?: InputMaybe<Scalars['BigInt']>;
+  batchStartTreePosition_lte?: InputMaybe<Scalars['BigInt']>;
+  batchStartTreePosition_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  batchStartTreePosition_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<CommitmentBatchEventNew_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<CommitmentBatchEventNew_filter>>>;
+};
+
+export type CommitmentBatchEventNew_orderBy =
+  | 'id'
+  | 'treeNumber'
+  | 'batchStartTreePosition';
 
 export type CommitmentCiphertext = {
   id: Scalars['Bytes'];
@@ -789,6 +833,8 @@ export type Query = {
   legacyCommitmentCiphertexts: Array<LegacyCommitmentCiphertext>;
   commitmentCiphertext?: Maybe<CommitmentCiphertext>;
   commitmentCiphertexts: Array<CommitmentCiphertext>;
+  commitmentBatchEventNew?: Maybe<CommitmentBatchEventNew>;
+  commitmentBatchEventNews: Array<CommitmentBatchEventNew>;
   legacyGeneratedCommitment?: Maybe<LegacyGeneratedCommitment>;
   legacyGeneratedCommitments: Array<LegacyGeneratedCommitment>;
   legacyEncryptedCommitment?: Maybe<LegacyEncryptedCommitment>;
@@ -801,8 +847,14 @@ export type Query = {
   unshields: Array<Unshield>;
   nullifier?: Maybe<Nullifier>;
   nullifiers: Array<Nullifier>;
+  transaction?: Maybe<Transaction>;
+  transactions: Array<Transaction>;
+  verificationHash?: Maybe<VerificationHash>;
+  verificationHashes: Array<VerificationHash>;
   commitment?: Maybe<Commitment>;
   commitments: Array<Commitment>;
+  transactionInterface?: Maybe<TransactionInterface>;
+  transactionInterfaces: Array<TransactionInterface>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -893,6 +945,24 @@ export type QuerycommitmentCiphertextsArgs = {
   orderBy?: InputMaybe<CommitmentCiphertext_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
   where?: InputMaybe<CommitmentCiphertext_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerycommitmentBatchEventNewArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerycommitmentBatchEventNewsArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<CommitmentBatchEventNew_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<CommitmentBatchEventNew_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -1006,6 +1076,42 @@ export type QuerynullifiersArgs = {
 };
 
 
+export type QuerytransactionArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerytransactionsArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Transaction_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Transaction_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryverificationHashArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryverificationHashesArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<VerificationHash_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<VerificationHash_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type QuerycommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
@@ -1019,6 +1125,24 @@ export type QuerycommitmentsArgs = {
   orderBy?: InputMaybe<Commitment_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
   where?: InputMaybe<Commitment_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerytransactionInterfaceArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerytransactionInterfacesArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<TransactionInterface_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<TransactionInterface_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -1197,6 +1321,8 @@ export type Subscription = {
   legacyCommitmentCiphertexts: Array<LegacyCommitmentCiphertext>;
   commitmentCiphertext?: Maybe<CommitmentCiphertext>;
   commitmentCiphertexts: Array<CommitmentCiphertext>;
+  commitmentBatchEventNew?: Maybe<CommitmentBatchEventNew>;
+  commitmentBatchEventNews: Array<CommitmentBatchEventNew>;
   legacyGeneratedCommitment?: Maybe<LegacyGeneratedCommitment>;
   legacyGeneratedCommitments: Array<LegacyGeneratedCommitment>;
   legacyEncryptedCommitment?: Maybe<LegacyEncryptedCommitment>;
@@ -1209,8 +1335,14 @@ export type Subscription = {
   unshields: Array<Unshield>;
   nullifier?: Maybe<Nullifier>;
   nullifiers: Array<Nullifier>;
+  transaction?: Maybe<Transaction>;
+  transactions: Array<Transaction>;
+  verificationHash?: Maybe<VerificationHash>;
+  verificationHashes: Array<VerificationHash>;
   commitment?: Maybe<Commitment>;
   commitments: Array<Commitment>;
+  transactionInterface?: Maybe<TransactionInterface>;
+  transactionInterfaces: Array<TransactionInterface>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -1301,6 +1433,24 @@ export type SubscriptioncommitmentCiphertextsArgs = {
   orderBy?: InputMaybe<CommitmentCiphertext_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
   where?: InputMaybe<CommitmentCiphertext_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptioncommitmentBatchEventNewArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptioncommitmentBatchEventNewsArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<CommitmentBatchEventNew_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<CommitmentBatchEventNew_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -1414,6 +1564,42 @@ export type SubscriptionnullifiersArgs = {
 };
 
 
+export type SubscriptiontransactionArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptiontransactionsArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<Transaction_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Transaction_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionverificationHashArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionverificationHashesArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<VerificationHash_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<VerificationHash_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type SubscriptioncommitmentArgs = {
   id: Scalars['ID'];
   block?: InputMaybe<Block_height>;
@@ -1427,6 +1613,24 @@ export type SubscriptioncommitmentsArgs = {
   orderBy?: InputMaybe<Commitment_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
   where?: InputMaybe<Commitment_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptiontransactionInterfaceArgs = {
+  id: Scalars['ID'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptiontransactionInterfacesArgs = {
+  skip?: InputMaybe<Scalars['Int']>;
+  first?: InputMaybe<Scalars['Int']>;
+  orderBy?: InputMaybe<TransactionInterface_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<TransactionInterface_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -1625,6 +1829,392 @@ export type TransactCommitment_orderBy =
   | 'ciphertext__annotationData'
   | 'ciphertext__memo';
 
+export type Transaction = TransactionInterface & {
+  id: Scalars['Bytes'];
+  blockNumber: Scalars['BigInt'];
+  transactionHash: Scalars['Bytes'];
+  merkleRoot: Scalars['Bytes'];
+  nullifiers: Array<Scalars['Bytes']>;
+  commitments: Array<Scalars['Bytes']>;
+  boundParamsHash: Scalars['Bytes'];
+  hasUnshield: Scalars['Boolean'];
+  utxoTreeIn: Scalars['BigInt'];
+  utxoTreeOut: Scalars['BigInt'];
+  utxoBatchStartPositionOut: Scalars['BigInt'];
+  unshieldToken: Token;
+  unshieldToAddress: Scalars['Bytes'];
+  unshieldValue: Scalars['BigInt'];
+  blockTimestamp: Scalars['BigInt'];
+  verificationHash: Scalars['Bytes'];
+};
+
+export type TransactionInterface = {
+  id: Scalars['Bytes'];
+  blockNumber: Scalars['BigInt'];
+  transactionHash: Scalars['Bytes'];
+  merkleRoot: Scalars['Bytes'];
+  nullifiers: Array<Scalars['Bytes']>;
+  commitments: Array<Scalars['Bytes']>;
+  boundParamsHash: Scalars['Bytes'];
+  hasUnshield: Scalars['Boolean'];
+  utxoTreeIn: Scalars['BigInt'];
+  utxoTreeOut: Scalars['BigInt'];
+  utxoBatchStartPositionOut: Scalars['BigInt'];
+  unshieldToken: Token;
+  unshieldToAddress: Scalars['Bytes'];
+  unshieldValue: Scalars['BigInt'];
+  blockTimestamp: Scalars['BigInt'];
+  verificationHash: Scalars['Bytes'];
+};
+
+export type TransactionInterface_filter = {
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_gt?: InputMaybe<Scalars['Bytes']>;
+  id_lt?: InputMaybe<Scalars['Bytes']>;
+  id_gte?: InputMaybe<Scalars['Bytes']>;
+  id_lte?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  blockNumber?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_not?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_lt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_lte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  transactionHash?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_not?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_gt?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_lt?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_gte?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_lte?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  transactionHash_contains?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_not?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_gt?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_lt?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_gte?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_lte?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  merkleRoot_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  merkleRoot_contains?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_not_contains?: InputMaybe<Scalars['Bytes']>;
+  nullifiers?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_not?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_contains?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_not_contains?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_not?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_contains?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_not_contains?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
+  boundParamsHash?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_not?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_gt?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_lt?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_gte?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_lte?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  boundParamsHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  boundParamsHash_contains?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  hasUnshield?: InputMaybe<Scalars['Boolean']>;
+  hasUnshield_not?: InputMaybe<Scalars['Boolean']>;
+  hasUnshield_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  hasUnshield_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  utxoTreeIn?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_not?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_gt?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_lt?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_gte?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_lte?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoTreeIn_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoTreeOut?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_not?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_gt?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_lt?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_gte?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_lte?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoTreeOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoBatchStartPositionOut?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_not?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_gt?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_lt?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_gte?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_lte?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoBatchStartPositionOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  unshieldToken?: InputMaybe<Scalars['String']>;
+  unshieldToken_not?: InputMaybe<Scalars['String']>;
+  unshieldToken_gt?: InputMaybe<Scalars['String']>;
+  unshieldToken_lt?: InputMaybe<Scalars['String']>;
+  unshieldToken_gte?: InputMaybe<Scalars['String']>;
+  unshieldToken_lte?: InputMaybe<Scalars['String']>;
+  unshieldToken_in?: InputMaybe<Array<Scalars['String']>>;
+  unshieldToken_not_in?: InputMaybe<Array<Scalars['String']>>;
+  unshieldToken_contains?: InputMaybe<Scalars['String']>;
+  unshieldToken_contains_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_contains?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_starts_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_starts_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_ends_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_ends_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_?: InputMaybe<Token_filter>;
+  unshieldToAddress?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_not?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_gte?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_lte?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  unshieldToAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  unshieldToAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
+  unshieldValue?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_not?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_gt?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_lt?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_gte?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_lte?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  unshieldValue_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_not?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_lt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  verificationHash?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_contains?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<TransactionInterface_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<TransactionInterface_filter>>>;
+};
+
+export type TransactionInterface_orderBy =
+  | 'id'
+  | 'blockNumber'
+  | 'transactionHash'
+  | 'merkleRoot'
+  | 'nullifiers'
+  | 'commitments'
+  | 'boundParamsHash'
+  | 'hasUnshield'
+  | 'utxoTreeIn'
+  | 'utxoTreeOut'
+  | 'utxoBatchStartPositionOut'
+  | 'unshieldToken'
+  | 'unshieldToken__id'
+  | 'unshieldToken__tokenType'
+  | 'unshieldToken__tokenAddress'
+  | 'unshieldToken__tokenSubID'
+  | 'unshieldToAddress'
+  | 'unshieldValue'
+  | 'blockTimestamp'
+  | 'verificationHash';
+
+export type Transaction_filter = {
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_gt?: InputMaybe<Scalars['Bytes']>;
+  id_lt?: InputMaybe<Scalars['Bytes']>;
+  id_gte?: InputMaybe<Scalars['Bytes']>;
+  id_lte?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  blockNumber?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_not?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_lt?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_gte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_lte?: InputMaybe<Scalars['BigInt']>;
+  blockNumber_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockNumber_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  transactionHash?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_not?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_gt?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_lt?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_gte?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_lte?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  transactionHash_contains?: InputMaybe<Scalars['Bytes']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_not?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_gt?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_lt?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_gte?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_lte?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  merkleRoot_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  merkleRoot_contains?: InputMaybe<Scalars['Bytes']>;
+  merkleRoot_not_contains?: InputMaybe<Scalars['Bytes']>;
+  nullifiers?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_not?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_contains?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_not_contains?: InputMaybe<Array<Scalars['Bytes']>>;
+  nullifiers_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_not?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_contains?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_not_contains?: InputMaybe<Array<Scalars['Bytes']>>;
+  commitments_not_contains_nocase?: InputMaybe<Array<Scalars['Bytes']>>;
+  boundParamsHash?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_not?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_gt?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_lt?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_gte?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_lte?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  boundParamsHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  boundParamsHash_contains?: InputMaybe<Scalars['Bytes']>;
+  boundParamsHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  hasUnshield?: InputMaybe<Scalars['Boolean']>;
+  hasUnshield_not?: InputMaybe<Scalars['Boolean']>;
+  hasUnshield_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  hasUnshield_not_in?: InputMaybe<Array<Scalars['Boolean']>>;
+  utxoTreeIn?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_not?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_gt?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_lt?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_gte?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_lte?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeIn_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoTreeIn_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoTreeOut?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_not?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_gt?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_lt?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_gte?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_lte?: InputMaybe<Scalars['BigInt']>;
+  utxoTreeOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoTreeOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoBatchStartPositionOut?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_not?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_gt?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_lt?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_gte?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_lte?: InputMaybe<Scalars['BigInt']>;
+  utxoBatchStartPositionOut_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  utxoBatchStartPositionOut_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  unshieldToken?: InputMaybe<Scalars['String']>;
+  unshieldToken_not?: InputMaybe<Scalars['String']>;
+  unshieldToken_gt?: InputMaybe<Scalars['String']>;
+  unshieldToken_lt?: InputMaybe<Scalars['String']>;
+  unshieldToken_gte?: InputMaybe<Scalars['String']>;
+  unshieldToken_lte?: InputMaybe<Scalars['String']>;
+  unshieldToken_in?: InputMaybe<Array<Scalars['String']>>;
+  unshieldToken_not_in?: InputMaybe<Array<Scalars['String']>>;
+  unshieldToken_contains?: InputMaybe<Scalars['String']>;
+  unshieldToken_contains_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_contains?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_contains_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_starts_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_starts_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_ends_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_ends_with?: InputMaybe<Scalars['String']>;
+  unshieldToken_not_ends_with_nocase?: InputMaybe<Scalars['String']>;
+  unshieldToken_?: InputMaybe<Token_filter>;
+  unshieldToAddress?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_not?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_gt?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_lt?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_gte?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_lte?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  unshieldToAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  unshieldToAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  unshieldToAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
+  unshieldValue?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_not?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_gt?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_lt?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_gte?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_lte?: InputMaybe<Scalars['BigInt']>;
+  unshieldValue_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  unshieldValue_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_not?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_lt?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_gte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_lte?: InputMaybe<Scalars['BigInt']>;
+  blockTimestamp_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  blockTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  verificationHash?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_contains?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Transaction_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<Transaction_filter>>>;
+};
+
+export type Transaction_orderBy =
+  | 'id'
+  | 'blockNumber'
+  | 'transactionHash'
+  | 'merkleRoot'
+  | 'nullifiers'
+  | 'commitments'
+  | 'boundParamsHash'
+  | 'hasUnshield'
+  | 'utxoTreeIn'
+  | 'utxoTreeOut'
+  | 'utxoBatchStartPositionOut'
+  | 'unshieldToken'
+  | 'unshieldToken__id'
+  | 'unshieldToken__tokenType'
+  | 'unshieldToken__tokenAddress'
+  | 'unshieldToken__tokenSubID'
+  | 'unshieldToAddress'
+  | 'unshieldValue'
+  | 'blockTimestamp'
+  | 'verificationHash';
+
 export type Unshield = {
   id: Scalars['Bytes'];
   blockNumber: Scalars['BigInt'];
@@ -1750,6 +2340,42 @@ export type Unshield_orderBy =
   | 'fee'
   | 'eventLogIndex';
 
+export type VerificationHash = {
+  id: Scalars['Bytes'];
+  verificationHash: Scalars['Bytes'];
+};
+
+export type VerificationHash_filter = {
+  id?: InputMaybe<Scalars['Bytes']>;
+  id_not?: InputMaybe<Scalars['Bytes']>;
+  id_gt?: InputMaybe<Scalars['Bytes']>;
+  id_lt?: InputMaybe<Scalars['Bytes']>;
+  id_gte?: InputMaybe<Scalars['Bytes']>;
+  id_lte?: InputMaybe<Scalars['Bytes']>;
+  id_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  id_contains?: InputMaybe<Scalars['Bytes']>;
+  id_not_contains?: InputMaybe<Scalars['Bytes']>;
+  verificationHash?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lt?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_gte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_lte?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  verificationHash_contains?: InputMaybe<Scalars['Bytes']>;
+  verificationHash_not_contains?: InputMaybe<Scalars['Bytes']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<VerificationHash_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<VerificationHash_filter>>>;
+};
+
+export type VerificationHash_orderBy =
+  | 'id'
+  | 'verificationHash';
+
 export type _Block_ = {
   /** The hash of the block */
   hash?: Maybe<Scalars['Bytes']>;
@@ -1803,6 +2429,10 @@ export type _SubgraphErrorPolicy_ =
   /** null **/
   commitmentCiphertexts: InContextSdkMethod<Query['commitmentCiphertexts'], QuerycommitmentCiphertextsArgs, MeshContext>,
   /** null **/
+  commitmentBatchEventNew: InContextSdkMethod<Query['commitmentBatchEventNew'], QuerycommitmentBatchEventNewArgs, MeshContext>,
+  /** null **/
+  commitmentBatchEventNews: InContextSdkMethod<Query['commitmentBatchEventNews'], QuerycommitmentBatchEventNewsArgs, MeshContext>,
+  /** null **/
   legacyGeneratedCommitment: InContextSdkMethod<Query['legacyGeneratedCommitment'], QuerylegacyGeneratedCommitmentArgs, MeshContext>,
   /** null **/
   legacyGeneratedCommitments: InContextSdkMethod<Query['legacyGeneratedCommitments'], QuerylegacyGeneratedCommitmentsArgs, MeshContext>,
@@ -1827,9 +2457,21 @@ export type _SubgraphErrorPolicy_ =
   /** null **/
   nullifiers: InContextSdkMethod<Query['nullifiers'], QuerynullifiersArgs, MeshContext>,
   /** null **/
+  transaction: InContextSdkMethod<Query['transaction'], QuerytransactionArgs, MeshContext>,
+  /** null **/
+  transactions: InContextSdkMethod<Query['transactions'], QuerytransactionsArgs, MeshContext>,
+  /** null **/
+  verificationHash: InContextSdkMethod<Query['verificationHash'], QueryverificationHashArgs, MeshContext>,
+  /** null **/
+  verificationHashes: InContextSdkMethod<Query['verificationHashes'], QueryverificationHashesArgs, MeshContext>,
+  /** null **/
   commitment: InContextSdkMethod<Query['commitment'], QuerycommitmentArgs, MeshContext>,
   /** null **/
   commitments: InContextSdkMethod<Query['commitments'], QuerycommitmentsArgs, MeshContext>,
+  /** null **/
+  transactionInterface: InContextSdkMethod<Query['transactionInterface'], QuerytransactionInterfaceArgs, MeshContext>,
+  /** null **/
+  transactionInterfaces: InContextSdkMethod<Query['transactionInterfaces'], QuerytransactionInterfacesArgs, MeshContext>,
   /** Access to subgraph metadata **/
   _meta: InContextSdkMethod<Query['_meta'], Query_metaArgs, MeshContext>
   };
@@ -1860,6 +2502,10 @@ export type _SubgraphErrorPolicy_ =
   /** null **/
   commitmentCiphertexts: InContextSdkMethod<Subscription['commitmentCiphertexts'], SubscriptioncommitmentCiphertextsArgs, MeshContext>,
   /** null **/
+  commitmentBatchEventNew: InContextSdkMethod<Subscription['commitmentBatchEventNew'], SubscriptioncommitmentBatchEventNewArgs, MeshContext>,
+  /** null **/
+  commitmentBatchEventNews: InContextSdkMethod<Subscription['commitmentBatchEventNews'], SubscriptioncommitmentBatchEventNewsArgs, MeshContext>,
+  /** null **/
   legacyGeneratedCommitment: InContextSdkMethod<Subscription['legacyGeneratedCommitment'], SubscriptionlegacyGeneratedCommitmentArgs, MeshContext>,
   /** null **/
   legacyGeneratedCommitments: InContextSdkMethod<Subscription['legacyGeneratedCommitments'], SubscriptionlegacyGeneratedCommitmentsArgs, MeshContext>,
@@ -1884,15 +2530,27 @@ export type _SubgraphErrorPolicy_ =
   /** null **/
   nullifiers: InContextSdkMethod<Subscription['nullifiers'], SubscriptionnullifiersArgs, MeshContext>,
   /** null **/
+  transaction: InContextSdkMethod<Subscription['transaction'], SubscriptiontransactionArgs, MeshContext>,
+  /** null **/
+  transactions: InContextSdkMethod<Subscription['transactions'], SubscriptiontransactionsArgs, MeshContext>,
+  /** null **/
+  verificationHash: InContextSdkMethod<Subscription['verificationHash'], SubscriptionverificationHashArgs, MeshContext>,
+  /** null **/
+  verificationHashes: InContextSdkMethod<Subscription['verificationHashes'], SubscriptionverificationHashesArgs, MeshContext>,
+  /** null **/
   commitment: InContextSdkMethod<Subscription['commitment'], SubscriptioncommitmentArgs, MeshContext>,
   /** null **/
   commitments: InContextSdkMethod<Subscription['commitments'], SubscriptioncommitmentsArgs, MeshContext>,
+  /** null **/
+  transactionInterface: InContextSdkMethod<Subscription['transactionInterface'], SubscriptiontransactionInterfaceArgs, MeshContext>,
+  /** null **/
+  transactionInterfaces: InContextSdkMethod<Subscription['transactionInterfaces'], SubscriptiontransactionInterfacesArgs, MeshContext>,
   /** Access to subgraph metadata **/
   _meta: InContextSdkMethod<Subscription['_meta'], Subscription_metaArgs, MeshContext>
   };
 
   export type Context = {
-      ["sepolia"]: { Query: QuerySdk, Mutation: MutationSdk, Subscription: SubscriptionSdk },
+      ["txs-goerli"]: { Query: QuerySdk, Mutation: MutationSdk, Subscription: SubscriptionSdk },
       
     };
 }

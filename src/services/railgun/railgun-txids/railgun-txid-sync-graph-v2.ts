@@ -35,7 +35,6 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.EthereumGoerli_DEPRECATED:
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.Hardhat:
-    default:
       throw new Error('No railgun-transaction subgraph for this network');
   }
 };

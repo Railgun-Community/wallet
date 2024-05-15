@@ -4,7 +4,9 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   getRailgunTxidsForUnshields,
+  getRailgunTxDataForUnshields,
   quickSyncRailgunTransactionsV2,
+  getRailgunTransactionDataForUnshieldToAddress,
 } from '../railgun-txid-sync-graph-v2';
 
 chai.use(chaiAsPromised);
@@ -64,5 +66,31 @@ describe('railgun-txid-sync-graph', () => {
     expect(unshieldRailgunTxids).to.deep.equal([
       '065bcb1a9d4cfa110f05b480f79f27fe2ad672868d3d1bdec05df2ddaec8333d',
     ]);
-  }).timeout(20000);
-  });
+  }).timeout(20_000);
+
+  it('Should pull unshield railgun txids for unshield to address - Ethereum', async () => {
+    const unshieldRailgunTxids =
+      await getRailgunTransactionDataForUnshieldToAddress(
+        ETH_CHAIN,
+        '0xE251BaFD15A1e011f23F9c68673aAf2Fa00C1D03',
+      );
+    expect(unshieldRailgunTxids[1].txid).to.deep.equal(
+      '0x2d4bc718a244d6ee07bc4683dda6f4a484caa4cd269f7c1912d65f19779f6864',
+    );
+    expect(
+      unshieldRailgunTxids[1].transactionDatas[0].railgunTxid,
+    ).to.deep.equal(
+      '1ebd03bc2705ecd3db31e261f54fbab362572dc413cf10e9457f28d68578e325',
+    );
+  }).timeout(20_000);
+
+  it('Should pull unshield railgun tx data for txid - Ethereum', async () => {
+    const unshieldRailgunTxids = await getRailgunTxDataForUnshields(
+      ETH_CHAIN,
+      '0x0b3b7179df1377c0a13058508e7dff2dbe8f73c39d68f569bc90b1c8b277082e',
+    );
+    expect(unshieldRailgunTxids[0].railgunTxid).to.deep.equal(
+      '065bcb1a9d4cfa110f05b480f79f27fe2ad672868d3d1bdec05df2ddaec8333d',
+    );
+  }).timeout(20_000);
+});
