@@ -190,9 +190,8 @@ describe('quick-sync-events-graph-v2', () => {
       EXPECTED_UNSHIELD_EVENTS_SEPOLIA,
     );
 
-    // TODO: Add when there are events
-    // const shouldThrow = true;
-    // assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+    const shouldThrow = true;
+    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(90_000);
 
   it('[V2] Should run live Railgun Event Log fetch for Polygon with high starting block', async function run() {
