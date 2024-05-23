@@ -89,6 +89,7 @@ const shouldRemoveGasLimitForL2GasEstimate = (networkName: NetworkName) => {
     case NetworkName.PolygonMumbai_DEPRECATED:
     case NetworkName.EthereumSepolia:
     case NetworkName.Hardhat:
+    default:
       return false;
   }
 };
