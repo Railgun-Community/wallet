@@ -211,31 +211,32 @@ export const MOCK_POI_PROOF_PROGRESS_CALLBACK_CALLBACK: POIProofProgressCallback
     // noop
   };
 
-export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON: FallbackProviderJsonConfig = {
-  chainId: 137,
-  providers: [
-    {
-      provider: 'https://polygon.llamarpc.com',
-      priority: 1,
-      weight: 2,
-      maxLogsPerBatch: 10,
-      stallTimeout: 2500,
-    },
-    {
-      provider: 'https://polygon-bor-rpc.publicnode.com',
-      priority: 1,
-      weight: 2,
-      maxLogsPerBatch: 10,
-      stallTimeout: 2500,
-    },
-    {
-      provider: 'https://rpc.ankr.com/polygon',
-      priority: 2,
-      weight: 2,
-      maxLogsPerBatch: 10,
-    },
-  ],
-};
+export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON: FallbackProviderJsonConfig =
+  {
+    chainId: 137,
+    providers: [
+      {
+        provider: 'https://rpc-mainnet.maticvigil.com	',
+        priority: 1,
+        weight: 2,
+        maxLogsPerBatch: 1,
+        stallTimeout: 2500,
+      },
+      {
+        provider: 'https://polygon-bor-rpc.publicnode.com',
+        priority: 1,
+        weight: 2,
+        maxLogsPerBatch: 5,
+        stallTimeout: 2500,
+      },
+      {
+        provider: 'https://rpc.ankr.com/polygon',
+        priority: 2,
+        weight: 2,
+        maxLogsPerBatch: 5,
+      },
+    ],
+  };
 
 export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA: FallbackProviderJsonConfig =
   {
