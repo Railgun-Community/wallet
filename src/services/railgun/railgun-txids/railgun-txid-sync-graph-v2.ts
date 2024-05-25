@@ -26,6 +26,7 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.Ethereum:
       return 'txs-ethereum';
     case NetworkName.EthereumSepolia:
+      return 'txs-sepolia';
     case NetworkName.BNBChain:
     case NetworkName.Polygon:
     case NetworkName.Arbitrum:
