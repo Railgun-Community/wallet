@@ -2,7 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
   MOCK_DB_ENCRYPTION_KEY,
-  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
   MOCK_MNEMONIC,
 } from '../../../../tests/mocks.test';
 import {
@@ -31,7 +31,7 @@ let railgunWalletID: string;
 
 const txidVersion = getTestTXIDVersion();
 
-const networkName = NetworkName.Polygon;
+const networkName = NetworkName.EthereumSepolia;
 const chain: Chain = NETWORK_CONFIG[networkName].chain;
 
 describe('balances-live', () => {
@@ -49,7 +49,7 @@ describe('balances-live', () => {
     railgunWalletID = railgunWalletInfo.id;
 
     await loadProvider(
-      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
       networkName,
       10_000, // pollingInterval
     );
@@ -87,6 +87,8 @@ describe('balances-live', () => {
       chain,
       false, // onlySpendable
     );
+
+    // Note: railgunWallet above needs to perform transactions on above network to have balances
     expect(Object.keys(balances).length).to.be.greaterThanOrEqual(1);
 
     const transactionHistory = await wallet.getTransactionHistory(
@@ -104,20 +106,19 @@ describe('balances-live', () => {
       'Missing',
     );
 
-    // TODO: Uncomment when we have PPOI enabled on the testnet of choice
-    // const txidMerkletree = getTXIDMerkletreeForNetwork(
-    //   txidVersion,
-    //   networkName,
-    // );
-    // expect(txidMerkletree.savedPOILaunchSnapshot).to.equal(true);
+    const txidMerkletree = getTXIDMerkletreeForNetwork(
+      txidVersion,
+      networkName,
+    );
+    expect(txidMerkletree.savedPOILaunchSnapshot).to.equal(true);
 
-    // const poiStatusSpent = await wallet.getTXOsSpentPOIStatusInfo(
-    //   txidVersion,
-    //   chain,
-    // );
-    // expect(poiStatusSpent.length).to.be.greaterThanOrEqual(1);
-    // expect(poiStatusSpent[0].strings.railgunTransactionInfo).to.not.equal(
-    //   'Not found',
-    // );
+    const poiStatusSpent = await wallet.getTXOsSpentPOIStatusInfo(
+      txidVersion,
+      chain,
+    );
+    expect(poiStatusSpent.length).to.be.greaterThanOrEqual(1);
+    expect(poiStatusSpent[0].strings.railgunTransactionInfo).to.not.equal(
+      'Not found',
+    );
   }).timeout(90_000);
 });

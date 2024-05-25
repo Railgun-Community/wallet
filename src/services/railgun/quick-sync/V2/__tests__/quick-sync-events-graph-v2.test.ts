@@ -31,9 +31,9 @@ const EXPECTED_NULLIFIER_EVENTS_ARBITRUM = 22_000;
 const EXPECTED_UNSHIELD_EVENTS_ARBITRUM = 9_000;
 
 const SEPOLIA_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumSepolia].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0;
-const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0;
-const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 0;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 1;
+const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 1;
+const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 1;
 
 const assertContiguousCommitmentEvents = (
   commitmentEvents: CommitmentEvent[],
@@ -169,7 +169,6 @@ describe('quick-sync-events-graph-v2', () => {
     const shouldThrow = true;
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(200_000);
-
 
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async function run() {
     if (!isV2Test()) {
