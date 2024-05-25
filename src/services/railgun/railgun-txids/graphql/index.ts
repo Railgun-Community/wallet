@@ -38,6 +38,7 @@ import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
 import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
+import type { TxsSepoliaTypes } from './.graphclient/sources/txs-sepolia/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -3114,7 +3115,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
 }>;
 
 
-export type MeshContext = TxsEthereumTypes.Context & BaseMeshContext;
+export type MeshContext = TxsEthereumTypes.Context & TxsSepoliaTypes.Context & BaseMeshContext;
 
 
 const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
@@ -3124,7 +3125,8 @@ const importFn: ImportFn = <T>(moduleId: string) => {
   switch(relativeModuleId) {
     case ".graphclient/sources/txs-ethereum/introspectionSchema":
       return import("./.graphclient/sources/txs-ethereum/introspectionSchema") as T;
-    
+    case '.graphclient/sources/txs-sepolia/introspectionSchema':
+      return import("./.graphclient/sources/txs-sepolia/introspectionSchema") as T;
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
   }
@@ -3156,6 +3158,7 @@ const sources: MeshResolvedSource[] = [];
 const transforms: MeshTransform[] = [];
 const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
 const txsEthereumTransforms = [];
+const txsSepoliaTransforms = [];
 const additionalTypeDefs = [] as any[];
 const txsEthereumHandler = new GraphqlHandler({
               name: "txs-ethereum",
@@ -3167,10 +3170,25 @@ const txsEthereumHandler = new GraphqlHandler({
               logger: logger.child("txs-ethereum"),
               importFn,
             });
+const txsSepoliaHandler = new GraphqlHandler({
+              name: "txs-sepolia",
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-eth-sepolia-v2/graphql"},
+              baseDir,
+              cache,
+              pubsub,
+              store: sourcesStore.child("txs-sepolia"),
+              logger: logger.child("txs-sepolia"),
+              importFn,
+            });
 sources[0] = {
           name: 'txs-ethereum',
           handler: txsEthereumHandler,
           transforms: txsEthereumTransforms
+        }
+sources[1] = {
+          name: 'txs-sepolia',
+          handler: txsSepoliaHandler,
+          transforms: txsSepoliaTransforms
         }
 const additionalResolvers = [] as any[]
 const merger = new(BareMerger as any)({
