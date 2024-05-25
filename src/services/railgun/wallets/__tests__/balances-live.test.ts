@@ -62,7 +62,7 @@ describe('balances-live', () => {
     await Promise.all([
       pollUntilUTXOMerkletreeScanned(),
       // Enable this when running on a network supporting PPOI:
-      // pollUntilTXIDMerkletreeScanned(),
+      pollUntilTXIDMerkletreeScanned(),
     ]);
   });
 
