@@ -31,6 +31,7 @@ import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_ERC20_RECIPIENTS,
   MOCK_ETH_WALLET_ADDRESS,
+  MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
   MOCK_FEE_TOKEN_DETAILS,
   MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2,
   MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
@@ -148,7 +149,8 @@ describe('tx-cross-contract-calls', () => {
   before(async function run() {
     this.timeout(60_000);
     await initTestEngine();
-    await initTestEngineNetworks();
+    await initTestEngineNetworks(NetworkName.Polygon, MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON);
+
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC,
