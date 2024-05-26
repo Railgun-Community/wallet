@@ -12,7 +12,7 @@ import {
   pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
 import { createRailgunWallet, fullWalletForID } from '../wallets';
-import { refreshBalances } from '../balances';
+import { rescanFullUTXOMerkletreesAndWallets } from '../balances';
 import {
   Chain,
   NETWORK_CONFIG,
@@ -76,10 +76,7 @@ describe('balances-live', () => {
       return;
     }
 
-    await refreshBalances(
-      chain,
-      undefined, // walletIdFilter
-    );
+    await rescanFullUTXOMerkletreesAndWallets(chain, [railgunWalletID]);
 
     const wallet = fullWalletForID(railgunWalletID);
     const balances = await wallet.getTokenBalances(
