@@ -216,22 +216,22 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON: FallbackProviderJsonCon
     chainId: 137,
     providers: [
       {
-        provider: 'https://rpc-mainnet.maticvigil.com	',
-        priority: 1,
-        weight: 2,
-        maxLogsPerBatch: 1,
+        provider: 'https://rpc-mainnet.matic.quiknode.pro',
+        priority: 3,
+        weight: 3,
+        maxLogsPerBatch: 2,
         stallTimeout: 2500,
       },
       {
         provider: 'https://polygon-bor-rpc.publicnode.com',
-        priority: 1,
+        priority: 3,
         weight: 2,
         maxLogsPerBatch: 5,
         stallTimeout: 2500,
       },
       {
         provider: 'https://rpc.ankr.com/polygon',
-        priority: 2,
+        priority: 3,
         weight: 2,
         maxLogsPerBatch: 5,
       },
@@ -244,15 +244,16 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA: FallbackProviderJsonCon
     providers: [
       {
         provider: 'https://rpc.sepolia.org/',
-        priority: 1,
-        weight: 2,
+        priority: 3,
+        weight: 3,
+        maxLogsPerBatch: 2,
         stallTimeout: 2500,
       },
       {
         provider: 'https://ethereum-sepolia-rpc.publicnode.com',
-        priority: 2,
+        priority: 3,
         weight: 2,
-        maxLogsPerBatch: 10,
+        maxLogsPerBatch: 5,
       },
     ],
   };
@@ -263,16 +264,16 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_ETHEREUM: FallbackProviderJsonCo
     providers: [
       {
         provider: 'https://eth.llamarpc.com',
-        priority: 1,
-        weight: 2,
-        maxLogsPerBatch: 10,
+        priority: 3,
+        weight: 3,
+        maxLogsPerBatch: 2,
         stallTimeout: 2500,
       },
       {
         provider: 'https://rpc.ankr.com/eth',
-        priority: 2,
+        priority: 3,
         weight: 2,
-        maxLogsPerBatch: 10,
+        maxLogsPerBatch: 5,
       },
     ],
   };
