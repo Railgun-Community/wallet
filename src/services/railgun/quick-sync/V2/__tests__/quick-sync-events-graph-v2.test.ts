@@ -41,6 +41,7 @@ const assertContiguousCommitmentEvents = (
 ) => {
   let nextTreeNumber = commitmentEvents[0].treeNumber;
   let nextStartPosition = commitmentEvents[0].startPosition;
+  let overallCommitmentCount = commitmentEvents[0].startPosition;
   for (const event of commitmentEvents) {
     if (
       event.treeNumber !== nextTreeNumber ||
@@ -59,6 +60,17 @@ const assertContiguousCommitmentEvents = (
       }
     } else {
       nextStartPosition += event.commitments.length;
+    }
+    for (const commitment of event.commitments) {
+      if (overallCommitmentCount !== commitment.utxoIndex) {
+        if (shouldThrow) {
+          throw new Error(`Commitment order is out of sync.`);
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(`Commitment order is out of sync.`);
+        }
+      }
+      overallCommitmentCount += 1;
     }
 
     // TODO: This logic may need an update if the tree is less than 65536 commitments.
