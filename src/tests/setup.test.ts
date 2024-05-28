@@ -143,6 +143,8 @@ export const initTestEngine = async (useNativeArtifacts = false) => {
     useNativeArtifacts,
     false, // skipMerkletreeScans
     undefined, // poiNodeURL
+    undefined, // customPOILists[]
+    false // verboseLogging
   );
 
   const testPOINodeInterface = new TestWalletPOINodeInterface();
@@ -159,14 +161,17 @@ export const initTestEngine = async (useNativeArtifacts = false) => {
   setOnTXIDMerkletreeScanCallback(txidMerkletreeHistoryScanCallback);
 };
 
-export const initTestEngineNetworks = async () => {
+export const initTestEngineNetworks = async (
+  networkName = NetworkName.EthereumSepolia,
+  mockConfig = MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
+) => {
   // Don't wait for async. It will try to load historical events, which takes a while.
   await loadProvider(
-    MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
-    NetworkName.EthereumSepolia,
+    mockConfig,
+    networkName,
     10_000, // pollingInterval
   );
-  const { chain } = NETWORK_CONFIG[NetworkName.EthereumSepolia];
+  const { chain } = NETWORK_CONFIG[networkName];
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
   getEngine().scanContractHistory(
     chain,

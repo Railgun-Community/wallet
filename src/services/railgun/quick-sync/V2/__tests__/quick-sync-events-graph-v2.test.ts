@@ -31,9 +31,9 @@ const EXPECTED_NULLIFIER_EVENTS_ARBITRUM = 22_000;
 const EXPECTED_UNSHIELD_EVENTS_ARBITRUM = 9_000;
 
 const SEPOLIA_CHAIN: Chain = NETWORK_CONFIG[NetworkName.EthereumSepolia].chain;
-const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 0;
-const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 0;
-const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 0;
+const EXPECTED_COMMITMENT_GROUP_EVENTS_SEPOLIA = 1;
+const EXPECTED_NULLIFIER_EVENTS_SEPOLIA = 1;
+const EXPECTED_UNSHIELD_EVENTS_SEPOLIA = 1;
 
 const assertContiguousCommitmentEvents = (
   commitmentEvents: CommitmentEvent[],
@@ -41,6 +41,7 @@ const assertContiguousCommitmentEvents = (
 ) => {
   let nextTreeNumber = commitmentEvents[0].treeNumber;
   let nextStartPosition = commitmentEvents[0].startPosition;
+  let overallCommitmentCount = commitmentEvents[0].startPosition;
   for (const event of commitmentEvents) {
     if (
       event.treeNumber !== nextTreeNumber ||
@@ -59,6 +60,17 @@ const assertContiguousCommitmentEvents = (
       }
     } else {
       nextStartPosition += event.commitments.length;
+    }
+    for (const commitment of event.commitments) {
+      if (overallCommitmentCount !== commitment.utxoIndex) {
+        if (shouldThrow) {
+          throw new Error(`Commitment order is out of sync.`);
+        } else {
+          // eslint-disable-next-line no-console
+          console.log(`Commitment order is out of sync.`);
+        }
+      }
+      overallCommitmentCount += 1;
     }
 
     // TODO: This logic may need an update if the tree is less than 65536 commitments.
@@ -170,7 +182,6 @@ describe('quick-sync-events-graph-v2', () => {
     assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(200_000);
 
-
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Sepolia', async function run() {
     if (!isV2Test()) {
       this.skip();
@@ -190,9 +201,8 @@ describe('quick-sync-events-graph-v2', () => {
       EXPECTED_UNSHIELD_EVENTS_SEPOLIA,
     );
 
-    // TODO: Add when there are events
-    // const shouldThrow = true;
-    // assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
+    const shouldThrow = true;
+    assertContiguousCommitmentEvents(eventLog.commitmentEvents, shouldThrow);
   }).timeout(90_000);
 
   it('[V2] Should run live Railgun Event Log fetch for Polygon with high starting block', async function run() {

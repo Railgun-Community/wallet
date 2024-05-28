@@ -26,6 +26,7 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.Ethereum:
       return 'txs-ethereum';
     case NetworkName.EthereumSepolia:
+      return 'txs-sepolia';
     case NetworkName.BNBChain:
     case NetworkName.Polygon:
     case NetworkName.Arbitrum:
@@ -36,7 +37,7 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.EthereumRopsten_DEPRECATED:
     case NetworkName.Hardhat:
     default:
-      throw new Error('No railgun-transaction subgraph for this network');
+      throw new Error('No railgun-transaction subsquid for this network');
   }
 };
 
