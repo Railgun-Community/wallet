@@ -25,7 +25,7 @@ describe('railgun-txid-sync-graph', () => {
     };
   });
 
-  it('Should pull railgun txs subgraph query - Ethereum', async () => {
+  it('Should pull railgun txs subsquid query - Ethereum', async () => {
     const railgunTxs: RailgunTransactionV2[] =
       await quickSyncRailgunTransactionsV2(ETH_CHAIN, undefined);
 
@@ -71,7 +71,7 @@ describe('railgun-txid-sync-graph', () => {
     ]);
   }).timeout(20000);
 
-  it('Should pull railgun txs subgraph query - Sepolia', async () => {
+  it('Should pull railgun txs subsquid query - Sepolia', async () => {
     const railgunTxs: RailgunTransactionV2[] =
       await quickSyncRailgunTransactionsV2(ETH_CHAIN, undefined);
 
