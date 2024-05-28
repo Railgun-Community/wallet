@@ -69,58 +69,55 @@ describe('balances-live', () => {
     await closeTestEngine();
   });
 
-  it.only(
-    '[V2] Should run live balance fetch, transaction history scan, and POI status info scan',
-    async function run() {
-      if (!isV2Test()) {
-        this.skip();
-        return;
-      }
+  it('[V2] Should run live balance fetch, transaction history scan, and POI status info scan', async function run() {
+    if (!isV2Test()) {
+      this.skip();
+      return;
+    }
 
-      await refreshBalances(
-        chain,
-        undefined, // walletIdFilter
-      );
+    await refreshBalances(
+      chain,
+      undefined, // walletIdFilter
+    );
 
-      const wallet = fullWalletForID(railgunWalletID);
-      const balances = await wallet.getTokenBalances(
-        txidVersion,
-        chain,
-        false, // onlySpendable
-      );
+    const wallet = fullWalletForID(railgunWalletID);
+    const balances = await wallet.getTokenBalances(
+      txidVersion,
+      chain,
+      false, // onlySpendable
+    );
 
-      // Note: railgunWallet above needs to perform transactions on above network to have balances
-      expect(Object.keys(balances).length).to.be.greaterThanOrEqual(1);
+    // Note: railgunWallet above needs to perform transactions on above network to have balances
+    expect(Object.keys(balances).length).to.be.greaterThanOrEqual(1);
 
-      const transactionHistory = await wallet.getTransactionHistory(
-        chain,
-        undefined,
-      );
-      expect(transactionHistory.length).to.be.greaterThanOrEqual(2);
+    const transactionHistory = await wallet.getTransactionHistory(
+      chain,
+      undefined,
+    );
+    expect(transactionHistory.length).to.be.greaterThanOrEqual(2);
 
-      const poiStatusReceived = await wallet.getTXOsReceivedPOIStatusInfo(
-        txidVersion,
-        chain,
-      );
-      expect(poiStatusReceived.length).to.be.greaterThanOrEqual(2);
-      expect(poiStatusReceived[0].strings.blindedCommitment).to.not.equal(
-        'Missing',
-      );
+    const poiStatusReceived = await wallet.getTXOsReceivedPOIStatusInfo(
+      txidVersion,
+      chain,
+    );
+    expect(poiStatusReceived.length).to.be.greaterThanOrEqual(2);
+    expect(poiStatusReceived[0].strings.blindedCommitment).to.not.equal(
+      'Missing',
+    );
 
-      const txidMerkletree = getTXIDMerkletreeForNetwork(
-        txidVersion,
-        networkName,
-      );
-      expect(txidMerkletree.savedPOILaunchSnapshot).to.equal(true);
+    const txidMerkletree = getTXIDMerkletreeForNetwork(
+      txidVersion,
+      networkName,
+    );
+    expect(txidMerkletree.savedPOILaunchSnapshot).to.equal(true);
 
-      const poiStatusSpent = await wallet.getTXOsSpentPOIStatusInfo(
-        txidVersion,
-        chain,
-      );
-      expect(poiStatusSpent.length).to.be.greaterThanOrEqual(1);
-      expect(poiStatusSpent[0].strings.railgunTransactionInfo).to.not.equal(
-        'Not found',
-      );
-    },
-  ).timeout(90_000);
+    const poiStatusSpent = await wallet.getTXOsSpentPOIStatusInfo(
+      txidVersion,
+      chain,
+    );
+    expect(poiStatusSpent.length).to.be.greaterThanOrEqual(1);
+    expect(poiStatusSpent[0].strings.railgunTransactionInfo).to.not.equal(
+      'Not found',
+    );
+  }).timeout(90_000);
 });
