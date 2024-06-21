@@ -2307,10 +2307,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/poseidon-hash-wasm/-/poseidon-hash-wasm-1.0.1.tgz#bfd3b3f915391a59486d8c9d632069f029e152d6"
   integrity sha512-zDAbMu095ZjMqsKIoyOnuKR4Zofnqqx4eTCtnA6qYglnexX5cadxItvJa3ozhDDTmFkDGAidDssQ7Pzl3wwLDA==
 
-"@railgun-community/shared-models@7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-7.1.0.tgz#11402faf5d8dad1b1cdb866a67c348d57129e35d"
-  integrity sha512-Lomd2l9950CLhyUyhGDJVdEUkgiJn5rQ2l+i4OxE4b5+vsOBhjB2jgiJ+rNJFRHbNkReSbng694gIt+dfjnuQA==
+"@railgun-community/shared-models@7.3.1":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-7.3.1.tgz#5aa4f7875f5dffe85622207c7c4b542d3d7a4226"
+  integrity sha512-tm3Q5eyC3Aff49YQ67zNn4dC72/jBuZPKt8usOFz60OmhHi7rQEktaTKARR+h+RWFbzTSxt+G1Gch/Bt3JVN3A==
 
 "@repeaterjs/repeater@3.0.4", "@repeaterjs/repeater@^3.0.4":
   version "3.0.4"
