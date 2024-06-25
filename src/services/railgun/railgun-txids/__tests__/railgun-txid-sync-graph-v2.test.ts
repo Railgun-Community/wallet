@@ -10,7 +10,7 @@ import {
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-describe.only('railgun-txid-sync-graph', () => {
+describe('railgun-txid-sync-graph', () => {
   it('Should pull railgun txs subsquid query - Ethereum', async () => {
     const railgunTxs: RailgunTransactionV2[] =
       await quickSyncRailgunTransactionsV2(
@@ -112,6 +112,53 @@ describe.only('railgun-txid-sync-graph', () => {
 
     expect(unshieldRailgunTxids).to.deep.equal([
       '1bef936762f21323e57539cdf4b87251279b34880881ae003219058dacc258a7',
+    ]);
+  }).timeout(20000);
+
+  it('Should pull railgun txs subsquid query - BNBChain', async () => {
+    const railgunTxs: RailgunTransactionV2[] =
+      await quickSyncRailgunTransactionsV2(
+        NETWORK_CONFIG[NetworkName.BNBChain].chain,
+        undefined,
+      );
+
+    expect(railgunTxs).to.be.an('array');
+    expect(railgunTxs.length).to.equal(5000);
+
+    expect(railgunTxs[0].commitments).to.deep.equal([
+      '0x2f1f83e339c05d14f102088c0c3f2b8f8addbd8497a88ef49a1e9c942bbb0f87',
+      '0x275c216c06fd5e68bb65f46f85e93afb563f9bad08b2eaf222a38ce6d848c004',
+    ]);
+    expect(railgunTxs[0].nullifiers).to.deep.equal([
+      '0x1866ea0094491975f18fa92ba6fac7c2f562bbc49e975866643108dd15f0a6b2',
+    ]);
+    expect(railgunTxs[0].graphID).to.equal(
+      '0x00000000000000000000000000000000000000000000000000000000010f2d7b000000000000000000000000000000000000000000000000000000000000003f0000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(railgunTxs[0].boundParamsHash).to.equal(
+      '0x0d0cc0770e4915c2b841f394834c0e3b2d5807642c23a9578a1bbc80f8b47f6a',
+    );
+    expect(railgunTxs[0].txid).to.equal(
+      '4388f3727fe7f9cfd0d57807f7a2a126fbb7e56a25a17e3e99102931ea2e4b33',
+    );
+    expect(railgunTxs[0].utxoTreeIn).to.equal(0);
+    expect(railgunTxs[0].utxoTreeOut).to.equal(0);
+    expect(railgunTxs[0].utxoBatchStartPositionOut).to.equal(4);
+    expect(railgunTxs[0].unshield).to.equal(undefined);
+    expect(railgunTxs[0].blockNumber).to.equal(17771899);
+    expect(railgunTxs[0].verificationHash).to.equal(
+      '0x5052ad94d14b1f0a16fa8ca6680f9736a357cc73798695d3e1247ca95483415c',
+    );
+  }).timeout(20_000);
+
+  it('Should pull unshield railgun txids - BNBChain', async () => {
+    const unshieldRailgunTxids: string[] = await getRailgunTxidsForUnshields(
+      NETWORK_CONFIG[NetworkName.BNBChain].chain,
+      '0xcef99c75d555b81625e5e96304716b04bd6900d99b664fda7d5a89265dca3c38',
+    );
+
+    expect(unshieldRailgunTxids).to.deep.equal([
+      '27fe3f9eef756cba48cf2850935c20dc7faf36911fe2cc43b69b4650912e09e0',
     ]);
   }).timeout(20000);
 
