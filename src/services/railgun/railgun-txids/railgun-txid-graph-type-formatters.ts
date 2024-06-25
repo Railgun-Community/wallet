@@ -4,7 +4,7 @@ import {
   RailgunTransactionVersion,
   ByteUtils,
 } from '@railgun-community/engine';
-import { GetRailgunTransactionsAfterGraphIDQuery } from './graphql';
+import { GetRailgunTransactionsAfterGraphIDQuery } from './graphql/.graphclient';
 import { getAddress } from 'ethers';
 import { graphTokenTypeToEngineTokenType } from '../quick-sync/shared-formatters';
 

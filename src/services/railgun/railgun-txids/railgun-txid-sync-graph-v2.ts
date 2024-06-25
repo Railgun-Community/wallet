@@ -9,7 +9,7 @@ import {
   isDefined,
   networkForChain,
 } from '@railgun-community/shared-models';
-import { getMeshOptions, getSdk } from './graphql';
+import { getMeshOptions, getSdk } from './graphql/.graphclient';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
 import {
   GraphRailgunTransactions,

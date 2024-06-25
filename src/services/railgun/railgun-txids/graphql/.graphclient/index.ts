@@ -21,9 +21,9 @@ import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
 import type { TxsEthereumTypes } from './sources/txs-ethereum/types';
-import type { TxsArbitrumTypes } from './sources/txs-arbitrum/types';
 import type { TxsSepoliaTypes } from './sources/txs-sepolia/types';
 import type { TxsBscTypes } from './sources/txs-bsc/types';
+import type { TxsArbitrumTypes } from './sources/txs-arbitrum/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -3100,7 +3100,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
 }>;
 
 
-export type MeshContext = TxsEthereumTypes.Context & TxsArbitrumTypes.Context & TxsSepoliaTypes.Context & TxsBscTypes.Context & BaseMeshContext;
+export type MeshContext = TxsSepoliaTypes.Context & TxsEthereumTypes.Context & TxsArbitrumTypes.Context & TxsBscTypes.Context & BaseMeshContext;
 
 
 const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
@@ -3108,14 +3108,14 @@ const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/',
 const importFn: ImportFn = <T>(moduleId: string) => {
   const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(baseDir + '/', '');
   switch(relativeModuleId) {
+    case ".graphclient/sources/txs-sepolia/introspectionSchema":
+      return import("./sources/txs-sepolia/introspectionSchema") as T;
+    
     case ".graphclient/sources/txs-ethereum/introspectionSchema":
       return import("./sources/txs-ethereum/introspectionSchema") as T;
     
     case ".graphclient/sources/txs-arbitrum/introspectionSchema":
       return import("./sources/txs-arbitrum/introspectionSchema") as T;
-    
-    case ".graphclient/sources/txs-sepolia/introspectionSchema":
-      return import("./sources/txs-sepolia/introspectionSchema") as T;
     
     case ".graphclient/sources/txs-bsc/introspectionSchema":
       return import("./sources/txs-bsc/introspectionSchema") as T;
