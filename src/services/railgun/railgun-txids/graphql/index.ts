@@ -39,6 +39,8 @@ import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
 import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
 import type { TxsSepoliaTypes } from './.graphclient/sources/txs-sepolia/types';
+import type { TxsBscTypes } from './.graphclient/sources/txs-bsc/types';
+import type { TxsArbitrumTypes } from './.graphclient/sources/txs-arbitrum/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -3115,7 +3117,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
 }>;
 
 
-export type MeshContext = TxsEthereumTypes.Context & TxsSepoliaTypes.Context & BaseMeshContext;
+export type MeshContext = TxsEthereumTypes.Context & TxsSepoliaTypes.Context & TxsArbitrumTypes.Context &TxsBscTypes.Context & BaseMeshContext;
 
 
 const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
@@ -3127,6 +3129,10 @@ const importFn: ImportFn = <T>(moduleId: string) => {
       return import("./.graphclient/sources/txs-ethereum/introspectionSchema") as T;
     case '.graphclient/sources/txs-sepolia/introspectionSchema':
       return import("./.graphclient/sources/txs-sepolia/introspectionSchema") as T;
+    case '.graphclient/sources/txs-arbitrum/introspectionSchema':
+        return import("./.graphclient/sources/txs-arbitrum/introspectionSchema") as T;
+    case '.graphclient/sources/txs-bsc/introspectionSchema':
+      return import("./.graphclient/sources/txs-bsc/introspectionSchema") as T;
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
   }
@@ -3159,6 +3165,8 @@ const transforms: MeshTransform[] = [];
 const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
 const txsEthereumTransforms = [];
 const txsSepoliaTransforms = [];
+const txsArbitrumTransforms = [];
+const txsBscTransforms = [];
 const additionalTypeDefs = [] as any[];
 const txsEthereumHandler = new GraphqlHandler({
               name: "txs-ethereum",
@@ -3180,6 +3188,26 @@ const txsSepoliaHandler = new GraphqlHandler({
               logger: logger.child("txs-sepolia"),
               importFn,
             });
+const txsArbitrumHandler = new GraphqlHandler({
+              name: "txs-arbitrum",
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-arbitrum-v2/graphql"},
+              baseDir,
+              cache,
+              pubsub,
+              store: sourcesStore.child("txs-arbitrum"),
+              logger: logger.child("txs-arbitrum"),
+              importFn,
+            });
+const txsBscHandler = new GraphqlHandler({
+              name: "txs-bsc",
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-bsc-v2/graphql"},
+              baseDir,
+              cache,
+              pubsub,
+              store: sourcesStore.child("txs-bsc"),
+              logger: logger.child("txs-bsc"),
+              importFn,
+            });
 sources[0] = {
           name: 'txs-ethereum',
           handler: txsEthereumHandler,
@@ -3189,6 +3217,16 @@ sources[1] = {
           name: 'txs-sepolia',
           handler: txsSepoliaHandler,
           transforms: txsSepoliaTransforms
+        }
+sources[2] = {
+          name: 'txs-arbitrum',
+          handler: txsArbitrumHandler,
+          transforms: txsArbitrumTransforms
+        }
+sources[3] = {
+          name: 'txs-bsc',
+          handler: txsBscHandler,
+          transforms: txsBscTransforms
         }
 const additionalResolvers = [] as any[]
 const merger = new(BareMerger as any)({
