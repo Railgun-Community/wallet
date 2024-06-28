@@ -28,8 +28,10 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.EthereumSepolia:
       return 'txs-sepolia';
     case NetworkName.BNBChain:
-    case NetworkName.Polygon:
+      return 'txs-bsc'
     case NetworkName.Arbitrum:
+      return 'txs-arbitrum'
+    case NetworkName.Polygon:
     case NetworkName.PolygonAmoy:
     case NetworkName.PolygonMumbai_DEPRECATED:
     case NetworkName.ArbitrumGoerli_DEPRECATED:
