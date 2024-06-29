@@ -4,6 +4,10 @@ sources:
     handler:
       graphql:
         endpoint: https://rail-squid.squids.live/squid-railgun-ethereum-v2/graphql
+  - name: txs-sepolia
+    handler:
+      graphql:
+        endpoint: https://rail-squid.squids.live/squid-railgun-eth-sepolia-v2/graphql
   - name: txs-arbitrum
     handler:
       graphql:
@@ -12,9 +16,5 @@ sources:
     handler:
       graphql:
         endpoint: https://rail-squid.squids.live/squid-railgun-bsc-v2/graphql
-  - name: txs-sepolia
-    handler:
-      graphql:
-        endpoint: https://rail-squid.squids.live/squid-railgun-eth-sepolia-v2/graphql
 documents:
   - ./railgun-txids-query.graphql
