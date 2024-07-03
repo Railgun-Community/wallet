@@ -85,6 +85,8 @@ export class ArtifactDownloader {
         dataFormatted = data;
       } else if (typeof data === 'object') {
         dataFormatted = JSON.stringify(data);
+      } else if (typeof data === 'string') {
+        dataFormatted = JSON.stringify(JSON.parse(data));
       } else {
         throw new Error('Unexpected response data type');
       }
