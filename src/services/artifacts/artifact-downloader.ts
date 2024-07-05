@@ -70,19 +70,26 @@ export class ArtifactDownloader {
     try {
       const url = getArtifactUrl(artifactName, artifactVariantString);
 
-      const result = await axios.get(url, {
+      const { data } = await axios.get<ArrayBuffer | Buffer | object>(url, {
         method: 'GET',
         responseType: ArtifactDownloader.artifactResponseType(artifactName),
       });
-      const data: ArrayBuffer | Buffer | object = result.data;
 
       // NodeJS downloads as Buffer.
       // Browser downloads as ArrayBuffer.
       // Both will validate with the same hash.
-      const dataFormatted: ArrayBuffer | Buffer | string =
-        data instanceof ArrayBuffer || data instanceof Buffer
-          ? data
-          : JSON.stringify(data);
+
+      let dataFormatted: ArrayBuffer | Buffer | string;
+
+      if (data instanceof ArrayBuffer || data instanceof Buffer) {
+        dataFormatted = data;
+      } else if (typeof data === 'object') {
+        dataFormatted = JSON.stringify(data);
+      } else if (typeof data === 'string') {
+        dataFormatted = JSON.stringify(JSON.parse(data));
+      } else {
+        throw new Error('Unexpected response data type');
+      }
 
       const decompressedData = ArtifactDownloader.getArtifactData(
         dataFormatted,
