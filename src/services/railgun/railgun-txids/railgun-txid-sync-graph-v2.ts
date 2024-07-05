@@ -32,6 +32,7 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.Arbitrum:
       return 'txs-arbitrum';
     case NetworkName.Polygon:
+      return 'txs-matic'
     case NetworkName.PolygonAmoy:
     case NetworkName.PolygonMumbai_DEPRECATED:
     case NetworkName.ArbitrumGoerli_DEPRECATED:
