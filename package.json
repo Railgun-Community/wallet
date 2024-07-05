@@ -1,6 +1,6 @@
 {
   "name": "@railgun-community/wallet",
-  "version": "10.1.1",
+  "version": "10.1.2",
   "description": "RAILGUN Wallet SDK, compatible with mobile, browser and nodejs environments.",
   "main": "dist/index.js",
   "license": "MIT",
