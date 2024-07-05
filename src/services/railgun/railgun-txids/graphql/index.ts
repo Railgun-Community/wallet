@@ -40,6 +40,7 @@ import { ImportFn } from '@graphql-mesh/types';
 import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
 import type { TxsSepoliaTypes } from './.graphclient/sources/txs-sepolia/types';
 import type { TxsBscTypes } from './.graphclient/sources/txs-bsc/types';
+import type { TxsMaticTypes } from './.graphclient/sources/txs-matic/types';
 import type { TxsArbitrumTypes } from './.graphclient/sources/txs-arbitrum/types';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -3117,7 +3118,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
 }>;
 
 
-export type MeshContext = TxsEthereumTypes.Context & TxsSepoliaTypes.Context & TxsArbitrumTypes.Context &TxsBscTypes.Context & BaseMeshContext;
+export type MeshContext = TxsEthereumTypes.Context & TxsSepoliaTypes.Context & TxsArbitrumTypes.Context & TxsBscTypes.Context & TxsMaticTypes.Context & BaseMeshContext;
 
 
 const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
@@ -3133,6 +3134,8 @@ const importFn: ImportFn = <T>(moduleId: string) => {
         return import("./.graphclient/sources/txs-arbitrum/introspectionSchema") as T;
     case '.graphclient/sources/txs-bsc/introspectionSchema':
       return import("./.graphclient/sources/txs-bsc/introspectionSchema") as T;
+    case '.graphclient/sources/txs-matic/introspectionSchema':
+      return import("./.graphclient/sources/txs-matic/introspectionSchema") as T;
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
   }
@@ -3167,6 +3170,7 @@ const txsEthereumTransforms = [];
 const txsSepoliaTransforms = [];
 const txsArbitrumTransforms = [];
 const txsBscTransforms = [];
+const txsMaticTransforms = [];
 const additionalTypeDefs = [] as any[];
 const txsEthereumHandler = new GraphqlHandler({
               name: "txs-ethereum",
@@ -3208,6 +3212,16 @@ const txsBscHandler = new GraphqlHandler({
               logger: logger.child("txs-bsc"),
               importFn,
             });
+const txsMaticHandler = new GraphqlHandler({
+              name: "txs-matic",
+              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-polygon-v2/graphql"},
+              baseDir,
+              cache,
+              pubsub,
+              store: sourcesStore.child("txs-matic"),
+              logger: logger.child("txs-matic"),
+              importFn,
+            });
 sources[0] = {
           name: 'txs-ethereum',
           handler: txsEthereumHandler,
@@ -3227,6 +3241,11 @@ sources[3] = {
           name: 'txs-bsc',
           handler: txsBscHandler,
           transforms: txsBscTransforms
+        }
+sources[4] = {
+          name: 'txs-matic',
+          handler: txsMaticHandler,
+          transforms: txsMaticTransforms
         }
 const additionalResolvers = [] as any[]
 const merger = new(BareMerger as any)({
