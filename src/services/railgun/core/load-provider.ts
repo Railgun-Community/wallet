@@ -45,6 +45,9 @@ const createPollingProviderForNetwork = async (
   fallbackProvider: FallbackProvider,
   pollingInterval: number,
 ): Promise<PollingJsonRpcProvider> => {
+  console.log('WALLET: Create polling provider for network');
+  console.log('fallbackProvider: ', JSON.stringify(fallbackProvider));
+
   const existingProvider = pollingProviderMap[networkName];
   if (existingProvider) {
     return existingProvider;
@@ -53,8 +56,9 @@ const createPollingProviderForNetwork = async (
   if (!isDefined(network)) {
     throw new Error('No network found');
   }
+
   const pollingProvider = await createPollingJsonRpcProviderForListeners(
-    fallbackProvider,
+    fallbackProvider as unknown as PollingJsonRpcProvider,
     network.chain.id,
     pollingInterval,
   );
@@ -70,15 +74,21 @@ const loadProviderForNetwork = async (
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
 
+  console.log('loadProviderForNetwork');
   const fallbackProvider = await createFallbackProviderForNetwork(
     networkName,
     fallbackProviderJsonConfig,
   );
+
+  console.log('fallbackProvider', JSON.stringify(fallbackProvider));
+
   const pollingProvider = await createPollingProviderForNetwork(
     networkName,
     fallbackProvider,
     pollingInterval,
   );
+
+  console.log('pollingProvider', JSON.stringify(pollingProvider));
 
   const network = NETWORK_CONFIG[networkName];
   const {
@@ -117,6 +127,8 @@ const loadProviderForNetwork = async (
 
   // This function will set up the contracts for this chain.
   // Throws if provider does not respond.
+  console.log('engine loadNetwork');
+
   await engine.loadNetwork(
     chain,
     proxyContract,
@@ -124,7 +136,7 @@ const loadProviderForNetwork = async (
     poseidonMerkleAccumulatorV3Contract,
     poseidonMerkleVerifierV3Contract,
     tokenVaultV3Contract,
-    fallbackProvider,
+    fallbackProvider as unknown as PollingJsonRpcProvider,
     pollingProvider,
     deploymentBlocks,
     poi?.launchBlock,
