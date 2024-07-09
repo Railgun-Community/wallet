@@ -45,7 +45,6 @@ const createPollingProviderForNetwork = async (
   fallbackProvider: FallbackProvider,
   pollingInterval: number,
 ): Promise<PollingJsonRpcProvider> => {
-
   const existingProvider = pollingProviderMap[networkName];
   if (existingProvider) {
     return existingProvider;
@@ -54,7 +53,6 @@ const createPollingProviderForNetwork = async (
   if (!isDefined(network)) {
     throw new Error('No network found');
   }
-
   const pollingProvider = await createPollingJsonRpcProviderForListeners(
     fallbackProvider as unknown as PollingJsonRpcProvider,
     network.chain.id,
@@ -76,14 +74,11 @@ const loadProviderForNetwork = async (
     networkName,
     fallbackProviderJsonConfig,
   );
-
-
   const pollingProvider = await createPollingProviderForNetwork(
     networkName,
     fallbackProvider,
     pollingInterval,
   );
-
 
   const network = NETWORK_CONFIG[networkName];
   const {
@@ -122,7 +117,6 @@ const loadProviderForNetwork = async (
 
   // This function will set up the contracts for this chain.
   // Throws if provider does not respond.
-
   await engine.loadNetwork(
     chain,
     proxyContract,

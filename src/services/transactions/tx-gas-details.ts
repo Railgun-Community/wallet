@@ -59,10 +59,7 @@ const estimateGas = (
   transaction: ContractTransaction,
   isCrossContractCall: boolean,
 ): Promise<bigint> => {
-  console.log('estimateGas');
   const provider = getFallbackProviderForNetwork(networkName);
-  console.log('estimateGas Provider: ', typeof provider, JSON.stringify(provider));
-
   if (isCrossContractCall) {
     // Includes custom error handler for relay-adapt transactions.
     return RelayAdaptVersionedSmartContracts.estimateGasWithErrorHandler(
