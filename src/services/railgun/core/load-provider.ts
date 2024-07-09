@@ -45,8 +45,6 @@ const createPollingProviderForNetwork = async (
   fallbackProvider: FallbackProvider,
   pollingInterval: number,
 ): Promise<PollingJsonRpcProvider> => {
-  console.log('WALLET: Create polling provider for network');
-  console.log('fallbackProvider: ', JSON.stringify(fallbackProvider));
 
   const existingProvider = pollingProviderMap[networkName];
   if (existingProvider) {
@@ -74,13 +72,11 @@ const loadProviderForNetwork = async (
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
 
-  console.log('loadProviderForNetwork');
   const fallbackProvider = await createFallbackProviderForNetwork(
     networkName,
     fallbackProviderJsonConfig,
   );
 
-  console.log('fallbackProvider', JSON.stringify(fallbackProvider));
 
   const pollingProvider = await createPollingProviderForNetwork(
     networkName,
@@ -88,7 +84,6 @@ const loadProviderForNetwork = async (
     pollingInterval,
   );
 
-  console.log('pollingProvider', JSON.stringify(pollingProvider));
 
   const network = NETWORK_CONFIG[networkName];
   const {
@@ -127,7 +122,6 @@ const loadProviderForNetwork = async (
 
   // This function will set up the contracts for this chain.
   // Throws if provider does not respond.
-  console.log('engine loadNetwork');
 
   await engine.loadNetwork(
     chain,
