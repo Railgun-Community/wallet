@@ -36,8 +36,11 @@ const createFallbackProviderForNetwork = async (
   const fallbackProvider = createFallbackProviderFromJsonConfig(
     fallbackProviderJsonConfig,
   );
-  setFallbackProviderForNetwork(networkName, fallbackProvider);
-  return fallbackProvider;
+
+  // console.log('fallbackProvider: ', fallbackProvider);
+
+  setFallbackProviderForNetwork(networkName, fallbackProvider as unknown as FallbackProvider);
+  return fallbackProvider as unknown as FallbackProvider;
 };
 
 const createPollingProviderForNetwork = async (

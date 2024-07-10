@@ -43,7 +43,7 @@ describe('tx-gas', () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider as unknown as FallbackProvider);
     const gasEstimate = await getGasEstimate(
       txidVersion,
       NetworkName.Polygon,
@@ -68,7 +68,7 @@ describe('tx-gas', () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider as unknown as FallbackProvider);
     const tx: ContractTransaction = {
       chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,
@@ -96,7 +96,7 @@ describe('tx-gas', () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider as unknown as FallbackProvider);
     const tx: ContractTransaction = {
       chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,
