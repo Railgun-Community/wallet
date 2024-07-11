@@ -2,7 +2,7 @@ query Nullifiers($blockNumber: BigInt = 0) {
   nullifiers(
     orderBy: [blockNumber_ASC, nullifier_DESC]
     where: { blockNumber_gte: $blockNumber }
-    limit: 1000
+    limit: 10000
   ) {
     id
     blockNumber
@@ -17,7 +17,7 @@ query Unshields($blockNumber: BigInt = 0) {
   unshields(
     orderBy: [blockNumber_ASC, eventLogIndex_ASC]
     where: { blockNumber_gte: $blockNumber }
-    limit: 1000
+    limit: 10000
   ) {
     id
     blockNumber
@@ -40,7 +40,7 @@ query Commitments($blockNumber: BigInt = 0) {
   commitments(
     orderBy: [blockNumber_ASC, treePosition_ASC]
     where: { blockNumber_gte: $blockNumber }
-    limit: 1000
+    limit: 10000
   ) {
     id
     treeNumber

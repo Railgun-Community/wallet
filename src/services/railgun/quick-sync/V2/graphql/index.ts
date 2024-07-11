@@ -3382,7 +3382,7 @@ export const NullifiersDocument = gql`
   nullifiers(
     orderBy: [blockNumber_ASC, nullifier_DESC]
     where: {blockNumber_gte: $blockNumber}
-    limit: 1000
+    limit: 10000
   ) {
     id
     blockNumber
@@ -3398,7 +3398,7 @@ export const UnshieldsDocument = gql`
   unshields(
     orderBy: [blockNumber_ASC, eventLogIndex_ASC]
     where: {blockNumber_gte: $blockNumber}
-    limit: 1000
+    limit: 10000
   ) {
     id
     blockNumber
@@ -3422,7 +3422,7 @@ export const CommitmentsDocument = gql`
   commitments(
     orderBy: [blockNumber_ASC, treePosition_ASC]
     where: {blockNumber_gte: $blockNumber}
-    limit: 1000
+    limit: 10000
   ) {
     id
     treeNumber

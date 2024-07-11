@@ -1,5 +1,5 @@
 import { AccumulatedEvents } from '@railgun-community/engine';
-import { promiseTimeout } from '@railgun-community/shared-models';
+import { delay, promiseTimeout } from '@railgun-community/shared-models';
 
 export const EMPTY_EVENTS: AccumulatedEvents = {
   commitmentEvents: [],
@@ -24,13 +24,14 @@ export const autoPaginatingQuery = async <
     return prevResults;
   }
 
-  const totalResults = prevResults.concat(newResults);
+  const totalResults = prevResults.concat(newResults); 
 
   const overLimit = totalResults.length >= maxQueryResults;
   const lastResult = totalResults[totalResults.length - 1];
 
-  const shouldQueryMore = newResults.length === 1000;
+  const shouldQueryMore = newResults.length === 10000;
   if (!overLimit && shouldQueryMore) {
+    await delay(250);
     return autoPaginatingQuery(
       query,
       lastResult.blockNumber,
