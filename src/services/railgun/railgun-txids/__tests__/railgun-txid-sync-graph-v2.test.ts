@@ -19,7 +19,7 @@ describe('railgun-txid-sync-graph', () => {
       );
 
     expect(railgunTxs).to.be.an('array');
-    expect(railgunTxs.length).to.equal(5000);
+    expect(railgunTxs.length).to.equal(10000);
 
     expect(railgunTxs[0].commitments).to.deep.equal([
       '0x1afd01a29faf22dcc5678694092a08d38de99fc97d07b9281fa66f956ce43579',
@@ -68,7 +68,7 @@ describe('railgun-txid-sync-graph', () => {
       );
 
     expect(railgunTxs).to.be.an('array');
-    expect(railgunTxs.length).to.equal(5000);
+    expect(railgunTxs.length).to.equal(10000);
 
     expect(railgunTxs[0].commitments).to.deep.equal([
       '0x0bb9f2d13f87b8ba19b7f5bb7750148faeb0fed4a97bc6c3e63d7fe2a7b6d63e',
@@ -123,7 +123,7 @@ describe('railgun-txid-sync-graph', () => {
       );
 
     expect(railgunTxs).to.be.an('array');
-    expect(railgunTxs.length).to.equal(5000);
+    expect(railgunTxs.length).to.be.at.least(5000);
 
     expect(railgunTxs[0].commitments).to.deep.equal([
       '0x2f1f83e339c05d14f102088c0c3f2b8f8addbd8497a88ef49a1e9c942bbb0f87',

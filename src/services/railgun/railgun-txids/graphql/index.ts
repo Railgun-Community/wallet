@@ -3337,7 +3337,7 @@ export type GetRailgunTransactionsByUnshieldToAddressQuery = { transactions: Arr
 
 export const GetRailgunTransactionsAfterGraphIDDocument = gql`
     query GetRailgunTransactionsAfterGraphID($idLow: String = "0x00") {
-  transactions(orderBy: id_ASC, limit: 1000, where: {id_gt: $idLow}) {
+  transactions(orderBy: id_ASC, limit: 10000, where: {id_gt: $idLow}) {
     id
     nullifiers
     commitments
@@ -3389,7 +3389,7 @@ export const GetRailgunTransactionsByUnshieldToAddressDocument = gql`
     query GetRailgunTransactionsByUnshieldToAddress($address: Bytes) {
   transactions(
     orderBy: id_ASC
-    limit: 1000
+    limit: 10000
     where: {unshieldToAddress_eq: $address}
   ) {
     id

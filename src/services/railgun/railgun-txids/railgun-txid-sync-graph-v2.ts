@@ -28,9 +28,9 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.EthereumSepolia:
       return 'txs-sepolia';
     case NetworkName.BNBChain:
-      return 'txs-bsc'
+      return 'txs-bsc';
     case NetworkName.Arbitrum:
-      return 'txs-arbitrum'
+      return 'txs-arbitrum';
     case NetworkName.Polygon:
     case NetworkName.PolygonAmoy:
     case NetworkName.PolygonMumbai_DEPRECATED:
@@ -242,7 +242,7 @@ const autoPaginatingQuery = async <ReturnType extends { id: string }>(
   const overLimit = totalResults.length >= MAX_QUERY_RESULTS;
   const lastResult = totalResults[totalResults.length - 1];
 
-  const shouldQueryMore = newResults.length === 1000;
+  const shouldQueryMore = newResults.length === 10000;
   if (!overLimit && shouldQueryMore) {
     return autoPaginatingQuery(query, lastResult.id, totalResults);
   }
