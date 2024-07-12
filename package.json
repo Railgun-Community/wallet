@@ -87,5 +87,8 @@
   "react-native": {
     "crypto": false,
     "util": false
+  },
+  "resolutions": {
+    "ethers": "6.13.1"
   }
 }
