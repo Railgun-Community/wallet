@@ -14,7 +14,7 @@ import {
   GAS_ESTIMATE_VARIANCE_DUMMY_TO_ACTUAL_TRANSACTION,
   RelayAdaptVersionedSmartContracts,
 } from '@railgun-community/engine';
-import { ContractTransaction, Provider } from 'ethers';
+import { ContractTransaction } from 'ethers';
 
 export const getGasEstimate = async (
   txidVersion: TXIDVersion,
@@ -64,7 +64,7 @@ const estimateGas = (
     // Includes custom error handler for relay-adapt transactions.
     return RelayAdaptVersionedSmartContracts.estimateGasWithErrorHandler(
       txidVersion,
-      provider as any, // TODO replace this not clear
+      provider,
       transaction,
     );
   }
