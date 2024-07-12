@@ -17,7 +17,7 @@ import {
   RailgunVersionedSmartContracts,
   createPollingJsonRpcProviderForListeners,
 } from '@railgun-community/engine';
-import { FallbackProvider } from 'ethers';
+import { FallbackProvider } from 'ethers'
 import {
   fallbackProviderMap,
   pollingProviderMap,
@@ -36,11 +36,8 @@ const createFallbackProviderForNetwork = async (
   const fallbackProvider = createFallbackProviderFromJsonConfig(
     fallbackProviderJsonConfig,
   );
-
-  // console.log('fallbackProvider: ', fallbackProvider);
-
-  setFallbackProviderForNetwork(networkName, fallbackProvider as unknown as FallbackProvider);
-  return fallbackProvider as unknown as FallbackProvider;
+  setFallbackProviderForNetwork(networkName, fallbackProvider);
+  return fallbackProvider;
 };
 
 const createPollingProviderForNetwork = async (
@@ -57,7 +54,7 @@ const createPollingProviderForNetwork = async (
     throw new Error('No network found');
   }
   const pollingProvider = await createPollingJsonRpcProviderForListeners(
-    fallbackProvider as unknown as PollingJsonRpcProvider,
+    fallbackProvider,
     network.chain.id,
     pollingInterval,
   );
@@ -80,7 +77,7 @@ const loadProviderForNetwork = async (
   const pollingProvider = await createPollingProviderForNetwork(
     networkName,
     fallbackProvider,
-    pollingInterval,
+    pollingInterval
   );
 
   const network = NETWORK_CONFIG[networkName];
@@ -127,7 +124,7 @@ const loadProviderForNetwork = async (
     poseidonMerkleAccumulatorV3Contract,
     poseidonMerkleVerifierV3Contract,
     tokenVaultV3Contract,
-    fallbackProvider as unknown as PollingJsonRpcProvider,
+    fallbackProvider,
     pollingProvider,
     deploymentBlocks,
     poi?.launchBlock,
