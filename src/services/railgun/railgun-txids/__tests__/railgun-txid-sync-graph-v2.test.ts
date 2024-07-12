@@ -19,7 +19,7 @@ describe('railgun-txid-sync-graph', () => {
       );
 
     expect(railgunTxs).to.be.an('array');
-    expect(railgunTxs.length).to.equal(10000);
+    expect(railgunTxs.length).to.equal(5000);
 
     expect(railgunTxs[0].commitments).to.deep.equal([
       '0x1afd01a29faf22dcc5678694092a08d38de99fc97d07b9281fa66f956ce43579',
@@ -60,6 +60,54 @@ describe('railgun-txid-sync-graph', () => {
     ]);
   }).timeout(20000);
 
+  it('Should pull railgun txs subsquid query - Polygon', async () => {
+    const railgunTxs: RailgunTransactionV2[] =
+      await quickSyncRailgunTransactionsV2(
+        NETWORK_CONFIG[NetworkName.Polygon].chain,
+        undefined,
+      );
+
+    expect(railgunTxs).to.be.an('array');
+    expect(railgunTxs.length).to.equal(5000);
+
+    expect(railgunTxs[0].commitments).to.deep.equal([
+      '0x06c764e6221b61792530c5d6d33710b9cd4c4d4f734265a4e9070cf081436079',
+      '0x140459c3519d73d56d292fd6d51292980f640623f008a4df063d387a819a7451',
+      '0x23303173569d99ffd5799f526bd53cb81073e2d6e9ff8f4b07bed8d948722673',
+    ]);
+    expect(railgunTxs[0].nullifiers).to.deep.equal([
+      '0x1e52cee52f67c37a468458671cddde6b56390dcbdc4cf3b770badc0e78d66401',
+    ]);
+    expect(railgunTxs[0].graphID).to.equal(
+      '0x0000000000000000000000000000000000000000000000000000000001ae397e00000000000000000000000000000000000000000000000000000000000000260000000000000000000000000000000000000000000000000000000000000000',
+    );
+    expect(railgunTxs[0].boundParamsHash).to.equal(
+      '0x251fcceba8b19129e88aff1e5214ad6f2a807e4a095075e55873aa59416111a2',
+    );
+    expect(railgunTxs[0].txid).to.equal(
+      '65df130da6a571fbcceb8538400f37bcaa4fe508caec7ab05f3b438f303bfe31',
+    );
+    expect(railgunTxs[0].utxoTreeIn).to.equal(0);
+    expect(railgunTxs[0].utxoTreeOut).to.equal(0);
+    expect(railgunTxs[0].utxoBatchStartPositionOut).to.equal(2);
+    expect(railgunTxs[0].unshield).to.equal(undefined);
+    expect(railgunTxs[0].blockNumber).to.equal(28195198);
+    expect(railgunTxs[0].verificationHash).to.equal(
+      '0x099cd3ebcadaf6ff470d16bc0186fb5f26cd4103e9970effc9b6679478e11c72',
+    );
+  }).timeout(20_000);
+
+  it('Should pull unshield railgun txids - Polygon', async () => {
+    const unshieldRailgunTxids: string[] = await getRailgunTxidsForUnshields(
+      NETWORK_CONFIG[NetworkName.Polygon].chain,
+      '0x7310a30b3a0dcec299917d5cd7ef2feab8c0507c41ec17649f38a21b4093dc32',
+    );
+
+    expect(unshieldRailgunTxids).to.deep.equal([
+      '113827d5fea4ebacffc3ab7289e6185d328c51c5f59ecbcd874d8f73e5638e27',
+    ]);
+  }).timeout(20000);
+
   it('Should pull railgun txs subsquid query - Arbitrum', async () => {
     const railgunTxs: RailgunTransactionV2[] =
       await quickSyncRailgunTransactionsV2(
@@ -68,7 +116,7 @@ describe('railgun-txid-sync-graph', () => {
       );
 
     expect(railgunTxs).to.be.an('array');
-    expect(railgunTxs.length).to.equal(10000);
+    expect(railgunTxs.length).to.equal(5000);
 
     expect(railgunTxs[0].commitments).to.deep.equal([
       '0x0bb9f2d13f87b8ba19b7f5bb7750148faeb0fed4a97bc6c3e63d7fe2a7b6d63e',
@@ -123,7 +171,7 @@ describe('railgun-txid-sync-graph', () => {
       );
 
     expect(railgunTxs).to.be.an('array');
-    expect(railgunTxs.length).to.be.at.least(5000);
+    expect(railgunTxs.length).to.equal(5000);
 
     expect(railgunTxs[0].commitments).to.deep.equal([
       '0x2f1f83e339c05d14f102088c0c3f2b8f8addbd8497a88ef49a1e9c942bbb0f87',
