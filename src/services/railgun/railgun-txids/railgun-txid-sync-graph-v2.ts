@@ -6,8 +6,10 @@ import {
 } from '@railgun-community/engine';
 import {
   NetworkName,
+  delay,
   isDefined,
   networkForChain,
+  promiseTimeout,
 } from '@railgun-community/shared-models';
 import { getMeshOptions, getSdk } from './graphql';
 import { MeshInstance, getMesh } from '@graphql-mesh/runtime';
@@ -32,7 +34,7 @@ const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
     case NetworkName.Arbitrum:
       return 'txs-arbitrum';
     case NetworkName.Polygon:
-      return 'txs-matic'
+      return 'txs-matic';
     case NetworkName.PolygonAmoy:
     case NetworkName.PolygonMumbai_DEPRECATED:
     case NetworkName.ArbitrumGoerli_DEPRECATED:
@@ -233,7 +235,11 @@ const autoPaginatingQuery = async <ReturnType extends { id: string }>(
   id: string,
   prevResults: ReturnType[] = [],
 ): Promise<ReturnType[]> => {
-  const newResults = await query(id);
+  const newResults = await promiseTimeout(
+    query(id),
+    20000,
+    new Error('Timeout querying Graph for QuickSync of RAILGUN-TXID Events'),
+  );
   if (newResults.length === 0) {
     return prevResults;
   }
@@ -243,8 +249,10 @@ const autoPaginatingQuery = async <ReturnType extends { id: string }>(
   const overLimit = totalResults.length >= MAX_QUERY_RESULTS;
   const lastResult = totalResults[totalResults.length - 1];
 
-  const shouldQueryMore = newResults.length === 10000;
+  const shouldQueryMore = newResults.length === 5000;
+  // console.log("SHOULD QUERY MORE", shouldQueryMore, "OVER LIMIT", overLimit, "TOTAL RESULTS", totalResults.length)
   if (!overLimit && shouldQueryMore) {
+    await delay(250);
     return autoPaginatingQuery(query, lastResult.id, totalResults);
   }
 
