@@ -41,13 +41,12 @@ export const getGasEstimate = async (
   }
 
   try {
-    const gasEstimate = await estimateGas(
+    return estimateGas(
       txidVersion,
       networkName,
       estimateGasTransactionRequest,
       isCrossContractCall,
     );
-    return gasEstimate;
   } catch (err) {
     throw reportAndSanitizeError(getGasEstimate.name, err);
   }

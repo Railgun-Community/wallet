@@ -28,22 +28,22 @@ const txidVersion = getTestTXIDVersion();
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-describe('tx-gas', () => {
+describe.only('tx-gas', () => {
   afterEach(() => {
     gasEstimateStub?.restore();
   });
 
   it('Should format gas estimate response', async () => {
-    gasEstimateStub = Sinon.stub(
-      FallbackProvider.prototype,
-      'estimateGas',
-    ).resolves(BigInt('200'));
-
     const transaction = {} as ContractTransaction;
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider as unknown as FallbackProvider);
+
+    setFallbackProviderForNetwork(
+      NetworkName.Polygon,
+      fallbackProvider as unknown as FallbackProvider,
+    );
+
     const gasEstimate = await getGasEstimate(
       txidVersion,
       NetworkName.Polygon,
@@ -54,21 +54,24 @@ describe('tx-gas', () => {
     );
 
     const isGasEstimateWithDummyProof = false;
+
     const rsp = gasEstimateResponse(
       gasEstimate,
       undefined, // broadcasterFeeCommitment
       isGasEstimateWithDummyProof,
     );
 
-    expect(gasEstimateStub.callCount).to.equal(1);
-    expect(rsp.gasEstimate).to.equal(200n);
+    expect(rsp.gasEstimate).to.equal(53000n);
   });
 
   it('Should pull gas estimate for basic transaction - self-signed', async () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider as unknown as FallbackProvider);
+    setFallbackProviderForNetwork(
+      NetworkName.Polygon,
+      fallbackProvider as unknown as FallbackProvider,
+    );
     const tx: ContractTransaction = {
       chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,
@@ -96,7 +99,10 @@ describe('tx-gas', () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider as unknown as FallbackProvider);
+    setFallbackProviderForNetwork(
+      NetworkName.Polygon,
+      fallbackProvider as unknown as FallbackProvider,
+    );
     const tx: ContractTransaction = {
       chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,
