@@ -149,18 +149,11 @@ const stubRelayAdaptGasEstimateFailure = () => {
   ).rejects(new Error('RelayAdapt multicall failed at index UNKNOWN.'));
 };
 
-const stubGasEstimateFailure = () => {
-  gasEstimateStub = Sinon.stub(
-    FallbackProvider.prototype,
-    'estimateGas',
-  ).rejects(new Error('test rejection - gas estimate'));
-};
-
 const spyOnSetUnshield = () => {
   addUnshieldDataSpy = Sinon.spy(TransactionBatch.prototype, 'addUnshieldData');
 };
 
-describe.only('tx-cross-contract-calls', () => {
+describe('tx-cross-contract-calls', () => {
   before(async function run() {
     this.timeout(60_000);
     await initTestEngine();
@@ -225,6 +218,7 @@ describe.only('tx-cross-contract-calls', () => {
     gasEstimateStub?.restore();
     addUnshieldDataSpy?.restore();
     erc20NoteSpy?.restore();
+    relayAdaptGasEstimateStub?.restore();
   });
   after(async () => {
     railProveStub.restore();
@@ -236,7 +230,6 @@ describe.only('tx-cross-contract-calls', () => {
   // GAS ESTIMATE
 
   it('Should get gas estimates for valid cross contract calls', async () => {
-    // stubGasEstimateSuccess();
     stubRelayAdaptGasEstimate();
     spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
@@ -333,7 +326,7 @@ describe.only('tx-cross-contract-calls', () => {
   }).timeout(10_000);
 
   it('Should get gas estimates for valid cross contract calls, public wallet', async () => {
-    stubGasEstimateSuccess();
+    stubRelayAdaptGasEstimate();
     spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       txidVersion,
@@ -413,8 +406,7 @@ describe.only('tx-cross-contract-calls', () => {
     ).rejectedWith(`Cross-contract calls require to and data fields.`);
   });
 
-  it.only('Should error on cross contract calls gas estimate for ethers rejections', async () => {
-    // stubGasEstimateFailure();
+  it('Should error on cross contract calls gas estimate for ethers rejections', async () => {
     stubRelayAdaptGasEstimateFailure();
     await expect(
       gasEstimateForUnprovenCrossContractCalls(
