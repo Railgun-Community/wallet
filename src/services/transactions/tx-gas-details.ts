@@ -129,7 +129,9 @@ export const setGasDetailsForTransaction = (
   );
 
   if (gasDetails.evmGasType !== evmGasType) {
-    const transactionType = sendWithPublicWallet ? 'self-signed' : 'Broadcaster';
+    const transactionType = sendWithPublicWallet
+      ? 'self-signed'
+      : 'Broadcaster';
     throw new Error(
       `Invalid evmGasType for ${networkName} (${transactionType}): expected Type${evmGasType}, received Type${gasDetails.evmGasType} in gasDetails. Retrieve appropriate gas type with getEVMGasTypeForTransaction (@railgun-community/shared-models).`,
     );

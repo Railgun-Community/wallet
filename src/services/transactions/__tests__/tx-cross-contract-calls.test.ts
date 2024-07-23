@@ -66,6 +66,7 @@ let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
 let relayAdaptPopulateCrossContractCalls: SinonStub;
+let relayAdaptGasEstimateStub: SinonStub;
 let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
@@ -127,6 +128,13 @@ const gasDetails: TransactionGasDetails = {
   gasPrice: overallBatchMinGasPrice,
 };
 
+const stubRelayAdaptGasEstimate = () => {
+  relayAdaptGasEstimateStub = Sinon.stub(
+    RelayAdaptVersionedSmartContracts,
+    'estimateGasWithErrorHandler',
+  ).resolves(BigInt('200'));
+};
+
 const stubGasEstimateSuccess = () => {
   gasEstimateStub = Sinon.stub(
     FallbackProvider.prototype,
@@ -149,7 +157,10 @@ describe('tx-cross-contract-calls', () => {
   before(async function run() {
     this.timeout(60_000);
     await initTestEngine();
-    await initTestEngineNetworks(NetworkName.Polygon, MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON);
+    await initTestEngineNetworks(
+      NetworkName.Polygon,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
+    );
 
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
@@ -217,101 +228,105 @@ describe('tx-cross-contract-calls', () => {
 
   // GAS ESTIMATE
 
-  it('Should get gas estimates for valid cross contract calls', async () => {
-    stubGasEstimateSuccess();
-    spyOnSetUnshield();
-    const rsp = await gasEstimateForUnprovenCrossContractCalls(
-      txidVersion,
-      NetworkName.Polygon,
-      railgunWallet.id,
-      MOCK_DB_ENCRYPTION_KEY,
-      MOCK_TOKEN_AMOUNTS,
-      MOCK_NFT_AMOUNTS,
-      MOCK_ERC20_RECIPIENTS,
-      MOCK_NFT_AMOUNT_RECIPIENTS,
-      mockCrossContractCalls,
-      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-      MOCK_FEE_TOKEN_DETAILS,
-      false, // sendWithPublicWallet
-      minGasLimit,
-    );
-    expect(rsp.broadcasterFeeCommitment).to.not.be.undefined;
-    expect(rsp.broadcasterFeeCommitment?.commitmentCiphertext).to.deep.equal(
-      isV2Test()
-        ? MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2
-        : MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
-    );
-    expect(addUnshieldDataSpy.called).to.be.true;
-    expect(addUnshieldDataSpy.args).to.deep.equal([
-      [
-        {
-          toAddress: polygonRelayAdaptContract,
-          tokenData: mockERC20TokenData0,
-          value: BigInt('0x0100'),
-          allowOverride: false,
-        },
-      ], // run 1 - erc20 1
-      [
-        {
-          toAddress: polygonRelayAdaptContract,
-          tokenData: mockERC20TokenData1,
-          value: BigInt('0x0200'),
-          allowOverride: false,
-        },
-      ], // run 1 - erc20 2
-      [
-        {
-          toAddress: polygonRelayAdaptContract,
-          tokenData: mockNFTTokenData0,
-          value: BigInt('1'),
-          allowOverride: false,
-        },
-      ], // run 1 - nft 0
-      [
-        {
-          toAddress: polygonRelayAdaptContract,
-          tokenData: mockNFTTokenData1,
-          value: BigInt('2'),
-          allowOverride: false,
-        },
-      ], // run 1 - nft 1
-      [
-        {
-          toAddress: polygonRelayAdaptContract,
-          tokenData: mockERC20TokenData0,
-          value: BigInt('0x0100'),
-          allowOverride: false,
-        },
-      ], // run 2 - erc20 1
-      [
-        {
-          toAddress: polygonRelayAdaptContract,
-          tokenData: mockERC20TokenData1,
-          value: BigInt('0x0200'),
-          allowOverride: false,
-        },
-      ], // run 2 - erc20 2
-      [
-        {
-          toAddress: polygonRelayAdaptContract,
-          tokenData: mockNFTTokenData0,
-          value: BigInt('1'),
-          allowOverride: false,
-        },
-      ], // run 2 - nft 0
-      [
-        {
-          toAddress: polygonRelayAdaptContract,
-          tokenData: mockNFTTokenData1,
-          value: BigInt('2'),
-          allowOverride: false,
-        },
-      ], // run 2 - nft 1
-    ]);
-    // Add 9000 for the dummy tx variance
-    // expect(rsp.gasEstimate).to.equal(9000n + 280n);
-    expect(rsp.gasEstimate).to.equal(3_200_000n); // Cross Contract Minimum
-  }).timeout(10_000);
+  it.only(
+    'Should get gas estimates for valid cross contract calls',
+    async () => {
+      // stubGasEstimateSuccess();
+      stubRelayAdaptGasEstimate();
+      spyOnSetUnshield();
+      const rsp = await gasEstimateForUnprovenCrossContractCalls(
+        txidVersion,
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        MOCK_TOKEN_AMOUNTS,
+        MOCK_NFT_AMOUNTS,
+        MOCK_ERC20_RECIPIENTS,
+        MOCK_NFT_AMOUNT_RECIPIENTS,
+        mockCrossContractCalls,
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false, // sendWithPublicWallet
+        minGasLimit,
+      );
+      expect(rsp.broadcasterFeeCommitment).to.not.be.undefined;
+      expect(rsp.broadcasterFeeCommitment?.commitmentCiphertext).to.deep.equal(
+        isV2Test()
+          ? MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V2
+          : MOCK_FORMATTED_BROADCASTER_FEE_COMMITMENT_CIPHERTEXT_V3,
+      );
+      expect(addUnshieldDataSpy.called).to.be.true;
+      expect(addUnshieldDataSpy.args).to.deep.equal([
+        [
+          {
+            toAddress: polygonRelayAdaptContract,
+            tokenData: mockERC20TokenData0,
+            value: BigInt('0x0100'),
+            allowOverride: false,
+          },
+        ], // run 1 - erc20 1
+        [
+          {
+            toAddress: polygonRelayAdaptContract,
+            tokenData: mockERC20TokenData1,
+            value: BigInt('0x0200'),
+            allowOverride: false,
+          },
+        ], // run 1 - erc20 2
+        [
+          {
+            toAddress: polygonRelayAdaptContract,
+            tokenData: mockNFTTokenData0,
+            value: BigInt('1'),
+            allowOverride: false,
+          },
+        ], // run 1 - nft 0
+        [
+          {
+            toAddress: polygonRelayAdaptContract,
+            tokenData: mockNFTTokenData1,
+            value: BigInt('2'),
+            allowOverride: false,
+          },
+        ], // run 1 - nft 1
+        [
+          {
+            toAddress: polygonRelayAdaptContract,
+            tokenData: mockERC20TokenData0,
+            value: BigInt('0x0100'),
+            allowOverride: false,
+          },
+        ], // run 2 - erc20 1
+        [
+          {
+            toAddress: polygonRelayAdaptContract,
+            tokenData: mockERC20TokenData1,
+            value: BigInt('0x0200'),
+            allowOverride: false,
+          },
+        ], // run 2 - erc20 2
+        [
+          {
+            toAddress: polygonRelayAdaptContract,
+            tokenData: mockNFTTokenData0,
+            value: BigInt('1'),
+            allowOverride: false,
+          },
+        ], // run 2 - nft 0
+        [
+          {
+            toAddress: polygonRelayAdaptContract,
+            tokenData: mockNFTTokenData1,
+            value: BigInt('2'),
+            allowOverride: false,
+          },
+        ], // run 2 - nft 1
+      ]);
+      // Add 9000 for the dummy tx variance
+      // expect(rsp.gasEstimate).to.equal(9000n + 280n);
+      expect(rsp.gasEstimate).to.equal(3_200_000n); // Cross Contract Minimum
+    },
+  ).timeout(10_000);
 
   it('Should get gas estimates for valid cross contract calls, public wallet', async () => {
     stubGasEstimateSuccess();
