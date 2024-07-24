@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import Sinon, { SinonStub } from 'sinon';
+import { SinonStub } from 'sinon';
 import {
   CommitmentSummary,
   createFallbackProviderFromJsonConfig,
@@ -28,7 +28,7 @@ const txidVersion = getTestTXIDVersion();
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-describe.only('tx-gas', () => {
+describe('tx-gas', () => {
   afterEach(() => {
     gasEstimateStub?.restore();
   });
@@ -54,7 +54,6 @@ describe.only('tx-gas', () => {
     );
 
     const isGasEstimateWithDummyProof = false;
-
     const rsp = gasEstimateResponse(
       gasEstimate,
       undefined, // broadcasterFeeCommitment

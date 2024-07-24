@@ -52,7 +52,10 @@ const generateERC20ShieldRequests = async (
     erc20AmountRecipient.amount,
     erc20AmountRecipient.tokenAddress,
   );
-  return shield.serialize(ByteUtils.hexToBytes(shieldPrivateKey), viewingPublicKey);
+  return shield.serialize(
+    ByteUtils.hexToBytes(shieldPrivateKey),
+    viewingPublicKey,
+  );
 };
 
 const generateNFTShieldRequests = async (
@@ -81,7 +84,10 @@ const generateNFTShieldRequests = async (
     value,
     nftTokenData,
   );
-  return shield.serialize(ByteUtils.hexToBytes(shieldPrivateKey), viewingPublicKey);
+  return shield.serialize(
+    ByteUtils.hexToBytes(shieldPrivateKey),
+    viewingPublicKey,
+  );
 };
 
 export const generateShieldTransaction = async (
