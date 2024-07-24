@@ -24,7 +24,6 @@ import {
 import * as txGasDetailsModule from '../tx-gas-details';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { ByteUtils } from '@railgun-community/engine';
-import { FallbackProvider } from 'ethers';
 import { getTestTXIDVersion } from '../../../tests/helper.test';
 
 let getGasEstimateStub: SinonStub;
