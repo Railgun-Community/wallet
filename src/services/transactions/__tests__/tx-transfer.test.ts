@@ -47,6 +47,7 @@ import {
   populateProvedTransfer,
   gasEstimateForUnprovenTransfer,
 } from '../tx-transfer';
+import * as txGasDetailsModule from '../tx-gas-details';
 import { generateTransferProof } from '../tx-proof-transfer';
 import {
   createRailgunWallet,
@@ -118,17 +119,15 @@ const MOCK_TOKEN_AMOUNT_RECIPIENTS_DIFFERENT: RailgunERC20AmountRecipient[] =
   }));
 
 const stubGasEstimateSuccess = () => {
-  gasEstimateStub = Sinon.stub(
-    FallbackProvider.prototype,
-    'estimateGas',
-  ).resolves(BigInt('200'));
+  gasEstimateStub = Sinon.stub(txGasDetailsModule, 'getGasEstimate').resolves(
+    BigInt('200'),
+  );
 };
 
 const stubGasEstimateFailure = () => {
-  gasEstimateStub = Sinon.stub(
-    FallbackProvider.prototype,
-    'estimateGas',
-  ).rejects(new Error('test rejection - gas estimate'));
+  gasEstimateStub = Sinon.stub(txGasDetailsModule, 'getGasEstimate').rejects(
+    new Error('test rejection - gas estimate'),
+  );
 };
 
 const spyOnERC20Note = () => {

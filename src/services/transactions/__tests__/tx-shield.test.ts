@@ -30,7 +30,9 @@ import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { getRandomBytes } from '../../railgun';
 import { FallbackProvider } from 'ethers';
 import { getTestTXIDVersion } from '../../../tests/helper.test';
+import * as txGasDetailsModule from '../tx-gas-details';
 
+let getGasEstimateStub: SinonStub;
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;
 
@@ -88,6 +90,19 @@ const stubFailure = () => {
   ).rejects(new Error('test rejection - gas estimate'));
 };
 
+const stubGetGasEstimate = () => {
+  getGasEstimateStub = Sinon.stub(
+    txGasDetailsModule,
+    'getGasEstimate',
+  ).resolves(200n);
+};
+
+const stubGetGasEstimateFailure = () => {
+  getGasEstimateStub = Sinon.stub(txGasDetailsModule, 'getGasEstimate').rejects(
+    new Error('test rejection - gas estimate'),
+  );
+};
+
 describe('tx-shield', () => {
   before(async function run() {
     this.timeout(60_000);
@@ -102,6 +117,7 @@ describe('tx-shield', () => {
   afterEach(() => {
     gasEstimateStub?.restore();
     sendTxStub?.restore();
+    getGasEstimateStub?.restore();
   });
   after(async () => {
     await closeTestEngine();
@@ -112,7 +128,8 @@ describe('tx-shield', () => {
   });
 
   it('Should get gas estimate for valid shield', async () => {
-    stubSuccess();
+    stubGetGasEstimate();
+    console.log('TESTING Should get gas estimate for valid shield');
     const rsp = await gasEstimateForShield(
       txidVersion,
       NetworkName.Polygon,
@@ -121,11 +138,15 @@ describe('tx-shield', () => {
       MOCK_NFT_AMOUNT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
+    console.log(
+      'TESTING Should get gas estimate for valid shield RESPONMSE: ',
+      rsp,
+    );
     expect(rsp.gasEstimate).to.equal(200n);
   });
 
   it('Should error on gas estimates for invalid shield', async () => {
-    stubSuccess();
+    stubGetGasEstimate();
     await expect(
       gasEstimateForShield(
         txidVersion,
@@ -139,7 +160,7 @@ describe('tx-shield', () => {
   });
 
   it('Should error for ethers rejections', async () => {
-    stubFailure();
+    stubGetGasEstimateFailure();
     await expect(
       gasEstimateForShield(
         txidVersion,
@@ -153,7 +174,7 @@ describe('tx-shield', () => {
   });
 
   it('Should send tx for valid shield - no gas details', async () => {
-    stubSuccess();
+    stubGetGasEstimate();
     const { transaction } = await populateShield(
       txidVersion,
       NetworkName.Polygon,
@@ -174,7 +195,7 @@ describe('tx-shield', () => {
   });
 
   it('Should send tx for valid shield - gas details', async () => {
-    stubSuccess();
+    stubGetGasEstimate();
     const { transaction } = await populateShield(
       txidVersion,
       NetworkName.Polygon,
@@ -195,7 +216,7 @@ describe('tx-shield', () => {
   });
 
   it('Should error on send tx for invalid shield', async () => {
-    stubSuccess();
+    stubGetGasEstimate();
     await expect(
       populateShield(
         txidVersion,
