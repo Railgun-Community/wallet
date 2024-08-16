@@ -129,7 +129,6 @@ describe('tx-shield', () => {
 
   it('Should get gas estimate for valid shield', async () => {
     stubGetGasEstimate();
-    console.log('TESTING Should get gas estimate for valid shield');
     const rsp = await gasEstimateForShield(
       txidVersion,
       NetworkName.Polygon,
