@@ -1,56 +1,14 @@
-/**
- * TO UPDATE:
- * 1. Find all places that are "MODIFIED", move them into the new built index.ts (in .graphclient)
- * 2. add these comments (including eslint disables)
- * 3. move the modified index file to quick-sync/graphql/ (NOTE: MAKE SURE TO DRAG AND DROP IN VSCODE SO THE SOURCE LOCATIONS CHANGE!)
- */
 // @ts-nocheck
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable import/no-duplicates */
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable import/newline-after-import */
-/* eslint-disable prefer-template */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 
-import { GraphQLResolveInfo, SelectionSetNode, FieldNode, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-import { gql } from '@graphql-mesh/utils';
+import { InContextSdkMethod } from '@graphql-mesh/types';
+import { MeshContext } from '@graphql-mesh/runtime';
 
-import type { GetMeshOptions } from '@graphql-mesh/runtime';
-import type { YamlConfig } from '@graphql-mesh/types';
-import { PubSub } from '@graphql-mesh/utils';
-import { DefaultLogger } from '@graphql-mesh/utils';
-import MeshCache from "@graphql-mesh/cache-localforage";
-import { fetch as fetchFn } from '@whatwg-node/fetch';
-
-import { MeshResolvedSource } from '@graphql-mesh/runtime';
-import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
-import GraphqlHandler from "@graphql-mesh/graphql"
-import BareMerger from "@graphql-mesh/merger-bare";
-import { printWithCache } from '@graphql-mesh/utils';
-import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
-import { getMesh, ExecuteMeshFn, SubscribeMeshFn, MeshContext as BaseMeshContext, MeshInstance } from '@graphql-mesh/runtime';
-import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
-import { path as pathModule } from '@graphql-mesh/cross-helpers';
-import { ImportFn } from '@graphql-mesh/types';
-import type { TxsEthereumTypes } from './.graphclient/sources/txs-ethereum/types';
-import type { TxsSepoliaTypes } from './.graphclient/sources/txs-sepolia/types';
-import type { TxsBscTypes } from './.graphclient/sources/txs-bsc/types';
-import type { TxsMaticTypes } from './.graphclient/sources/txs-matic/types';
-import type { TxsArbitrumTypes } from './.graphclient/sources/txs-arbitrum/types';
-export type Maybe<T> = T | null;
+export namespace TxsMaticTypes {
+  export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
-
-
-
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -58,8 +16,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Bytes: string;  // MODIFIED
-  BigInt: string; // MODIFIED
+  Bytes: any;
+  BigInt: any;
 };
 
 export type Query = {
@@ -2347,1108 +2305,137 @@ export type SquidStatus = {
   height?: Maybe<Scalars['Int']>;
 };
 
-export type WithIndex<TObject> = TObject & Record<string, any>;
-export type ResolversObject<TObject> = WithIndex<TObject>;
-
-export type ResolverTypeWrapper<T> = Promise<T> | T;
-
-
-export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
-  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
-};
-
-export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
-  fragment: string;
-  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
-};
-
-export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
-  selectionSet: string | ((fieldNode: FieldNode) => SelectionSetNode);
-  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
-};
-export type StitchingResolver<TResult, TParent, TContext, TArgs> = LegacyStitchingResolver<TResult, TParent, TContext, TArgs> | NewStitchingResolver<TResult, TParent, TContext, TArgs>;
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
-  | ResolverFn<TResult, TParent, TContext, TArgs>
-  | ResolverWithResolve<TResult, TParent, TContext, TArgs>
-  | StitchingResolver<TResult, TParent, TContext, TArgs>;
-
-export type ResolverFn<TResult, TParent, TContext, TArgs> = (
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => Promise<TResult> | TResult;
-
-export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>;
-
-export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => TResult | Promise<TResult>;
-
-export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
-  subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>;
-  resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>;
-}
-
-export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
-  subscribe: SubscriptionSubscribeFn<any, TParent, TContext, TArgs>;
-  resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
-}
-
-export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
-  | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
-  | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
-
-export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
-  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
-  | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
-
-export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
-  parent: TParent,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
-
-export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
-
-export type NextResolverFn<T> = () => Promise<T>;
-
-export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
-  next: NextResolverFn<TResult>,
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => TResult | Promise<TResult>;
-
-/** Mapping between all available schema types and the resolvers types */
-export type ResolversTypes = ResolversObject<{
-  Query: ResolverTypeWrapper<{}>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
-  String: ResolverTypeWrapper<Scalars['String']>;
-  Token: ResolverTypeWrapper<Token>;
-  TokenType: TokenType;
-  Bytes: ResolverTypeWrapper<Scalars['Bytes']>;
-  TokenWhereInput: TokenWhereInput;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  TokenOrderByInput: TokenOrderByInput;
-  WhereIdInput: WhereIdInput;
-  TokensConnection: ResolverTypeWrapper<TokensConnection>;
-  TokenEdge: ResolverTypeWrapper<TokenEdge>;
-  PageInfo: ResolverTypeWrapper<PageInfo>;
-  CommitmentPreimage: ResolverTypeWrapper<CommitmentPreimage>;
-  BigInt: ResolverTypeWrapper<Scalars['BigInt']>;
-  CommitmentPreimageWhereInput: CommitmentPreimageWhereInput;
-  CommitmentPreimageOrderByInput: CommitmentPreimageOrderByInput;
-  CommitmentPreimagesConnection: ResolverTypeWrapper<CommitmentPreimagesConnection>;
-  CommitmentPreimageEdge: ResolverTypeWrapper<CommitmentPreimageEdge>;
-  Ciphertext: ResolverTypeWrapper<Ciphertext>;
-  CiphertextWhereInput: CiphertextWhereInput;
-  CiphertextOrderByInput: CiphertextOrderByInput;
-  CiphertextsConnection: ResolverTypeWrapper<CiphertextsConnection>;
-  CiphertextEdge: ResolverTypeWrapper<CiphertextEdge>;
-  LegacyCommitmentCiphertext: ResolverTypeWrapper<LegacyCommitmentCiphertext>;
-  LegacyCommitmentCiphertextWhereInput: LegacyCommitmentCiphertextWhereInput;
-  LegacyCommitmentCiphertextOrderByInput: LegacyCommitmentCiphertextOrderByInput;
-  LegacyCommitmentCiphertextsConnection: ResolverTypeWrapper<LegacyCommitmentCiphertextsConnection>;
-  LegacyCommitmentCiphertextEdge: ResolverTypeWrapper<LegacyCommitmentCiphertextEdge>;
-  CommitmentCiphertext: ResolverTypeWrapper<CommitmentCiphertext>;
-  CommitmentCiphertextWhereInput: CommitmentCiphertextWhereInput;
-  CommitmentCiphertextOrderByInput: CommitmentCiphertextOrderByInput;
-  CommitmentCiphertextsConnection: ResolverTypeWrapper<CommitmentCiphertextsConnection>;
-  CommitmentCiphertextEdge: ResolverTypeWrapper<CommitmentCiphertextEdge>;
-  LegacyGeneratedCommitment: ResolverTypeWrapper<LegacyGeneratedCommitment>;
-  Commitment: ResolversTypes['LegacyGeneratedCommitment'] | ResolversTypes['LegacyEncryptedCommitment'] | ResolversTypes['ShieldCommitment'] | ResolversTypes['TransactCommitment'];
-  CommitmentType: CommitmentType;
-  LegacyGeneratedCommitmentWhereInput: LegacyGeneratedCommitmentWhereInput;
-  LegacyGeneratedCommitmentOrderByInput: LegacyGeneratedCommitmentOrderByInput;
-  LegacyGeneratedCommitmentsConnection: ResolverTypeWrapper<LegacyGeneratedCommitmentsConnection>;
-  LegacyGeneratedCommitmentEdge: ResolverTypeWrapper<LegacyGeneratedCommitmentEdge>;
-  CommitmentWhereInput: CommitmentWhereInput;
-  CommitmentOrderByInput: CommitmentOrderByInput;
-  CommitmentsConnection: ResolverTypeWrapper<CommitmentsConnection>;
-  CommitmentEdge: ResolverTypeWrapper<CommitmentEdge>;
-  LegacyEncryptedCommitment: ResolverTypeWrapper<LegacyEncryptedCommitment>;
-  LegacyEncryptedCommitmentWhereInput: LegacyEncryptedCommitmentWhereInput;
-  LegacyEncryptedCommitmentOrderByInput: LegacyEncryptedCommitmentOrderByInput;
-  LegacyEncryptedCommitmentsConnection: ResolverTypeWrapper<LegacyEncryptedCommitmentsConnection>;
-  LegacyEncryptedCommitmentEdge: ResolverTypeWrapper<LegacyEncryptedCommitmentEdge>;
-  ShieldCommitment: ResolverTypeWrapper<ShieldCommitment>;
-  ShieldCommitmentWhereInput: ShieldCommitmentWhereInput;
-  ShieldCommitmentOrderByInput: ShieldCommitmentOrderByInput;
-  ShieldCommitmentsConnection: ResolverTypeWrapper<ShieldCommitmentsConnection>;
-  ShieldCommitmentEdge: ResolverTypeWrapper<ShieldCommitmentEdge>;
-  TransactCommitment: ResolverTypeWrapper<TransactCommitment>;
-  TransactCommitmentWhereInput: TransactCommitmentWhereInput;
-  TransactCommitmentOrderByInput: TransactCommitmentOrderByInput;
-  TransactCommitmentsConnection: ResolverTypeWrapper<TransactCommitmentsConnection>;
-  TransactCommitmentEdge: ResolverTypeWrapper<TransactCommitmentEdge>;
-  Unshield: ResolverTypeWrapper<Unshield>;
-  UnshieldWhereInput: UnshieldWhereInput;
-  UnshieldOrderByInput: UnshieldOrderByInput;
-  UnshieldsConnection: ResolverTypeWrapper<UnshieldsConnection>;
-  UnshieldEdge: ResolverTypeWrapper<UnshieldEdge>;
-  Nullifier: ResolverTypeWrapper<Nullifier>;
-  NullifierWhereInput: NullifierWhereInput;
-  NullifierOrderByInput: NullifierOrderByInput;
-  NullifiersConnection: ResolverTypeWrapper<NullifiersConnection>;
-  NullifierEdge: ResolverTypeWrapper<NullifierEdge>;
-  Transaction: ResolverTypeWrapper<Transaction>;
-  TransactionInterface: ResolversTypes['Transaction'];
-  TransactionWhereInput: TransactionWhereInput;
-  TransactionOrderByInput: TransactionOrderByInput;
-  TransactionsConnection: ResolverTypeWrapper<TransactionsConnection>;
-  TransactionEdge: ResolverTypeWrapper<TransactionEdge>;
-  VerificationHash: ResolverTypeWrapper<VerificationHash>;
-  VerificationHashWhereInput: VerificationHashWhereInput;
-  VerificationHashOrderByInput: VerificationHashOrderByInput;
-  VerificationHashesConnection: ResolverTypeWrapper<VerificationHashesConnection>;
-  VerificationHashEdge: ResolverTypeWrapper<VerificationHashEdge>;
-  CommitmentBatchEventNew: ResolverTypeWrapper<CommitmentBatchEventNew>;
-  CommitmentBatchEventNewWhereInput: CommitmentBatchEventNewWhereInput;
-  CommitmentBatchEventNewOrderByInput: CommitmentBatchEventNewOrderByInput;
-  CommitmentBatchEventNewsConnection: ResolverTypeWrapper<CommitmentBatchEventNewsConnection>;
-  CommitmentBatchEventNewEdge: ResolverTypeWrapper<CommitmentBatchEventNewEdge>;
-  SquidStatus: ResolverTypeWrapper<SquidStatus>;
-}>;
-
-/** Mapping between all available schema types and the resolvers parents */
-export type ResolversParentTypes = ResolversObject<{
-  Query: {};
-  Int: Scalars['Int'];
-  String: Scalars['String'];
-  Token: Token;
-  Bytes: Scalars['Bytes'];
-  TokenWhereInput: TokenWhereInput;
-  Boolean: Scalars['Boolean'];
-  WhereIdInput: WhereIdInput;
-  TokensConnection: TokensConnection;
-  TokenEdge: TokenEdge;
-  PageInfo: PageInfo;
-  CommitmentPreimage: CommitmentPreimage;
-  BigInt: Scalars['BigInt'];
-  CommitmentPreimageWhereInput: CommitmentPreimageWhereInput;
-  CommitmentPreimagesConnection: CommitmentPreimagesConnection;
-  CommitmentPreimageEdge: CommitmentPreimageEdge;
-  Ciphertext: Ciphertext;
-  CiphertextWhereInput: CiphertextWhereInput;
-  CiphertextsConnection: CiphertextsConnection;
-  CiphertextEdge: CiphertextEdge;
-  LegacyCommitmentCiphertext: LegacyCommitmentCiphertext;
-  LegacyCommitmentCiphertextWhereInput: LegacyCommitmentCiphertextWhereInput;
-  LegacyCommitmentCiphertextsConnection: LegacyCommitmentCiphertextsConnection;
-  LegacyCommitmentCiphertextEdge: LegacyCommitmentCiphertextEdge;
-  CommitmentCiphertext: CommitmentCiphertext;
-  CommitmentCiphertextWhereInput: CommitmentCiphertextWhereInput;
-  CommitmentCiphertextsConnection: CommitmentCiphertextsConnection;
-  CommitmentCiphertextEdge: CommitmentCiphertextEdge;
-  LegacyGeneratedCommitment: LegacyGeneratedCommitment;
-  Commitment: ResolversParentTypes['LegacyGeneratedCommitment'] | ResolversParentTypes['LegacyEncryptedCommitment'] | ResolversParentTypes['ShieldCommitment'] | ResolversParentTypes['TransactCommitment'];
-  LegacyGeneratedCommitmentWhereInput: LegacyGeneratedCommitmentWhereInput;
-  LegacyGeneratedCommitmentsConnection: LegacyGeneratedCommitmentsConnection;
-  LegacyGeneratedCommitmentEdge: LegacyGeneratedCommitmentEdge;
-  CommitmentWhereInput: CommitmentWhereInput;
-  CommitmentsConnection: CommitmentsConnection;
-  CommitmentEdge: CommitmentEdge;
-  LegacyEncryptedCommitment: LegacyEncryptedCommitment;
-  LegacyEncryptedCommitmentWhereInput: LegacyEncryptedCommitmentWhereInput;
-  LegacyEncryptedCommitmentsConnection: LegacyEncryptedCommitmentsConnection;
-  LegacyEncryptedCommitmentEdge: LegacyEncryptedCommitmentEdge;
-  ShieldCommitment: ShieldCommitment;
-  ShieldCommitmentWhereInput: ShieldCommitmentWhereInput;
-  ShieldCommitmentsConnection: ShieldCommitmentsConnection;
-  ShieldCommitmentEdge: ShieldCommitmentEdge;
-  TransactCommitment: TransactCommitment;
-  TransactCommitmentWhereInput: TransactCommitmentWhereInput;
-  TransactCommitmentsConnection: TransactCommitmentsConnection;
-  TransactCommitmentEdge: TransactCommitmentEdge;
-  Unshield: Unshield;
-  UnshieldWhereInput: UnshieldWhereInput;
-  UnshieldsConnection: UnshieldsConnection;
-  UnshieldEdge: UnshieldEdge;
-  Nullifier: Nullifier;
-  NullifierWhereInput: NullifierWhereInput;
-  NullifiersConnection: NullifiersConnection;
-  NullifierEdge: NullifierEdge;
-  Transaction: Transaction;
-  TransactionInterface: ResolversParentTypes['Transaction'];
-  TransactionWhereInput: TransactionWhereInput;
-  TransactionsConnection: TransactionsConnection;
-  TransactionEdge: TransactionEdge;
-  VerificationHash: VerificationHash;
-  VerificationHashWhereInput: VerificationHashWhereInput;
-  VerificationHashesConnection: VerificationHashesConnection;
-  VerificationHashEdge: VerificationHashEdge;
-  CommitmentBatchEventNew: CommitmentBatchEventNew;
-  CommitmentBatchEventNewWhereInput: CommitmentBatchEventNewWhereInput;
-  CommitmentBatchEventNewsConnection: CommitmentBatchEventNewsConnection;
-  CommitmentBatchEventNewEdge: CommitmentBatchEventNewEdge;
-  SquidStatus: SquidStatus;
-}>;
-
-export type QueryResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  tokens?: Resolver<Array<ResolversTypes['Token']>, ParentType, ContextType, Partial<QuerytokensArgs>>;
-  tokenById?: Resolver<Maybe<ResolversTypes['Token']>, ParentType, ContextType, RequireFields<QuerytokenByIdArgs, 'id'>>;
-  tokenByUniqueInput?: Resolver<Maybe<ResolversTypes['Token']>, ParentType, ContextType, RequireFields<QuerytokenByUniqueInputArgs, 'where'>>;
-  tokensConnection?: Resolver<ResolversTypes['TokensConnection'], ParentType, ContextType, RequireFields<QuerytokensConnectionArgs, 'orderBy'>>;
-  commitmentPreimages?: Resolver<Array<ResolversTypes['CommitmentPreimage']>, ParentType, ContextType, Partial<QuerycommitmentPreimagesArgs>>;
-  commitmentPreimageById?: Resolver<Maybe<ResolversTypes['CommitmentPreimage']>, ParentType, ContextType, RequireFields<QuerycommitmentPreimageByIdArgs, 'id'>>;
-  commitmentPreimageByUniqueInput?: Resolver<Maybe<ResolversTypes['CommitmentPreimage']>, ParentType, ContextType, RequireFields<QuerycommitmentPreimageByUniqueInputArgs, 'where'>>;
-  commitmentPreimagesConnection?: Resolver<ResolversTypes['CommitmentPreimagesConnection'], ParentType, ContextType, RequireFields<QuerycommitmentPreimagesConnectionArgs, 'orderBy'>>;
-  ciphertexts?: Resolver<Array<ResolversTypes['Ciphertext']>, ParentType, ContextType, Partial<QueryciphertextsArgs>>;
-  ciphertextById?: Resolver<Maybe<ResolversTypes['Ciphertext']>, ParentType, ContextType, RequireFields<QueryciphertextByIdArgs, 'id'>>;
-  ciphertextByUniqueInput?: Resolver<Maybe<ResolversTypes['Ciphertext']>, ParentType, ContextType, RequireFields<QueryciphertextByUniqueInputArgs, 'where'>>;
-  ciphertextsConnection?: Resolver<ResolversTypes['CiphertextsConnection'], ParentType, ContextType, RequireFields<QueryciphertextsConnectionArgs, 'orderBy'>>;
-  legacyCommitmentCiphertexts?: Resolver<Array<ResolversTypes['LegacyCommitmentCiphertext']>, ParentType, ContextType, Partial<QuerylegacyCommitmentCiphertextsArgs>>;
-  legacyCommitmentCiphertextById?: Resolver<Maybe<ResolversTypes['LegacyCommitmentCiphertext']>, ParentType, ContextType, RequireFields<QuerylegacyCommitmentCiphertextByIdArgs, 'id'>>;
-  legacyCommitmentCiphertextByUniqueInput?: Resolver<Maybe<ResolversTypes['LegacyCommitmentCiphertext']>, ParentType, ContextType, RequireFields<QuerylegacyCommitmentCiphertextByUniqueInputArgs, 'where'>>;
-  legacyCommitmentCiphertextsConnection?: Resolver<ResolversTypes['LegacyCommitmentCiphertextsConnection'], ParentType, ContextType, RequireFields<QuerylegacyCommitmentCiphertextsConnectionArgs, 'orderBy'>>;
-  commitmentCiphertexts?: Resolver<Array<ResolversTypes['CommitmentCiphertext']>, ParentType, ContextType, Partial<QuerycommitmentCiphertextsArgs>>;
-  commitmentCiphertextById?: Resolver<Maybe<ResolversTypes['CommitmentCiphertext']>, ParentType, ContextType, RequireFields<QuerycommitmentCiphertextByIdArgs, 'id'>>;
-  commitmentCiphertextByUniqueInput?: Resolver<Maybe<ResolversTypes['CommitmentCiphertext']>, ParentType, ContextType, RequireFields<QuerycommitmentCiphertextByUniqueInputArgs, 'where'>>;
-  commitmentCiphertextsConnection?: Resolver<ResolversTypes['CommitmentCiphertextsConnection'], ParentType, ContextType, RequireFields<QuerycommitmentCiphertextsConnectionArgs, 'orderBy'>>;
-  legacyGeneratedCommitments?: Resolver<Array<ResolversTypes['LegacyGeneratedCommitment']>, ParentType, ContextType, Partial<QuerylegacyGeneratedCommitmentsArgs>>;
-  legacyGeneratedCommitmentById?: Resolver<Maybe<ResolversTypes['LegacyGeneratedCommitment']>, ParentType, ContextType, RequireFields<QuerylegacyGeneratedCommitmentByIdArgs, 'id'>>;
-  legacyGeneratedCommitmentByUniqueInput?: Resolver<Maybe<ResolversTypes['LegacyGeneratedCommitment']>, ParentType, ContextType, RequireFields<QuerylegacyGeneratedCommitmentByUniqueInputArgs, 'where'>>;
-  legacyGeneratedCommitmentsConnection?: Resolver<ResolversTypes['LegacyGeneratedCommitmentsConnection'], ParentType, ContextType, RequireFields<QuerylegacyGeneratedCommitmentsConnectionArgs, 'orderBy'>>;
-  commitments?: Resolver<Array<ResolversTypes['Commitment']>, ParentType, ContextType, Partial<QuerycommitmentsArgs>>;
-  commitmentsConnection?: Resolver<ResolversTypes['CommitmentsConnection'], ParentType, ContextType, RequireFields<QuerycommitmentsConnectionArgs, 'orderBy'>>;
-  legacyEncryptedCommitments?: Resolver<Array<ResolversTypes['LegacyEncryptedCommitment']>, ParentType, ContextType, Partial<QuerylegacyEncryptedCommitmentsArgs>>;
-  legacyEncryptedCommitmentById?: Resolver<Maybe<ResolversTypes['LegacyEncryptedCommitment']>, ParentType, ContextType, RequireFields<QuerylegacyEncryptedCommitmentByIdArgs, 'id'>>;
-  legacyEncryptedCommitmentByUniqueInput?: Resolver<Maybe<ResolversTypes['LegacyEncryptedCommitment']>, ParentType, ContextType, RequireFields<QuerylegacyEncryptedCommitmentByUniqueInputArgs, 'where'>>;
-  legacyEncryptedCommitmentsConnection?: Resolver<ResolversTypes['LegacyEncryptedCommitmentsConnection'], ParentType, ContextType, RequireFields<QuerylegacyEncryptedCommitmentsConnectionArgs, 'orderBy'>>;
-  shieldCommitments?: Resolver<Array<ResolversTypes['ShieldCommitment']>, ParentType, ContextType, Partial<QueryshieldCommitmentsArgs>>;
-  shieldCommitmentById?: Resolver<Maybe<ResolversTypes['ShieldCommitment']>, ParentType, ContextType, RequireFields<QueryshieldCommitmentByIdArgs, 'id'>>;
-  shieldCommitmentByUniqueInput?: Resolver<Maybe<ResolversTypes['ShieldCommitment']>, ParentType, ContextType, RequireFields<QueryshieldCommitmentByUniqueInputArgs, 'where'>>;
-  shieldCommitmentsConnection?: Resolver<ResolversTypes['ShieldCommitmentsConnection'], ParentType, ContextType, RequireFields<QueryshieldCommitmentsConnectionArgs, 'orderBy'>>;
-  transactCommitments?: Resolver<Array<ResolversTypes['TransactCommitment']>, ParentType, ContextType, Partial<QuerytransactCommitmentsArgs>>;
-  transactCommitmentById?: Resolver<Maybe<ResolversTypes['TransactCommitment']>, ParentType, ContextType, RequireFields<QuerytransactCommitmentByIdArgs, 'id'>>;
-  transactCommitmentByUniqueInput?: Resolver<Maybe<ResolversTypes['TransactCommitment']>, ParentType, ContextType, RequireFields<QuerytransactCommitmentByUniqueInputArgs, 'where'>>;
-  transactCommitmentsConnection?: Resolver<ResolversTypes['TransactCommitmentsConnection'], ParentType, ContextType, RequireFields<QuerytransactCommitmentsConnectionArgs, 'orderBy'>>;
-  unshields?: Resolver<Array<ResolversTypes['Unshield']>, ParentType, ContextType, Partial<QueryunshieldsArgs>>;
-  unshieldById?: Resolver<Maybe<ResolversTypes['Unshield']>, ParentType, ContextType, RequireFields<QueryunshieldByIdArgs, 'id'>>;
-  unshieldByUniqueInput?: Resolver<Maybe<ResolversTypes['Unshield']>, ParentType, ContextType, RequireFields<QueryunshieldByUniqueInputArgs, 'where'>>;
-  unshieldsConnection?: Resolver<ResolversTypes['UnshieldsConnection'], ParentType, ContextType, RequireFields<QueryunshieldsConnectionArgs, 'orderBy'>>;
-  nullifiers?: Resolver<Array<ResolversTypes['Nullifier']>, ParentType, ContextType, Partial<QuerynullifiersArgs>>;
-  nullifierById?: Resolver<Maybe<ResolversTypes['Nullifier']>, ParentType, ContextType, RequireFields<QuerynullifierByIdArgs, 'id'>>;
-  nullifierByUniqueInput?: Resolver<Maybe<ResolversTypes['Nullifier']>, ParentType, ContextType, RequireFields<QuerynullifierByUniqueInputArgs, 'where'>>;
-  nullifiersConnection?: Resolver<ResolversTypes['NullifiersConnection'], ParentType, ContextType, RequireFields<QuerynullifiersConnectionArgs, 'orderBy'>>;
-  transactions?: Resolver<Array<ResolversTypes['Transaction']>, ParentType, ContextType, Partial<QuerytransactionsArgs>>;
-  transactionById?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, RequireFields<QuerytransactionByIdArgs, 'id'>>;
-  transactionByUniqueInput?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType, RequireFields<QuerytransactionByUniqueInputArgs, 'where'>>;
-  transactionsConnection?: Resolver<ResolversTypes['TransactionsConnection'], ParentType, ContextType, RequireFields<QuerytransactionsConnectionArgs, 'orderBy'>>;
-  verificationHashes?: Resolver<Array<ResolversTypes['VerificationHash']>, ParentType, ContextType, Partial<QueryverificationHashesArgs>>;
-  verificationHashById?: Resolver<Maybe<ResolversTypes['VerificationHash']>, ParentType, ContextType, RequireFields<QueryverificationHashByIdArgs, 'id'>>;
-  verificationHashByUniqueInput?: Resolver<Maybe<ResolversTypes['VerificationHash']>, ParentType, ContextType, RequireFields<QueryverificationHashByUniqueInputArgs, 'where'>>;
-  verificationHashesConnection?: Resolver<ResolversTypes['VerificationHashesConnection'], ParentType, ContextType, RequireFields<QueryverificationHashesConnectionArgs, 'orderBy'>>;
-  commitmentBatchEventNews?: Resolver<Array<ResolversTypes['CommitmentBatchEventNew']>, ParentType, ContextType, Partial<QuerycommitmentBatchEventNewsArgs>>;
-  commitmentBatchEventNewById?: Resolver<Maybe<ResolversTypes['CommitmentBatchEventNew']>, ParentType, ContextType, RequireFields<QuerycommitmentBatchEventNewByIdArgs, 'id'>>;
-  commitmentBatchEventNewByUniqueInput?: Resolver<Maybe<ResolversTypes['CommitmentBatchEventNew']>, ParentType, ContextType, RequireFields<QuerycommitmentBatchEventNewByUniqueInputArgs, 'where'>>;
-  commitmentBatchEventNewsConnection?: Resolver<ResolversTypes['CommitmentBatchEventNewsConnection'], ParentType, ContextType, RequireFields<QuerycommitmentBatchEventNewsConnectionArgs, 'orderBy'>>;
-  squidStatus?: Resolver<Maybe<ResolversTypes['SquidStatus']>, ParentType, ContextType>;
-}>;
-
-export type TokenResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Token'] = ResolversParentTypes['Token']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  tokenType?: Resolver<ResolversTypes['TokenType'], ParentType, ContextType>;
-  tokenAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  tokenSubID?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export interface BytesScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Bytes'], any> {
-  name: 'Bytes';
-}
-
-export type TokensConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TokensConnection'] = ResolversParentTypes['TokensConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['TokenEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type TokenEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TokenEdge'] = ResolversParentTypes['TokenEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type PageInfoResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
-  hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  startCursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  endCursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentPreimageResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentPreimage'] = ResolversParentTypes['CommitmentPreimage']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  npk?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  token?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
-  value?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export interface BigIntScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['BigInt'], any> {
-  name: 'BigInt';
-}
-
-export type CommitmentPreimagesConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentPreimagesConnection'] = ResolversParentTypes['CommitmentPreimagesConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['CommitmentPreimageEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentPreimageEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentPreimageEdge'] = ResolversParentTypes['CommitmentPreimageEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['CommitmentPreimage'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CiphertextResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Ciphertext'] = ResolversParentTypes['Ciphertext']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  iv?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  tag?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  data?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CiphertextsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CiphertextsConnection'] = ResolversParentTypes['CiphertextsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['CiphertextEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CiphertextEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CiphertextEdge'] = ResolversParentTypes['CiphertextEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['Ciphertext'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type LegacyCommitmentCiphertextResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyCommitmentCiphertext'] = ResolversParentTypes['LegacyCommitmentCiphertext']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  ciphertext?: Resolver<ResolversTypes['Ciphertext'], ParentType, ContextType>;
-  ephemeralKeys?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  memo?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type LegacyCommitmentCiphertextsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyCommitmentCiphertextsConnection'] = ResolversParentTypes['LegacyCommitmentCiphertextsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['LegacyCommitmentCiphertextEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type LegacyCommitmentCiphertextEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyCommitmentCiphertextEdge'] = ResolversParentTypes['LegacyCommitmentCiphertextEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['LegacyCommitmentCiphertext'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentCiphertextResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentCiphertext'] = ResolversParentTypes['CommitmentCiphertext']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  ciphertext?: Resolver<ResolversTypes['Ciphertext'], ParentType, ContextType>;
-  blindedSenderViewingKey?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  blindedReceiverViewingKey?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  annotationData?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  memo?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentCiphertextsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentCiphertextsConnection'] = ResolversParentTypes['CommitmentCiphertextsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['CommitmentCiphertextEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentCiphertextEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentCiphertextEdge'] = ResolversParentTypes['CommitmentCiphertextEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['CommitmentCiphertext'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type LegacyGeneratedCommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyGeneratedCommitment'] = ResolversParentTypes['LegacyGeneratedCommitment']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
-  hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  preimage?: Resolver<ResolversTypes['CommitmentPreimage'], ParentType, ContextType>;
-  encryptedRandom?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Commitment'] = ResolversParentTypes['Commitment']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'LegacyGeneratedCommitment' | 'LegacyEncryptedCommitment' | 'ShieldCommitment' | 'TransactCommitment', ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
-  hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-}>;
-
-export type LegacyGeneratedCommitmentsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyGeneratedCommitmentsConnection'] = ResolversParentTypes['LegacyGeneratedCommitmentsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['LegacyGeneratedCommitmentEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type LegacyGeneratedCommitmentEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyGeneratedCommitmentEdge'] = ResolversParentTypes['LegacyGeneratedCommitmentEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['LegacyGeneratedCommitment'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentsConnection'] = ResolversParentTypes['CommitmentsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['CommitmentEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentEdge'] = ResolversParentTypes['CommitmentEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['Commitment'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type LegacyEncryptedCommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyEncryptedCommitment'] = ResolversParentTypes['LegacyEncryptedCommitment']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
-  hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  ciphertext?: Resolver<ResolversTypes['LegacyCommitmentCiphertext'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type LegacyEncryptedCommitmentsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyEncryptedCommitmentsConnection'] = ResolversParentTypes['LegacyEncryptedCommitmentsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['LegacyEncryptedCommitmentEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type LegacyEncryptedCommitmentEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['LegacyEncryptedCommitmentEdge'] = ResolversParentTypes['LegacyEncryptedCommitmentEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['LegacyEncryptedCommitment'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type ShieldCommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['ShieldCommitment'] = ResolversParentTypes['ShieldCommitment']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
-  hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  preimage?: Resolver<ResolversTypes['CommitmentPreimage'], ParentType, ContextType>;
-  encryptedBundle?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  shieldKey?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  fee?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type ShieldCommitmentsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['ShieldCommitmentsConnection'] = ResolversParentTypes['ShieldCommitmentsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['ShieldCommitmentEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type ShieldCommitmentEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['ShieldCommitmentEdge'] = ResolversParentTypes['ShieldCommitmentEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['ShieldCommitment'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type TransactCommitmentResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TransactCommitment'] = ResolversParentTypes['TransactCommitment']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  treePosition?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commitmentType?: Resolver<ResolversTypes['CommitmentType'], ParentType, ContextType>;
-  hash?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  ciphertext?: Resolver<ResolversTypes['CommitmentCiphertext'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type TransactCommitmentsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TransactCommitmentsConnection'] = ResolversParentTypes['TransactCommitmentsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['TransactCommitmentEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type TransactCommitmentEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TransactCommitmentEdge'] = ResolversParentTypes['TransactCommitmentEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['TransactCommitment'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type UnshieldResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Unshield'] = ResolversParentTypes['Unshield']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  to?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  token?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
-  amount?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  fee?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  eventLogIndex?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type UnshieldsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['UnshieldsConnection'] = ResolversParentTypes['UnshieldsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['UnshieldEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type UnshieldEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['UnshieldEdge'] = ResolversParentTypes['UnshieldEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['Unshield'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type NullifierResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Nullifier'] = ResolversParentTypes['Nullifier']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  treeNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  nullifier?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type NullifiersConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['NullifiersConnection'] = ResolversParentTypes['NullifiersConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['NullifierEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type NullifierEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['NullifierEdge'] = ResolversParentTypes['NullifierEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['Nullifier'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type TransactionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Transaction'] = ResolversParentTypes['Transaction']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  merkleRoot?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  nullifiers?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  commitments?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  boundParamsHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  hasUnshield?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  utxoTreeIn?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  utxoTreeOut?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  utxoBatchStartPositionOut?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  unshieldToken?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
-  unshieldToAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  unshieldValue?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  verificationHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type TransactionInterfaceResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TransactionInterface'] = ResolversParentTypes['TransactionInterface']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'Transaction', ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  blockNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  transactionHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  merkleRoot?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  nullifiers?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  commitments?: Resolver<Array<ResolversTypes['Bytes']>, ParentType, ContextType>;
-  boundParamsHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  hasUnshield?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  utxoTreeIn?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  utxoTreeOut?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  utxoBatchStartPositionOut?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  unshieldToken?: Resolver<ResolversTypes['Token'], ParentType, ContextType>;
-  unshieldToAddress?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  unshieldValue?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  blockTimestamp?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  verificationHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-}>;
-
-export type TransactionsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TransactionsConnection'] = ResolversParentTypes['TransactionsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['TransactionEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type TransactionEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['TransactionEdge'] = ResolversParentTypes['TransactionEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['Transaction'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type VerificationHashResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['VerificationHash'] = ResolversParentTypes['VerificationHash']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  verificationHash?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type VerificationHashesConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['VerificationHashesConnection'] = ResolversParentTypes['VerificationHashesConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['VerificationHashEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type VerificationHashEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['VerificationHashEdge'] = ResolversParentTypes['VerificationHashEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['VerificationHash'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentBatchEventNewResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentBatchEventNew'] = ResolversParentTypes['CommitmentBatchEventNew']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  treeNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  batchStartTreePosition?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentBatchEventNewsConnectionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentBatchEventNewsConnection'] = ResolversParentTypes['CommitmentBatchEventNewsConnection']> = ResolversObject<{
-  edges?: Resolver<Array<ResolversTypes['CommitmentBatchEventNewEdge']>, ParentType, ContextType>;
-  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type CommitmentBatchEventNewEdgeResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CommitmentBatchEventNewEdge'] = ResolversParentTypes['CommitmentBatchEventNewEdge']> = ResolversObject<{
-  node?: Resolver<ResolversTypes['CommitmentBatchEventNew'], ParentType, ContextType>;
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type SquidStatusResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['SquidStatus'] = ResolversParentTypes['SquidStatus']> = ResolversObject<{
-  height?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type Resolvers<ContextType = MeshContext> = ResolversObject<{
-  Query?: QueryResolvers<ContextType>;
-  Token?: TokenResolvers<ContextType>;
-  Bytes?: GraphQLScalarType;
-  TokensConnection?: TokensConnectionResolvers<ContextType>;
-  TokenEdge?: TokenEdgeResolvers<ContextType>;
-  PageInfo?: PageInfoResolvers<ContextType>;
-  CommitmentPreimage?: CommitmentPreimageResolvers<ContextType>;
-  BigInt?: GraphQLScalarType;
-  CommitmentPreimagesConnection?: CommitmentPreimagesConnectionResolvers<ContextType>;
-  CommitmentPreimageEdge?: CommitmentPreimageEdgeResolvers<ContextType>;
-  Ciphertext?: CiphertextResolvers<ContextType>;
-  CiphertextsConnection?: CiphertextsConnectionResolvers<ContextType>;
-  CiphertextEdge?: CiphertextEdgeResolvers<ContextType>;
-  LegacyCommitmentCiphertext?: LegacyCommitmentCiphertextResolvers<ContextType>;
-  LegacyCommitmentCiphertextsConnection?: LegacyCommitmentCiphertextsConnectionResolvers<ContextType>;
-  LegacyCommitmentCiphertextEdge?: LegacyCommitmentCiphertextEdgeResolvers<ContextType>;
-  CommitmentCiphertext?: CommitmentCiphertextResolvers<ContextType>;
-  CommitmentCiphertextsConnection?: CommitmentCiphertextsConnectionResolvers<ContextType>;
-  CommitmentCiphertextEdge?: CommitmentCiphertextEdgeResolvers<ContextType>;
-  LegacyGeneratedCommitment?: LegacyGeneratedCommitmentResolvers<ContextType>;
-  Commitment?: CommitmentResolvers<ContextType>;
-  LegacyGeneratedCommitmentsConnection?: LegacyGeneratedCommitmentsConnectionResolvers<ContextType>;
-  LegacyGeneratedCommitmentEdge?: LegacyGeneratedCommitmentEdgeResolvers<ContextType>;
-  CommitmentsConnection?: CommitmentsConnectionResolvers<ContextType>;
-  CommitmentEdge?: CommitmentEdgeResolvers<ContextType>;
-  LegacyEncryptedCommitment?: LegacyEncryptedCommitmentResolvers<ContextType>;
-  LegacyEncryptedCommitmentsConnection?: LegacyEncryptedCommitmentsConnectionResolvers<ContextType>;
-  LegacyEncryptedCommitmentEdge?: LegacyEncryptedCommitmentEdgeResolvers<ContextType>;
-  ShieldCommitment?: ShieldCommitmentResolvers<ContextType>;
-  ShieldCommitmentsConnection?: ShieldCommitmentsConnectionResolvers<ContextType>;
-  ShieldCommitmentEdge?: ShieldCommitmentEdgeResolvers<ContextType>;
-  TransactCommitment?: TransactCommitmentResolvers<ContextType>;
-  TransactCommitmentsConnection?: TransactCommitmentsConnectionResolvers<ContextType>;
-  TransactCommitmentEdge?: TransactCommitmentEdgeResolvers<ContextType>;
-  Unshield?: UnshieldResolvers<ContextType>;
-  UnshieldsConnection?: UnshieldsConnectionResolvers<ContextType>;
-  UnshieldEdge?: UnshieldEdgeResolvers<ContextType>;
-  Nullifier?: NullifierResolvers<ContextType>;
-  NullifiersConnection?: NullifiersConnectionResolvers<ContextType>;
-  NullifierEdge?: NullifierEdgeResolvers<ContextType>;
-  Transaction?: TransactionResolvers<ContextType>;
-  TransactionInterface?: TransactionInterfaceResolvers<ContextType>;
-  TransactionsConnection?: TransactionsConnectionResolvers<ContextType>;
-  TransactionEdge?: TransactionEdgeResolvers<ContextType>;
-  VerificationHash?: VerificationHashResolvers<ContextType>;
-  VerificationHashesConnection?: VerificationHashesConnectionResolvers<ContextType>;
-  VerificationHashEdge?: VerificationHashEdgeResolvers<ContextType>;
-  CommitmentBatchEventNew?: CommitmentBatchEventNewResolvers<ContextType>;
-  CommitmentBatchEventNewsConnection?: CommitmentBatchEventNewsConnectionResolvers<ContextType>;
-  CommitmentBatchEventNewEdge?: CommitmentBatchEventNewEdgeResolvers<ContextType>;
-  SquidStatus?: SquidStatusResolvers<ContextType>;
-}>;
-
-
-export type MeshContext = TxsEthereumTypes.Context & TxsSepoliaTypes.Context & TxsArbitrumTypes.Context & TxsBscTypes.Context & TxsMaticTypes.Context & BaseMeshContext;
-
-
-const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/', '..');
-
-const importFn: ImportFn = <T>(moduleId: string) => {
-  const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(baseDir + '/', '');
-  switch(relativeModuleId) {
-    case ".graphclient/sources/txs-ethereum/introspectionSchema":
-      return import("./.graphclient/sources/txs-ethereum/introspectionSchema") as T;
-    case '.graphclient/sources/txs-sepolia/introspectionSchema':
-      return import("./.graphclient/sources/txs-sepolia/introspectionSchema") as T;
-    case '.graphclient/sources/txs-arbitrum/introspectionSchema':
-        return import("./.graphclient/sources/txs-arbitrum/introspectionSchema") as T;
-    case '.graphclient/sources/txs-bsc/introspectionSchema':
-      return import("./.graphclient/sources/txs-bsc/introspectionSchema") as T;
-    case '.graphclient/sources/txs-matic/introspectionSchema':
-      return import("./.graphclient/sources/txs-matic/introspectionSchema") as T;
-    default:
-      return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
-  }
-};
-
-const rootStore = new MeshStore('.graphclient', new FsStoreStorageAdapter({
-  cwd: baseDir,
-  importFn,
-  fileType: "ts",
-}), {
-  readonly: true,
-  validate: false
-});
-
-export const rawServeConfig: YamlConfig.Config['serve'] = undefined as any
-export async function getMeshOptions(): Promise<GetMeshOptions> {
-const pubsub = new PubSub();
-const sourcesStore = rootStore.child('sources');
-const logger = new DefaultLogger("GraphClient");
-const cache = new (MeshCache as any)({
-      ...({} as any),
-      importFn,
-      store: rootStore.child('cache'),
-      pubsub,
-      logger,
-    } as any)
-
-const sources: MeshResolvedSource[] = [];
-const transforms: MeshTransform[] = [];
-const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
-const txsEthereumTransforms = [];
-const txsSepoliaTransforms = [];
-const txsArbitrumTransforms = [];
-const txsBscTransforms = [];
-const txsMaticTransforms = [];
-const additionalTypeDefs = [] as any[];
-const txsEthereumHandler = new GraphqlHandler({
-              name: "txs-ethereum",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-ethereum-v2/graphql"},
-              baseDir,
-              cache,
-              pubsub,
-              store: sourcesStore.child("txs-ethereum"),
-              logger: logger.child("txs-ethereum"),
-              importFn,
-            });
-const txsSepoliaHandler = new GraphqlHandler({
-              name: "txs-sepolia",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-eth-sepolia-v2/graphql"},
-              baseDir,
-              cache,
-              pubsub,
-              store: sourcesStore.child("txs-sepolia"),
-              logger: logger.child("txs-sepolia"),
-              importFn,
-            });
-const txsArbitrumHandler = new GraphqlHandler({
-              name: "txs-arbitrum",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-arbitrum-v2/graphql"},
-              baseDir,
-              cache,
-              pubsub,
-              store: sourcesStore.child("txs-arbitrum"),
-              logger: logger.child("txs-arbitrum"),
-              importFn,
-            });
-const txsBscHandler = new GraphqlHandler({
-              name: "txs-bsc",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-bsc-v2/graphql"},
-              baseDir,
-              cache,
-              pubsub,
-              store: sourcesStore.child("txs-bsc"),
-              logger: logger.child("txs-bsc"),
-              importFn,
-            });
-const txsMaticHandler = new GraphqlHandler({
-              name: "txs-matic",
-              config: {"endpoint":"https://rail-squid.squids.live/squid-railgun-polygon-v2/graphql"},
-              baseDir,
-              cache,
-              pubsub,
-              store: sourcesStore.child("txs-matic"),
-              logger: logger.child("txs-matic"),
-              importFn,
-            });
-sources[0] = {
-          name: 'txs-ethereum',
-          handler: txsEthereumHandler,
-          transforms: txsEthereumTransforms
-        }
-sources[1] = {
-          name: 'txs-sepolia',
-          handler: txsSepoliaHandler,
-          transforms: txsSepoliaTransforms
-        }
-sources[2] = {
-          name: 'txs-arbitrum',
-          handler: txsArbitrumHandler,
-          transforms: txsArbitrumTransforms
-        }
-sources[3] = {
-          name: 'txs-bsc',
-          handler: txsBscHandler,
-          transforms: txsBscTransforms
-        }
-sources[4] = {
-          name: 'txs-matic',
-          handler: txsMaticHandler,
-          transforms: txsMaticTransforms
-        }
-const additionalResolvers = [] as any[]
-const merger = new(BareMerger as any)({
-        cache,
-        pubsub,
-        logger: logger.child('bareMerger'),
-        store: rootStore.child('bareMerger')
-      })
-
-  return {
-    sources,
-    transforms,
-    additionalTypeDefs,
-    additionalResolvers,
-    cache,
-    pubsub,
-    merger,
-    logger,
-    additionalEnvelopPlugins,
-    get documents() {
-      return [
-      {
-        document: GetRailgunTransactionsAfterGraphIdDocument,
-        get rawSDL() {
-          return printWithCache(GetRailgunTransactionsAfterGraphIdDocument);
-        },
-        location: 'GetRailgunTransactionsAfterGraphIdDocument.graphql'
-      },{
-        document: GetRailgunTransactionsByTxidDocument,
-        get rawSDL() {
-          return printWithCache(GetRailgunTransactionsByTxidDocument);
-        },
-        location: 'GetRailgunTransactionsByTxidDocument.graphql'
-      },{
-        document: GetRailgunTransactionsByUnshieldToAddressDocument,
-        get rawSDL() {
-          return printWithCache(GetRailgunTransactionsByUnshieldToAddressDocument);
-        },
-        location: 'GetRailgunTransactionsByUnshieldToAddressDocument.graphql'
-      }
-    ];
-    },
-    fetchFn,
+  export type QuerySdk = {
+      /** null **/
+  tokens: InContextSdkMethod<Query['tokens'], QuerytokensArgs, MeshContext>,
+  /** null **/
+  tokenById: InContextSdkMethod<Query['tokenById'], QuerytokenByIdArgs, MeshContext>,
+  /** null **/
+  tokenByUniqueInput: InContextSdkMethod<Query['tokenByUniqueInput'], QuerytokenByUniqueInputArgs, MeshContext>,
+  /** null **/
+  tokensConnection: InContextSdkMethod<Query['tokensConnection'], QuerytokensConnectionArgs, MeshContext>,
+  /** null **/
+  commitmentPreimages: InContextSdkMethod<Query['commitmentPreimages'], QuerycommitmentPreimagesArgs, MeshContext>,
+  /** null **/
+  commitmentPreimageById: InContextSdkMethod<Query['commitmentPreimageById'], QuerycommitmentPreimageByIdArgs, MeshContext>,
+  /** null **/
+  commitmentPreimageByUniqueInput: InContextSdkMethod<Query['commitmentPreimageByUniqueInput'], QuerycommitmentPreimageByUniqueInputArgs, MeshContext>,
+  /** null **/
+  commitmentPreimagesConnection: InContextSdkMethod<Query['commitmentPreimagesConnection'], QuerycommitmentPreimagesConnectionArgs, MeshContext>,
+  /** null **/
+  ciphertexts: InContextSdkMethod<Query['ciphertexts'], QueryciphertextsArgs, MeshContext>,
+  /** null **/
+  ciphertextById: InContextSdkMethod<Query['ciphertextById'], QueryciphertextByIdArgs, MeshContext>,
+  /** null **/
+  ciphertextByUniqueInput: InContextSdkMethod<Query['ciphertextByUniqueInput'], QueryciphertextByUniqueInputArgs, MeshContext>,
+  /** null **/
+  ciphertextsConnection: InContextSdkMethod<Query['ciphertextsConnection'], QueryciphertextsConnectionArgs, MeshContext>,
+  /** null **/
+  legacyCommitmentCiphertexts: InContextSdkMethod<Query['legacyCommitmentCiphertexts'], QuerylegacyCommitmentCiphertextsArgs, MeshContext>,
+  /** null **/
+  legacyCommitmentCiphertextById: InContextSdkMethod<Query['legacyCommitmentCiphertextById'], QuerylegacyCommitmentCiphertextByIdArgs, MeshContext>,
+  /** null **/
+  legacyCommitmentCiphertextByUniqueInput: InContextSdkMethod<Query['legacyCommitmentCiphertextByUniqueInput'], QuerylegacyCommitmentCiphertextByUniqueInputArgs, MeshContext>,
+  /** null **/
+  legacyCommitmentCiphertextsConnection: InContextSdkMethod<Query['legacyCommitmentCiphertextsConnection'], QuerylegacyCommitmentCiphertextsConnectionArgs, MeshContext>,
+  /** null **/
+  commitmentCiphertexts: InContextSdkMethod<Query['commitmentCiphertexts'], QuerycommitmentCiphertextsArgs, MeshContext>,
+  /** null **/
+  commitmentCiphertextById: InContextSdkMethod<Query['commitmentCiphertextById'], QuerycommitmentCiphertextByIdArgs, MeshContext>,
+  /** null **/
+  commitmentCiphertextByUniqueInput: InContextSdkMethod<Query['commitmentCiphertextByUniqueInput'], QuerycommitmentCiphertextByUniqueInputArgs, MeshContext>,
+  /** null **/
+  commitmentCiphertextsConnection: InContextSdkMethod<Query['commitmentCiphertextsConnection'], QuerycommitmentCiphertextsConnectionArgs, MeshContext>,
+  /** null **/
+  legacyGeneratedCommitments: InContextSdkMethod<Query['legacyGeneratedCommitments'], QuerylegacyGeneratedCommitmentsArgs, MeshContext>,
+  /** null **/
+  legacyGeneratedCommitmentById: InContextSdkMethod<Query['legacyGeneratedCommitmentById'], QuerylegacyGeneratedCommitmentByIdArgs, MeshContext>,
+  /** null **/
+  legacyGeneratedCommitmentByUniqueInput: InContextSdkMethod<Query['legacyGeneratedCommitmentByUniqueInput'], QuerylegacyGeneratedCommitmentByUniqueInputArgs, MeshContext>,
+  /** null **/
+  legacyGeneratedCommitmentsConnection: InContextSdkMethod<Query['legacyGeneratedCommitmentsConnection'], QuerylegacyGeneratedCommitmentsConnectionArgs, MeshContext>,
+  /** null **/
+  commitments: InContextSdkMethod<Query['commitments'], QuerycommitmentsArgs, MeshContext>,
+  /** null **/
+  commitmentsConnection: InContextSdkMethod<Query['commitmentsConnection'], QuerycommitmentsConnectionArgs, MeshContext>,
+  /** null **/
+  legacyEncryptedCommitments: InContextSdkMethod<Query['legacyEncryptedCommitments'], QuerylegacyEncryptedCommitmentsArgs, MeshContext>,
+  /** null **/
+  legacyEncryptedCommitmentById: InContextSdkMethod<Query['legacyEncryptedCommitmentById'], QuerylegacyEncryptedCommitmentByIdArgs, MeshContext>,
+  /** null **/
+  legacyEncryptedCommitmentByUniqueInput: InContextSdkMethod<Query['legacyEncryptedCommitmentByUniqueInput'], QuerylegacyEncryptedCommitmentByUniqueInputArgs, MeshContext>,
+  /** null **/
+  legacyEncryptedCommitmentsConnection: InContextSdkMethod<Query['legacyEncryptedCommitmentsConnection'], QuerylegacyEncryptedCommitmentsConnectionArgs, MeshContext>,
+  /** null **/
+  shieldCommitments: InContextSdkMethod<Query['shieldCommitments'], QueryshieldCommitmentsArgs, MeshContext>,
+  /** null **/
+  shieldCommitmentById: InContextSdkMethod<Query['shieldCommitmentById'], QueryshieldCommitmentByIdArgs, MeshContext>,
+  /** null **/
+  shieldCommitmentByUniqueInput: InContextSdkMethod<Query['shieldCommitmentByUniqueInput'], QueryshieldCommitmentByUniqueInputArgs, MeshContext>,
+  /** null **/
+  shieldCommitmentsConnection: InContextSdkMethod<Query['shieldCommitmentsConnection'], QueryshieldCommitmentsConnectionArgs, MeshContext>,
+  /** null **/
+  transactCommitments: InContextSdkMethod<Query['transactCommitments'], QuerytransactCommitmentsArgs, MeshContext>,
+  /** null **/
+  transactCommitmentById: InContextSdkMethod<Query['transactCommitmentById'], QuerytransactCommitmentByIdArgs, MeshContext>,
+  /** null **/
+  transactCommitmentByUniqueInput: InContextSdkMethod<Query['transactCommitmentByUniqueInput'], QuerytransactCommitmentByUniqueInputArgs, MeshContext>,
+  /** null **/
+  transactCommitmentsConnection: InContextSdkMethod<Query['transactCommitmentsConnection'], QuerytransactCommitmentsConnectionArgs, MeshContext>,
+  /** null **/
+  unshields: InContextSdkMethod<Query['unshields'], QueryunshieldsArgs, MeshContext>,
+  /** null **/
+  unshieldById: InContextSdkMethod<Query['unshieldById'], QueryunshieldByIdArgs, MeshContext>,
+  /** null **/
+  unshieldByUniqueInput: InContextSdkMethod<Query['unshieldByUniqueInput'], QueryunshieldByUniqueInputArgs, MeshContext>,
+  /** null **/
+  unshieldsConnection: InContextSdkMethod<Query['unshieldsConnection'], QueryunshieldsConnectionArgs, MeshContext>,
+  /** null **/
+  nullifiers: InContextSdkMethod<Query['nullifiers'], QuerynullifiersArgs, MeshContext>,
+  /** null **/
+  nullifierById: InContextSdkMethod<Query['nullifierById'], QuerynullifierByIdArgs, MeshContext>,
+  /** null **/
+  nullifierByUniqueInput: InContextSdkMethod<Query['nullifierByUniqueInput'], QuerynullifierByUniqueInputArgs, MeshContext>,
+  /** null **/
+  nullifiersConnection: InContextSdkMethod<Query['nullifiersConnection'], QuerynullifiersConnectionArgs, MeshContext>,
+  /** null **/
+  transactions: InContextSdkMethod<Query['transactions'], QuerytransactionsArgs, MeshContext>,
+  /** null **/
+  transactionById: InContextSdkMethod<Query['transactionById'], QuerytransactionByIdArgs, MeshContext>,
+  /** null **/
+  transactionByUniqueInput: InContextSdkMethod<Query['transactionByUniqueInput'], QuerytransactionByUniqueInputArgs, MeshContext>,
+  /** null **/
+  transactionsConnection: InContextSdkMethod<Query['transactionsConnection'], QuerytransactionsConnectionArgs, MeshContext>,
+  /** null **/
+  verificationHashes: InContextSdkMethod<Query['verificationHashes'], QueryverificationHashesArgs, MeshContext>,
+  /** null **/
+  verificationHashById: InContextSdkMethod<Query['verificationHashById'], QueryverificationHashByIdArgs, MeshContext>,
+  /** null **/
+  verificationHashByUniqueInput: InContextSdkMethod<Query['verificationHashByUniqueInput'], QueryverificationHashByUniqueInputArgs, MeshContext>,
+  /** null **/
+  verificationHashesConnection: InContextSdkMethod<Query['verificationHashesConnection'], QueryverificationHashesConnectionArgs, MeshContext>,
+  /** null **/
+  commitmentBatchEventNews: InContextSdkMethod<Query['commitmentBatchEventNews'], QuerycommitmentBatchEventNewsArgs, MeshContext>,
+  /** null **/
+  commitmentBatchEventNewById: InContextSdkMethod<Query['commitmentBatchEventNewById'], QuerycommitmentBatchEventNewByIdArgs, MeshContext>,
+  /** null **/
+  commitmentBatchEventNewByUniqueInput: InContextSdkMethod<Query['commitmentBatchEventNewByUniqueInput'], QuerycommitmentBatchEventNewByUniqueInputArgs, MeshContext>,
+  /** null **/
+  commitmentBatchEventNewsConnection: InContextSdkMethod<Query['commitmentBatchEventNewsConnection'], QuerycommitmentBatchEventNewsConnectionArgs, MeshContext>,
+  /** null **/
+  squidStatus: InContextSdkMethod<Query['squidStatus'], {}, MeshContext>
   };
-}
 
-export function createBuiltMeshHTTPHandler<TServerContext = {}>(): MeshHTTPHandler<TServerContext> {
-  return createMeshHTTPHandler<TServerContext>({
-    baseDir,
-    getBuiltMesh: getBuiltGraphClient,
-    rawServeConfig: undefined,
-  })
-}
-
-
-let meshInstance$: Promise<MeshInstance> | undefined;
-
-export function getBuiltGraphClient(): Promise<MeshInstance> {
-  if (meshInstance$ == null) {
-    meshInstance$ = getMeshOptions().then(meshOptions => getMesh(meshOptions)).then(mesh => {
-      const id = mesh.pubsub.subscribe('destroy', () => {
-        meshInstance$ = undefined;
-        mesh.pubsub.unsubscribe(id);
-      });
-      return mesh;
-    });
-  }
-  return meshInstance$;
-}
-
-export const execute: ExecuteMeshFn = (...args) => getBuiltGraphClient().then(({ execute }) => execute(...args));
-
-export const subscribe: SubscribeMeshFn = (...args) => getBuiltGraphClient().then(({ subscribe }) => subscribe(...args));
-export function getBuiltGraphSDK<TGlobalContext = any, TOperationContext = any>(globalContext?: TGlobalContext) {
-  const sdkRequester$ = getBuiltGraphClient().then(({ sdkRequesterFactory }) => sdkRequesterFactory(globalContext));
-  return getSdk<TOperationContext, TGlobalContext>((...args) => sdkRequester$.then(sdkRequester => sdkRequester(...args)));
-}
-export type GetRailgunTransactionsAfterGraphIDQueryVariables = Exact<{
-  idLow?: InputMaybe<Scalars['String']>;
-}>;
-
-
-export type GetRailgunTransactionsAfterGraphIDQuery = { transactions: Array<(
-    Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
-    & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
-  )> };
-
-export type GetRailgunTransactionsByTxidQueryVariables = Exact<{
-  txid?: InputMaybe<Scalars['Bytes']>;
-}>;
-
-
-export type GetRailgunTransactionsByTxidQuery = { transactions: Array<(
-    Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
-    & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
-  )> };
-
-export type GetRailgunTransactionsByUnshieldToAddressQueryVariables = Exact<{
-  address?: InputMaybe<Scalars['Bytes']>;
-}>;
-
-
-export type GetRailgunTransactionsByUnshieldToAddressQuery = { transactions: Array<(
-    Pick<Transaction, 'id' | 'nullifiers' | 'commitments' | 'transactionHash' | 'boundParamsHash' | 'blockNumber' | 'utxoTreeIn' | 'utxoTreeOut' | 'utxoBatchStartPositionOut' | 'hasUnshield' | 'unshieldToAddress' | 'unshieldValue' | 'blockTimestamp' | 'verificationHash'>
-    & { unshieldToken: Pick<Token, 'tokenType' | 'tokenSubID' | 'tokenAddress'> }
-  )> };
-
-
-export const GetRailgunTransactionsAfterGraphIDDocument = gql`
-    query GetRailgunTransactionsAfterGraphID($idLow: String = "0x00") {
-  transactions(orderBy: id_ASC, limit: 5000, where: {id_gt: $idLow}) {
-    id
-    nullifiers
-    commitments
-    transactionHash
-    boundParamsHash
-    blockNumber
-    utxoTreeIn
-    utxoTreeOut
-    utxoBatchStartPositionOut
-    hasUnshield
-    unshieldToken {
-      tokenType
-      tokenSubID
-      tokenAddress
-    }
-    unshieldToAddress
-    unshieldValue
-    blockTimestamp
-    verificationHash
-  }
-}
-    ` as unknown as DocumentNode<GetRailgunTransactionsAfterGraphIDQuery, GetRailgunTransactionsAfterGraphIDQueryVariables>;
-export const GetRailgunTransactionsByTxidDocument = gql`
-    query GetRailgunTransactionsByTxid($txid: Bytes) {
-  transactions(where: {transactionHash_eq: $txid}) {
-    id
-    nullifiers
-    commitments
-    transactionHash
-    boundParamsHash
-    blockNumber
-    utxoTreeIn
-    utxoTreeOut
-    utxoBatchStartPositionOut
-    hasUnshield
-    unshieldToken {
-      tokenType
-      tokenSubID
-      tokenAddress
-    }
-    unshieldToAddress
-    unshieldValue
-    blockTimestamp
-    verificationHash
-  }
-}
-    ` as unknown as DocumentNode<GetRailgunTransactionsByTxidQuery, GetRailgunTransactionsByTxidQueryVariables>;
-export const GetRailgunTransactionsByUnshieldToAddressDocument = gql`
-    query GetRailgunTransactionsByUnshieldToAddress($address: Bytes) {
-  transactions(
-    orderBy: id_ASC
-    limit: 5000
-    where: {unshieldToAddress_eq: $address}
-  ) {
-    id
-    nullifiers
-    commitments
-    transactionHash
-    boundParamsHash
-    blockNumber
-    utxoTreeIn
-    utxoTreeOut
-    utxoBatchStartPositionOut
-    hasUnshield
-    unshieldToken {
-      tokenType
-      tokenSubID
-      tokenAddress
-    }
-    unshieldToAddress
-    unshieldValue
-    blockTimestamp
-    verificationHash
-  }
-}
-    ` as unknown as DocumentNode<GetRailgunTransactionsByUnshieldToAddressQuery, GetRailgunTransactionsByUnshieldToAddressQueryVariables>;
-
-
-
-
-export type Requester<C = {}, E = unknown> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R> | AsyncIterable<R>
-export function getSdk<C, E>(requester: Requester<C, E>) {
-  return {
-    GetRailgunTransactionsAfterGraphID(variables?: GetRailgunTransactionsAfterGraphIDQueryVariables, options?: C): Promise<GetRailgunTransactionsAfterGraphIDQuery> {
-      return requester<GetRailgunTransactionsAfterGraphIDQuery, GetRailgunTransactionsAfterGraphIDQueryVariables>(GetRailgunTransactionsAfterGraphIDDocument, variables, options) as Promise<GetRailgunTransactionsAfterGraphIDQuery>;
-    },
-    GetRailgunTransactionsByTxid(variables?: GetRailgunTransactionsByTxidQueryVariables, options?: C): Promise<GetRailgunTransactionsByTxidQuery> {
-      return requester<GetRailgunTransactionsByTxidQuery, GetRailgunTransactionsByTxidQueryVariables>(GetRailgunTransactionsByTxidDocument, variables, options) as Promise<GetRailgunTransactionsByTxidQuery>;
-    },
-    GetRailgunTransactionsByUnshieldToAddress(variables?: GetRailgunTransactionsByUnshieldToAddressQueryVariables, options?: C): Promise<GetRailgunTransactionsByUnshieldToAddressQuery> {
-      return requester<GetRailgunTransactionsByUnshieldToAddressQuery, GetRailgunTransactionsByUnshieldToAddressQueryVariables>(GetRailgunTransactionsByUnshieldToAddressDocument, variables, options) as Promise<GetRailgunTransactionsByUnshieldToAddressQuery>;
-    }
+  export type MutationSdk = {
+    
   };
+
+  export type SubscriptionSdk = {
+    
+  };
+
+  export type Context = {
+      ["txs-matic"]: { Query: QuerySdk, Mutation: MutationSdk, Subscription: SubscriptionSdk },
+      
+    };
 }
-export type Sdk = ReturnType<typeof getSdk>;

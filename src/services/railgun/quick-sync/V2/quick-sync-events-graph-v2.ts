@@ -1,6 +1,7 @@
 import { AccumulatedEvents, Chain } from '@railgun-community/engine';
 import {
   NetworkName,
+  delay,
   isDefined,
   networkForChain,
   removeUndefineds,
@@ -67,38 +68,38 @@ export const quickSyncEventsGraphV2 = async (
 
   const sdk = getBuiltGraphSDK(network.name);
 
-  const [nullifiers, unshields, commitments] = await Promise.all([
-    autoPaginatingQuery(
-      async (blockNumber: string) =>
-        (
-          await sdk.Nullifiers({
-            blockNumber,
-          })
-        ).nullifiers,
-      startingBlock.toString(),
-      MAX_QUERY_RESULTS,
-    ),
-    autoPaginatingQuery(
-      async (blockNumber: string) =>
-        (
-          await sdk.Unshields({
-            blockNumber,
-          })
-        ).unshields,
-      startingBlock.toString(),
-      MAX_QUERY_RESULTS,
-    ),
-    autoPaginatingQuery(
-      async (blockNumber: string) =>
-        (
-          await sdk.Commitments({
-            blockNumber,
-          })
-        ).commitments,
-      startingBlock.toString(),
-      MAX_QUERY_RESULTS,
-    ),
-  ]);
+  const nullifiers = await autoPaginatingQuery(
+    async (blockNumber: string) =>
+      (
+        await sdk.Nullifiers({
+          blockNumber,
+        })
+      ).nullifiers,
+    startingBlock.toString(),
+    MAX_QUERY_RESULTS,
+  );
+  await delay(100);
+  const unshields = await autoPaginatingQuery(
+    async (blockNumber: string) =>
+      (
+        await sdk.Unshields({
+          blockNumber,
+        })
+      ).unshields,
+    startingBlock.toString(),
+    MAX_QUERY_RESULTS,
+  );
+  await delay(100);
+  const commitments = await autoPaginatingQuery(
+    async (blockNumber: string) =>
+      (
+        await sdk.Commitments({
+          blockNumber,
+        })
+      ).commitments,
+    startingBlock.toString(),
+    MAX_QUERY_RESULTS,
+  );
 
   const filteredNullifiers = removeDuplicatesByID(nullifiers);
   const filteredUnshields = removeDuplicatesByID(unshields);
