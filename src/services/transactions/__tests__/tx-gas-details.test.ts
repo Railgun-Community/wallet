@@ -33,7 +33,7 @@ describe('tx-gas', () => {
     gasEstimateStub?.restore();
   });
 
-  it.skip('Should format gas estimate response', async () => {
+  it('Should format gas estimate response', async () => {
     const transaction = {} as ContractTransaction;
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
