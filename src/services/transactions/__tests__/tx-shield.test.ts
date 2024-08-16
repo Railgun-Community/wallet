@@ -138,10 +138,6 @@ describe('tx-shield', () => {
       MOCK_NFT_AMOUNT_RECIPIENTS,
       MOCK_ETH_WALLET_ADDRESS,
     );
-    console.log(
-      'TESTING Should get gas estimate for valid shield RESPONMSE: ',
-      rsp,
-    );
     expect(rsp.gasEstimate).to.equal(200n);
   });
 
