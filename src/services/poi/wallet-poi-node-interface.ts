@@ -19,20 +19,20 @@ import {
   type POIsPerListMap,
 } from '@railgun-community/shared-models';
 import { POIRequired } from './poi-required';
-// import { getEngine } from '../railgun';
+
 export type BatchListUpdateEvent = {
   current: number;
   total: number;
   percent: number;
   status: string;
 };
+
 export class WalletPOINodeInterface extends POINodeInterface {
   private poiNodeRequest: POINodeRequest;
   private batchSize = 20;
 
   private static isPaused = false;
 
-  // private engine: RailgunEngine;
   static listBatchCallback:
     | ((batchData: BatchListUpdateEvent) => void)
     | undefined;
@@ -94,7 +94,6 @@ export class WalletPOINodeInterface extends POINodeInterface {
   static setListBatchCallback = (
     callback: (batchData: BatchListUpdateEvent) => void,
   ): void => {
-    // console.log('SETTING LIST BATCH CALLBACK');
     WalletPOINodeInterface.listBatchCallback = callback;
   };
 
@@ -119,7 +118,6 @@ export class WalletPOINodeInterface extends POINodeInterface {
       const status = `${message} PPOI Batch (${current} of ${total}) ${percent.toFixed(
         2,
       )}%`;
-      // console.log(status);
       WalletPOINodeInterface.listBatchCallback({
         current,
         total,
@@ -127,9 +125,6 @@ export class WalletPOINodeInterface extends POINodeInterface {
         status,
       });
     }
-    // else {
-    //   console.log('NO LIST BATCH CALLBACK', current, total, message);
-    // }
   };
 
   async getPOIsPerList(
@@ -141,45 +136,32 @@ export class WalletPOINodeInterface extends POINodeInterface {
     const poisPerList: POIsPerListMap = {};
     for (let i = 0; i < blindedCommitmentDatas.length; i += this.batchSize) {
       if (WalletPOINodeInterface.isPaused) {
-        // console.log(
-        //   `PPOI Polling on chain ${chain.type}:${chain.id} is paused`,
-        // );
-        // clear the status message
         WalletPOINodeInterface.clearListBatchStatus();
         continue;
       }
       const batch = blindedCommitmentDatas.slice(i, i + this.batchSize);
       const type = batch[0].type;
-      // console.log(`Submitting batch ${i} of ${blindedCommitmentDatas.length}`);
-      try {
-        WalletPOINodeInterface.emitListBatchCallback(
-          i,
-          blindedCommitmentDatas.length,
-          `Verifying ${type}'s`,
-        );
-        const batchPoisPerList: POIsPerListMap =
-          // eslint-disable-next-line no-await-in-loop
-          await this.poiNodeRequest.getPOIsPerList(
-            txidVersion,
-            chain,
-            listKeys,
-            batch,
-          );
-        WalletPOINodeInterface.emitListBatchCallback(
-          i + batch.length,
-          blindedCommitmentDatas.length,
-          `Received results for ${type}'s now Analyzing`,
-        );
+      WalletPOINodeInterface.emitListBatchCallback(
+        i,
+        blindedCommitmentDatas.length,
+        `Verifying ${type}'s`,
+      );
+      const batchPoisPerList: POIsPerListMap =
         // eslint-disable-next-line no-await-in-loop
-        await delay(100);
-        for (const blindedCommitment of Object.keys(batchPoisPerList)) {
-          poisPerList[blindedCommitment] = batchPoisPerList[blindedCommitment];
-        }
-      } catch (error) {
-        // console.error(
-        //   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        //   `Error getting POIs per List: ${error.message} batch index: ${i}`,
-        // );
+        await this.poiNodeRequest
+          .getPOIsPerList(txidVersion, chain, listKeys, batch)
+          .catch(() => {
+            return {};
+          });
+      WalletPOINodeInterface.emitListBatchCallback(
+        i + batch.length,
+        blindedCommitmentDatas.length,
+        `Received results for ${type}'s now Analyzing`,
+      );
+      // eslint-disable-next-line no-await-in-loop
+      await delay(100);
+      for (const blindedCommitment of Object.keys(batchPoisPerList)) {
+        poisPerList[blindedCommitment] = batchPoisPerList[blindedCommitment];
       }
     }
 
@@ -259,38 +241,27 @@ export class WalletPOINodeInterface extends POINodeInterface {
   ): Promise<void> {
     for (let i = 0; i < legacyTransactProofDatas.length; i += this.batchSize) {
       if (WalletPOINodeInterface.isPaused) {
-        // console.log(
-        //   `Legacy PPOI Polling on chain ${chain.type}:${chain.id} is paused there are ${legacyTransactProofDatas.length} proofs left`,
-        // );
         continue;
       }
       const batch = legacyTransactProofDatas.slice(i, i + this.batchSize);
-      try {
-        WalletPOINodeInterface.emitListBatchCallback(
-          i,
-          legacyTransactProofDatas.length,
-          'Submitting Legacy Transact Proofs',
-        );
-        // eslint-disable-next-line no-await-in-loop
-        await this.poiNodeRequest.submitLegacyTransactProofs(
-          txidVersion,
-          chain,
-          listKeys,
-          batch,
-        );
-        WalletPOINodeInterface.emitListBatchCallback(
-          i + batch.length,
-          legacyTransactProofDatas.length,
-          'Submitted Legacy Transact Proofs',
-        );
-        // eslint-disable-next-line no-await-in-loop
-        await delay(100);
-      } catch (error) {
-        // console.error(
-        //   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        //   `Error submitting legacy transact proofs: ${error.message} batch index: ${i}`,
-        // );
-      }
+      WalletPOINodeInterface.emitListBatchCallback(
+        i,
+        legacyTransactProofDatas.length,
+        'Submitting Legacy Transact Proofs',
+      );
+      // eslint-disable-next-line no-await-in-loop
+      await this.poiNodeRequest
+        .submitLegacyTransactProofs(txidVersion, chain, listKeys, batch)
+        .catch(() => {
+          return undefined;
+        });
+      WalletPOINodeInterface.emitListBatchCallback(
+        i + batch.length,
+        legacyTransactProofDatas.length,
+        'Submitted Legacy Transact Proofs',
+      );
+      // eslint-disable-next-line no-await-in-loop
+      await delay(100);
     }
   }
 }
