@@ -13,12 +13,29 @@ import {
   SnarkProof,
   TXIDVersion,
   TransactProofData,
+  delay,
+  isDefined,
   networkForChain,
+  type POIsPerListMap,
 } from '@railgun-community/shared-models';
 import { POIRequired } from './poi-required';
-
+// import { getEngine } from '../railgun';
+export type BatchListUpdateEvent = {
+  current: number;
+  total: number;
+  percent: number;
+  status: string;
+};
 export class WalletPOINodeInterface extends POINodeInterface {
   private poiNodeRequest: POINodeRequest;
+  private batchSize = 20;
+
+  private static isPaused = false;
+
+  // private engine: RailgunEngine;
+  static listBatchCallback:
+    | ((batchData: BatchListUpdateEvent) => void)
+    | undefined;
 
   constructor(poiNodeURLs: string[]) {
     super();
@@ -57,6 +74,14 @@ export class WalletPOINodeInterface extends POINodeInterface {
     return WalletPOINodeInterface.getPOISettings(chain) != null;
   }
 
+  static pause(): void {
+    WalletPOINodeInterface.isPaused = true;
+  }
+
+  static unpause(): void {
+    WalletPOINodeInterface.isPaused = false;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   async isRequired(chain: Chain): Promise<boolean> {
     const network = networkForChain(chain);
@@ -66,18 +91,97 @@ export class WalletPOINodeInterface extends POINodeInterface {
     return POIRequired.isRequiredForNetwork(network.name);
   }
 
+  static setListBatchCallback = (
+    callback: (batchData: BatchListUpdateEvent) => void,
+  ): void => {
+    // console.log('SETTING LIST BATCH CALLBACK');
+    WalletPOINodeInterface.listBatchCallback = callback;
+  };
+
+  static clearListBatchStatus = (): void => {
+    if (isDefined(WalletPOINodeInterface.listBatchCallback)) {
+      WalletPOINodeInterface.listBatchCallback({
+        current: 0,
+        total: 0,
+        percent: 0,
+        status: '',
+      });
+    }
+  };
+
+  static emitListBatchCallback = (
+    current: number,
+    total: number,
+    message: string,
+  ) => {
+    if (isDefined(WalletPOINodeInterface.listBatchCallback)) {
+      const percent = (current / total) * 100;
+      const status = `${message} PPOI Batch (${current} of ${total}) ${percent.toFixed(
+        2,
+      )}%`;
+      // console.log(status);
+      WalletPOINodeInterface.listBatchCallback({
+        current,
+        total,
+        percent,
+        status,
+      });
+    }
+    // else {
+    //   console.log('NO LIST BATCH CALLBACK', current, total, message);
+    // }
+  };
+
   async getPOIsPerList(
     txidVersion: TXIDVersion,
     chain: Chain,
     listKeys: string[],
     blindedCommitmentDatas: BlindedCommitmentData[],
   ): Promise<{ [blindedCommitment: string]: POIsPerList }> {
-    const poisPerList = await this.poiNodeRequest.getPOIsPerList(
-      txidVersion,
-      chain,
-      listKeys,
-      blindedCommitmentDatas,
-    );
+    const poisPerList: POIsPerListMap = {};
+    for (let i = 0; i < blindedCommitmentDatas.length; i += this.batchSize) {
+      if (WalletPOINodeInterface.isPaused) {
+        // console.log(
+        //   `PPOI Polling on chain ${chain.type}:${chain.id} is paused`,
+        // );
+        // clear the status message
+        WalletPOINodeInterface.clearListBatchStatus();
+        continue;
+      }
+      const batch = blindedCommitmentDatas.slice(i, i + this.batchSize);
+      const type = batch[0].type;
+      // console.log(`Submitting batch ${i} of ${blindedCommitmentDatas.length}`);
+      try {
+        WalletPOINodeInterface.emitListBatchCallback(
+          i,
+          blindedCommitmentDatas.length,
+          `Verifying ${type}'s`,
+        );
+        const batchPoisPerList: POIsPerListMap =
+          // eslint-disable-next-line no-await-in-loop
+          await this.poiNodeRequest.getPOIsPerList(
+            txidVersion,
+            chain,
+            listKeys,
+            batch,
+          );
+        WalletPOINodeInterface.emitListBatchCallback(
+          i + batch.length,
+          blindedCommitmentDatas.length,
+          `Received results for ${type}'s now Analyzing`,
+        );
+        // eslint-disable-next-line no-await-in-loop
+        await delay(100);
+        for (const blindedCommitment of Object.keys(batchPoisPerList)) {
+          poisPerList[blindedCommitment] = batchPoisPerList[blindedCommitment];
+        }
+      } catch (error) {
+        // console.error(
+        //   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        //   `Error getting POIs per List: ${error.message} batch index: ${i}`,
+        // );
+      }
+    }
 
     const poisPerListConverted: { [blindedCommitment: string]: POIsPerList } =
       {};
@@ -153,11 +257,40 @@ export class WalletPOINodeInterface extends POINodeInterface {
     listKeys: string[],
     legacyTransactProofDatas: LegacyTransactProofData[],
   ): Promise<void> {
-    return this.poiNodeRequest.submitLegacyTransactProofs(
-      txidVersion,
-      chain,
-      listKeys,
-      legacyTransactProofDatas,
-    );
+    for (let i = 0; i < legacyTransactProofDatas.length; i += this.batchSize) {
+      if (WalletPOINodeInterface.isPaused) {
+        // console.log(
+        //   `Legacy PPOI Polling on chain ${chain.type}:${chain.id} is paused there are ${legacyTransactProofDatas.length} proofs left`,
+        // );
+        continue;
+      }
+      const batch = legacyTransactProofDatas.slice(i, i + this.batchSize);
+      try {
+        WalletPOINodeInterface.emitListBatchCallback(
+          i,
+          legacyTransactProofDatas.length,
+          'Submitting Legacy Transact Proofs',
+        );
+        // eslint-disable-next-line no-await-in-loop
+        await this.poiNodeRequest.submitLegacyTransactProofs(
+          txidVersion,
+          chain,
+          listKeys,
+          batch,
+        );
+        WalletPOINodeInterface.emitListBatchCallback(
+          i + batch.length,
+          legacyTransactProofDatas.length,
+          'Submitted Legacy Transact Proofs',
+        );
+        // eslint-disable-next-line no-await-in-loop
+        await delay(100);
+      } catch (error) {
+        // console.error(
+        //   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        //   `Error submitting legacy transact proofs: ${error.message} batch index: ${i}`,
+        // );
+      }
+    }
   }
 }
