@@ -33,6 +33,13 @@ export class WalletPOINodeInterface extends POINodeInterface {
 
   private static isPaused = false;
 
+  private static isPausedMap: { [type: number]: { [id: number]: boolean } } =
+    {};
+
+  static isPausedForChain(chain: Chain): boolean {
+    return WalletPOINodeInterface.isPausedMap[chain.type]?.[chain.id] ?? false;
+  }
+
   static listBatchCallback:
     | ((batchData: BatchListUpdateEvent) => void)
     | undefined;
@@ -74,12 +81,15 @@ export class WalletPOINodeInterface extends POINodeInterface {
     return WalletPOINodeInterface.getPOISettings(chain) != null;
   }
 
-  static pause(): void {
-    WalletPOINodeInterface.isPaused = true;
+  static pause(chain: Chain): void {
+    WalletPOINodeInterface.isPausedMap[chain.type] ??= {};
+    WalletPOINodeInterface.isPausedMap[chain.type][chain.id] = true;
   }
 
-  static unpause(): void {
-    WalletPOINodeInterface.isPaused = false;
+  static unpause(chain: Chain): void {
+    // would be good practice to unpause when loading providers, or resuming polling providers.
+    WalletPOINodeInterface.isPausedMap[chain.type] ??= {};
+    WalletPOINodeInterface.isPausedMap[chain.type][chain.id] = false;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -135,7 +145,7 @@ export class WalletPOINodeInterface extends POINodeInterface {
   ): Promise<{ [blindedCommitment: string]: POIsPerList }> {
     const poisPerList: POIsPerListMap = {};
     for (let i = 0; i < blindedCommitmentDatas.length; i += this.batchSize) {
-      if (WalletPOINodeInterface.isPaused) {
+      if (WalletPOINodeInterface.isPausedForChain(chain)) {
         WalletPOINodeInterface.clearListBatchStatus();
         continue;
       }
@@ -240,7 +250,7 @@ export class WalletPOINodeInterface extends POINodeInterface {
     legacyTransactProofDatas: LegacyTransactProofData[],
   ): Promise<void> {
     for (let i = 0; i < legacyTransactProofDatas.length; i += this.batchSize) {
-      if (WalletPOINodeInterface.isPaused) {
+      if (WalletPOINodeInterface.isPausedForChain(chain)) {
         continue;
       }
       const batch = legacyTransactProofDatas.slice(i, i + this.batchSize);

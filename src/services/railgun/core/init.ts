@@ -12,6 +12,7 @@ import {
 import {
   MerkletreeScanUpdateEvent,
   isDefined,
+  type Chain,
 } from '@railgun-community/shared-models';
 import { sendErrorMessage, sendMessage } from '../../../utils/logger';
 import {
@@ -118,12 +119,12 @@ export const setBatchListCallback = (
   WalletPOINodeInterface.setListBatchCallback(onBatchListCallback);
 };
 
-export const pausePPOIBatching = () => {
-  WalletPOINodeInterface.pause();
+export const pausePPOIBatchingForChain = (chain: Chain) => {
+  WalletPOINodeInterface.pause(chain);
 };
 
-export const resumePPOIBatching = () => {
-  WalletPOINodeInterface.unpause();
+export const resumePPOIBatching = (chain: Chain) => {
+  WalletPOINodeInterface.unpause(chain);
 };
 
 /**
