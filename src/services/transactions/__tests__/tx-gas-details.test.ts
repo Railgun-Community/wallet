@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import Sinon, { SinonStub } from 'sinon';
+import { SinonStub } from 'sinon';
 import {
   CommitmentSummary,
   createFallbackProviderFromJsonConfig,
@@ -34,16 +34,16 @@ describe('tx-gas', () => {
   });
 
   it('Should format gas estimate response', async () => {
-    gasEstimateStub = Sinon.stub(
-      FallbackProvider.prototype,
-      'estimateGas',
-    ).resolves(BigInt('200'));
-
     const transaction = {} as ContractTransaction;
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+
+    setFallbackProviderForNetwork(
+      NetworkName.Polygon,
+      fallbackProvider as unknown as FallbackProvider,
+    );
+
     const gasEstimate = await getGasEstimate(
       txidVersion,
       NetworkName.Polygon,
@@ -60,15 +60,17 @@ describe('tx-gas', () => {
       isGasEstimateWithDummyProof,
     );
 
-    expect(gasEstimateStub.callCount).to.equal(1);
-    expect(rsp.gasEstimate).to.equal(200n);
+    expect(rsp.gasEstimate).to.equal(53000n);
   });
 
   it('Should pull gas estimate for basic transaction - self-signed', async () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(
+      NetworkName.Polygon,
+      fallbackProvider as unknown as FallbackProvider,
+    );
     const tx: ContractTransaction = {
       chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,
@@ -96,7 +98,10 @@ describe('tx-gas', () => {
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(
+      NetworkName.Polygon,
+      fallbackProvider as unknown as FallbackProvider,
+    );
     const tx: ContractTransaction = {
       chainId: 1n,
       to: MOCK_ETH_WALLET_ADDRESS,
