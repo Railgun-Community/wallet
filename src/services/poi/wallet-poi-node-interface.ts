@@ -13,12 +13,36 @@ import {
   SnarkProof,
   TXIDVersion,
   TransactProofData,
+  delay,
+  isDefined,
   networkForChain,
+  type POIsPerListMap,
 } from '@railgun-community/shared-models';
 import { POIRequired } from './poi-required';
 
+export type BatchListUpdateEvent = {
+  current: number;
+  total: number;
+  percent: number;
+  status: string;
+};
+
 export class WalletPOINodeInterface extends POINodeInterface {
   private poiNodeRequest: POINodeRequest;
+  private batchSize = 20;
+
+  private static isPaused = false;
+
+  private static isPausedMap: { [type: number]: { [id: number]: boolean } } =
+    {};
+
+  static isPausedForChain(chain: Chain): boolean {
+    return WalletPOINodeInterface.isPausedMap[chain.type]?.[chain.id] ?? false;
+  }
+
+  static listBatchCallback:
+    | ((batchData: BatchListUpdateEvent) => void)
+    | undefined;
 
   constructor(poiNodeURLs: string[]) {
     super();
@@ -57,6 +81,17 @@ export class WalletPOINodeInterface extends POINodeInterface {
     return WalletPOINodeInterface.getPOISettings(chain) != null;
   }
 
+  static pause(chain: Chain): void {
+    WalletPOINodeInterface.isPausedMap[chain.type] ??= {};
+    WalletPOINodeInterface.isPausedMap[chain.type][chain.id] = true;
+  }
+
+  static unpause(chain: Chain): void {
+    // would be good practice to unpause when loading providers, or resuming polling providers.
+    WalletPOINodeInterface.isPausedMap[chain.type] ??= {};
+    WalletPOINodeInterface.isPausedMap[chain.type][chain.id] = false;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   async isRequired(chain: Chain): Promise<boolean> {
     const network = networkForChain(chain);
@@ -66,18 +101,79 @@ export class WalletPOINodeInterface extends POINodeInterface {
     return POIRequired.isRequiredForNetwork(network.name);
   }
 
+  static setListBatchCallback = (
+    callback: (batchData: BatchListUpdateEvent) => void,
+  ): void => {
+    WalletPOINodeInterface.listBatchCallback = callback;
+  };
+
+  static clearListBatchStatus = (): void => {
+    if (isDefined(WalletPOINodeInterface.listBatchCallback)) {
+      WalletPOINodeInterface.listBatchCallback({
+        current: 0,
+        total: 0,
+        percent: 0,
+        status: '',
+      });
+    }
+  };
+
+  static emitListBatchCallback = (
+    current: number,
+    total: number,
+    message: string,
+  ) => {
+    if (isDefined(WalletPOINodeInterface.listBatchCallback)) {
+      const percent = (current / total) * 100;
+      const status = `${message} PPOI Batch (${current} of ${total}) ${percent.toFixed(
+        2,
+      )}%`;
+      WalletPOINodeInterface.listBatchCallback({
+        current,
+        total,
+        percent,
+        status,
+      });
+    }
+  };
+
   async getPOIsPerList(
     txidVersion: TXIDVersion,
     chain: Chain,
     listKeys: string[],
     blindedCommitmentDatas: BlindedCommitmentData[],
   ): Promise<{ [blindedCommitment: string]: POIsPerList }> {
-    const poisPerList = await this.poiNodeRequest.getPOIsPerList(
-      txidVersion,
-      chain,
-      listKeys,
-      blindedCommitmentDatas,
-    );
+    const poisPerList: POIsPerListMap = {};
+    for (let i = 0; i < blindedCommitmentDatas.length; i += this.batchSize) {
+      if (WalletPOINodeInterface.isPausedForChain(chain)) {
+        WalletPOINodeInterface.clearListBatchStatus();
+        continue;
+      }
+      const batch = blindedCommitmentDatas.slice(i, i + this.batchSize);
+      const type = batch[0].type;
+      WalletPOINodeInterface.emitListBatchCallback(
+        i,
+        blindedCommitmentDatas.length,
+        `Verifying ${type}'s`,
+      );
+      const batchPoisPerList: POIsPerListMap =
+        // eslint-disable-next-line no-await-in-loop
+        await this.poiNodeRequest
+          .getPOIsPerList(txidVersion, chain, listKeys, batch)
+          .catch(() => {
+            return {};
+          });
+      WalletPOINodeInterface.emitListBatchCallback(
+        i + batch.length,
+        blindedCommitmentDatas.length,
+        `Received results for ${type}'s now Analyzing`,
+      );
+      // eslint-disable-next-line no-await-in-loop
+      await delay(100);
+      for (const blindedCommitment of Object.keys(batchPoisPerList)) {
+        poisPerList[blindedCommitment] = batchPoisPerList[blindedCommitment];
+      }
+    }
 
     const poisPerListConverted: { [blindedCommitment: string]: POIsPerList } =
       {};
@@ -153,11 +249,29 @@ export class WalletPOINodeInterface extends POINodeInterface {
     listKeys: string[],
     legacyTransactProofDatas: LegacyTransactProofData[],
   ): Promise<void> {
-    return this.poiNodeRequest.submitLegacyTransactProofs(
-      txidVersion,
-      chain,
-      listKeys,
-      legacyTransactProofDatas,
-    );
+    for (let i = 0; i < legacyTransactProofDatas.length; i += this.batchSize) {
+      if (WalletPOINodeInterface.isPausedForChain(chain)) {
+        continue;
+      }
+      const batch = legacyTransactProofDatas.slice(i, i + this.batchSize);
+      WalletPOINodeInterface.emitListBatchCallback(
+        i,
+        legacyTransactProofDatas.length,
+        'Submitting Legacy Transact Proofs',
+      );
+      // eslint-disable-next-line no-await-in-loop
+      await this.poiNodeRequest
+        .submitLegacyTransactProofs(txidVersion, chain, listKeys, batch)
+        .catch(() => {
+          return undefined;
+        });
+      WalletPOINodeInterface.emitListBatchCallback(
+        i + batch.length,
+        legacyTransactProofDatas.length,
+        'Submitted Legacy Transact Proofs',
+      );
+      // eslint-disable-next-line no-await-in-loop
+      await delay(100);
+    }
   }
 }

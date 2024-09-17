@@ -12,6 +12,7 @@ import {
 import {
   MerkletreeScanUpdateEvent,
   isDefined,
+  type Chain,
 } from '@railgun-community/shared-models';
 import { sendErrorMessage, sendMessage } from '../../../utils/logger';
 import {
@@ -24,10 +25,15 @@ import { reportAndSanitizeError } from '../../../utils/error';
 import { quickSyncEventsGraph } from '../quick-sync/quick-sync-events';
 import { quickSyncRailgunTransactionsV2 } from '../railgun-txids/railgun-txid-sync-graph-v2';
 import { WalletPOI } from '../../poi/wallet-poi';
-import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
+import {
+  WalletPOINodeInterface,
+  type BatchListUpdateEvent,
+} from '../../poi/wallet-poi-node-interface';
 import { setEngine, getEngine, hasEngine } from './engine';
 import { onBalancesUpdate } from '../wallets/balance-update';
 import { POIValidator } from '../../poi';
+
+export { type BatchListUpdateEvent } from '../../poi/wallet-poi-node-interface';
 
 export type EngineDebugger = {
   log: (msg: string) => void;
@@ -105,6 +111,20 @@ const setOnUTXOScanDecryptBalancesCompleteListener = () => {
       updateWalletBalances();
     },
   );
+};
+
+export const setBatchListCallback = (
+  onBatchListCallback: (callbackData: BatchListUpdateEvent) => void,
+) => {
+  WalletPOINodeInterface.setListBatchCallback(onBatchListCallback);
+};
+
+export const pausePPOIBatchingForChain = (chain: Chain) => {
+  WalletPOINodeInterface.pause(chain);
+};
+
+export const resumePPOIBatching = (chain: Chain) => {
+  WalletPOINodeInterface.unpause(chain);
 };
 
 /**
