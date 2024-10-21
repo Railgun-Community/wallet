@@ -17,6 +17,7 @@ import {
   SubmitSingleCommitmentProofsParams,
   delay,
   POIJSONRPCMethod,
+  promiseTimeout,
 } from '@railgun-community/shared-models';
 import axios, { AxiosError } from 'axios';
 import { sendErrorMessage } from '../../utils';
@@ -29,6 +30,14 @@ export class POINodeRequest {
   constructor(nodeURLs: string[]) {
     this.nodeURLs = nodeURLs;
   }
+
+  private currentNodeURLIndex = 0;
+
+  private getNextNodeURL = () => {
+    this.currentNodeURLIndex =
+      (this.currentNodeURLIndex + 1) % this.nodeURLs.length;
+    return this.getNodeURL(this.currentNodeURLIndex);
+  };
 
   private getNodeURL = (nodeUrlAttemptIndex: number): string => {
     return `${this.nodeURLs[nodeUrlAttemptIndex]}`;
@@ -83,18 +92,19 @@ export class POINodeRequest {
   ): Promise<ResponseData> {
     try {
       const url = this.getNodeURL(nodeUrlAttemptIndex);
-      const res = await POINodeRequest.jsonRpcRequest<Params, ResponseData>(
-        url,
-        method,
-        params,
+      const res = await promiseTimeout(
+        POINodeRequest.jsonRpcRequest<Params, ResponseData>(
+          url,
+          method,
+          params,
+        ),
+        60_000,
       );
-
       return res;
     } catch (err) {
       if (finalAttempt) {
         throw err;
       }
-
       // If nodeUrlAttemptIndex is already at the last index, try one final time with the priority 0 nodeUrl
       if (nodeUrlAttemptIndex === this.nodeURLs.length - 1) {
         return this.attemptRequestWithFallbacks(

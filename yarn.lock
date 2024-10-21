@@ -1949,10 +1949,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@9.1.1":
-  version "9.1.1"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-9.1.1.tgz#6f097dd0260d02e908b062d46a0584b58e70f4a7"
-  integrity sha512-pmgEV5QwQXcrdoHrPCeMMLpV9cUg+EWSL6r02qwzyacrtIHls4rPgExkuCTOy/RtKdySZYJtblw8FqrGsM0dcw==
+"@railgun-community/engine@9.1.2":
+  version "9.1.2"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-9.1.2.tgz#570c04222dfa589869ad945a23d4bc2389cf1d86"
+  integrity sha512-GfE5AY+U/+0Gf4T5jmxE7EzEPJGwB7YOf684QTU5LnZtHGKvEL1jxTHloL0u6YfoLnPFAZW8GxfD+pWzKfAkBQ==
   dependencies:
     "@noble/ciphers" "^0.4.0"
     "@noble/ed25519" "^1.7.1"
@@ -1984,10 +1984,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/poseidon-hash-wasm/-/poseidon-hash-wasm-1.0.1.tgz#bfd3b3f915391a59486d8c9d632069f029e152d6"
   integrity sha512-zDAbMu095ZjMqsKIoyOnuKR4Zofnqqx4eTCtnA6qYglnexX5cadxItvJa3ozhDDTmFkDGAidDssQ7Pzl3wwLDA==
 
-"@railgun-community/shared-models@7.4.3":
-  version "7.4.3"
-  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-7.4.3.tgz#f052b3c1f26ffc206d66fa010d452b07c86c137f"
-  integrity sha512-63YDTWvvXvZG7U7R4j1ZG0lvnCl95Kn9LPvJRd+56oachKs1Z6Z3TeXCBQXN2dK+viqXgHH4Aa6+Ij4goTeG3Q==
+"@railgun-community/shared-models@7.4.4":
+  version "7.4.4"
+  resolved "https://registry.yarnpkg.com/@railgun-community/shared-models/-/shared-models-7.4.4.tgz#11059cd49222417961fc7016771cd5e687b0ac89"
+  integrity sha512-1rDbaGsLP7dEdcJxVZEWv4Ew0RZ54r/Ij74LJ0CZ505MYk118H4Cs6FFDHoFEHyEeEpnXYGDnjVtcEmCT7xQxA==
 
 "@repeaterjs/repeater@3.0.4":
   version "3.0.4"

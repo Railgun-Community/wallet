@@ -24,6 +24,7 @@ import {
   setFallbackProviderForNetwork,
   setPollingProviderForNetwork,
 } from './providers';
+import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
 
 const createFallbackProviderForNetwork = async (
   networkName: NetworkName,
@@ -155,7 +156,7 @@ export const loadProvider = async (
       fallbackProviderJsonConfig,
       pollingInterval,
     );
-
+    WalletPOINodeInterface.unpause(chain);
     const { shield: shieldFeeV2, unshield: unshieldFeeV2 } =
       await RailgunVersionedSmartContracts.fees(
         TXIDVersion.V2_PoseidonMerkle,
@@ -195,6 +196,7 @@ export const loadProvider = async (
 export const unloadProvider = async (
   networkName: NetworkName,
 ): Promise<void> => {
+  WalletPOINodeInterface.pause(NETWORK_CONFIG[networkName].chain);
   await fallbackProviderMap[networkName]?.destroy();
   pollingProviderMap[networkName]?.destroy();
   delete fallbackProviderMap[networkName];
