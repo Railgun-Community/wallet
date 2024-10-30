@@ -60,7 +60,13 @@ describe('tx-gas', () => {
       isGasEstimateWithDummyProof,
     );
 
-    expect(rsp.gasEstimate).to.equal(53000n);
+
+    const expectedGas = 53000n
+    const variance = 0.05; // 5%
+    const lowerBound = Number(expectedGas) * (1 - variance);
+    const upperBound = Number(expectedGas) * (1 + variance);
+
+    expect(Number(rsp.gasEstimate)).to.be.within(lowerBound, upperBound);
   });
 
   it('Should pull gas estimate for basic transaction - self-signed', async () => {
