@@ -77,11 +77,12 @@ describe('tx-gas', () => {
       fallbackProvider as unknown as FallbackProvider,
     );
     const tx: ContractTransaction = {
-      chainId: 1n,
+      chainId: 137n,
       to: MOCK_ETH_WALLET_ADDRESS,
-      value: BigInt('100'),
+      value: BigInt('0'),
       data: '0x',
     };
+
     const gasEstimate = await getGasEstimate(
       txidVersion,
       NetworkName.Polygon,
@@ -108,9 +109,9 @@ describe('tx-gas', () => {
       fallbackProvider as unknown as FallbackProvider,
     );
     const tx: ContractTransaction = {
-      chainId: 1n,
+      chainId: 137n,
       to: MOCK_ETH_WALLET_ADDRESS,
-      value: BigInt('100'),
+      value: BigInt('0'),
       data: '0x',
     };
     const gasEstimate = await getGasEstimate(
