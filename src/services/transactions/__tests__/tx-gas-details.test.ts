@@ -1,6 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { SinonStub } from 'sinon';
+import Sinon, { SinonStub } from 'sinon';
 import {
   CommitmentSummary,
   createFallbackProviderFromJsonConfig,
@@ -27,6 +27,14 @@ const txidVersion = getTestTXIDVersion();
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
+
+
+const stubGasEstimateSuccess = () => {
+  gasEstimateStub = Sinon.stub(
+    FallbackProvider.prototype,
+    'estimateGas',
+  ).resolves(BigInt('200'));
+};
 
 describe('tx-gas', () => {
   afterEach(() => {
@@ -69,6 +77,7 @@ describe('tx-gas', () => {
   }).timeout(6000);
 
   it('Should pull gas estimate for basic transaction - self-signed', async () => {
+    stubGasEstimateSuccess();
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
@@ -79,7 +88,7 @@ describe('tx-gas', () => {
     const tx: ContractTransaction = {
       chainId: 137n,
       to: MOCK_ETH_WALLET_ADDRESS,
-      value: BigInt('0'),
+      value: BigInt('100'),
       data: '0x',
     };
 
@@ -101,6 +110,7 @@ describe('tx-gas', () => {
   }).timeout(60_000);
 
   it('Should pull gas estimate for basic transaction - broadcaster', async () => {
+    stubGasEstimateSuccess();
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
@@ -111,7 +121,7 @@ describe('tx-gas', () => {
     const tx: ContractTransaction = {
       chainId: 137n,
       to: MOCK_ETH_WALLET_ADDRESS,
-      value: BigInt('0'),
+      value: BigInt('100'),
       data: '0x',
     };
     const gasEstimate = await getGasEstimate(
