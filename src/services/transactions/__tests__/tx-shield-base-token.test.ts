@@ -21,11 +21,12 @@ import {
   populateShieldBaseToken,
   gasEstimateForShieldBaseToken,
 } from '../tx-shield-base-token';
+import * as txGasDetailsModule from '../tx-gas-details';
 import { createRailgunWallet } from '../../railgun/wallets/wallets';
 import { ByteUtils } from '@railgun-community/engine';
-import { FallbackProvider } from 'ethers';
 import { getTestTXIDVersion } from '../../../tests/helper.test';
 
+let getGasEstimateStub: SinonStub;
 let gasEstimateStub: SinonStub;
 let sendTxStub: SinonStub;
 let railgunAddress: string;
@@ -44,18 +45,17 @@ const gasDetails: TransactionGasDetails = {
   maxPriorityFeePerGas: BigInt('0x100'),
 };
 
-const stubSuccess = () => {
-  gasEstimateStub = Sinon.stub(
-    FallbackProvider.prototype,
-    'estimateGas',
+const stubGetGasEstimate = () => {
+  getGasEstimateStub = Sinon.stub(
+    txGasDetailsModule,
+    'getGasEstimate',
   ).resolves(200n);
 };
 
-const stubFailure = () => {
-  gasEstimateStub = Sinon.stub(
-    FallbackProvider.prototype,
-    'estimateGas',
-  ).rejects(new Error('test rejection - gas estimate'));
+const stubGetGasEstimateFailure = () => {
+  getGasEstimateStub = Sinon.stub(txGasDetailsModule, 'getGasEstimate').rejects(
+    new Error('test rejection - gas estimate'),
+  );
 };
 
 describe('tx-shield-base-token', () => {
@@ -74,13 +74,14 @@ describe('tx-shield-base-token', () => {
   afterEach(() => {
     gasEstimateStub?.restore();
     sendTxStub?.restore();
+    getGasEstimateStub?.restore();
   });
   after(async () => {
     await closeTestEngine();
   });
 
   it('Should get gas estimate for valid shield base token', async () => {
-    stubSuccess();
+    stubGetGasEstimate();
     const rsp = await gasEstimateForShieldBaseToken(
       txidVersion,
       NetworkName.Polygon,
@@ -93,7 +94,7 @@ describe('tx-shield-base-token', () => {
   });
 
   it('Should error on gas estimates for invalid shield base token', async () => {
-    stubSuccess();
+    stubGetGasEstimate();
     await expect(
       gasEstimateForShieldBaseToken(
         txidVersion,
@@ -107,7 +108,7 @@ describe('tx-shield-base-token', () => {
   });
 
   it('Should error for ethers rejections', async () => {
-    stubFailure();
+    stubGetGasEstimateFailure();
     await expect(
       gasEstimateForShieldBaseToken(
         txidVersion,
@@ -121,7 +122,7 @@ describe('tx-shield-base-token', () => {
   });
 
   it('Should send tx for valid shield base token', async () => {
-    stubSuccess();
+    stubGetGasEstimate();
     const { transaction } = await populateShieldBaseToken(
       txidVersion,
       NetworkName.Polygon,
@@ -136,7 +137,7 @@ describe('tx-shield-base-token', () => {
   });
 
   it('Should error on send tx for invalid shield base token', async () => {
-    stubSuccess();
+    stubGetGasEstimate();
     await expect(
       populateShieldBaseToken(
         txidVersion,

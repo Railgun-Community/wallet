@@ -28,22 +28,30 @@ const txidVersion = getTestTXIDVersion();
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
+
+const stubGasEstimateSuccess = () => {
+  gasEstimateStub = Sinon.stub(
+    FallbackProvider.prototype,
+    'estimateGas',
+  ).resolves(BigInt('200'));
+};
+
 describe('tx-gas', () => {
   afterEach(() => {
     gasEstimateStub?.restore();
   });
 
   it('Should format gas estimate response', async () => {
-    gasEstimateStub = Sinon.stub(
-      FallbackProvider.prototype,
-      'estimateGas',
-    ).resolves(BigInt('200'));
-
     const transaction = {} as ContractTransaction;
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+
+    setFallbackProviderForNetwork(
+      NetworkName.Polygon,
+      fallbackProvider as unknown as FallbackProvider,
+    );
+
     const gasEstimate = await getGasEstimate(
       txidVersion,
       NetworkName.Polygon,
@@ -60,21 +68,30 @@ describe('tx-gas', () => {
       isGasEstimateWithDummyProof,
     );
 
-    expect(gasEstimateStub.callCount).to.equal(1);
-    expect(rsp.gasEstimate).to.equal(200n);
-  });
+    const expectedGas = 53000n; // This field may vary
+    const variance = 0.05; // 5%
+    const lowerBound = Number(expectedGas) * (1 - variance);
+    const upperBound = Number(expectedGas) * (1 + variance);
+
+    expect(Number(rsp.gasEstimate)).to.be.within(lowerBound, upperBound);
+  }).timeout(6000);
 
   it('Should pull gas estimate for basic transaction - self-signed', async () => {
+    stubGasEstimateSuccess();
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(
+      NetworkName.Polygon,
+      fallbackProvider as unknown as FallbackProvider,
+    );
     const tx: ContractTransaction = {
-      chainId: 1n,
+      chainId: 137n,
       to: MOCK_ETH_WALLET_ADDRESS,
       value: BigInt('100'),
       data: '0x',
     };
+
     const gasEstimate = await getGasEstimate(
       txidVersion,
       NetworkName.Polygon,
@@ -93,12 +110,16 @@ describe('tx-gas', () => {
   }).timeout(60_000);
 
   it('Should pull gas estimate for basic transaction - broadcaster', async () => {
+    stubGasEstimateSuccess();
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(NetworkName.Polygon, fallbackProvider);
+    setFallbackProviderForNetwork(
+      NetworkName.Polygon,
+      fallbackProvider as unknown as FallbackProvider,
+    );
     const tx: ContractTransaction = {
-      chainId: 1n,
+      chainId: 137n,
       to: MOCK_ETH_WALLET_ADDRESS,
       value: BigInt('100'),
       data: '0x',

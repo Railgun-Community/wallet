@@ -42,8 +42,8 @@
     "@graphql-mesh/types": "^0.91.14",
     "@graphql-mesh/utils": "^0.43.22",
     "@noble/ed25519": "^1.7.1",
-    "@railgun-community/engine": "9.1.2",
-    "@railgun-community/shared-models": "7.4.4",
+    "@railgun-community/engine": "9.2.0",
+    "@railgun-community/shared-models": "7.5.0",
     "@whatwg-node/fetch": "^0.8.4",
     "assert": "2.0.0",
     "axios": "1.7.2",
@@ -51,7 +51,7 @@
     "buffer": "^6.0.3",
     "crypto-browserify": "3.12.0",
     "ethereum-cryptography": "^2.0.0",
-    "ethers": "github:Railgun-Community/ethers.js#v6.7.10",
+    "ethers": "6.13.1",
     "events": "3.3.0",
     "graphql": "^16.6.0",
     "stream-browserify": "3.0.0"
@@ -86,6 +86,9 @@
   "react-native": {
     "crypto": false,
     "util": false
+  },
+  "resolutions": {
+    "ethers": "6.13.1"
   },
   "packageManager": "yarn@1.22.22"
 }

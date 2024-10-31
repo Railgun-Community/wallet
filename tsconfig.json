@@ -29,5 +29,8 @@
   "exclude": ["node_modules", "src/**/__tests__", "src/tests", "dist"],
   "ts-node": {
     "files": true
+  },
+  "paths": {
+    "ethers": ["./node_modules/ethers"]
   }
 }

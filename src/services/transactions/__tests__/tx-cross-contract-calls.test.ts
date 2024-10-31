@@ -66,6 +66,7 @@ let gasEstimateStub: SinonStub;
 let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
 let relayAdaptPopulateCrossContractCalls: SinonStub;
+let relayAdaptGasEstimateStub: SinonStub;
 let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
@@ -127,6 +128,13 @@ const gasDetails: TransactionGasDetails = {
   gasPrice: overallBatchMinGasPrice,
 };
 
+const stubRelayAdaptGasEstimate = () => {
+  relayAdaptGasEstimateStub = Sinon.stub(
+    RelayAdaptVersionedSmartContracts,
+    'estimateGasWithErrorHandler',
+  ).resolves(BigInt('200'));
+};
+
 const stubGasEstimateSuccess = () => {
   gasEstimateStub = Sinon.stub(
     FallbackProvider.prototype,
@@ -134,11 +142,11 @@ const stubGasEstimateSuccess = () => {
   ).resolves(BigInt('200'));
 };
 
-const stubGasEstimateFailure = () => {
-  gasEstimateStub = Sinon.stub(
-    FallbackProvider.prototype,
-    'estimateGas',
-  ).rejects(new Error('test rejection - gas estimate'));
+const stubRelayAdaptGasEstimateFailure = () => {
+  relayAdaptGasEstimateStub = Sinon.stub(
+    RelayAdaptVersionedSmartContracts,
+    'estimateGasWithErrorHandler',
+  ).rejects(new Error('RelayAdapt multicall failed at index UNKNOWN.'));
 };
 
 const spyOnSetUnshield = () => {
@@ -149,7 +157,10 @@ describe('tx-cross-contract-calls', () => {
   before(async function run() {
     this.timeout(60_000);
     await initTestEngine();
-    await initTestEngineNetworks(NetworkName.Polygon, MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON);
+    await initTestEngineNetworks(
+      NetworkName.Polygon,
+      MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
+    );
 
     const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
@@ -207,6 +218,7 @@ describe('tx-cross-contract-calls', () => {
     gasEstimateStub?.restore();
     addUnshieldDataSpy?.restore();
     erc20NoteSpy?.restore();
+    relayAdaptGasEstimateStub?.restore();
   });
   after(async () => {
     railProveStub.restore();
@@ -218,7 +230,7 @@ describe('tx-cross-contract-calls', () => {
   // GAS ESTIMATE
 
   it('Should get gas estimates for valid cross contract calls', async () => {
-    stubGasEstimateSuccess();
+    stubRelayAdaptGasEstimate();
     spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       txidVersion,
@@ -314,7 +326,7 @@ describe('tx-cross-contract-calls', () => {
   }).timeout(10_000);
 
   it('Should get gas estimates for valid cross contract calls, public wallet', async () => {
-    stubGasEstimateSuccess();
+    stubRelayAdaptGasEstimate();
     spyOnSetUnshield();
     const rsp = await gasEstimateForUnprovenCrossContractCalls(
       txidVersion,
@@ -395,7 +407,7 @@ describe('tx-cross-contract-calls', () => {
   });
 
   it('Should error on cross contract calls gas estimate for ethers rejections', async () => {
-    stubGasEstimateFailure();
+    stubRelayAdaptGasEstimateFailure();
     await expect(
       gasEstimateForUnprovenCrossContractCalls(
         txidVersion,

@@ -79,7 +79,9 @@ export const gasEstimateResponseDummyProofIterativeBroadcasterFee = async (
     : undefined;
 
   let serializedTransactions =
-    await generateDummyTransactionStructsWithBroadcasterFee(dummyBroadcasterFee);
+    await generateDummyTransactionStructsWithBroadcasterFee(
+      dummyBroadcasterFee,
+    );
   let transaction = await generateTransaction(serializedTransactions);
 
   let gasEstimate = await getGasEstimate(
@@ -121,7 +123,9 @@ export const gasEstimateResponseDummyProofIterativeBroadcasterFee = async (
     true,
   );
 
-  let broadcasterFeeCommitment = getBroadcasterFeeCommitment(serializedTransactions);
+  let broadcasterFeeCommitment = getBroadcasterFeeCommitment(
+    serializedTransactions,
+  );
 
   // Iteratively calculate new broadcaster fee and estimate new gas amount.
   // This change if the number of circuits changes because of the additional Broadcaster Fees.
@@ -146,14 +150,19 @@ export const gasEstimateResponseDummyProofIterativeBroadcasterFee = async (
       ))
     ) {
       updatedBroadcasterFee.amount =
-        balanceForBroadcasterFeeERC20 - broadcasterFeeMatchingSendingERC20Amount.amount;
+        balanceForBroadcasterFeeERC20 -
+        broadcasterFeeMatchingSendingERC20Amount.amount;
     }
 
     const newSerializedTransactions =
       // eslint-disable-next-line no-await-in-loop
-      await generateDummyTransactionStructsWithBroadcasterFee(updatedBroadcasterFee);
+      await generateDummyTransactionStructsWithBroadcasterFee(
+        updatedBroadcasterFee,
+      );
 
-    broadcasterFeeCommitment = getBroadcasterFeeCommitment(newSerializedTransactions);
+    broadcasterFeeCommitment = getBroadcasterFeeCommitment(
+      newSerializedTransactions,
+    );
 
     if (
       compareCircuitSizesTransactionStructs(

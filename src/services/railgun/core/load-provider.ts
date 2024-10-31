@@ -17,7 +17,7 @@ import {
   RailgunVersionedSmartContracts,
   createPollingJsonRpcProviderForListeners,
 } from '@railgun-community/engine';
-import { FallbackProvider } from 'ethers';
+import { FallbackProvider } from 'ethers'
 import {
   fallbackProviderMap,
   pollingProviderMap,
@@ -78,7 +78,7 @@ const loadProviderForNetwork = async (
   const pollingProvider = await createPollingProviderForNetwork(
     networkName,
     fallbackProvider,
-    pollingInterval,
+    pollingInterval
   );
 
   const network = NETWORK_CONFIG[networkName];
