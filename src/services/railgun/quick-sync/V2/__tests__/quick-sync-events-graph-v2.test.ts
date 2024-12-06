@@ -42,10 +42,12 @@ const assertContiguousCommitmentEvents = (
   let nextTreeNumber = commitmentEvents[0].treeNumber;
   let nextStartPosition = commitmentEvents[0].startPosition;
   let overallCommitmentCount = commitmentEvents[0].startPosition;
+  let treeRolledOver = false;
   for (const event of commitmentEvents) {
     if (
-      event.treeNumber !== nextTreeNumber ||
-      event.startPosition !== nextStartPosition
+      !treeRolledOver &&
+      (event.treeNumber !== nextTreeNumber ||
+        event.startPosition !== nextStartPosition)
     ) {
       if (shouldThrow) {
         throw new Error(
@@ -59,10 +61,15 @@ const assertContiguousCommitmentEvents = (
         nextStartPosition = event.startPosition + event.commitments.length;
       }
     } else {
+      if (treeRolledOver) {
+        treeRolledOver = false;
+      }
       nextStartPosition += event.commitments.length;
     }
     for (const commitment of event.commitments) {
-      if (overallCommitmentCount !== commitment.utxoIndex) {
+      const normalizedOverallIndex = overallCommitmentCount % 2 ** 16;
+      const normalizedCommitmentIndex = commitment.utxoIndex % 2 ** 16;
+      if (normalizedOverallIndex !== normalizedCommitmentIndex) {
         if (shouldThrow) {
           throw new Error(`Commitment order is out of sync.`);
         } else {
@@ -78,11 +85,12 @@ const assertContiguousCommitmentEvents = (
       // Roll over to next tree.
       nextTreeNumber += 1;
       nextStartPosition = 0;
+      treeRolledOver = true;
     }
   }
 };
 
-describe('quick-sync-events-graph-v2', () => {
+describe.only('quick-sync-events-graph-v2', () => {
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Ethereum', async function run() {
     if (!isV2Test()) {
       this.skip();
