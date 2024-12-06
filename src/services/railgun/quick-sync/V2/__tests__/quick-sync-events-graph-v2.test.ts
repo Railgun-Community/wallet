@@ -90,7 +90,7 @@ const assertContiguousCommitmentEvents = (
   }
 };
 
-describe.only('quick-sync-events-graph-v2', () => {
+describe('quick-sync-events-graph-v2', () => {
   it('[V2] Should make sure Graph V2 query has no data gaps in commitments - Ethereum', async function run() {
     if (!isV2Test()) {
       this.skip();
