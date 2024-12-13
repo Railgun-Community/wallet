@@ -83,7 +83,7 @@ export const createEngineWalletTreeBalancesStub = async (
     ByteLength.UINT_256,
   );
   treeBalancesStub = sinon
-    .stub(RailgunWallet.prototype, 'getTotalBalancesByTreeNumber')
+    .stub(RailgunWallet.prototype, 'getTotalBalancesGroupedByTreeNumber')
     .resolves({
       [formattedTokenAddress]: [
         await getMockBalanceData(addressData, tokenAddress, tree),
