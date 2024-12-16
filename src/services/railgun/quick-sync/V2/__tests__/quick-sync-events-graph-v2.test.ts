@@ -42,18 +42,15 @@ const assertContiguousCommitmentEvents = (
 ) => {
   // Track unique events by their actual start positions
   const positionMap = new Map<number, Set<number>>();
-  
-  // First, log what we're processing
+
   for (const event of commitmentEvents) {
     const uniqueIndices = new Set(event.commitments.map(c => c.utxoIndex));
-    // Store unique indices for this position
     positionMap.set(event.startPosition, uniqueIndices);
   }
 
   // Get sorted positions
   const positions = Array.from(positionMap.keys()).sort((a, b) => a - b);
 
-  // Validate sequence
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < positions.length - 1; i++) {
     const currentPos = positions[i];
