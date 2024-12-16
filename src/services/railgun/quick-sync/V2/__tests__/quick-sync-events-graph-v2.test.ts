@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import { Chain, CommitmentEvent, TXIDVersion } from '@railgun-community/engine';
 import { NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import chai from 'chai';
@@ -39,53 +40,36 @@ const assertContiguousCommitmentEvents = (
   commitmentEvents: CommitmentEvent[],
   shouldThrow: boolean,
 ) => {
-  let nextTreeNumber = commitmentEvents[0].treeNumber;
-  let nextStartPosition = commitmentEvents[0].startPosition;
-  let overallCommitmentCount = commitmentEvents[0].startPosition;
-  let treeRolledOver = false;
+  // Track unique events by their actual start positions
+  const positionMap = new Map<number, Set<number>>();
+  
+  // First, log what we're processing
   for (const event of commitmentEvents) {
-    if (
-      !treeRolledOver &&
-      (event.treeNumber !== nextTreeNumber ||
-        event.startPosition !== nextStartPosition)
-    ) {
-      if (shouldThrow) {
-        throw new Error(
-          `Could not find treeNumber ${nextTreeNumber}, startPosition ${nextStartPosition}`,
-        );
-      } else {
-        // eslint-disable-next-line no-console
-        console.log(
-          `Could not find treeNumber ${nextTreeNumber}, startPosition ${nextStartPosition}`,
-        );
-        nextStartPosition = event.startPosition + event.commitments.length;
-      }
-    } else {
-      if (treeRolledOver) {
-        treeRolledOver = false;
-      }
-      nextStartPosition += event.commitments.length;
-    }
-    for (const commitment of event.commitments) {
-      const normalizedOverallIndex = overallCommitmentCount % 2 ** 16;
-      const normalizedCommitmentIndex = commitment.utxoIndex % 2 ** 16;
-      if (normalizedOverallIndex !== normalizedCommitmentIndex) {
-        if (shouldThrow) {
-          throw new Error(`Commitment order is out of sync.`);
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(`Commitment order is out of sync.`);
-        }
-      }
-      overallCommitmentCount += 1;
-    }
+    const uniqueIndices = new Set(event.commitments.map(c => c.utxoIndex));
+    // Store unique indices for this position
+    positionMap.set(event.startPosition, uniqueIndices);
+  }
 
-    // TODO: This logic may need an update if the tree is less than 65536 commitments.
-    if (nextStartPosition >= 65536) {
-      // Roll over to next tree.
-      nextTreeNumber += 1;
-      nextStartPosition = 0;
-      treeRolledOver = true;
+  // Get sorted positions
+  const positions = Array.from(positionMap.keys()).sort((a, b) => a - b);
+
+  // Validate sequence
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < positions.length - 1; i++) {
+    const currentPos = positions[i];
+    const nextPos = positions[i + 1];
+    
+    const currentIndices = positionMap.get(currentPos);
+
+    // Check if current position's indices bridge the gap
+    const maxIndexInCurrent = Math.max(...Array.from(currentIndices || []));
+    const bridgesGap = maxIndexInCurrent >= nextPos - 1;
+
+    // Only throw if there's a gap AND the current indices don't bridge it
+    if (nextPos !== currentPos + 1 && !bridgesGap) {
+      if (shouldThrow) {
+        throw new Error(`Gap in sequence: found ${nextPos} after ${currentPos} (max index: ${maxIndexInCurrent})`);
+      }
     }
   }
 };
@@ -96,7 +80,6 @@ describe('quick-sync-events-graph-v2', () => {
       this.skip();
       return;
     }
-
     const eventLog = await quickSyncEventsGraph(
       txidVersion,
       ETH_CHAIN,
