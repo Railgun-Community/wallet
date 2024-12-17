@@ -43,6 +43,7 @@ const assertContiguousCommitmentEvents = (
   // Track unique events by their actual start positions
   const positionMap = new Map<number, Set<number>>();
 
+  // Build map of positions to their commitment indices
   for (const event of commitmentEvents) {
     const uniqueIndices = new Set(event.commitments.map(c => c.utxoIndex));
     positionMap.set(event.startPosition, uniqueIndices);
