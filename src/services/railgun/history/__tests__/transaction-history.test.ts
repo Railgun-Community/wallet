@@ -260,7 +260,7 @@ const MOCK_HISTORY_ENTRY: TransactionHistoryEntry[] = [
  ];
 
 
-describe.only('transaction-history', () => {
+describe('transaction-history', () => {
   before(async function run() {
     this.timeout(6 * 60_000); // The scanning nowadays can take a long time
     await initTestEngine();
