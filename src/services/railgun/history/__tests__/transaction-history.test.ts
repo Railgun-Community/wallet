@@ -336,3 +336,4 @@ describe('transaction-history', () => {
     expect(category).to.equal(TransactionHistoryItemCategory.UnshieldERC20s);
   });
 });
+
