@@ -1,5 +1,6 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import sinon from 'sinon';
 import { createRailgunWallet, fullWalletForID } from '../../wallets/wallets';
 import {
   categoryForTransactionHistoryItem,
@@ -15,7 +16,7 @@ import {
   initTestEngineNetworks,
   pollUntilUTXOMerkletreeScanned,
 } from '../../../../tests/setup.test';
-import { RailgunWallet } from '@railgun-community/engine';
+import { RailgunWallet, TransactionHistoryEntry } from '@railgun-community/engine';
 import {
   Chain,
   ChainType,
@@ -35,6 +36,7 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 const SEPOLIA_CHAIN: Chain = { type: ChainType.EVM, id: 11155111 };
+
 let wallet: RailgunWallet;
 
 const txidVersion = getTestTXIDVersion();
@@ -221,6 +223,43 @@ const MOCKED_UNKNOWN_SWAP_TRX: TransactionHistoryItem = {
   timestamp: 1680269870,
 };
 
+const MOCK_HISTORY_ENTRY: TransactionHistoryEntry[] = [
+  {
+    txidVersion: TXIDVersion.V2_PoseidonMerkle,
+    txid: MOCKED_TRANSFER_SEND_TRX.txid,
+    blockNumber: MOCKED_TRANSFER_SEND_TRX.blockNumber,
+    transferTokenAmounts: [],
+    changeTokenAmounts: [],
+    receiveTokenAmounts: [], 
+    unshieldTokenAmounts: [],
+    version: MOCKED_TRANSFER_SEND_TRX.version,
+    timestamp: MOCKED_TRANSFER_SEND_TRX.timestamp
+  },
+  {
+    txidVersion: TXIDVersion.V2_PoseidonMerkle,
+    txid: MOCKED_TRANSFER_RECEIVE_TRX.txid,
+    blockNumber: MOCKED_TRANSFER_RECEIVE_TRX.blockNumber,
+    transferTokenAmounts: [],
+    changeTokenAmounts: [],
+    receiveTokenAmounts: [],
+    unshieldTokenAmounts: [],
+    version: MOCKED_TRANSFER_RECEIVE_TRX.version,
+    timestamp: MOCKED_TRANSFER_RECEIVE_TRX.timestamp
+  },
+  {
+    txidVersion: TXIDVersion.V2_PoseidonMerkle,
+    txid: MOCKED_SHIELD_TRX.txid,
+    blockNumber: MOCKED_SHIELD_TRX.blockNumber,
+    transferTokenAmounts: [],
+    changeTokenAmounts: [],
+    receiveTokenAmounts: [],
+    unshieldTokenAmounts: [],
+    version: MOCKED_SHIELD_TRX.version,
+    timestamp: MOCKED_SHIELD_TRX.timestamp
+  }
+ ];
+
+
 describe('transaction-history', () => {
   before(async function run() {
     this.timeout(6 * 60_000); // The scanning nowadays can take a long time
@@ -242,23 +281,22 @@ describe('transaction-history', () => {
     await closeTestEngine();
   });
 
-  // TODO: improve reliability and speed of this test.
-  // It currently downloads a large history from the Graph into a local DB.
-  // We could cache this DB and use it for future tests, avoiding redownloads.
   it('[V2] Should get wallet transaction history', async function run() {
     if (!isV2Test()) {
       this.skip();
       return;
     }
+     
+    const mockGetHistory = sinon.stub(wallet, 'getTransactionHistory').resolves(MOCK_HISTORY_ENTRY);
 
     const items = await getWalletTransactionHistory(
       SEPOLIA_CHAIN,
       wallet.id,
       undefined,
     );
-    // TODO: There are no transactions in the Sepolia mocked wallet (yet).
-    // When there is, we should uncomment this:
-    // expect(items.length).to.be.greaterThanOrEqual(6);
+
+    expect(mockGetHistory.calledWith(SEPOLIA_CHAIN, undefined)).to.be.true;
+    expect(items.length).to.be.greaterThanOrEqual(3);
     for (const item of items) {
       expect(item.txidVersion).to.equal(TXIDVersion.V2_PoseidonMerkle);
       expect(item.txid.length).to.equal(66); // '0x' + 32 bytes
@@ -298,3 +336,4 @@ describe('transaction-history', () => {
     expect(category).to.equal(TransactionHistoryItemCategory.UnshieldERC20s);
   });
 });
+
