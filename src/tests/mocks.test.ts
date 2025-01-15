@@ -243,7 +243,7 @@ export const MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA: FallbackProviderJsonCon
     chainId: 11155111,
     providers: [
       {
-        provider: 'https://rpc.sepolia.org/',
+        provider: 'https://sepolia.drpc.org',
         priority: 3,
         weight: 3,
         maxLogsPerBatch: 2,
