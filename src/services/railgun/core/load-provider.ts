@@ -13,16 +13,12 @@ import { reportAndSanitizeError } from '../../../utils/error';
 import { WalletPOI } from '../../poi/wallet-poi';
 import { getEngine } from './engine';
 import {
-  PollingJsonRpcProvider,
   RailgunVersionedSmartContracts,
-  createPollingJsonRpcProviderForListeners,
 } from '@railgun-community/engine';
 import { FallbackProvider } from 'ethers'
 import {
   fallbackProviderMap,
-  pollingProviderMap,
   setFallbackProviderForNetwork,
-  setPollingProviderForNetwork,
 } from './providers';
 import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
 
@@ -41,32 +37,20 @@ const createFallbackProviderForNetwork = async (
   return fallbackProvider;
 };
 
-const createPollingProviderForNetwork = async (
-  networkName: NetworkName,
-  fallbackProvider: FallbackProvider,
-  pollingInterval: number,
-): Promise<PollingJsonRpcProvider> => {
-  const existingProvider = pollingProviderMap[networkName];
-  if (existingProvider) {
-    return existingProvider;
-  }
-  const network = NETWORK_CONFIG[networkName];
-  if (!isDefined(network)) {
-    throw new Error('No network found');
-  }
-  const pollingProvider = await createPollingJsonRpcProviderForListeners(
-    fallbackProvider,
-    network.chain.id,
-    pollingInterval,
-  );
-  setPollingProviderForNetwork(networkName, pollingProvider);
-  return pollingProvider;
-};
-
+/**
+ * 
+ * @param chain 
+ * @param networkName 
+ * @param fallbackProviderJsonConfig 
+ * @param pollingInterval - DEPRECATED
+ */
 const loadProviderForNetwork = async (
   chain: Chain,
   networkName: NetworkName,
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
+  /**
+   * @deprecated pollingInterval - DEPRECATED
+   */
   pollingInterval: number,
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
@@ -74,11 +58,6 @@ const loadProviderForNetwork = async (
   const fallbackProvider = await createFallbackProviderForNetwork(
     networkName,
     fallbackProviderJsonConfig,
-  );
-  const pollingProvider = await createPollingProviderForNetwork(
-    networkName,
-    fallbackProvider,
-    pollingInterval
   );
 
   const network = NETWORK_CONFIG[networkName];
@@ -126,7 +105,7 @@ const loadProviderForNetwork = async (
     poseidonMerkleVerifierV3Contract,
     tokenVaultV3Contract,
     fallbackProvider,
-    pollingProvider,
+    undefined, // pollingProvider is being deprecated
     deploymentBlocks,
     poi?.launchBlock,
     supportsV3,
@@ -140,6 +119,9 @@ const loadProviderForNetwork = async (
 export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
+  /**
+   * @deprecated pollingInterval - DEPRECATED
+   */
   pollingInterval = 15000,
 ): Promise<LoadProviderResponse> => {
   try {
@@ -198,19 +180,17 @@ export const unloadProvider = async (
 ): Promise<void> => {
   WalletPOINodeInterface.pause(NETWORK_CONFIG[networkName].chain);
   await fallbackProviderMap[networkName]?.destroy();
-  pollingProviderMap[networkName]?.destroy();
   delete fallbackProviderMap[networkName];
-  delete pollingProviderMap[networkName];
 };
 
 export const pauseAllPollingProviders = (
   excludeNetworkName?: NetworkName,
 ): void => {
-  Object.keys(pollingProviderMap).forEach(networkName => {
+  Object.keys(fallbackProviderMap).forEach(networkName => {
     if (networkName === excludeNetworkName) {
       return;
     }
-    const pollingProvider = pollingProviderMap[networkName];
+    const pollingProvider = fallbackProviderMap[networkName];
     if (isDefined(pollingProvider) && !pollingProvider.paused) {
       pollingProvider.pause();
     }
@@ -223,7 +203,7 @@ export const resumeIsolatedPollingProviderForNetwork = (
   pauseAllPollingProviders(
     networkName, // excludeNetworkName
   );
-  const pollingProviderForNetwork = pollingProviderMap[networkName];
+  const pollingProviderForNetwork = fallbackProviderMap[networkName];
   if (
     isDefined(pollingProviderForNetwork) &&
     pollingProviderForNetwork.paused
