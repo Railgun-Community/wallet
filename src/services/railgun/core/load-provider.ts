@@ -42,14 +42,14 @@ const createFallbackProviderForNetwork = async (
  * @param chain 
  * @param networkName 
  * @param fallbackProviderJsonConfig 
- * @param pollingInterval - DEPRECATED
+ * @param pollingInterval
  */
 const loadProviderForNetwork = async (
   chain: Chain,
   networkName: NetworkName,
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   /**
-   * @deprecated pollingInterval - DEPRECATED
+   * @deprecated pollingInterval - Default ethers polling interval is used
    */
   pollingInterval: number,
 ) => {
@@ -120,7 +120,7 @@ export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
   /**
-   * @deprecated pollingInterval - DEPRECATED
+   * @deprecated pollingInterval - Default ethers polling interval is used
    */
   pollingInterval = 15000,
 ): Promise<LoadProviderResponse> => {
