@@ -140,6 +140,6 @@ describe('providers', () => {
         NetworkName.BNBChain,
         10000, // pollingInterval
       ),
-    ).rejectedWith('Invalid fallback provider config for chain 56');
+    ).rejectedWith('Invalid provider config for chain 56');
   });
 });

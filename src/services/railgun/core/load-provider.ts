@@ -4,6 +4,7 @@ import {
   LoadProviderResponse,
   NETWORK_CONFIG,
   NetworkName,
+  ProviderJson,
   TXIDVersion,
   createFallbackProviderFromJsonConfig,
   isDefined,
@@ -15,7 +16,7 @@ import { getEngine } from './engine';
 import {
   RailgunVersionedSmartContracts,
 } from '@railgun-community/engine';
-import { FallbackProvider } from 'ethers'
+import { FallbackProvider, JsonRpcProvider, WebSocketProvider } from 'ethers'
 import {
   fallbackProviderMap,
   setFallbackProviderForNetwork,
@@ -25,6 +26,7 @@ import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
 const createFallbackProviderForNetwork = async (
   networkName: NetworkName,
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
+  pollingInterval?: number,
 ): Promise<FallbackProvider> => {
   const existingProvider = fallbackProviderMap[networkName];
   if (existingProvider) {
@@ -32,6 +34,7 @@ const createFallbackProviderForNetwork = async (
   }
   const fallbackProvider = createFallbackProviderFromJsonConfig(
     fallbackProviderJsonConfig,
+    pollingInterval
   );
   setFallbackProviderForNetwork(networkName, fallbackProvider);
   return fallbackProvider;
@@ -47,18 +50,40 @@ const createFallbackProviderForNetwork = async (
 const loadProviderForNetwork = async (
   chain: Chain,
   networkName: NetworkName,
-  fallbackProviderJsonConfig: FallbackProviderJsonConfig,
-  /**
-   * @deprecated pollingInterval - Default ethers polling interval is used
-   */
+  providerJsonConfig: FallbackProviderJsonConfig | ProviderJson,
   pollingInterval: number,
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
 
-  const fallbackProvider = await createFallbackProviderForNetwork(
-    networkName,
-    fallbackProviderJsonConfig,
-  );
+  // Allow each kind of provider
+  let provider: FallbackProvider | WebSocketProvider | JsonRpcProvider;
+  if ('providers' in providerJsonConfig) {
+    // If it has providers, it's a FallbackProviderJsonConfig
+    provider = await createFallbackProviderForNetwork(
+      networkName,
+      providerJsonConfig,
+      pollingInterval,
+    );
+  } else {
+    // Get the singular RPC URL
+    if (!isDefined(providerJsonConfig.provider) || typeof providerJsonConfig.provider !== 'string') {
+      throw new Error(`Invalid provider config for chain ${chain.id}`);
+    }
+    const providerURL = providerJsonConfig.provider;
+
+    // Check if WebSocket or HTTP
+    if (providerURL.startsWith('wss')) {
+      provider = new WebSocketProvider(providerURL, chain.id, {
+        staticNetwork: true,
+        // NOTE: WebSocketProvider does not poll and uses eth_subscribe for events
+      });
+    } else {
+      provider = new JsonRpcProvider(providerURL, chain.id, {
+        staticNetwork: true,
+        pollingInterval,
+      });
+    }
+  }
 
   const network = NETWORK_CONFIG[networkName];
   const {
@@ -104,7 +129,7 @@ const loadProviderForNetwork = async (
     poseidonMerkleAccumulatorV3Contract,
     poseidonMerkleVerifierV3Contract,
     tokenVaultV3Contract,
-    fallbackProvider,
+    provider, // Can be of type FallbackProvider, WebSocketProvider, or JsonRpcProvider
     undefined, // pollingProvider is being deprecated
     deploymentBlocks,
     poi?.launchBlock,
