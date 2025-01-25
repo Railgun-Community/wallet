@@ -142,7 +142,7 @@ const loadProviderForNetwork = async (
  * for new RAILGUN events (balance updates).
  */
 export const loadProvider = async (
-  fallbackProviderJsonConfig: FallbackProviderJsonConfig,
+  providerJsonConfig: FallbackProviderJsonConfig | ProviderJson,
   networkName: NetworkName,
   /**
    * @deprecated pollingInterval - Default ethers polling interval is used
@@ -153,14 +153,14 @@ export const loadProvider = async (
     delete fallbackProviderMap[networkName];
 
     const { chain, supportsV3 } = NETWORK_CONFIG[networkName];
-    if (fallbackProviderJsonConfig.chainId !== chain.id) {
+    if ('chainId' in providerJsonConfig && providerJsonConfig.chainId !== chain.id) {
       throw new Error('Invalid chain ID');
     }
 
     await loadProviderForNetwork(
       chain,
       networkName,
-      fallbackProviderJsonConfig,
+      providerJsonConfig,
       pollingInterval,
     );
     WalletPOINodeInterface.unpause(chain);
