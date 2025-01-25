@@ -3,7 +3,7 @@ import {
   NetworkName,
   isDefined,
 } from '@railgun-community/shared-models';
-import { getFallbackProviderForNetwork } from '../railgun/core/providers';
+import { getProviderForNetwork } from '../railgun/core/providers';
 import { POI } from '@railgun-community/engine';
 
 export class POIRequired {
@@ -21,7 +21,7 @@ export class POIRequired {
       return false;
     }
 
-    const provider = getFallbackProviderForNetwork(networkName);
+    const provider = getProviderForNetwork(networkName);
     const blockNumber = await provider.getBlockNumber();
 
     const isRequired = poi.launchBlock < blockNumber;

@@ -11,7 +11,7 @@ import {
   MOCK_FALLBACK_PROVIDER_JSON_CONFIG_SEPOLIA,
 } from '../../../../tests/mocks.test';
 import { closeTestEngine, initTestEngine } from '../../../../tests/setup.test';
-import { getFallbackProviderForNetwork } from '../providers';
+import { getProviderForNetwork } from '../providers';
 import { loadProvider } from '../load-provider';
 import { createRailgunWallet, walletForID } from '../../wallets/wallets';
 import {
@@ -54,10 +54,10 @@ describe('providers', () => {
       unshieldFeeV3: undefined,
     });
 
-    expect(getFallbackProviderForNetwork(NetworkName.EthereumSepolia)).to.not.be
+    expect(getProviderForNetwork(NetworkName.EthereumSepolia)).to.not.be
       .undefined;
     expect(() =>
-      getFallbackProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
+      getProviderForNetwork(NetworkName.EthereumRopsten_DEPRECATED),
     ).to.throw;
 
     expect(getUTXOMerkletreeForNetwork(txidVersion, NetworkName.EthereumSepolia))
@@ -140,6 +140,6 @@ describe('providers', () => {
         NetworkName.BNBChain,
         10000, // pollingInterval
       ),
-    ).rejectedWith('Invalid provider config for chain 56');
+    ).rejectedWith('provider is required for single provider configuration');
   });
 });

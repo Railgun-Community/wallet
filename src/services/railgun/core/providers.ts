@@ -1,21 +1,21 @@
 import { NetworkName, isDefined } from '@railgun-community/shared-models';
-import { FallbackProvider } from 'ethers';
+import { Provider } from 'ethers';
 
-export const fallbackProviderMap: MapType<FallbackProvider> = {};
+export const providerMap: MapType<Provider> = {};
 
-export const getFallbackProviderForNetwork = (
+export const getProviderForNetwork = (
   networkName: NetworkName,
-): FallbackProvider => {
-  const provider = fallbackProviderMap[networkName];
+): Provider => {
+  const provider = providerMap[networkName];
   if (!isDefined(provider)) {
     throw new Error(`Provider not yet loaded for network ${networkName}`);
   }
   return provider;
 };
 
-export const setFallbackProviderForNetwork = (
+export const setProviderForNetwork = (
   networkName: NetworkName,
-  provider: FallbackProvider,
+  provider: Provider,
 ): void => {
-  fallbackProviderMap[networkName] = provider;
+  providerMap[networkName] = provider;
 };
