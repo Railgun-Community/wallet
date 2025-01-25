@@ -54,6 +54,7 @@
     "ethers": "6.13.1",
     "events": "3.3.0",
     "graphql": "^16.6.0",
+    "patch-package": "^8.0.0",
     "stream-browserify": "3.0.0"
   },
   "devDependencies": {
