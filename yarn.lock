@@ -1984,8 +1984,9 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/poseidon-hash-wasm/-/poseidon-hash-wasm-1.0.1.tgz#bfd3b3f915391a59486d8c9d632069f029e152d6"
   integrity sha512-zDAbMu095ZjMqsKIoyOnuKR4Zofnqqx4eTCtnA6qYglnexX5cadxItvJa3ozhDDTmFkDGAidDssQ7Pzl3wwLDA==
 
-"@railgun-community/shared-models@file:../shared-models":
+"@railgun-community/shared-models@git+https://github.com/Railgun-Community/shared-models.git#mattgle/ink-integration":
   version "7.5.2"
+  resolved "git+https://github.com/Railgun-Community/shared-models.git#3c8547562e1d6ccc2c0fbb9dd0c93ef807de0964"
 
 "@repeaterjs/repeater@3.0.4":
   version "3.0.4"
