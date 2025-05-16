@@ -134,9 +134,9 @@ export const generateDummyProofTransactions = async (
   const broadcasterFeeERC20AmountRecipient: Optional<RailgunERC20AmountRecipient> =
     broadcasterFeeERC20Amount
       ? {
-          ...broadcasterFeeERC20Amount,
-          recipientAddress: broadcasterRailgunAddress,
-        }
+        ...broadcasterFeeERC20Amount,
+        recipientAddress: broadcasterRailgunAddress,
+      }
       : undefined;
 
   return (
@@ -202,6 +202,7 @@ export const generateUnshieldBaseToken = async (
       txs,
       toWalletAddress,
       relayAdaptParamsRandom,
+      useDummyProof,
     );
   if (useDummyProof) {
     return {

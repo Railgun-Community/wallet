@@ -222,6 +222,7 @@ export const generateUnshieldBaseTokenProof = async (
         dummyTxs,
         publicWalletAddress,
         relayAdaptParamsRandom,
+        sendWithPublicWallet,
       );
     const relayAdaptContract =
       RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
@@ -262,7 +263,7 @@ export const generateUnshieldBaseTokenProof = async (
       networkName,
       publicWalletAddress,
       relayAdaptParamsRandom,
-      false, // useDummyProof
+      sendWithPublicWallet, // useDummyProof
     );
 
     const nullifiers = nullifiersForTransactions(provedTransactions);
