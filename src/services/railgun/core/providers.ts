@@ -1,42 +1,21 @@
 import { NetworkName, isDefined } from '@railgun-community/shared-models';
-import { PollingJsonRpcProvider } from '@railgun-community/engine';
-import { FallbackProvider } from 'ethers';
+import { Provider } from 'ethers';
 
-export const fallbackProviderMap: MapType<FallbackProvider> = {};
-export const pollingProviderMap: MapType<PollingJsonRpcProvider> = {};
+export const providerMap: MapType<Provider> = {};
 
-export const getFallbackProviderForNetwork = (
+export const getProviderForNetwork = (
   networkName: NetworkName,
-): FallbackProvider => {
-  const provider = fallbackProviderMap[networkName];
+): Provider => {
+  const provider = providerMap[networkName];
   if (!isDefined(provider)) {
     throw new Error(`Provider not yet loaded for network ${networkName}`);
   }
   return provider;
 };
 
-export const getPollingProviderForNetwork = (
+export const setProviderForNetwork = (
   networkName: NetworkName,
-): PollingJsonRpcProvider => {
-  const provider = pollingProviderMap[networkName];
-  if (!isDefined(provider)) {
-    throw new Error(
-      `Polling provider not yet loaded for network ${networkName}`,
-    );
-  }
-  return provider;
-};
-
-export const setFallbackProviderForNetwork = (
-  networkName: NetworkName,
-  provider: FallbackProvider,
+  provider: Provider,
 ): void => {
-  fallbackProviderMap[networkName] = provider;
-};
-
-export const setPollingProviderForNetwork = (
-  networkName: NetworkName,
-  provider: PollingJsonRpcProvider,
-): void => {
-  pollingProviderMap[networkName] = provider;
+  providerMap[networkName] = provider;
 };
