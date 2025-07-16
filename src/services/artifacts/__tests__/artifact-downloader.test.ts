@@ -181,7 +181,7 @@ describe('artifact-downloader', () => {
     expect(artifacts.wasm).to.not.be.undefined;
     expect(artifacts.dat).to.be.undefined;
 
-    const cached = artifactCache['8x2'];
+    const cached = artifactCache['08x02'];
     expect(cached?.vkey).to.not.be.undefined;
     expect(cached?.zkey).to.not.be.undefined;
     expect(cached?.wasm).to.not.be.undefined;
@@ -217,7 +217,7 @@ describe('artifact-downloader', () => {
     expect(artifacts.wasm).to.be.undefined;
     expect(artifacts.dat).to.not.be.undefined;
 
-    const cached = artifactCache['6x3'];
+    const cached = artifactCache['06x03'];
     expect(cached?.vkey).to.not.be.undefined;
     expect(cached?.zkey).to.not.be.undefined;
     expect(cached?.wasm).to.be.undefined;
