@@ -7,7 +7,7 @@ import brotliDecompress from 'brotli/decompress';
 const IPFS_GATEWAY = 'https://ipfs-lb.com';
 
 const MASTER_IPFS_HASH_ARTIFACTS =
-  'QmeBrG7pii1qTqsn7rusvDiqXopHPjCT9gR4PsmW7wXqZq';
+  'QmUsmnK4PFc7zDp2cmC4wBZxYLjNyRgWfs5GNcJJ2uLcpU';
 
 const IPFS_HASH_ARTIFACTS_POI =
   'QmZrP9zaZw2LwErT2yA6VpMWm65UdToQiKj4DtStVsUJHr';
