@@ -26,7 +26,7 @@ export const getArtifactVariantString = (
   nullifiers: number,
   commitments: number,
 ) => {
-  return `${nullifiers}x${commitments}`;
+  return `${nullifiers.toString().padStart(2, '0')}x${commitments.toString().padStart(2, '0')}`;
 };
 
 export const getArtifactVariantStringPOI = (
@@ -86,11 +86,11 @@ const getArtifactIPFSFilepath = (
 ) => {
   switch (artifactName) {
     case ArtifactName.ZKEY:
-      return `${artifactVariantString}/zkey.br`;
+      return `circuits/${artifactVariantString}/zkey.br`;
     case ArtifactName.WASM:
       return `prover/snarkjs/${artifactVariantString}.wasm.br`;
     case ArtifactName.VKEY:
-      return `${artifactVariantString}/vkey.json`;
+      return `circuits/${artifactVariantString}/vkey.json`;
     case ArtifactName.DAT:
       return `prover/native/${artifactVariantString}.dat.br`;
   }
@@ -131,5 +131,6 @@ export const getArtifactUrl = (
     artifactName,
     artifactVariantString,
   );
+  
   return `${IPFS_GATEWAY}/ipfs/${MASTER_IPFS_HASH_ARTIFACTS}/${artifactFilepath}`;
 };
