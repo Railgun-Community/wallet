@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import Sinon, { SinonStub } from 'sinon';
 import {
   CommitmentSummary,
-  createFallbackProviderFromJsonConfig,
+  createProviderFromJsonConfig,
   EVMGasType,
   NetworkName,
   TransactionGasDetails,
@@ -17,7 +17,7 @@ import {
   getGasEstimate,
   setGasDetailsForTransaction,
 } from '../tx-gas-details';
-import { setFallbackProviderForNetwork } from '../../railgun';
+import { setProviderForNetwork } from '../../railgun';
 import { ContractTransaction, FallbackProvider } from 'ethers';
 import { getTestTXIDVersion } from '../../../tests/helper.test';
 
@@ -43,11 +43,11 @@ describe('tx-gas', () => {
 
   it('Should format gas estimate response', async () => {
     const transaction = {} as ContractTransaction;
-    const fallbackProvider = createFallbackProviderFromJsonConfig(
+    const fallbackProvider = createProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
 
-    setFallbackProviderForNetwork(
+    setProviderForNetwork(
       NetworkName.Polygon,
       fallbackProvider as unknown as FallbackProvider,
     );
@@ -78,10 +78,10 @@ describe('tx-gas', () => {
 
   it('Should pull gas estimate for basic transaction - self-signed', async () => {
     stubGasEstimateSuccess();
-    const fallbackProvider = createFallbackProviderFromJsonConfig(
+    const fallbackProvider = createProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(
+    setProviderForNetwork(
       NetworkName.Polygon,
       fallbackProvider as unknown as FallbackProvider,
     );
@@ -111,10 +111,10 @@ describe('tx-gas', () => {
 
   it('Should pull gas estimate for basic transaction - broadcaster', async () => {
     stubGasEstimateSuccess();
-    const fallbackProvider = createFallbackProviderFromJsonConfig(
+    const fallbackProvider = createProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
-    setFallbackProviderForNetwork(
+    setProviderForNetwork(
       NetworkName.Polygon,
       fallbackProvider as unknown as FallbackProvider,
     );
