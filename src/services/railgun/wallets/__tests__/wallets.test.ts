@@ -2,6 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { getEngine } from '../../core/engine';
 import {
+  createMultiSigRailgunWallet,
   createRailgunWallet,
   createViewOnlyRailgunWallet,
   fullWalletForID,
@@ -61,6 +62,30 @@ describe('wallets', () => {
     const viewOnlyWallet = viewOnlyWalletForID(railgunWalletInfo.id);
     expect(viewOnlyWallet).to.not.be.undefined;
     expect(railgunWalletInfo.railgunAddress).to.equal(wallet.getAddress());
+  }).timeout(60_000);
+
+  it.only('Should create multi-sig wallet', async () => {
+    const testSharedViewingKey = '82a57670726976d94034326232623861643234306331323630396633623265363865656137613636373330306437373332633335346238373338343266373433313135313836303066a473707562d94061316166356531353935616330303736303734646465653034323737356230363365366434653666313966613632633333323935636336643363646635313165'
+    const railgunWalletInfo = await createMultiSigRailgunWallet(
+      MOCK_DB_ENCRYPTION_KEY,
+      testSharedViewingKey,
+      undefined, // creationBlockNumbers
+      {
+        symmetricKey: '0x818e3ed121f4cc505f0a763cc91c83cab62005c0d04a5e97f6bab3a006c8a972',
+        sessionId: 'tiger-garment-pen-method',
+        sign: async (a: any, b: any, c: any, d: any): Promise<any> =>{
+          console.log('sign-called', a, b, c, d)
+          
+        }
+      }
+    );
+    if (!isDefined(railgunWalletInfo)) {
+      throw new Error('Could not create view-only wallet');
+    }
+    const multiSigWallet = viewOnlyWalletForID(railgunWalletInfo.id);
+    expect(multiSigWallet).to.not.be.undefined;
+    console.log('railgunWalletInfo', railgunWalletInfo)
+    expect(railgunWalletInfo.railgunAddress).to.equal('0zk1qy2ukgmgcks06peftlkz4csqyxgdsl79qucx5gufxga5p346duevlrv7j6fe3z53llk55mjaa43ds8l0lq3r5nnjcf4zfkzgwnugrxc9emu7v44nn3w4kxwxqa3');
   }).timeout(60_000);
 
   it('Should get wallet address', () => {

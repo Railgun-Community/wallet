@@ -21,6 +21,7 @@ import { onBalancesUpdate, onWalletPOIProofProgress } from './balance-update';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { getAddress } from 'ethers';
 import { getEngine } from '../core/engine';
+import { WakuConnector } from '@railgun-community/engine/dist/wallet/multisig-wallet';
 
 export const awaitWalletScan = (walletID: string, chain: Chain) => {
   const wallet = walletForID(walletID);
@@ -140,7 +141,10 @@ const loadExistingWallet = async (
   encryptionKey: string,
   railgunWalletID: string,
   isViewOnlyWallet: boolean,
+  isMultiSigWallet: boolean,
+  wakuConnector: WakuConnector
 ): Promise<RailgunWalletInfo> => {
+  // returns a 'already loaded' wallet
   const existingWallet = getExistingWallet(railgunWalletID);
   if (existingWallet) {
     return infoForWallet(existingWallet);
@@ -152,6 +156,12 @@ const loadExistingWallet = async (
     wallet = await engine.loadExistingViewOnlyWallet(
       encryptionKey,
       railgunWalletID,
+    );
+  } else if (isMultiSigWallet) {
+    wallet = await engine.loadExistingMultiSigWallet(
+      encryptionKey,
+      railgunWalletID,
+      wakuConnector
     );
   } else {
     wallet = await engine.loadExistingWallet(encryptionKey, railgunWalletID);
@@ -199,6 +209,26 @@ const createViewOnlyWallet = async (
   return infoForWallet(wallet);
 };
 
+const createMultiSigWallet = async (
+  encryptionKey: string,
+  shareableViewingKey: string,
+  creationBlockNumbers: Optional<MapType<number>>,
+  waku: WakuConnector
+): Promise<RailgunWalletInfo> => {
+  const formattedCreationBlockNumbers =
+    formatCreationBlockNumbers(creationBlockNumbers);
+
+  const engine = getEngine();
+  const wallet = await engine.createMultiSigWalletFromShareableViewingKey(
+    encryptionKey,
+    shareableViewingKey,
+    formattedCreationBlockNumbers,
+    waku
+  );
+  subscribeToEvents(wallet);
+  return infoForWallet(wallet);
+};
+
 export const createRailgunWallet = async (
   encryptionKey: string,
   mnemonic: string,
@@ -233,16 +263,39 @@ export const createViewOnlyRailgunWallet = async (
   }
 };
 
+export const createMultiSigRailgunWallet = async (
+  encryptionKey: string,
+  shareableViewingKey: string,
+  creationBlockNumbers: Optional<MapType<number>>,
+  waku: WakuConnector
+): Promise<RailgunWalletInfo> => {
+  try {
+    return await createMultiSigWallet(
+      encryptionKey,
+      shareableViewingKey,
+      creationBlockNumbers,
+      waku
+    );
+  } catch (err) {
+    throw reportAndSanitizeError(createViewOnlyRailgunWallet.name, err);
+  }
+};
+
 export const loadWalletByID = async (
   encryptionKey: string,
   railgunWalletID: string,
   isViewOnlyWallet: boolean,
+  isMultiSigWallet = false,
+  // @ts-ignore
+  wakuConnector: WakuConnector = {}
 ): Promise<RailgunWalletInfo> => {
   try {
     return await loadExistingWallet(
       encryptionKey,
       railgunWalletID,
       isViewOnlyWallet,
+      isMultiSigWallet,
+      wakuConnector as any // TODO: Fix
     );
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(loadWalletByID.name, err);
