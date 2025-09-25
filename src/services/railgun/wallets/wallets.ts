@@ -9,6 +9,8 @@ import {
   ByteUtils,
   POICurrentProofEventData,
   ViewOnlyWallet,
+  MultisigWallet,
+  WakuConnector 
 } from '@railgun-community/engine';
 import {
   RailgunWalletInfo,
@@ -21,7 +23,6 @@ import { onBalancesUpdate, onWalletPOIProofProgress } from './balance-update';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { getAddress } from 'ethers';
 import { getEngine } from '../core/engine';
-import { WakuConnector } from '@railgun-community/engine/dist/wallet/multisig-wallet';
 
 export const awaitWalletScan = (walletID: string, chain: Chain) => {
   const wallet = walletForID(walletID);
@@ -61,10 +62,11 @@ export const walletForID = (id: string): AbstractWallet => {
 
 export const fullWalletForID = (id: string): RailgunWallet => {
   const wallet = walletForID(id);
-  if (!(wallet instanceof RailgunWallet)) {
+  if (!(wallet instanceof RailgunWallet) && !(wallet instanceof MultisigWallet) ) {
+    console.log('wallet', wallet)
     throw new Error('Can not load View-Only wallet.');
   }
-  return wallet;
+  return wallet as RailgunWallet;
 };
 
 export const viewOnlyWalletForID = (id: string): RailgunWallet => {

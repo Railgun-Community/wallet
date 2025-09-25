@@ -71,6 +71,7 @@ describe('wallets', () => {
       testSharedViewingKey,
       undefined, // creationBlockNumbers
       {
+        myId: 1,
         symmetricKey: '0x818e3ed121f4cc505f0a763cc91c83cab62005c0d04a5e97f6bab3a006c8a972',
         sessionId: 'tiger-garment-pen-method',
         sign: async (a: any, b: any, c: any, d: any): Promise<any> =>{
