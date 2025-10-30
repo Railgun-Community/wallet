@@ -262,7 +262,9 @@ export const generateUnshieldBaseTokenProof = async (
       provedTransactions,
       networkName,
       publicWalletAddress,
-      relayAdaptParamsRandom
+      relayAdaptParamsRandom,
+      false, // useDummyProof
+      sendWithPublicWallet,
     );
 
     const nullifiers = nullifiersForTransactions(provedTransactions);

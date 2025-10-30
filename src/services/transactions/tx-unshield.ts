@@ -229,7 +229,8 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           networkName,
           publicWalletAddress,
           relayAdaptParamsRandom,
-          true, // useDummyProof
+          true, // useDummyProof (for gas estimation)
+          sendWithPublicWallet,
         );
       },
       txidVersion,
