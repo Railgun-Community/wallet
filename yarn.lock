@@ -1949,10 +1949,10 @@
   resolved "https://registry.yarnpkg.com/@railgun-community/curve25519-scalarmult-wasm/-/curve25519-scalarmult-wasm-0.1.5.tgz#edb5e40a8f1fdb7f7e0de1d04e8badabe41cb2a8"
   integrity sha512-Cur8uM/IdNW3WzUwdPloDG1CF0rpSBDWq2yGXJMZ7IMeBGdc4Jj0h9tnNMFRZ35ZuCVVbZ3yClmqSa4PsbpdGQ==
 
-"@railgun-community/engine@9.4.0":
-  version "9.4.0"
-  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-9.4.0.tgz#d8beb18ac83f2a560ce63f8b5e49e3f0866a2a5a"
-  integrity sha512-7BZcUKo5oVBWdyBrjpKft3zT0hFo1V3PzcDSuvEIDzA8mOqFXTrIr4j+0A9ONwb5bo4A/7vfO0yll6uk0Y4GSQ==
+"@railgun-community/engine@9.5.0":
+  version "9.5.0"
+  resolved "https://registry.yarnpkg.com/@railgun-community/engine/-/engine-9.5.0.tgz#a09530fef505953320433b2030bbcb96ae56b490"
+  integrity sha512-bqlUwENskF8b2X4wDlJwaXMJ6gHFlKtuBfryWFPEXWTWVZzhDW5wrboBENvjlEEeOnFe3CCW9UClsiFtep6yhg==
   dependencies:
     "@noble/ciphers" "^0.4.0"
     "@noble/ed25519" "^1.7.1"
