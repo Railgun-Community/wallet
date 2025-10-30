@@ -188,7 +188,9 @@ export const generateUnshieldBaseToken = async (
   networkName: NetworkName,
   toWalletAddress: string,
   relayAdaptParamsRandom: string,
-  useDummyProof = false,
+  // eslint-disable-next-line default-param-last, @typescript-eslint/no-inferrable-types
+  useDummyProof : boolean = false,
+  sendWithPublicWallet: boolean,
 ): Promise<ContractTransaction> => {
   assertValidEthAddress(toWalletAddress);
   assertNotBlockedAddress(toWalletAddress);
@@ -203,6 +205,7 @@ export const generateUnshieldBaseToken = async (
       toWalletAddress,
       relayAdaptParamsRandom,
       useDummyProof,
+      sendWithPublicWallet,
     );
   if (useDummyProof) {
     return {
