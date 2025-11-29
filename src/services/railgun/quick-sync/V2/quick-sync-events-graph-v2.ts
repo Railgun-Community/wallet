@@ -20,9 +20,8 @@ import { EMPTY_EVENTS, autoPaginatingQuery } from '../graph-query';
 
 const meshes: MapType<MeshInstance> = {};
 
-// 1.5 full trees of commitments
-// TODO: This will have to change when we have more than 100k commitments.
-const MAX_QUERY_RESULTS = 100000;
+// NOTE: maybe reduce this; but for now its all commitments max
+const MAX_QUERY_RESULTS = 16 * (2 ** 16);
 
 const sourceNameForNetwork = (networkName: NetworkName): string => {
   switch (networkName) {

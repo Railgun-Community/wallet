@@ -14,6 +14,7 @@ export const autoPaginatingQuery = async <
   blockNumber: string,
   maxQueryResults: number,
   prevResults: ReturnType[] = [],
+  maxResults = 10_000
 ): Promise<ReturnType[]> => {
   const newResults = await promiseTimeout(
     query(blockNumber),
@@ -25,11 +26,10 @@ export const autoPaginatingQuery = async <
   }
 
   const totalResults = prevResults.concat(newResults); 
-
   const overLimit = totalResults.length >= maxQueryResults;
   const lastResult = totalResults[totalResults.length - 1];
 
-  const shouldQueryMore = newResults.length === 10000;
+  const shouldQueryMore = newResults.length === maxResults;
   if (!overLimit && shouldQueryMore) {
     await delay(250);
     return autoPaginatingQuery(
