@@ -18,10 +18,11 @@ import {
   formatRailgunTransactions,
 } from './railgun-txid-graph-type-formatters';
 import { removeDuplicatesByID } from '../util/graph-util';
+import { EMPTY_EVENTS, autoPaginatingQuery } from "../quick-sync/graph-query";
 
 const meshes: MapType<MeshInstance> = {};
 
-const MAX_QUERY_RESULTS = 5000;
+const MAX_QUERY_RESULTS = 16 * (2 ** 16);
 
 const txsSubgraphSourceNameForNetwork = (networkName: NetworkName): string => {
   switch (networkName) {
@@ -219,6 +220,9 @@ export const quickSyncRailgunTransactionsV2 = async (
           })
         ).transactions,
       latestGraphID ?? '0x00',
+      MAX_QUERY_RESULTS,
+      undefined,
+      10_000
     );
 
   const filteredRailgunTransactions: GraphRailgunTransactions =
@@ -228,35 +232,6 @@ export const quickSyncRailgunTransactionsV2 = async (
     formatRailgunTransactions(filteredRailgunTransactions);
 
   return formattedRailgunTransactions;
-};
-
-const autoPaginatingQuery = async <ReturnType extends { id: string }>(
-  query: (id: string) => Promise<ReturnType[]>,
-  id: string,
-  prevResults: ReturnType[] = [],
-): Promise<ReturnType[]> => {
-  const newResults = await promiseTimeout(
-    query(id),
-    20000,
-    new Error('Timeout querying Graph for QuickSync of RAILGUN-TXID Events'),
-  );
-  if (newResults.length === 0) {
-    return prevResults;
-  }
-
-  const totalResults = prevResults.concat(newResults);
-
-  const overLimit = totalResults.length >= MAX_QUERY_RESULTS;
-  const lastResult = totalResults[totalResults.length - 1];
-
-  const shouldQueryMore = newResults.length === 5000;
-  // console.log("SHOULD QUERY MORE", shouldQueryMore, "OVER LIMIT", overLimit, "TOTAL RESULTS", totalResults.length)
-  if (!overLimit && shouldQueryMore) {
-    await delay(250);
-    return autoPaginatingQuery(query, lastResult.id, totalResults);
-  }
-
-  return totalResults;
 };
 
 const getBuiltGraphClient = async (
