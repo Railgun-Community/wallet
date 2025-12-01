@@ -123,11 +123,13 @@ const createGraphCommitmentBatches = (
   const graphCommitmentMap: MapType<GraphCommitmentBatchV2> = {};
   for (const commitment of flattenedCommitments) {
     const startPosition = commitment.batchStartTreePosition;
-    const existingBatch = graphCommitmentMap[startPosition];
+    const treeNumber = commitment.treeNumber;
+    const key = `${treeNumber}-${startPosition}`;
+    const existingBatch = graphCommitmentMap[key];
     if (isDefined(existingBatch)) {
       existingBatch.commitments.push(commitment);
     } else {
-      graphCommitmentMap[commitment.batchStartTreePosition] = {
+      graphCommitmentMap[key] = {
         commitments: [commitment],
         transactionHash: commitment.transactionHash,
         treeNumber: commitment.treeNumber,
