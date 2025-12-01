@@ -40,35 +40,36 @@ const assertContiguousCommitmentEvents = (
   commitmentEvents: CommitmentEvent[],
   shouldThrow: boolean,
 ) => {
-  // Track unique events by their actual start positions
-  const positionMap = new Map<number, Set<number>>();
-
-  // Build map of positions to their commitment indices
-  for (const event of commitmentEvents) {
-    const uniqueIndices = new Set(event.commitments.map(c => c.utxoIndex));
-    positionMap.set(event.startPosition, uniqueIndices);
-  }
-
-  // Get sorted positions
-  const positions = Array.from(positionMap.keys()).sort((a, b) => a - b);
+  const sortedEvents = [...commitmentEvents].sort((a, b) => {
+    if (a.treeNumber !== b.treeNumber) {
+      return a.treeNumber - b.treeNumber;
+    }
+    return a.startPosition - b.startPosition;
+  });
 
   // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < positions.length - 1; i++) {
-    const currentPos = positions[i];
-    const nextPos = positions[i + 1];
-    
-    const currentIndices = positionMap.get(currentPos);
+  for (let i = 0; i < sortedEvents.length - 1; i++) {
+    const currentEvent = sortedEvents[i];
+    const nextEvent = sortedEvents[i + 1];
 
-    // Check if current position's indices bridge the gap
-    const maxIndexInCurrent = Math.max(...Array.from(currentIndices || []));
-    const bridgesGap = maxIndexInCurrent >= nextPos - 1;
-
-    // Only throw if there's a gap AND the current indices don't bridge it
-    if (nextPos !== currentPos + 1 && !bridgesGap) {
-      if (shouldThrow) {
-        throw new Error(`Gap in sequence: found ${nextPos} after ${currentPos} (max index: ${maxIndexInCurrent})`);
+    if (currentEvent.treeNumber === nextEvent.treeNumber) {
+      const currentMaxIndex = Math.max(
+        ...currentEvent.commitments.map(c => c.utxoIndex),
+      );
+      if (nextEvent.startPosition > currentMaxIndex + 1) {
+        if (shouldThrow) {
+          throw new Error(
+            `Gap in sequence (tree ${currentEvent.treeNumber}): found ${nextEvent.startPosition} after ${currentEvent.startPosition} (max index: ${currentMaxIndex})`,
+          );
+        }
       }
-    }
+    } else if (nextEvent.treeNumber !== currentEvent.treeNumber + 1) {
+        if (shouldThrow) {
+          throw new Error(
+            `Gap in trees: found ${nextEvent.treeNumber} after ${currentEvent.treeNumber}`,
+          );
+        }
+      }
   }
 };
 
