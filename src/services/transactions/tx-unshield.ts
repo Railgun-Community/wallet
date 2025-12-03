@@ -29,7 +29,7 @@ import { reportAndSanitizeError } from '../../utils/error';
 import { gasEstimateResponse, getGasEstimate } from './tx-gas-details';
 import {
   walletForID,
-  getFallbackProviderForNetwork,
+  getProviderForNetwork,
   getSerializedERC20Balances,
   getSerializedNFTBalances,
 } from '../railgun';
@@ -269,7 +269,7 @@ export const getERC20AndNFTAmountRecipientsForUnshieldToOrigin = async (
     originalShieldTxid,
   );
 
-  const provider = getFallbackProviderForNetwork(networkName);
+  const provider = getProviderForNetwork(networkName);
   const transaction = await provider.getTransaction(originalShieldTxid);
   if (!transaction) {
     throw new Error('Could not find shield transaction from RPC');

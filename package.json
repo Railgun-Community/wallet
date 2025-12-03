@@ -25,7 +25,7 @@
     "eslint": "eslint src/**/* --ext .ts,.tsx --ignore-pattern **/*.graphql --fix",
     "lint": "npm run check-circular-deps && npm run eslint && npm run tsc && npm run tsc-test",
     "prepare": "npm run build",
-    "postinstall": "node postinstall.js",
+    "postinstall": "node postinstall.js && patch-package",
     "build-graphql-V2": "rm -rf src/services/railgun/quick-sync/V2/graphql/.graphclient && graphclient build --dir src/services/railgun/quick-sync/V2/graphql",
     "build-graphql-V3": "rm -rf src/services/railgun/quick-sync/V3/graphql/.graphclient && graphclient build --dir src/services/railgun/quick-sync/V3/graphql",
     "build-graphql-railgun-txids": "rm -rf src/services/railgun/railgun-txids/graphql/.graphclient && graphclient build --dir src/services/railgun/railgun-txids/graphql"
@@ -54,6 +54,7 @@
     "ethers": "6.13.1",
     "events": "3.3.0",
     "graphql": "^16.6.0",
+    "patch-package": "^8.0.0",
     "stream-browserify": "3.0.0"
   },
   "devDependencies": {

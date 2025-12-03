@@ -1,0 +1,241 @@
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.d.ts b/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.d.ts
+index a84b244..e144017 100644
+--- a/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.d.ts
++++ b/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.d.ts
+@@ -1,4 +1,4 @@
+-import { ProviderJson } from './fallback-provider';
++import { ProviderJson } from './provider';
+ type LogError = (err: string) => void;
+ /**
+  * Health checks ProviderJson inputs, and returns an array of available RPC providers.
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.js b/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.js
+index b87c16f..78e1f9f 100644
+--- a/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.js
++++ b/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.js
+@@ -36,9 +36,18 @@ const getAvailableProviderJSONs = async (chainId, providerJsons, logError) => {
+ exports.getAvailableProviderJSONs = getAvailableProviderJSONs;
+ const getBlockNumber = async (chainId, provider, logError) => {
+     const network = ethers_1.Network.from(chainId);
+-    const rpcProvider = new ethers_1.JsonRpcProvider(provider, network, {
+-        staticNetwork: network,
+-    });
++    // Conditionally handle what type of provider is being passed
++    let rpcProvider;
++    if (provider.startsWith('wss')) {
++        rpcProvider = new ethers_1.WebSocketProvider(provider, network, {
++            staticNetwork: network, // Network is dictated in the RPC URL, will not change
++        });
++    }
++    else {
++        rpcProvider = new ethers_1.JsonRpcProvider(provider, network, {
++            staticNetwork: network, // Network is dictated in the RPC URL, will not change
++        });
++    }
+     try {
+         const block = await (0, promises_1.promiseTimeout)(rpcProvider.getBlock('latest'), BLOCK_NUMBER_TIMEOUT_MS);
+         if (block == null) {
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.js.map b/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.js.map
+index b2f79ce..87b1a61 100644
+--- a/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.js.map
++++ b/node_modules/@railgun-community/shared-models/dist/utils/available-rpc.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"available-rpc.js","sourceRoot":"","sources":["../../src/utils/available-rpc.ts"],"names":[],"mappings":";;;AAAA,yCAAyC;AACzC,mCAAkD;AAElD,qCAA+C;AAC/C,yCAA4C;AAI5C,MAAM,uBAAuB,GAAG,IAAI,CAAC;AAErC;;;GAGG;AACI,MAAM,yBAAyB,GAAG,KAAK,EAC5C,OAAe,EACf,aAA6B,EAC7B,QAAkB,EACO,EAAE;IAC3B,MAAM,YAAY,GAAuB,MAAM,OAAO,CAAC,GAAG,CACxD,aAAa,CAAC,GAAG,CACf,KAAK,EAAC,YAAY,EAAC,EAAE,CACnB,MAAM,cAAc,CAAC,OAAO,EAAE,YAAY,CAAC,QAAQ,EAAE,QAAQ,CAAC,CACjE,CACF,CAAC;IAEF,MAAM,mBAAmB,GAAG,YAAY,CAAC,MAAM,CAC7C,WAAW,CAAC,EAAE,CAAC,WAAW,IAAI,IAAI,IAAI,WAAW,GAAG,CAAC,CAC1C,CAAC;IACd,MAAM,iBAAiB,GAAG,IAAA,4BAAmB,EAAC,mBAAmB,CAAC,CAAC;IACnE,MAAM,eAAe,GAAG,iBAAiB,GAAG,GAAG,CAAC;IAChD,MAAM,eAAe,GAAG,iBAAiB,GAAG,GAAG,CAAC;IAEhD,OAAO,aAAa,CAAC,MAAM,CAAC,CAAC,YAAY,EAAE,KAAK,EAAE,EAAE;QAClD,MAAM,WAAW,GAAG,YAAY,CAAC,KAAK,CAAC,CAAC;QACxC,IAAI,WAAW,IAAI,IAAI,EAAE;YACvB,QAAQ,CACN,+BAA+B,YAAY,CAAC,QAAQ,mBAAmB,CACxE,CAAC;YACF,OAAO,KAAK,CAAC;SACd;QACD,IAAI,WAAW,GAAG,eAAe,EAAE;YACjC,QAAQ,CACN,+BAA+B,YAAY,CAAC,QAAQ,mBAClD,iBAAiB,GAAG,WACtB,cAAc,CACf,CAAC;YACF,OAAO,KAAK,CAAC;SACd;QACD,IAAI,WAAW,GAAG,eAAe,EAAE;YACjC,QAAQ,CACN,+BAA+B,YAAY,CAAC,QAAQ,mBAClD,WAAW,GAAG,iBAChB,cAAc,CACf,CAAC;YACF,OAAO,KAAK,CAAC;SACd;QACD,OAAO,IAAI,CAAC;IACd,CAAC,CAAC,CAAC;AACL,CAAC,CAAC;AA7CW,QAAA,yBAAyB,6BA6CpC;AAEF,MAAM,cAAc,GAAG,KAAK,EAC1B,OAAe,EACf,QAAgB,EAChB,QAAkB,EACS,EAAE;IAC7B,MAAM,OAAO,GAAG,gBAAO,CAAC,IAAI,CAAC,OAAO,CAAC,CAAC;IACtC,MAAM,WAAW,GAAG,IAAI,wBAAe,CAAC,QAAQ,EAAE,OAAO,EAAE;QACzD,aAAa,EAAE,OAAO;KACvB,CAAC,CAAC;IACH,IAAI;QACF,MAAM,KAAK,GAAG,MAAM,IAAA,yBAAc,EAChC,WAAW,CAAC,QAAQ,CAAC,QAAQ,CAAC,EAC9B,uBAAuB,CACxB,CAAC;QACF,IAAI,KAAK,IAAI,IAAI,EAAE;YACjB,MAAM,IAAI,KAAK,CAAC,eAAe,CAAC,CAAC;SAClC;QACD,OAAO,KAAK,CAAC,MAAM,CAAC;KACrB;IAAC,OAAO,KAAK,EAAE;QACd,IAAI,CAAC,CAAC,KAAK,YAAY,KAAK,CAAC,EAAE;YAC7B,MAAM,IAAI,KAAK,CAAC,sCAAsC,EAAE,EAAE,KAAK,EAAE,CAAC,CAAC;SACpE;QACD,WAAW,CAAC,OAAO,EAAE,CAAC;QACtB,QAAQ,CAAC,KAAK,CAAC,OAAO,CAAC,CAAC;QACxB,OAAO,SAAS,CAAC;KAClB;AACH,CAAC,CAAC","sourcesContent":["/// <reference types=\"../types/global\" />\nimport { JsonRpcProvider, Network } from 'ethers';\nimport { ProviderJson } from './fallback-provider';\nimport { getUpperBoundMedian } from './median';\nimport { promiseTimeout } from './promises';\n\ntype LogError = (err: string) => void;\n\nconst BLOCK_NUMBER_TIMEOUT_MS = 5000;\n\n/**\n * Health checks ProviderJson inputs, and returns an array of available RPC providers.\n * Available means that they respond to getBlockNumber(), and they are +/- 100 blocks from the median.\n */\nexport const getAvailableProviderJSONs = async (\n  chainId: number,\n  providerJsons: ProviderJson[],\n  logError: LogError,\n): Promise<ProviderJson[]> => {\n  const blockNumbers: Optional<number>[] = await Promise.all(\n    providerJsons.map(\n      async providerJson =>\n        await getBlockNumber(chainId, providerJson.provider, logError),\n    ),\n  );\n\n  const nonZeroBlockNumbers = blockNumbers.filter(\n    blockNumber => blockNumber != null && blockNumber > 0,\n  ) as number[];\n  const medianBlockNumber = getUpperBoundMedian(nonZeroBlockNumbers);\n  const lowerBoundRange = medianBlockNumber - 100;\n  const upperBoundRange = medianBlockNumber + 100;\n\n  return providerJsons.filter((providerJson, index) => {\n    const blockNumber = blockNumbers[index];\n    if (blockNumber == null) {\n      logError(\n        `RPC Health Check failed for ${providerJson.provider}: No Block Number`,\n      );\n      return false;\n    }\n    if (blockNumber < lowerBoundRange) {\n      logError(\n        `RPC Health Check failed for ${providerJson.provider}: Block Number -${\n          medianBlockNumber - blockNumber\n        } from median`,\n      );\n      return false;\n    }\n    if (blockNumber > upperBoundRange) {\n      logError(\n        `RPC Health Check failed for ${providerJson.provider}: Block Number +${\n          blockNumber - medianBlockNumber\n        } from median`,\n      );\n      return false;\n    }\n    return true;\n  });\n};\n\nconst getBlockNumber = async (\n  chainId: number,\n  provider: string,\n  logError: LogError,\n): Promise<Optional<number>> => {\n  const network = Network.from(chainId);\n  const rpcProvider = new JsonRpcProvider(provider, network, {\n    staticNetwork: network,\n  });\n  try {\n    const block = await promiseTimeout(\n      rpcProvider.getBlock('latest'),\n      BLOCK_NUMBER_TIMEOUT_MS,\n    );\n    if (block == null) {\n      throw new Error('Block is null');\n    }\n    return block.number;\n  } catch (cause) {\n    if (!(cause instanceof Error)) {\n      throw new Error('Non-error thrown from getBlockNumber', { cause });\n    }\n    rpcProvider.destroy();\n    logError(cause.message);\n    return undefined;\n  }\n};\n"]}
+\ No newline at end of file
++{"version":3,"file":"available-rpc.js","sourceRoot":"","sources":["../../src/utils/available-rpc.ts"],"names":[],"mappings":"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","sourcesContent":["/// <reference types=\"../types/global\" />\nimport { JsonRpcProvider, Network, type Provider, WebSocketProvider } from 'ethers';\nimport { ProviderJson } from './provider';\nimport { getUpperBoundMedian } from './median';\nimport { promiseTimeout } from './promises';\n\ntype LogError = (err: string) => void;\n\nconst BLOCK_NUMBER_TIMEOUT_MS = 5000;\n\n/**\n * Health checks ProviderJson inputs, and returns an array of available RPC providers.\n * Available means that they respond to getBlockNumber(), and they are +/- 100 blocks from the median.\n */\nexport const getAvailableProviderJSONs = async (\n  chainId: number,\n  providerJsons: ProviderJson[],\n  logError: LogError,\n): Promise<ProviderJson[]> => {\n  const blockNumbers: Optional<number>[] = await Promise.all(\n    providerJsons.map(\n      async providerJson =>\n        await getBlockNumber(chainId, providerJson.provider, logError),\n    ),\n  );\n\n  const nonZeroBlockNumbers = blockNumbers.filter(\n    blockNumber => blockNumber != null && blockNumber > 0,\n  ) as number[];\n  const medianBlockNumber = getUpperBoundMedian(nonZeroBlockNumbers);\n  const lowerBoundRange = medianBlockNumber - 100;\n  const upperBoundRange = medianBlockNumber + 100;\n\n  return providerJsons.filter((providerJson, index) => {\n    const blockNumber = blockNumbers[index];\n    if (blockNumber == null) {\n      logError(\n        `RPC Health Check failed for ${providerJson.provider}: No Block Number`,\n      );\n      return false;\n    }\n    if (blockNumber < lowerBoundRange) {\n      logError(\n        `RPC Health Check failed for ${providerJson.provider}: Block Number -${\n          medianBlockNumber - blockNumber\n        } from median`,\n      );\n      return false;\n    }\n    if (blockNumber > upperBoundRange) {\n      logError(\n        `RPC Health Check failed for ${providerJson.provider}: Block Number +${\n          blockNumber - medianBlockNumber\n        } from median`,\n      );\n      return false;\n    }\n    return true;\n  });\n};\n\nconst getBlockNumber = async (\n  chainId: number,\n  provider: string,\n  logError: LogError,\n): Promise<Optional<number>> => {\n  const network = Network.from(chainId);\n\n  // Conditionally handle what type of provider is being passed\n  let rpcProvider: Provider;\n  if(provider.startsWith('wss')) {\n    rpcProvider = new WebSocketProvider(provider, network, {\n      staticNetwork: network, // Network is dictated in the RPC URL, will not change\n    });\n  } else {\n    rpcProvider = new JsonRpcProvider(provider, network, {\n      staticNetwork: network, // Network is dictated in the RPC URL, will not change\n    });\n  }\n\n  try {\n    const block = await promiseTimeout(\n      rpcProvider.getBlock('latest'),\n      BLOCK_NUMBER_TIMEOUT_MS,\n    );\n    if (block == null) {\n      throw new Error('Block is null');\n    }\n    return block.number;\n  } catch (cause) {\n    if (!(cause instanceof Error)) {\n      throw new Error('Non-error thrown from getBlockNumber', { cause });\n    }\n    rpcProvider.destroy();\n    logError(cause.message);\n    return undefined;\n  }\n};\n"]}
+\ No newline at end of file
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/fallback-provider.js b/node_modules/@railgun-community/shared-models/dist/utils/fallback-provider.js
+deleted file mode 100644
+index 75cd1e7..0000000
+--- a/node_modules/@railgun-community/shared-models/dist/utils/fallback-provider.js
++++ /dev/null
+@@ -1,36 +0,0 @@
+-"use strict";
+-Object.defineProperty(exports, "__esModule", { value: true });
+-exports.createFallbackProviderFromJsonConfig = void 0;
+-const ethers_1 = require("ethers");
+-const configured_json_rpc_provider_1 = require("./configured-json-rpc-provider");
+-const createFallbackProviderFromJsonConfig = (config) => {
+-    try {
+-        const totalWeight = config.providers.reduce((acc, { weight }) => acc + weight, 0);
+-        if (totalWeight < 2) {
+-            throw new Error('Total weight across providers must be >= 2 for fallback quorum.');
+-        }
+-        const network = ethers_1.Network.from(Number(config.chainId));
+-        const providers = config.providers.map(({ provider: providerURL, priority, weight, stallTimeout, maxLogsPerBatch, }) => {
+-            const isWebsocket = providerURL.startsWith('wss');
+-            const provider = isWebsocket
+-                ? new ethers_1.WebSocketProvider(providerURL, network)
+-                : new configured_json_rpc_provider_1.ConfiguredJsonRpcProvider(providerURL, network, maxLogsPerBatch);
+-            const fallbackProviderConfig = {
+-                provider,
+-                priority,
+-                weight,
+-                stallTimeout,
+-            };
+-            return fallbackProviderConfig;
+-        });
+-        return new ethers_1.FallbackProvider(providers, network);
+-    }
+-    catch (cause) {
+-        if (!(cause instanceof Error)) {
+-            throw new Error('Non-error thrown from createFallbackProviderFromJsonConfig', { cause });
+-        }
+-        throw new Error(`Invalid fallback provider config for chain ${config.chainId}`, { cause });
+-    }
+-};
+-exports.createFallbackProviderFromJsonConfig = createFallbackProviderFromJsonConfig;
+-//# sourceMappingURL=fallback-provider.js.map
+\ No newline at end of file
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/fallback-provider.js.map b/node_modules/@railgun-community/shared-models/dist/utils/fallback-provider.js.map
+deleted file mode 100644
+index 2118e5a..0000000
+--- a/node_modules/@railgun-community/shared-models/dist/utils/fallback-provider.js.map
++++ /dev/null
+@@ -1 +0,0 @@
+-{"version":3,"file":"fallback-provider.js","sourceRoot":"","sources":["../../src/utils/fallback-provider.ts"],"names":[],"mappings":";;;AAAA,mCAAsE;AACtE,iFAA2E;AAgBpE,MAAM,oCAAoC,GAAG,CAClD,MAAkC,EAChB,EAAE;IACpB,IAAI;QACF,MAAM,WAAW,GAAG,MAAM,CAAC,SAAS,CAAC,MAAM,CACzC,CAAC,GAAG,EAAE,EAAE,MAAM,EAAE,EAAE,EAAE,CAAC,GAAG,GAAG,MAAM,EACjC,CAAC,CACF,CAAC;QACF,IAAI,WAAW,GAAG,CAAC,EAAE;YACnB,MAAM,IAAI,KAAK,CACb,iEAAiE,CAClE,CAAC;SACH;QAED,MAAM,OAAO,GAAG,gBAAO,CAAC,IAAI,CAAC,MAAM,CAAC,MAAM,CAAC,OAAO,CAAC,CAAC,CAAC;QAErD,MAAM,SAAS,GAA6B,MAAM,CAAC,SAAS,CAAC,GAAG,CAC9D,CAAC,EACC,QAAQ,EAAE,WAAW,EACrB,QAAQ,EACR,MAAM,EACN,YAAY,EACZ,eAAe,GAChB,EAAE,EAAE;YACH,MAAM,WAAW,GAAG,WAAW,CAAC,UAAU,CAAC,KAAK,CAAC,CAAC;YAClD,MAAM,QAAQ,GAAG,WAAW;gBAC1B,CAAC,CAAC,IAAI,0BAAiB,CAAC,WAAW,EAAE,OAAO,CAAC;gBAC7C,CAAC,CAAC,IAAI,wDAAyB,CAC3B,WAAW,EACX,OAAO,EACP,eAAe,CAChB,CAAC;YAEN,MAAM,sBAAsB,GAA2B;gBACrD,QAAQ;gBACR,QAAQ;gBACR,MAAM;gBACN,YAAY;aACb,CAAC;YACF,OAAO,sBAAsB,CAAC;QAChC,CAAC,CACF,CAAC;QAEF,OAAO,IAAI,yBAAgB,CAAC,SAAS,EAAE,OAAO,CAAC,CAAC;KACjD;IAAC,OAAO,KAAK,EAAE;QACd,IAAI,CAAC,CAAC,KAAK,YAAY,KAAK,CAAC,EAAE;YAC7B,MAAM,IAAI,KAAK,CACb,4DAA4D,EAC5D,EAAE,KAAK,EAAE,CACV,CAAC;SACH;QACD,MAAM,IAAI,KAAK,CACb,8CAA8C,MAAM,CAAC,OAAO,EAAE,EAC9D,EAAE,KAAK,EAAE,CACV,CAAC;KACH;AACH,CAAC,CAAC;AAxDW,QAAA,oCAAoC,wCAwD/C","sourcesContent":["import { FallbackProvider, Network, WebSocketProvider } from 'ethers';\nimport { ConfiguredJsonRpcProvider } from './configured-json-rpc-provider';\nimport { FallbackProviderConfig } from 'ethers/lib.commonjs/providers/provider-fallback';\n\nexport type FallbackProviderJsonConfig = {\n  chainId: number;\n  providers: ProviderJson[];\n};\n\nexport type ProviderJson = {\n  priority: number;\n  weight: number;\n  provider: string;\n  stallTimeout?: number;\n  maxLogsPerBatch?: number;\n};\n\nexport const createFallbackProviderFromJsonConfig = (\n  config: FallbackProviderJsonConfig,\n): FallbackProvider => {\n  try {\n    const totalWeight = config.providers.reduce(\n      (acc, { weight }) => acc + weight,\n      0,\n    );\n    if (totalWeight < 2) {\n      throw new Error(\n        'Total weight across providers must be >= 2 for fallback quorum.',\n      );\n    }\n\n    const network = Network.from(Number(config.chainId));\n\n    const providers: FallbackProviderConfig[] = config.providers.map(\n      ({\n        provider: providerURL,\n        priority,\n        weight,\n        stallTimeout,\n        maxLogsPerBatch,\n      }) => {\n        const isWebsocket = providerURL.startsWith('wss');\n        const provider = isWebsocket\n          ? new WebSocketProvider(providerURL, network)\n          : new ConfiguredJsonRpcProvider(\n              providerURL,\n              network,\n              maxLogsPerBatch,\n            );\n\n        const fallbackProviderConfig: FallbackProviderConfig = {\n          provider,\n          priority,\n          weight,\n          stallTimeout,\n        };\n        return fallbackProviderConfig;\n      },\n    );\n\n    return new FallbackProvider(providers, network);\n  } catch (cause) {\n    if (!(cause instanceof Error)) {\n      throw new Error(\n        'Non-error thrown from createFallbackProviderFromJsonConfig',\n        { cause },\n      );\n    }\n    throw new Error(\n      `Invalid fallback provider config for chain ${config.chainId}`,\n      { cause },\n    );\n  }\n};\n"]}
+\ No newline at end of file
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/index.d.ts b/node_modules/@railgun-community/shared-models/dist/utils/index.d.ts
+index 8a9c0c5..8480616 100644
+--- a/node_modules/@railgun-community/shared-models/dist/utils/index.d.ts
++++ b/node_modules/@railgun-community/shared-models/dist/utils/index.d.ts
+@@ -1,7 +1,7 @@
+ export * from './artifact-v2';
+ export * from './available-rpc';
+ export * from './compare';
+-export * from './fallback-provider';
++export * from './provider';
+ export * from './error';
+ export * from './format';
+ export * from './gas';
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/index.js b/node_modules/@railgun-community/shared-models/dist/utils/index.js
+index 3c2c697..8b5f57e 100644
+--- a/node_modules/@railgun-community/shared-models/dist/utils/index.js
++++ b/node_modules/@railgun-community/shared-models/dist/utils/index.js
+@@ -17,7 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ __exportStar(require("./artifact-v2"), exports);
+ __exportStar(require("./available-rpc"), exports);
+ __exportStar(require("./compare"), exports);
+-__exportStar(require("./fallback-provider"), exports);
++__exportStar(require("./provider"), exports);
+ __exportStar(require("./error"), exports);
+ __exportStar(require("./format"), exports);
+ __exportStar(require("./gas"), exports);
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/index.js.map b/node_modules/@railgun-community/shared-models/dist/utils/index.js.map
+index c266b30..972acee 100644
+--- a/node_modules/@railgun-community/shared-models/dist/utils/index.js.map
++++ b/node_modules/@railgun-community/shared-models/dist/utils/index.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/utils/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;AAAA,gDAA8B;AAC9B,kDAAgC;AAChC,4CAA0B;AAC1B,sDAAoC;AACpC,0CAAwB;AACxB,2CAAyB;AACzB,wCAAsB;AACtB,4CAA0B;AAC1B,6CAA2B;AAC3B,yCAAuB;AACvB,6CAA2B","sourcesContent":["export * from './artifact-v2';\nexport * from './available-rpc';\nexport * from './compare';\nexport * from './fallback-provider';\nexport * from './error';\nexport * from './format';\nexport * from './gas';\nexport * from './network';\nexport * from './promises';\nexport * from './util';\nexport * from './versions';\n"]}
+\ No newline at end of file
++{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/utils/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;AAAA,gDAA8B;AAC9B,kDAAgC;AAChC,4CAA0B;AAC1B,6CAA2B;AAC3B,0CAAwB;AACxB,2CAAyB;AACzB,wCAAsB;AACtB,4CAA0B;AAC1B,6CAA2B;AAC3B,yCAAuB;AACvB,6CAA2B","sourcesContent":["export * from './artifact-v2';\nexport * from './available-rpc';\nexport * from './compare';\nexport * from './provider';\nexport * from './error';\nexport * from './format';\nexport * from './gas';\nexport * from './network';\nexport * from './promises';\nexport * from './util';\nexport * from './versions';\n"]}
+\ No newline at end of file
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/fallback-provider.d.ts b/node_modules/@railgun-community/shared-models/dist/utils/provider.d.ts
+similarity index 55%
+rename from node_modules/@railgun-community/shared-models/dist/utils/fallback-provider.d.ts
+rename to node_modules/@railgun-community/shared-models/dist/utils/provider.d.ts
+index fec4ce9..3f9b115 100644
+--- a/node_modules/@railgun-community/shared-models/dist/utils/fallback-provider.d.ts
++++ b/node_modules/@railgun-community/shared-models/dist/utils/provider.d.ts
+@@ -1,4 +1,4 @@
+-import { FallbackProvider } from 'ethers';
++import { Provider } from 'ethers';
+ export type FallbackProviderJsonConfig = {
+     chainId: number;
+     providers: ProviderJson[];
+@@ -7,7 +7,8 @@ export type ProviderJson = {
+     priority: number;
+     weight: number;
+     provider: string;
++    chainId?: number;
+     stallTimeout?: number;
+     maxLogsPerBatch?: number;
+ };
+-export declare const createFallbackProviderFromJsonConfig: (config: FallbackProviderJsonConfig) => FallbackProvider;
++export declare const createProviderFromJsonConfig: (config: FallbackProviderJsonConfig | ProviderJson, pollingInterval?: number) => Provider;
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/provider.js b/node_modules/@railgun-community/shared-models/dist/utils/provider.js
+new file mode 100644
+index 0000000..3d56966
+--- /dev/null
++++ b/node_modules/@railgun-community/shared-models/dist/utils/provider.js
+@@ -0,0 +1,72 @@
++"use strict";
++Object.defineProperty(exports, "__esModule", { value: true });
++exports.createProviderFromJsonConfig = void 0;
++const ethers_1 = require("ethers");
++const configured_json_rpc_provider_1 = require("./configured-json-rpc-provider");
++const util_1 = require("./util");
++const createProviderFromJsonConfig = (config, pollingInterval) => {
++    try {
++        // Handle single provider case
++        if (!('providers' in config)) {
++            // Get RPC URL
++            const providerURL = config.provider;
++            // Ensure providerURL exists and is a string
++            if (!(0, util_1.isDefined)(providerURL)) {
++                throw new Error('provider is required for single provider configuration');
++            }
++            else if (typeof providerURL !== 'string') {
++                throw new Error('provider must be a string');
++            }
++            // Ensure chainId is present
++            if (!(0, util_1.isDefined)(config.chainId)) {
++                throw new Error('chainId is required for single provider configuration');
++            }
++            // Create singular provider depending on the URL
++            let provider;
++            if (providerURL.startsWith('wss')) {
++                provider = new ethers_1.WebSocketProvider(providerURL, config.chainId, {
++                    staticNetwork: true,
++                });
++            }
++            else {
++                provider = new ethers_1.JsonRpcProvider(providerURL, config.chainId, {
++                    staticNetwork: true,
++                    pollingInterval,
++                });
++            }
++            return provider;
++        }
++        ;
++        const totalWeight = config.providers.reduce((acc, { weight }) => acc + weight, 0);
++        if (totalWeight < 2) {
++            throw new Error('Total weight across providers must be >= 2 for fallback quorum.');
++        }
++        const network = ethers_1.Network.from(Number(config.chainId));
++        const providers = config.providers.map(({ provider: providerURL, priority, weight, stallTimeout, maxLogsPerBatch, }) => {
++            const isWebsocket = providerURL.startsWith('wss');
++            if (isWebsocket) {
++                throw new Error('WebSocketProvider not supported in FallbackProvider as it will use polling instead of eth_subscribe');
++            }
++            const provider = new configured_json_rpc_provider_1.ConfiguredJsonRpcProvider(providerURL, network, maxLogsPerBatch);
++            const fallbackProviderConfig = {
++                provider,
++                priority,
++                weight,
++                stallTimeout,
++            };
++            return fallbackProviderConfig;
++        });
++        return new ethers_1.FallbackProvider(providers, network, {
++            pollingInterval
++        });
++    }
++    catch (cause) {
++        if (!(cause instanceof Error)) {
++            throw new Error('Non-error thrown from createFallbackProviderFromJsonConfig', { cause });
++        }
++        // Preserve the original error message
++        throw cause;
++    }
++};
++exports.createProviderFromJsonConfig = createProviderFromJsonConfig;
++//# sourceMappingURL=provider.js.map
+\ No newline at end of file
+diff --git a/node_modules/@railgun-community/shared-models/dist/utils/provider.js.map b/node_modules/@railgun-community/shared-models/dist/utils/provider.js.map
+new file mode 100644
+index 0000000..45612f1
+--- /dev/null
++++ b/node_modules/@railgun-community/shared-models/dist/utils/provider.js.map
+@@ -0,0 +1 @@
++{"version":3,"file":"provider.js","sourceRoot":"","sources":["../../src/utils/provider.ts"],"names":[],"mappings":";;;AAAA,mCAAiG;AACjG,iFAA2E;AAE3E,iCAAmC;AAgB5B,MAAM,4BAA4B,GAAG,CAC1C,MAAiD,EACjD,eAAwB,EACd,EAAE;IACZ,IAAI;QACF,8BAA8B;QAC9B,IAAI,CAAC,CAAC,WAAW,IAAI,MAAM,CAAC,EAAE;YAC5B,cAAc;YACd,MAAM,WAAW,GAAG,MAAM,CAAC,QAAQ,CAAC;YACpC,4CAA4C;YAC5C,IAAI,CAAC,IAAA,gBAAS,EAAC,WAAW,CAAC,EAAE;gBAC3B,MAAM,IAAI,KAAK,CAAC,wDAAwD,CAAC,CAAC;aAC3E;iBAAM,IAAI,OAAO,WAAW,KAAK,QAAQ,EAAE;gBAC1C,MAAM,IAAI,KAAK,CAAC,2BAA2B,CAAC,CAAC;aAC9C;YAED,4BAA4B;YAC5B,IAAI,CAAC,IAAA,gBAAS,EAAC,MAAM,CAAC,OAAO,CAAC,EAAE;gBAC9B,MAAM,IAAI,KAAK,CAAC,uDAAuD,CAAC,CAAC;aAC1E;YAED,gDAAgD;YAChD,IAAI,QAA6C,CAAC;YAClD,IAAI,WAAW,CAAC,UAAU,CAAC,KAAK,CAAC,EAAE;gBACjC,QAAQ,GAAG,IAAI,0BAAiB,CAAC,WAAW,EAAE,MAAM,CAAC,OAAO,EAAE;oBAC5D,aAAa,EAAE,IAAI;iBACpB,CAAC,CAAC;aACJ;iBAAM;gBACL,QAAQ,GAAG,IAAI,wBAAe,CAAC,WAAW,EAAE,MAAM,CAAC,OAAO,EAAE;oBAC1D,aAAa,EAAE,IAAI;oBACnB,eAAe;iBAChB,CAAC,CAAC;aACJ;YAED,OAAO,QAAQ,CAAC;SACjB;QAAA,CAAC;QAEF,MAAM,WAAW,GAAG,MAAM,CAAC,SAAS,CAAC,MAAM,CACzC,CAAC,GAAG,EAAE,EAAE,MAAM,EAAE,EAAE,EAAE,CAAC,GAAG,GAAG,MAAM,EACjC,CAAC,CACF,CAAC;QACF,IAAI,WAAW,GAAG,CAAC,EAAE;YACnB,MAAM,IAAI,KAAK,CACb,iEAAiE,CAClE,CAAC;SACH;QAED,MAAM,OAAO,GAAG,gBAAO,CAAC,IAAI,CAAC,MAAM,CAAC,MAAM,CAAC,OAAO,CAAC,CAAC,CAAC;QAErD,MAAM,SAAS,GAA6B,MAAM,CAAC,SAAS,CAAC,GAAG,CAC9D,CAAC,EACC,QAAQ,EAAE,WAAW,EACrB,QAAQ,EACR,MAAM,EACN,YAAY,EACZ,eAAe,GAChB,EAAE,EAAE;YACH,MAAM,WAAW,GAAG,WAAW,CAAC,UAAU,CAAC,KAAK,CAAC,CAAC;YAClD,IAAI,WAAW,EAAE;gBACf,MAAM,IAAI,KAAK,CACb,qGAAqG,CACtG,CAAC;aACH;YAED,MAAM,QAAQ,GAAG,IAAI,wDAAyB,CAC5C,WAAW,EACX,OAAO,EACP,eAAe,CAChB,CAAC;YAEF,MAAM,sBAAsB,GAA2B;gBACrD,QAAQ;gBACR,QAAQ;gBACR,MAAM;gBACN,YAAY;aACb,CAAC;YACF,OAAO,sBAAsB,CAAC;QAChC,CAAC,CACF,CAAC;QAEF,OAAO,IAAI,yBAAgB,CAAC,SAAS,EAAE,OAAO,EAAE;YAC9C,eAAe;SAChB,CAAC,CAAC;KACJ;IAAC,OAAO,KAAK,EAAE;QACd,IAAI,CAAC,CAAC,KAAK,YAAY,KAAK,CAAC,EAAE;YAC7B,MAAM,IAAI,KAAK,CACb,4DAA4D,EAC5D,EAAE,KAAK,EAAE,CACV,CAAC;SACH;QACD,sCAAsC;QACtC,MAAM,KAAK,CAAC;KACb;AACH,CAAC,CAAC;AA7FW,QAAA,4BAA4B,gCA6FvC","sourcesContent":["import { FallbackProvider, JsonRpcProvider, Network, Provider, WebSocketProvider } from 'ethers';\nimport { ConfiguredJsonRpcProvider } from './configured-json-rpc-provider';\nimport { FallbackProviderConfig } from 'ethers/lib.commonjs/providers/provider-fallback';\nimport { isDefined } from './util';\n\nexport type FallbackProviderJsonConfig = {\n  chainId: number;\n  providers: ProviderJson[];\n};\n\nexport type ProviderJson = {\n  priority: number;\n  weight: number;\n  provider: string;\n  chainId?: number;\n  stallTimeout?: number;\n  maxLogsPerBatch?: number;\n};\n\nexport const createProviderFromJsonConfig = (\n  config: FallbackProviderJsonConfig | ProviderJson,\n  pollingInterval?: number,\n): Provider => {\n  try {\n    // Handle single provider case\n    if (!('providers' in config)) {\n      // Get RPC URL\n      const providerURL = config.provider;\n      // Ensure providerURL exists and is a string\n      if (!isDefined(providerURL)) {\n        throw new Error('provider is required for single provider configuration');\n      } else if (typeof providerURL !== 'string') {\n        throw new Error('provider must be a string');\n      }\n\n      // Ensure chainId is present\n      if (!isDefined(config.chainId)) {\n        throw new Error('chainId is required for single provider configuration');\n      }\n      \n      // Create singular provider depending on the URL\n      let provider: JsonRpcProvider | WebSocketProvider;\n      if (providerURL.startsWith('wss')) {\n        provider = new WebSocketProvider(providerURL, config.chainId, {\n          staticNetwork: true,\n        });\n      } else {\n        provider = new JsonRpcProvider(providerURL, config.chainId, {\n          staticNetwork: true,\n          pollingInterval,\n        });\n      }\n\n      return provider;\n    };\n\n    const totalWeight = config.providers.reduce(\n      (acc, { weight }) => acc + weight,\n      0,\n    );\n    if (totalWeight < 2) {\n      throw new Error(\n        'Total weight across providers must be >= 2 for fallback quorum.',\n      );\n    }\n\n    const network = Network.from(Number(config.chainId));\n\n    const providers: FallbackProviderConfig[] = config.providers.map(\n      ({\n        provider: providerURL,\n        priority,\n        weight,\n        stallTimeout,\n        maxLogsPerBatch,\n      }) => {\n        const isWebsocket = providerURL.startsWith('wss');\n        if (isWebsocket) {\n          throw new Error(\n            'WebSocketProvider not supported in FallbackProvider as it will use polling instead of eth_subscribe',  \n          );\n        }\n\n        const provider = new ConfiguredJsonRpcProvider(\n          providerURL,\n          network,\n          maxLogsPerBatch,\n        );\n\n        const fallbackProviderConfig: FallbackProviderConfig = {\n          provider,\n          priority,\n          weight,\n          stallTimeout,\n        };\n        return fallbackProviderConfig;\n      },\n    );\n\n    return new FallbackProvider(providers, network, {\n      pollingInterval\n    });\n  } catch (cause) {\n    if (!(cause instanceof Error)) {\n      throw new Error(\n        'Non-error thrown from createFallbackProviderFromJsonConfig',\n        { cause },\n      );\n    }\n    // Preserve the original error message\n    throw cause;\n  }\n};\n"]}
+\ No newline at end of file

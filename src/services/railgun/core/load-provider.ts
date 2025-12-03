@@ -4,8 +4,9 @@ import {
   LoadProviderResponse,
   NETWORK_CONFIG,
   NetworkName,
+  ProviderJson,
   TXIDVersion,
-  createFallbackProviderFromJsonConfig,
+  createProviderFromJsonConfig,
   isDefined,
 } from '@railgun-community/shared-models';
 import { sendMessage } from '../../../utils';
@@ -13,73 +14,53 @@ import { reportAndSanitizeError } from '../../../utils/error';
 import { WalletPOI } from '../../poi/wallet-poi';
 import { getEngine } from './engine';
 import {
-  PollingJsonRpcProvider,
   RailgunVersionedSmartContracts,
-  createPollingJsonRpcProviderForListeners,
 } from '@railgun-community/engine';
-import { FallbackProvider } from 'ethers'
+import { type Provider} from 'ethers'
 import {
-  fallbackProviderMap,
-  pollingProviderMap,
-  setFallbackProviderForNetwork,
-  setPollingProviderForNetwork,
+  providerMap,
+  setProviderForNetwork,
 } from './providers';
 import { WalletPOINodeInterface } from '../../poi/wallet-poi-node-interface';
 
-const createFallbackProviderForNetwork = async (
+const createProviderForNetwork = async (
   networkName: NetworkName,
-  fallbackProviderJsonConfig: FallbackProviderJsonConfig,
-): Promise<FallbackProvider> => {
-  const existingProvider = fallbackProviderMap[networkName];
+  providerJsonConfig: FallbackProviderJsonConfig | ProviderJson,
+  pollingInterval?: number,
+): Promise<Provider> => {
+  const existingProvider = providerMap[networkName];
   if (existingProvider) {
     return existingProvider;
   }
-  const fallbackProvider = createFallbackProviderFromJsonConfig(
-    fallbackProviderJsonConfig,
+  const provider = createProviderFromJsonConfig(
+    providerJsonConfig,
+    pollingInterval
   );
-  setFallbackProviderForNetwork(networkName, fallbackProvider);
-  return fallbackProvider;
+  setProviderForNetwork(networkName, provider);
+  return provider;
 };
 
-const createPollingProviderForNetwork = async (
-  networkName: NetworkName,
-  fallbackProvider: FallbackProvider,
-  pollingInterval: number,
-): Promise<PollingJsonRpcProvider> => {
-  const existingProvider = pollingProviderMap[networkName];
-  if (existingProvider) {
-    return existingProvider;
-  }
-  const network = NETWORK_CONFIG[networkName];
-  if (!isDefined(network)) {
-    throw new Error('No network found');
-  }
-  const pollingProvider = await createPollingJsonRpcProviderForListeners(
-    fallbackProvider,
-    network.chain.id,
-    pollingInterval,
-  );
-  setPollingProviderForNetwork(networkName, pollingProvider);
-  return pollingProvider;
-};
-
+/**
+ * 
+ * @param chain 
+ * @param networkName 
+ * @param fallbackProviderJsonConfig 
+ * @param pollingInterval
+ */
 const loadProviderForNetwork = async (
   chain: Chain,
   networkName: NetworkName,
-  fallbackProviderJsonConfig: FallbackProviderJsonConfig,
+  providerJsonConfig: FallbackProviderJsonConfig | ProviderJson,
   pollingInterval: number,
 ) => {
   sendMessage(`Load provider for network: ${networkName}`);
 
-  const fallbackProvider = await createFallbackProviderForNetwork(
-    networkName,
-    fallbackProviderJsonConfig,
-  );
-  const pollingProvider = await createPollingProviderForNetwork(
-    networkName,
-    fallbackProvider,
-    pollingInterval
-  );
+  // Create the provider from the JSON config
+  const provider = await createProviderForNetwork(
+      networkName,
+      providerJsonConfig,
+      pollingInterval,
+    );
 
   const network = NETWORK_CONFIG[networkName];
   const {
@@ -125,8 +106,8 @@ const loadProviderForNetwork = async (
     poseidonMerkleAccumulatorV3Contract,
     poseidonMerkleVerifierV3Contract,
     tokenVaultV3Contract,
-    fallbackProvider,
-    pollingProvider,
+    provider, // Can be of type FallbackProvider, WebSocketProvider, or JsonRpcProvider
+    undefined, // pollingProvider is being deprecated
     deploymentBlocks,
     poi?.launchBlock,
     supportsV3,
@@ -138,22 +119,25 @@ const loadProviderForNetwork = async (
  * for new RAILGUN events (balance updates).
  */
 export const loadProvider = async (
-  fallbackProviderJsonConfig: FallbackProviderJsonConfig,
+  providerJsonConfig: FallbackProviderJsonConfig | ProviderJson,
   networkName: NetworkName,
+  /**
+   * @deprecated pollingInterval - Default ethers polling interval is used
+   */
   pollingInterval = 15000,
 ): Promise<LoadProviderResponse> => {
   try {
-    delete fallbackProviderMap[networkName];
+    delete providerMap[networkName];
 
     const { chain, supportsV3 } = NETWORK_CONFIG[networkName];
-    if (fallbackProviderJsonConfig.chainId !== chain.id) {
+    if ('chainId' in providerJsonConfig && providerJsonConfig.chainId !== chain.id) {
       throw new Error('Invalid chain ID');
     }
 
     await loadProviderForNetwork(
       chain,
       networkName,
-      fallbackProviderJsonConfig,
+      providerJsonConfig,
       pollingInterval,
     );
     WalletPOINodeInterface.unpause(chain);
@@ -197,23 +181,33 @@ export const unloadProvider = async (
   networkName: NetworkName,
 ): Promise<void> => {
   WalletPOINodeInterface.pause(NETWORK_CONFIG[networkName].chain);
-  await fallbackProviderMap[networkName]?.destroy();
-  pollingProviderMap[networkName]?.destroy();
-  delete fallbackProviderMap[networkName];
-  delete pollingProviderMap[networkName];
+  providerMap[networkName]?.destroy();
+  delete providerMap[networkName];
 };
 
 export const pauseAllPollingProviders = (
   excludeNetworkName?: NetworkName,
 ): void => {
-  Object.keys(pollingProviderMap).forEach(networkName => {
+  Object.keys(providerMap).forEach(networkName => {
     if (networkName === excludeNetworkName) {
       return;
     }
-    const pollingProvider = pollingProviderMap[networkName];
-    if (isDefined(pollingProvider) && !pollingProvider.paused) {
-      pollingProvider.pause();
+    const provider = providerMap[networkName];
+
+    // Check if provider exists
+    if (!isDefined(provider)) {
+      throw new Error(`No provider found for network: ${networkName}`);
     }
+
+    // Ensure provider is a pausable provider
+    if (!('paused' in provider && 'pause' in provider)) {
+      throw new Error(
+        `Provider for network ${networkName} is not a pausable provider`,
+      );
+    }
+
+    // Safe to call pause() after type check
+    (provider as { pause(): void }).pause();
   });
 };
 
@@ -223,11 +217,20 @@ export const resumeIsolatedPollingProviderForNetwork = (
   pauseAllPollingProviders(
     networkName, // excludeNetworkName
   );
-  const pollingProviderForNetwork = pollingProviderMap[networkName];
-  if (
-    isDefined(pollingProviderForNetwork) &&
-    pollingProviderForNetwork.paused
-  ) {
-    pollingProviderForNetwork.resume();
+  const provider = providerMap[networkName];
+
+  // Check if provider exists
+  if (!isDefined(provider)) {
+    throw new Error(`No provider found for network: ${networkName}`);
   }
+
+  // Ensure provider has resume functionality 
+  if (!('paused' in provider && 'resume' in provider)) {
+    throw new Error(
+      `Provider for network ${networkName} is not a pausable provider`,
+    );
+  }
+
+  // Safe to call resume() after type check
+  (provider as { resume(): void }).resume();
 };
