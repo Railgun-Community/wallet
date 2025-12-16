@@ -9,6 +9,7 @@ export const extractFirstNoteERC20AmountMapFromTransactionRequest = (
   network: Network,
   transactionRequest: ContractTransaction,
   useRelayAdapt: boolean,
+  useRelayAdapt7702 = false,
 ): Promise<MapType<bigint>> => {
   const chain = network.chain;
 
@@ -17,6 +18,7 @@ export const extractFirstNoteERC20AmountMapFromTransactionRequest = (
     contractAddress = RailgunVersionedSmartContracts.getRelayAdaptContract(
       txidVersion,
       chain,
+      useRelayAdapt7702,
     ).address;
   } else {
     contractAddress = RailgunVersionedSmartContracts.getVerifier(
@@ -32,5 +34,6 @@ export const extractFirstNoteERC20AmountMapFromTransactionRequest = (
     transactionRequest,
     useRelayAdapt,
     contractAddress,
+    useRelayAdapt7702,
   );
 };

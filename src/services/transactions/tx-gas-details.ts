@@ -34,7 +34,7 @@ export const getGasEstimate = async (
   const estimateGasTransactionRequest: ContractTransaction = {
     ...transaction,
     from: fromWalletAddress,
-    type: evmGasType,
+    type: transaction.type === 4 ? 4 : evmGasType,
   };
   if (shouldRemoveGasLimitForL2GasEstimate(networkName)) {
     delete estimateGasTransactionRequest.gasLimit;
@@ -127,7 +127,7 @@ export const setGasDetailsForTransaction = (
     sendWithPublicWallet,
   );
 
-  if (gasDetails.evmGasType !== evmGasType) {
+  if (gasDetails.evmGasType !== evmGasType && gasDetails.evmGasType !== EVMGasType.Type4) {
     const transactionType = sendWithPublicWallet
       ? 'self-signed'
       : 'Broadcaster';
@@ -152,7 +152,8 @@ export const setGasDetailsForTransaction = (
       transaction.gasPrice = gasDetails.gasPrice;
       break;
     }
-    case EVMGasType.Type2: {
+    case EVMGasType.Type2:
+    case EVMGasType.Type4: {
       // eslint-disable-next-line no-param-reassign
       transaction.maxFeePerGas = gasDetails.maxFeePerGas;
       // eslint-disable-next-line no-param-reassign

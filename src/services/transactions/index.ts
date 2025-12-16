@@ -11,3 +11,4 @@ export * from './tx-proof-unshield';
 export * from './tx-nullifiers';
 export * from './tx-transfer';
 export * from './tx-unshield';
+export * from './tx-cross-contract-calls-7702';

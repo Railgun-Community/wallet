@@ -93,6 +93,9 @@ const loadProviderForNetwork = async (
     publicName,
     poi,
     supportsV3,
+    supports7702,
+    relayAdapt7702Contract,
+    relayAdapt7702DeployerContract
   } = network;
   if (!proxyContract) {
     throw new Error(`Could not find Proxy contract for network: ${publicName}`);
@@ -116,6 +119,13 @@ const loadProviderForNetwork = async (
       deploymentBlockPoseidonMerkleAccumulatorV3 ?? 0,
   };
 
+  // load 7702 contracts only if supported.
+  let adapt7702Contract, adapt7702DeployerContract;
+  if(supports7702){
+    adapt7702Contract = isDefined(relayAdapt7702Contract) && relayAdapt7702Contract !== '' ? relayAdapt7702Contract : undefined;
+    adapt7702DeployerContract = isDefined(relayAdapt7702DeployerContract) && relayAdapt7702DeployerContract !== '' ? relayAdapt7702DeployerContract : undefined;
+  }
+
   // This function will set up the contracts for this chain.
   // Throws if provider does not respond.
   await engine.loadNetwork(
@@ -130,6 +140,8 @@ const loadProviderForNetwork = async (
     deploymentBlocks,
     poi?.launchBlock,
     supportsV3,
+    adapt7702Contract,
+    adapt7702DeployerContract
   );
 };
 

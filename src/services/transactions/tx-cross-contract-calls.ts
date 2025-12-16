@@ -128,7 +128,7 @@ export const createNFTTokenDataFromRailgunNFTAmount = (
   };
 };
 
-const createRelayAdaptShieldNFTRecipients = (
+export const createRelayAdaptShieldNFTRecipients = (
   relayAdaptShieldNFTRecipients: RailgunNFTAmountRecipient[],
 ): RelayAdaptShieldNFTRecipient[] => {
   return relayAdaptShieldNFTRecipients.map(

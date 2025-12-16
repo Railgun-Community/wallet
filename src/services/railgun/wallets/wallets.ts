@@ -9,6 +9,10 @@ import {
   ByteUtils,
   POICurrentProofEventData,
   ViewOnlyWallet,
+  EIP7702Authorization,
+  TransactionStructV2,
+  TransactionStructV3,
+  RelayAdapt,
 } from '@railgun-community/engine';
 import {
   RailgunWalletInfo,
@@ -387,4 +391,35 @@ const formatCreationBlockNumbers = (
   }
 
   return formattedCreationBlockNumbers;
+};
+
+export const sign7702Request = async (
+  walletID: string,
+  encryptionKey: string,
+  contractAddress: string,
+  chainId: bigint,
+  transactions: (TransactionStructV2 | TransactionStructV3)[],
+  actionData: RelayAdapt.ActionDataStruct,
+): Promise<{ authorization: EIP7702Authorization; signature: string }> => {
+  const wallet = fullWalletForID(walletID);
+  return wallet.sign7702Request(
+    encryptionKey,
+    contractAddress,
+    chainId,
+    transactions,
+    actionData,
+  );
+};
+
+export const ratchetEphemeralAddress = async (walletID: string): Promise<void> => {
+  const wallet = fullWalletForID(walletID);
+  return wallet.ratchetEphemeralAddress();
+};
+
+export const getCurrentEphemeralAddress = async (
+  walletID: string,
+  encryptionKey: string,
+): Promise<string> => {
+  const wallet = fullWalletForID(walletID);
+  return wallet.getCurrentEphemeralAddress(encryptionKey);
 };
