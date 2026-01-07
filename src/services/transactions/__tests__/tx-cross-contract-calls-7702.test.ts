@@ -290,7 +290,6 @@ describe('tx-cross-contract-calls-7702', () => {
       MOCK_FEE_TOKEN_DETAILS,
       false, // sendWithPublicWallet
       minGasLimit, // minGasLimit
-      polygonRelayAdaptContract7702,
     );
     expect(response.broadcasterFeeCommitment).to.not.be.undefined;
     expect(response.broadcasterFeeCommitment?.commitmentCiphertext).to.deep.equal(
@@ -388,7 +387,6 @@ describe('tx-cross-contract-calls-7702', () => {
       MOCK_FEE_TOKEN_DETAILS,
       true, // sendWithPublicWallet
       minGasLimit, // minGasLimit
-      polygonRelayAdaptContract7702,
     );
 
     expect(response.broadcasterFeeCommitment).to.be.undefined;
@@ -448,7 +446,6 @@ describe('tx-cross-contract-calls-7702', () => {
         MOCK_FEE_TOKEN_DETAILS,
         false, // sendWithPublicWallet
         undefined, // minGasLimit
-        polygonRelayAdaptContract7702,
       ),
     ).rejectedWith(
       `Cross-contract calls require to and data fields (7702).`,
@@ -472,7 +469,6 @@ describe('tx-cross-contract-calls-7702', () => {
         MOCK_FEE_TOKEN_DETAILS,
         false, // sendWithPublicWallet
         minGasLimit, // minGasLimit
-        polygonRelayAdaptContract7702,
       ),
     ).rejectedWith('RelayAdapt multicall failed at index UNKNOWN.');
   });
@@ -497,7 +493,6 @@ describe('tx-cross-contract-calls-7702', () => {
       false, // sendWithPublicWallet
       overallBatchMinGasPrice, // overallBatchMinGasPrice
       minGasLimit, // minGasLimit
-      polygonRelayAdaptContract7702,
       () => {}, // progressCallback
     );
 
@@ -617,7 +612,6 @@ describe('tx-cross-contract-calls-7702', () => {
       false, // sendWithPublicWallet
       overallBatchMinGasPrice,
       minGasLimit,
-      polygonRelayAdaptContract7702,
       () => {}, // progressCallback
     );
     await expect(
@@ -655,7 +649,6 @@ describe('tx-cross-contract-calls-7702', () => {
         false, // sendWithPublicWallet
         undefined, // overallBatchMinGasPrice
         undefined, // minGasLimit
-        polygonRelayAdaptContract7702,
         () => {}, // progressCallback
       ),
     ).rejectedWith(

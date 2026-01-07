@@ -46,6 +46,23 @@ import {
 import { getCurrentEphemeralAddress, sign7702Request } from '../railgun/wallets/wallets';
 
 
+const RELAY_ADAPT_7702_EXECUTE_SIGNATURE =
+  'execute((((uint256,uint256),(uint256[2],uint256[2]),(uint256,uint256)),bytes32,bytes32[],bytes32[],(uint16,uint72,uint8,uint64,address,bytes32,(bytes32[4],bytes32,bytes32,bytes,bytes)[]),(bytes32,(uint8,address,uint256),uint120))[],(bytes31,bool,uint256,(address,bytes,uint256)[]),bytes)';
+
+const encodeRelayAdapt7702Execute = (
+  transactions: TransactionStructV2[],
+  actionData: RelayAdapt.ActionDataStruct,
+  signature: string,
+): string => {
+  const iface = RelayAdapt7702Factory.createInterface();
+  return iface.encodeFunctionData(RELAY_ADAPT_7702_EXECUTE_SIGNATURE, [
+    transactions,
+    actionData,
+    signature,
+  ]);
+};
+
+
 const createActionData = async (
   validCrossContractCalls: ContractTransaction[],
   relayShieldRequests: ShieldRequestStruct[],
@@ -54,13 +71,13 @@ const createActionData = async (
   requireSuccess: boolean,
   minGasLimit: bigint,
 ): Promise<RelayAdapt.ActionDataStruct> => {
-  const calls: RelayAdapt.CallStruct[] = [];
+  const calls: ContractTransaction[] = [];
 
   // Add Cross Contract Calls
   for (const call of validCrossContractCalls) {
     calls.push({
-      to: call.to ,
-      data: call.data ,
+      to: call.to,
+      data: call.data,
       value: call.value ?? 0n,
     });
   }
@@ -76,12 +93,13 @@ const createActionData = async (
     });
   }
 
-  return {
-    random,
+  // RelayAdapt7702Helper expects random without 0x prefix.
+  return RelayAdapt7702Helper.getActionData(
+    ByteUtils.strip0x(random),
     requireSuccess,
-    minGasLimit,
     calls,
-  };
+    minGasLimit,
+  );
 };
 
 // 7702 refactor for cross-contract calls
@@ -152,7 +170,6 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
   minGasLimit: Optional<bigint>,
-  relayerContractAddress: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -220,25 +237,18 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
         );
 
         const chainId = NETWORK_CONFIG[networkName].chain.id;
+        const { relayAdapt7702Contract } = NETWORK_CONFIG[networkName]
+        const transactions = txs as TransactionStructV2[];
         const { authorization, signature } = await sign7702Request(
           railgunWalletID,
           encryptionKey,
-          relayerContractAddress,
+          relayAdapt7702Contract,
           BigInt(chainId),
-          txs as TransactionStructV2[],
+          transactions,
           actionData,
         );
 
-        const relayAdapt7702Interface = RelayAdapt7702Factory.createInterface();
-        const data = relayAdapt7702Interface.encodeFunctionData(
-          'execute((((uint256,uint256),(uint256[2],uint256[2]),(uint256,uint256)),bytes32,bytes32[],bytes32[],(uint16,uint72,uint8,uint64,address,bytes32,(bytes32[4],bytes32,bytes32,bytes,bytes)[]),(bytes32,(uint8,address,uint256),uint120))[],(bytes31,bool,uint256,(address,bytes,uint256)[]),bytes)',
-          [
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            txs as any, // TransactionStruct[]
-            actionData,
-            signature,
-          ],
-        );
+        const data = encodeRelayAdapt7702Execute(transactions, actionData, signature);
 
         const transaction: ContractTransaction = {
           to: ephemeralAddress, // Send to the ephemeral address (which will have code)
@@ -290,7 +300,6 @@ export const generateCrossContractCallsProof7702 = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   minGasLimit: Optional<bigint>,
-  relayerContractAddress: string,
   progressCallback: GenerateTransactionsProgressCallback,
 ): Promise<RelayAdapt7702Request> => {
   try {
@@ -387,25 +396,19 @@ export const generateCrossContractCallsProof7702 = async (
 
     // Signatures
     const chainId = NETWORK_CONFIG[networkName].chain.id;
+    const { relayAdapt7702Contract } = NETWORK_CONFIG[networkName]
+    const transactions = provedTransactions as TransactionStructV2[];
     const { authorization, signature: executionSignature } = await sign7702Request(
       railgunWalletID,
       encryptionKey,
-      relayerContractAddress,
+      relayAdapt7702Contract,
       BigInt(chainId),
-      provedTransactions as TransactionStructV2[],
+      transactions,
       actionData,
     );
 
     // Construct the transaction data
-    const relayAdapt7702Interface = RelayAdapt7702Factory.createInterface();
-    const data = relayAdapt7702Interface.encodeFunctionData(
-      'execute((((uint256,uint256),(uint256[2],uint256[2]),(uint256,uint256)),bytes32,bytes32[],bytes32[],(uint16,uint72,uint8,uint64,address,bytes32,(bytes32[4],bytes32,bytes32,bytes,bytes)[]),(bytes32,(uint8,address,uint256),uint120))[],(bytes31,bool,uint256,(address,bytes,uint256)[]),bytes)',
-      [
-        provedTransactions as any,
-        actionData,
-        executionSignature,
-      ],
-    );
+    const data = encodeRelayAdapt7702Execute(transactions, actionData, executionSignature);
 
     const transaction: ContractTransaction = {
       to: ephemeralAddress,
@@ -438,7 +441,7 @@ export const generateCrossContractCallsProof7702 = async (
     });
 
     return {
-      transactions: provedTransactions as TransactionStructV2[],
+      transactions,
       actionData,
       authorization,
       executionSignature,

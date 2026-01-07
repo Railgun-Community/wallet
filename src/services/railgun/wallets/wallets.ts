@@ -1,3 +1,4 @@
+import { Authorization } from 'ethers';
 import {
   RailgunWallet,
   EngineEvent,
@@ -9,7 +10,6 @@ import {
   ByteUtils,
   POICurrentProofEventData,
   ViewOnlyWallet,
-  EIP7702Authorization,
   TransactionStructV2,
   TransactionStructV3,
   RelayAdapt,
@@ -400,7 +400,7 @@ export const sign7702Request = async (
   chainId: bigint,
   transactions: (TransactionStructV2 | TransactionStructV3)[],
   actionData: RelayAdapt.ActionDataStruct,
-): Promise<{ authorization: EIP7702Authorization; signature: string }> => {
+): Promise<{ authorization: Authorization; signature: string }> => {
   const wallet = fullWalletForID(walletID);
   return wallet.sign7702Request(
     encryptionKey,

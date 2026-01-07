@@ -120,7 +120,7 @@ const loadProviderForNetwork = async (
   };
 
   // load 7702 contracts only if supported.
-  let adapt7702Contract, adapt7702DeployerContract;
+  let adapt7702Contract; let adapt7702DeployerContract;
   if(supports7702){
     adapt7702Contract = isDefined(relayAdapt7702Contract) && relayAdapt7702Contract !== '' ? relayAdapt7702Contract : undefined;
     adapt7702DeployerContract = isDefined(relayAdapt7702DeployerContract) && relayAdapt7702DeployerContract !== '' ? relayAdapt7702DeployerContract : undefined;
