@@ -255,7 +255,6 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
           data,
           value: 0n,
           type: 4, // EIP-7702 Transaction Type
-          // @ts-expect-error - Ethers v6 might not have authorizationList in type definition yet
           authorizationList: [authorization],
         };
         
@@ -415,7 +414,6 @@ export const generateCrossContractCallsProof7702 = async (
       data,
       value: 0n,
       type: 4,
-      // @ts-expect-error - Ethers v6 might not have authorizationList in type definition yet
       authorizationList: [authorization],
     };
 

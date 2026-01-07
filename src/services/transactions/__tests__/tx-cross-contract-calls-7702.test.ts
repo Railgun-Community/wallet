@@ -52,7 +52,7 @@ import {
   gasEstimateForUnprovenCrossContractCalls7702,
   generateCrossContractCallsProof7702,
 } from '../tx-cross-contract-calls-7702';
-import { ContractTransaction, FallbackProvider, Wallet } from 'ethers';
+import { ContractTransaction, FallbackProvider, Wallet, Signature } from 'ethers';
 import { getTestTXIDVersion, isV2Test } from '../../../tests/helper.test';
 import { createNFTTokenDataFromRailgunNFTAmount, populateProvedCrossContractCalls } from '../tx-cross-contract-calls';
 
@@ -240,12 +240,14 @@ describe('tx-cross-contract-calls-7702', () => {
       'sign7702Request',
     ).resolves({
       authorization: {
-        chainId: '137',
+        chainId: 137n,
         address: polygonRelayAdaptContract7702,
-        nonce: 0,
-        yParity: 0,
-        r: '0x01',
-        s: '0x02',
+        nonce: 0n,
+        signature: Signature.from({
+          r: '0x01',
+          s: '0x02',
+          yParity: 0,
+        }),
       },
       signature:
         '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',

@@ -1,4 +1,4 @@
-import { Authorization } from 'ethers';
+import { Authorization, getAddress } from 'ethers';
 import {
   RailgunWallet,
   EngineEvent,
@@ -23,7 +23,6 @@ import {
 } from '@railgun-community/shared-models';
 import { onBalancesUpdate, onWalletPOIProofProgress } from './balance-update';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { getAddress } from 'ethers';
 import { getEngine } from '../core/engine';
 
 export const awaitWalletScan = (walletID: string, chain: Chain) => {
