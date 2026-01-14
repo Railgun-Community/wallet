@@ -121,9 +121,10 @@ const overallBatchMinGasPrice = BigInt('0x1000');
 const minGasLimit = MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2;
 
 const gasDetails: TransactionGasDetails = {
-  evmGasType: EVMGasType.Type1,
+  evmGasType: EVMGasType.Type4,
   gasEstimate: 2000n,
-  gasPrice: overallBatchMinGasPrice,
+  maxFeePerGas: overallBatchMinGasPrice,
+  maxPriorityFeePerGas: 0n,
 };
 
 
@@ -589,13 +590,15 @@ describe('tx-cross-contract-calls-7702', () => {
     const { transaction } = populateResponse;
 
     expect(transaction.nonce).to.equal(undefined);
-    expect(transaction.gasPrice?.toString()).to.equal('4096');
+    expect(transaction.gasPrice).to.equal(undefined);
+    expect(transaction.maxFeePerGas?.toString()).to.equal('4096');
+    expect(transaction.maxPriorityFeePerGas?.toString()).to.equal('0');
     expect(transaction.gasLimit).to.equal(2400n);
     expect(transaction.value?.toString()).to.equal('0');
     expect(transaction.data).to.not.equal(undefined);
     expect(transaction.to).to.equal(mockEphemeralWallet.address);
     expect(transaction.chainId).to.equal(undefined);
-    expect(transaction.type).to.equal(1);
+    expect(transaction.type).to.equal(4);
   });
 
   it('Should error on populate cross contract calls tx when params changed (invalid cached proof)', async () => {

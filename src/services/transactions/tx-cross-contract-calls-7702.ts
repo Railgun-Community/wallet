@@ -9,6 +9,7 @@ import {
   RailgunNFTAmount,
   TransactionGasDetails,
   RailgunERC20Recipient,
+  EVMGasType,
   TXIDVersion,
   NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
@@ -174,6 +175,10 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
   try {
     setCachedProvedTransaction(undefined);
 
+    // Broadcaster fee estimation for 7702 must use Type4 fee semantics (maxFeePerGas).
+    // Coerce legacy inputs (eg. Type1 + gasPrice) to Type4 where possible.
+    const originalGasDetailsType4 = coerceGasDetailsToType4(originalGasDetails);
+
     const overallBatchMinGasPrice = 0n;
 
     const validCrossContractCalls =
@@ -264,7 +269,7 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
       networkName,
       railgunWalletID,
       relayAdaptUnshieldERC20AmountRecipients,
-      originalGasDetails,
+      originalGasDetailsType4,
       feeTokenDetails,
       sendWithPublicWallet,
       true, // isCrossContractCall
@@ -284,6 +289,31 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
     );
   }
 };
+
+function coerceGasDetailsToType4(
+  gasDetails: TransactionGasDetails,
+): TransactionGasDetails {
+  if (gasDetails.evmGasType === EVMGasType.Type4) {
+    return gasDetails;
+  }
+  if (gasDetails.evmGasType === EVMGasType.Type2) {
+    return {
+      ...gasDetails,
+      evmGasType: EVMGasType.Type4,
+    };
+  }
+  if ('gasPrice' in gasDetails && gasDetails.gasPrice != null) {
+    return {
+      evmGasType: EVMGasType.Type4,
+      gasEstimate: gasDetails.gasEstimate,
+      maxFeePerGas: gasDetails.gasPrice,
+      maxPriorityFeePerGas: 0n,
+    };
+  }
+  throw new Error(
+    '7702 cross-contract call requires Type4 gas details (maxFeePerGas/maxPriorityFeePerGas).',
+  );
+}
 
 export const generateCrossContractCallsProof7702 = async (
   txidVersion: TXIDVersion,

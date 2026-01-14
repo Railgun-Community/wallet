@@ -127,7 +127,18 @@ export const setGasDetailsForTransaction = (
     sendWithPublicWallet,
   );
 
-  if (gasDetails.evmGasType !== evmGasType && gasDetails.evmGasType !== EVMGasType.Type4) {
+  const isEIP7702Type4Transaction = transaction.type === 4;
+
+  // EIP-7702 transactions (type 4) must remain type 4 and use EIP-1559-style fee fields.
+  // Some callers may still provide legacy gas details; coerce safely where possible.
+  const resolvedGasDetails: TransactionGasDetails = isEIP7702Type4Transaction
+    ? coerceGasDetailsToType4(gasDetails)
+    : gasDetails;
+
+  if (
+    resolvedGasDetails.evmGasType !== evmGasType &&
+    resolvedGasDetails.evmGasType !== EVMGasType.Type4
+  ) {
     const transactionType = sendWithPublicWallet
       ? 'self-signed'
       : 'Broadcaster';
@@ -137,28 +148,62 @@ export const setGasDetailsForTransaction = (
   }
 
   // eslint-disable-next-line no-param-reassign
-  transaction.type = gasDetails.evmGasType;
+  transaction.type = isEIP7702Type4Transaction
+    ? EVMGasType.Type4
+    : resolvedGasDetails.evmGasType;
 
-  switch (gasDetails.evmGasType) {
+  switch (resolvedGasDetails.evmGasType) {
     case EVMGasType.Type0: {
       // eslint-disable-next-line no-param-reassign
-      transaction.gasPrice = gasDetails.gasPrice;
+      transaction.gasPrice = resolvedGasDetails.gasPrice;
       // eslint-disable-next-line no-param-reassign
       delete transaction.accessList;
       break;
     }
     case EVMGasType.Type1: {
       // eslint-disable-next-line no-param-reassign
-      transaction.gasPrice = gasDetails.gasPrice;
+      transaction.gasPrice = resolvedGasDetails.gasPrice;
       break;
     }
     case EVMGasType.Type2:
     case EVMGasType.Type4: {
       // eslint-disable-next-line no-param-reassign
-      transaction.maxFeePerGas = gasDetails.maxFeePerGas;
+      transaction.maxFeePerGas = resolvedGasDetails.maxFeePerGas;
       // eslint-disable-next-line no-param-reassign
-      transaction.maxPriorityFeePerGas = gasDetails.maxPriorityFeePerGas;
+      transaction.maxPriorityFeePerGas = resolvedGasDetails.maxPriorityFeePerGas;
+      // eslint-disable-next-line no-param-reassign
+      delete transaction.gasPrice;
       break;
     }
   }
 };
+
+function coerceGasDetailsToType4(
+  gasDetails: TransactionGasDetails,
+): TransactionGasDetails {
+  if (gasDetails.evmGasType === EVMGasType.Type4) {
+    return gasDetails;
+  }
+  if (gasDetails.evmGasType === EVMGasType.Type2) {
+    // Type2 and Type4 share EIP-1559 fee fields.
+    return {
+      ...gasDetails,
+      evmGasType: EVMGasType.Type4,
+    };
+  }
+
+  // Coerce legacy fee field into EIP-1559 maxFeePerGas.
+  // If the caller wants a separate maxPriorityFeePerGas, they must provide it.
+  if ('gasPrice' in gasDetails && gasDetails.gasPrice != null) {
+    return {
+      evmGasType: EVMGasType.Type4,
+      gasEstimate: gasDetails.gasEstimate,
+      maxFeePerGas: gasDetails.gasPrice,
+      maxPriorityFeePerGas: 0n,
+    };
+  }
+
+  throw new Error(
+    'EIP-7702 transaction requires Type4 gas details (maxFeePerGas/maxPriorityFeePerGas).',
+  );
+}
