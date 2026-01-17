@@ -33,6 +33,9 @@ import {
   getSerializedERC20Balances,
   getSerializedNFTBalances,
 } from '../railgun';
+import { TransactionReceipt, TransactionResponse } from 'ethers';
+
+const ERC20_TRANSFER_EVENT_SIGNATURE = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 export const populateProvedUnshield = async (
   txidVersion: TXIDVersion,
@@ -251,6 +254,103 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
   }
 };
 
+async function extractTokenOwnerFromTransferEvents(
+  receipt: TransactionReceipt,
+  railgunContractAddress: string
+): Promise<string> {
+  const railgunAddressLower = railgunContractAddress.toLowerCase();
+
+  const potentialOwners: Set<string> = new Set();
+
+  for (const log of receipt.logs) {
+    try {
+      // look for transfer signature
+      if (log.topics.length < 3) {
+        continue;
+      }
+
+      if (log.topics[0] !== ERC20_TRANSFER_EVENT_SIGNATURE) {
+        continue;
+      }
+
+      // topics[0] = event signature hash
+      // topics[1] = from address
+      // topics[2] = to address
+      // data = amount (non-indexed)
+
+      const toAddress = `0x${  log.topics[2].slice(-40).toLowerCase()}`;
+
+      // check if transfer is to the contract
+      if (toAddress === railgunAddressLower) {
+        const fromAddress = `0x${  log.topics[1].slice(-40)}`;
+        potentialOwners.add(fromAddress);
+      }
+    } catch (error) {
+      console.warn('Error parsing log for token owner extraction:', error);
+      continue;
+    }
+  }
+
+  // got the owner ?
+  if (potentialOwners.size === 1) {
+    const [owner] = Array.from(potentialOwners);
+    return owner;
+  }
+
+  // multiple owners scenario
+  // we should take the first one (first transfer)
+  // this handles cases where there are multiple deposits in one transaction
+  if (potentialOwners.size > 1) {
+    console.warn(
+      `Multiple token owners found in transaction. Using first owner. ` +
+      `Owners: ${Array.from(potentialOwners).join(', ')}`
+    );
+
+    // return the first owner found
+    const [firstOwner] = Array.from(potentialOwners);
+    return firstOwner;
+  }
+
+  // No Transfer events to Railgun contract found
+  throw new Error(
+    'Could not find token owner: No Transfer event to Railgun contract detected in transaction'
+  );
+}
+
+async function getTokenOwnerWithFallback(
+  receipt: TransactionReceipt,
+  transaction: TransactionResponse,
+  railgunContractAddress: string
+): Promise<string> {
+  try {
+    // first attempt is try to extract from Transfer events
+    const tokenOwner = await extractTokenOwnerFromTransferEvents(
+      receipt,
+      railgunContractAddress
+    );
+
+    // Check if the token owner differs from tx.from (indicates gasless/delegated tx)
+    if (tokenOwner.toLowerCase() !== transaction.from.toLowerCase()) {
+      console.log(
+        `✓ Gasless/delegated transaction detected:\n` +
+        `  Transaction sender: ${transaction.from}\n` +
+        `  True token owner:   ${tokenOwner}`
+      );
+    }
+
+    return tokenOwner;
+  } catch (error) {
+    // fall back to transaction.from with warning
+    console.warn(
+      'Failed to extract token owner from Transfer events, ' +
+      'falling back to transaction.from. This may be incorrect for gasless transactions.',
+      error
+    );
+
+    return transaction.from;
+  }
+}
+
 export const getERC20AndNFTAmountRecipientsForUnshieldToOrigin = async (
   txidVersion: TXIDVersion,
   networkName: NetworkName,
@@ -270,12 +370,35 @@ export const getERC20AndNFTAmountRecipientsForUnshieldToOrigin = async (
   );
 
   const provider = getFallbackProviderForNetwork(networkName);
-  const transaction = await provider.getTransaction(originalShieldTxid);
+
+  // fetch both transaction AND receipt
+  const [transaction, receipt] = await Promise.all([
+    provider.getTransaction(originalShieldTxid),
+    provider.getTransactionReceipt(originalShieldTxid),
+  ]);
+
   if (!transaction) {
     throw new Error('Could not find shield transaction from RPC');
   }
 
-  const recipientAddress = transaction.from;
+  if (!receipt) {
+    throw new Error('Could not find shield transaction receipt from RPC');
+  }
+
+  // get contract address for this network
+  const network = NETWORK_CONFIG[networkName];
+  const railgunContractAddress = network.proxyContract;
+
+  if (!railgunContractAddress) {
+    throw new Error(`Could not find Railgun proxy contract for network: ${networkName}`);
+  }
+
+  // extract TRUE token owner from Transfer events
+  const recipientAddress = await getTokenOwnerWithFallback(
+    receipt,
+    transaction,
+    railgunContractAddress
+  );
   const erc20Amounts = getSerializedERC20Balances(balances);
   const nftAmounts = getSerializedNFTBalances(balances);
   const erc20AmountRecipients: RailgunERC20AmountRecipient[] = erc20Amounts
