@@ -271,9 +271,7 @@ async function extractTokenOwnerFromTransferEvents(
       if (log.topics[0] !== ERC20_TRANSFER_EVENT_SIGNATURE) {
         continue;
       }
-
       // topics[0] = event signature hash
-
       const toAddress = `0x${  log.topics[2].slice(-40).toLowerCase()}`;
 
       if (toAddress === railgunAddressLower) {
@@ -292,11 +290,6 @@ async function extractTokenOwnerFromTransferEvents(
   }
   // this handles cases where there are multiple deposits in one transaction
   if (potentialOwners.size > 1) {
-    console.warn(
-      `Multiple token owners found in transaction. Using first owner. ` +
-      `Owners: ${Array.from(potentialOwners).join(', ')}`
-    );
-
     const [firstOwner] = Array.from(potentialOwners);
     return firstOwner;
   }
@@ -317,24 +310,8 @@ async function getTokenOwnerWithFallback(
       receipt,
       railgunContractAddress
     );
-
-    // Check if the token owner differs from tx.from (indicates gasless/delegated tx)
-    if (tokenOwner.toLowerCase() !== transaction.from.toLowerCase()) {
-      console.log(
-        `✓ Gasless/delegated transaction detected:\n` +
-        `  Transaction sender: ${transaction.from}\n` +
-        `  True token owner:   ${tokenOwner}`
-      );
-    }
-
     return tokenOwner;
   } catch (error) {
-    console.warn(
-      'Failed to extract token owner from Transfer events, ' +
-      'falling back to transaction.from. This may be incorrect for gasless transactions.',
-      error
-    );
-
     return transaction.from;
   }
 }
