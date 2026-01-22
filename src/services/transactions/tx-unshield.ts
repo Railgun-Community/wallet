@@ -264,7 +264,6 @@ async function extractTokenOwnerFromTransferEvents(
 
   for (const log of receipt.logs) {
     try {
-      // look for transfer signature
       if (log.topics.length < 3) {
         continue;
       }
@@ -274,13 +273,9 @@ async function extractTokenOwnerFromTransferEvents(
       }
 
       // topics[0] = event signature hash
-      // topics[1] = from address
-      // topics[2] = to address
-      // data = amount (non-indexed)
 
       const toAddress = `0x${  log.topics[2].slice(-40).toLowerCase()}`;
 
-      // check if transfer is to the contract
       if (toAddress === railgunAddressLower) {
         const fromAddress = `0x${  log.topics[1].slice(-40)}`;
         potentialOwners.add(fromAddress);
@@ -291,14 +286,10 @@ async function extractTokenOwnerFromTransferEvents(
     }
   }
 
-  // got the owner ?
   if (potentialOwners.size === 1) {
     const [owner] = Array.from(potentialOwners);
     return owner;
   }
-
-  // multiple owners scenario
-  // we should take the first one (first transfer)
   // this handles cases where there are multiple deposits in one transaction
   if (potentialOwners.size > 1) {
     console.warn(
@@ -306,12 +297,10 @@ async function extractTokenOwnerFromTransferEvents(
       `Owners: ${Array.from(potentialOwners).join(', ')}`
     );
 
-    // return the first owner found
     const [firstOwner] = Array.from(potentialOwners);
     return firstOwner;
   }
 
-  // No Transfer events to Railgun contract found
   throw new Error(
     'Could not find token owner: No Transfer event to Railgun contract detected in transaction'
   );
@@ -340,7 +329,6 @@ async function getTokenOwnerWithFallback(
 
     return tokenOwner;
   } catch (error) {
-    // fall back to transaction.from with warning
     console.warn(
       'Failed to extract token owner from Transfer events, ' +
       'falling back to transaction.from. This may be incorrect for gasless transactions.',
@@ -371,7 +359,6 @@ export const getERC20AndNFTAmountRecipientsForUnshieldToOrigin = async (
 
   const provider = getFallbackProviderForNetwork(networkName);
 
-  // fetch both transaction AND receipt
   const [transaction, receipt] = await Promise.all([
     provider.getTransaction(originalShieldTxid),
     provider.getTransactionReceipt(originalShieldTxid),
@@ -385,7 +372,6 @@ export const getERC20AndNFTAmountRecipientsForUnshieldToOrigin = async (
     throw new Error('Could not find shield transaction receipt from RPC');
   }
 
-  // get contract address for this network
   const network = NETWORK_CONFIG[networkName];
   const railgunContractAddress = network.proxyContract;
 
@@ -393,7 +379,6 @@ export const getERC20AndNFTAmountRecipientsForUnshieldToOrigin = async (
     throw new Error(`Could not find Railgun proxy contract for network: ${networkName}`);
   }
 
-  // extract TRUE token owner from Transfer events
   const recipientAddress = await getTokenOwnerWithFallback(
     receipt,
     transaction,
