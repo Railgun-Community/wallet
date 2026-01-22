@@ -64,7 +64,7 @@ import {
   createRailgunWallet,
   fullWalletForID,
 } from '../../railgun/wallets/wallets';
-import { setFallbackProviderForNetwork } from '../../railgun/core/providers';
+import { setFallbackProviderForNetwork, fallbackProviderMap } from '../../railgun/core/providers';
 import { setCachedProvedTransaction } from '../proof-cache';
 import { ContractTransaction, FallbackProvider } from 'ethers';
 import {
@@ -823,6 +823,7 @@ describe('tx-unshield', () => {
 
   describe('EIP-7702 Token Owner Extraction (Unshield to Origin)', () => {
     let originalProvider: FallbackProvider | undefined;
+    let hadOriginalProvider: boolean;
 
     const MOCK_USER_ADDRESS = '0x1234567890123456789012345678901234567890';
     const MOCK_RELAYER_ADDRESS = '0x9876543210987654321098765432109876543210';
@@ -834,15 +835,20 @@ describe('tx-unshield', () => {
       // Save original provider if it exists
       try {
         originalProvider = railgunModule.getFallbackProviderForNetwork(NetworkName.Polygon);
+        hadOriginalProvider = true;
       } catch {
         originalProvider = undefined;
+        hadOriginalProvider = false;
       }
     });
 
     afterEach(() => {
-      // Restore original provider
-      if (originalProvider) {
+      // Restore original provider or clear it
+      if (hadOriginalProvider && originalProvider) {
         setFallbackProviderForNetwork(NetworkName.Polygon, originalProvider);
+      } else if (!hadOriginalProvider) {
+        // Clear the mock provider we set
+        delete fallbackProviderMap[NetworkName.Polygon];
       }
     });
 
