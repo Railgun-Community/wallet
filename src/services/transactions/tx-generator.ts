@@ -205,7 +205,6 @@ export const generateUnshieldBaseToken = async (
       toWalletAddress,
       relayAdaptParamsRandom,
       useDummyProof,
-      sendWithPublicWallet,
     );
   if (useDummyProof) {
     return {

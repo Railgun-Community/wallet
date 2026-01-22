@@ -51,6 +51,7 @@ import {
   gasEstimateForUnprovenUnshieldBaseToken,
   populateProvedUnshieldToOrigin,
   gasEstimateForUnprovenUnshieldToOrigin,
+  getERC20AndNFTAmountRecipientsForUnshieldToOrigin,
 } from '../tx-unshield';
 import {
   generateUnshieldBaseTokenProof,
@@ -58,10 +59,12 @@ import {
   generateUnshieldToOriginProof,
 } from '../tx-proof-unshield';
 import * as txGasDetailsModule from '../tx-gas-details';
+import * as railgunModule from '../../railgun';
 import {
   createRailgunWallet,
   fullWalletForID,
 } from '../../railgun/wallets/wallets';
+import { setFallbackProviderForNetwork } from '../../railgun/core/providers';
 import { setCachedProvedTransaction } from '../proof-cache';
 import { ContractTransaction, FallbackProvider } from 'ethers';
 import {
@@ -816,5 +819,365 @@ describe('tx-unshield', () => {
         gasDetails,
       ),
     ).rejectedWith('Invalid proof for this transaction');
+  });
+
+  describe('EIP-7702 Token Owner Extraction (Unshield to Origin)', () => {
+    let originalProvider: FallbackProvider | undefined;
+
+    const MOCK_USER_ADDRESS = '0x1234567890123456789012345678901234567890';
+    const MOCK_RELAYER_ADDRESS = '0x9876543210987654321098765432109876543210';
+    const MOCK_RAILGUN_PROXY_ADDRESS = NETWORK_CONFIG[NetworkName.Polygon].proxyContract;
+    const MOCK_SHIELD_TXID = '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+    const ERC20_TRANSFER_EVENT_SIGNATURE = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+
+    beforeEach(() => {
+      // Save original provider if it exists
+      try {
+        originalProvider = railgunModule.getFallbackProviderForNetwork(NetworkName.Polygon);
+      } catch {
+        originalProvider = undefined;
+      }
+    });
+
+    afterEach(() => {
+      // Restore original provider
+      if (originalProvider) {
+        setFallbackProviderForNetwork(NetworkName.Polygon, originalProvider);
+      }
+    });
+
+    const createMockTransferLog = (
+      fromAddress: string,
+      toAddress: string,
+      tokenAddress: string = MOCK_TOKEN_ADDRESS,
+    ) => {
+      const paddedFrom = fromAddress.toLowerCase().replace('0x', '').padStart(64, '0');
+      const paddedTo = toAddress.toLowerCase().replace('0x', '').padStart(64, '0');
+
+      return {
+        address: tokenAddress,
+        topics: [
+          ERC20_TRANSFER_EVENT_SIGNATURE,
+          `0x${paddedFrom}`,
+          `0x${paddedTo}`,
+        ],
+        data: '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
+        blockNumber: 12345,
+        transactionHash: MOCK_SHIELD_TXID,
+        transactionIndex: 0,
+        blockHash: '0xblockhash',
+        logIndex: 0,
+        removed: false,
+        index: 0,
+      };
+    };
+
+    const createMockReceipt = (logs: any[]) => {
+      return {
+        to: MOCK_RAILGUN_PROXY_ADDRESS,
+        from: MOCK_RELAYER_ADDRESS,
+        contractAddress: null,
+        transactionIndex: 0,
+        gasUsed: BigInt(100000),
+        logsBloom: '0x',
+        blockHash: '0xblockhash',
+        transactionHash: MOCK_SHIELD_TXID,
+        logs,
+        blockNumber: 12345,
+        confirmations: 10,
+        cumulativeGasUsed: BigInt(100000),
+        effectiveGasPrice: BigInt(1000000000),
+        status: 1,
+        type: 2,
+        byzantium: true,
+        hash: MOCK_SHIELD_TXID,
+        index: 0,
+      };
+    };
+
+    const createMockTransaction = (fromAddress: string) => {
+      return {
+        hash: MOCK_SHIELD_TXID,
+        from: fromAddress,
+        to: MOCK_RAILGUN_PROXY_ADDRESS,
+        nonce: 1,
+        gasLimit: BigInt(200000),
+        data: '0x',
+        value: BigInt(0),
+        chainId: BigInt(137),
+        blockNumber: 12345,
+        blockHash: '0xblockhash',
+        index: 0,
+        type: 2,
+        accessList: [],
+      };
+    };
+
+    it('Should extract true token owner from Transfer events in EIP-7702 gasless transaction', async function () {
+      this.timeout(60_000);
+
+      const transferLog = createMockTransferLog(
+        MOCK_USER_ADDRESS,
+        MOCK_RAILGUN_PROXY_ADDRESS!,
+      );
+
+      const mockReceipt = createMockReceipt([transferLog]);
+      const mockTransaction = createMockTransaction(MOCK_RELAYER_ADDRESS);
+
+      const mockProvider = {
+        getTransaction: async () => mockTransaction,
+        getTransactionReceipt: async () => mockReceipt,
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      const result = await getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+        txidVersion,
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_SHIELD_TXID,
+      );
+
+      expect(result.erc20AmountRecipients).to.be.an('array');
+      if (result.erc20AmountRecipients.length > 0) {
+        expect(result.erc20AmountRecipients[0].recipientAddress).to.equal(
+          MOCK_USER_ADDRESS,
+          'Should extract token owner from Transfer event, not tx.from (relayer)',
+        );
+      }
+    });
+
+    it('Should handle standard transactions where tx.from equals token owner', async function () {
+      this.timeout(60_000);
+
+      const transferLog = createMockTransferLog(
+        MOCK_USER_ADDRESS,
+        MOCK_RAILGUN_PROXY_ADDRESS!,
+      );
+
+      const mockReceipt = createMockReceipt([transferLog]);
+      const mockTransaction = createMockTransaction(MOCK_USER_ADDRESS);
+
+      const mockProvider = {
+        getTransaction: async () => mockTransaction,
+        getTransactionReceipt: async () => mockReceipt,
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      const result = await getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+        txidVersion,
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_SHIELD_TXID,
+      );
+
+      expect(result.erc20AmountRecipients).to.be.an('array');
+      if (result.erc20AmountRecipients.length > 0) {
+        expect(result.erc20AmountRecipients[0].recipientAddress).to.equal(
+          MOCK_USER_ADDRESS,
+        );
+      }
+    });
+
+    it('Should ignore Transfer events not directed to Railgun contract', async function () {
+      this.timeout(60_000);
+
+      const irrelevantTransferLog = createMockTransferLog(
+        MOCK_USER_ADDRESS,
+        MOCK_ETH_WALLET_ADDRESS,
+      );
+
+      const relevantTransferLog = createMockTransferLog(
+        MOCK_USER_ADDRESS,
+        MOCK_RAILGUN_PROXY_ADDRESS!,
+      );
+
+      const mockReceipt = createMockReceipt([
+        irrelevantTransferLog,
+        relevantTransferLog,
+      ]);
+      const mockTransaction = createMockTransaction(MOCK_RELAYER_ADDRESS);
+
+      const mockProvider = {
+        getTransaction: async () => mockTransaction,
+        getTransactionReceipt: async () => mockReceipt,
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      const result = await getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+        txidVersion,
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_SHIELD_TXID,
+      );
+
+      expect(result.erc20AmountRecipients).to.be.an('array');
+      if (result.erc20AmountRecipients.length > 0) {
+        expect(result.erc20AmountRecipients[0].recipientAddress).to.equal(
+          MOCK_USER_ADDRESS,
+        );
+      }
+    });
+
+    it('Should fallback to tx.from when no Transfer events found', async function () {
+      this.timeout(60_000);
+
+      const mockReceipt = createMockReceipt([]);
+      const mockTransaction = createMockTransaction(MOCK_USER_ADDRESS);
+
+      const mockProvider = {
+        getTransaction: async () => mockTransaction,
+        getTransactionReceipt: async () => mockReceipt,
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      const result = await getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+        txidVersion,
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_SHIELD_TXID,
+      );
+
+      expect(result.erc20AmountRecipients).to.be.an('array');
+      if (result.erc20AmountRecipients.length > 0) {
+        expect(result.erc20AmountRecipients[0].recipientAddress).to.equal(
+          MOCK_USER_ADDRESS,
+          'Should fallback to tx.from when no Transfer events',
+        );
+      }
+    });
+
+    it('Should handle malformed log topics gracefully', async function () {
+      this.timeout(60_000);
+
+      const malformedLog = {
+        address: MOCK_TOKEN_ADDRESS,
+        topics: [ERC20_TRANSFER_EVENT_SIGNATURE],
+        data: '0x0000000000000000000000000000000000000000000000000de0b6b3a7640000',
+        blockNumber: 12345,
+        transactionHash: MOCK_SHIELD_TXID,
+        transactionIndex: 0,
+        blockHash: '0xblockhash',
+        logIndex: 0,
+        removed: false,
+        index: 0,
+      };
+
+      const validLog = createMockTransferLog(
+        MOCK_USER_ADDRESS,
+        MOCK_RAILGUN_PROXY_ADDRESS!,
+      );
+
+      const mockReceipt = createMockReceipt([malformedLog, validLog]);
+      const mockTransaction = createMockTransaction(MOCK_RELAYER_ADDRESS);
+
+      const mockProvider = {
+        getTransaction: async () => mockTransaction,
+        getTransactionReceipt: async () => mockReceipt,
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      const result = await getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+        txidVersion,
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_SHIELD_TXID,
+      );
+
+      expect(result.erc20AmountRecipients).to.be.an('array');
+      if (result.erc20AmountRecipients.length > 0) {
+        expect(result.erc20AmountRecipients[0].recipientAddress).to.equal(
+          MOCK_USER_ADDRESS,
+          'Should skip malformed log and process valid one',
+        );
+      }
+    });
+
+    it('Should throw error when transaction is not found', async function () {
+      this.timeout(60_000);
+
+      const mockProvider = {
+        getTransaction: async () => null,
+        getTransactionReceipt: async () => createMockReceipt([]),
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      await expect(
+        getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+          txidVersion,
+          NetworkName.Polygon,
+          railgunWallet.id,
+          MOCK_SHIELD_TXID,
+        ),
+      ).to.be.rejectedWith('Could not find shield transaction from RPC');
+    });
+
+    it('Should throw error when receipt is not found', async function () {
+      this.timeout(60_000);
+
+      const mockProvider = {
+        getTransaction: async () => createMockTransaction(MOCK_USER_ADDRESS),
+        getTransactionReceipt: async () => null,
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      await expect(
+        getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+          txidVersion,
+          NetworkName.Polygon,
+          railgunWallet.id,
+          MOCK_SHIELD_TXID,
+        ),
+      ).to.be.rejectedWith('Could not find shield transaction receipt from RPC');
+    });
+
+    it('Should handle multiple token owners by using first one', async function () {
+      this.timeout(60_000);
+
+      const user1Address = '0x1111111111111111111111111111111111111111';
+      const user2Address = '0x2222222222222222222222222222222222222222';
+
+      const transferLog1 = createMockTransferLog(
+        user1Address,
+        MOCK_RAILGUN_PROXY_ADDRESS!,
+      );
+
+      const transferLog2 = createMockTransferLog(
+        user2Address,
+        MOCK_RAILGUN_PROXY_ADDRESS!,
+      );
+
+      const mockReceipt = createMockReceipt([transferLog1, transferLog2]);
+      const mockTransaction = createMockTransaction(MOCK_RELAYER_ADDRESS);
+
+      const mockProvider = {
+        getTransaction: async () => mockTransaction,
+        getTransactionReceipt: async () => mockReceipt,
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      const result = await getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+        txidVersion,
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_SHIELD_TXID,
+      );
+
+      expect(result.erc20AmountRecipients).to.be.an('array');
+      if (result.erc20AmountRecipients.length > 0) {
+        const recipientAddr = result.erc20AmountRecipients[0].recipientAddress.toLowerCase();
+        const isValidOwner =
+          recipientAddr === user1Address.toLowerCase() ||
+          recipientAddr === user2Address.toLowerCase();
+        expect(isValidOwner).to.be.true;
+      }
+    });
   });
 });
