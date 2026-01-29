@@ -95,7 +95,7 @@ const loadProviderForNetwork = async (
     supportsV3,
     supports7702,
     relayAdapt7702Contract,
-    relayAdapt7702DeployerContract
+    railgunRegistryContract
   } = network;
   if (!proxyContract) {
     throw new Error(`Could not find Proxy contract for network: ${publicName}`);
@@ -120,10 +120,10 @@ const loadProviderForNetwork = async (
   };
 
   // load 7702 contracts only if supported.
-  let adapt7702Contract; let adapt7702DeployerContract;
+  let adapt7702Contract; let railgunRegistry;
   if(supports7702){
     adapt7702Contract = isDefined(relayAdapt7702Contract) && relayAdapt7702Contract !== '' ? relayAdapt7702Contract : undefined;
-    adapt7702DeployerContract = isDefined(relayAdapt7702DeployerContract) && relayAdapt7702DeployerContract !== '' ? relayAdapt7702DeployerContract : undefined;
+    railgunRegistry = isDefined(railgunRegistryContract) && railgunRegistryContract !== '' ? railgunRegistryContract : undefined;
   }
 
   // This function will set up the contracts for this chain.
@@ -141,7 +141,7 @@ const loadProviderForNetwork = async (
     poi?.launchBlock,
     supportsV3,
     adapt7702Contract,
-    adapt7702DeployerContract
+    railgunRegistry
   );
 };
 
@@ -152,7 +152,7 @@ const loadProviderForNetwork = async (
 export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
-  pollingInterval = 15000,
+  pollingInterval = 60000,
 ): Promise<LoadProviderResponse> => {
   try {
     delete fallbackProviderMap[networkName];
