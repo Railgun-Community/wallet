@@ -919,12 +919,145 @@ describe('tx-unshield', () => {
       };
     };
 
+    it('Should reject when getTransaction fails', async function () {
+      this.timeout(60_000);
+
+      const mockProvider = {
+        getTransaction: async () => {
+          throw new Error('RPC error: Transaction lookup failed');
+        },
+        getTransactionReceipt: async () => createMockReceipt([]),
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      await expect(
+        getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+          txidVersion,
+          NetworkName.Polygon,
+          railgunWallet.id,
+          MOCK_SHIELD_TXID,
+        ),
+      ).to.be.rejectedWith('RPC error: Transaction lookup failed');
+    });
+
+    it('Should reject when getTransactionReceipt fails', async function () {
+      this.timeout(60_000);
+
+      const mockProvider = {
+        getTransaction: async () => createMockTransaction(MOCK_USER_ADDRESS),
+        getTransactionReceipt: async () => {
+          throw new Error('RPC error: Receipt lookup failed');
+        },
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      await expect(
+        getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+          txidVersion,
+          NetworkName.Polygon,
+          railgunWallet.id,
+          MOCK_SHIELD_TXID,
+        ),
+      ).to.be.rejectedWith('RPC error: Receipt lookup failed');
+    });
+
+    it('Should reject when both getTransaction and getTransactionReceipt fail', async function () {
+      this.timeout(60_000);
+
+      const mockProvider = {
+        getTransaction: async () => {
+          // Simulate slower failure
+          await new Promise(resolve => setTimeout(resolve, 100));
+          throw new Error('RPC error: Transaction lookup failed');
+        },
+        getTransactionReceipt: async () => {
+          // Simulate faster failure
+          throw new Error('RPC error: Receipt lookup failed');
+        },
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      // Promise.all() should reject with whichever error occurs first
+      // In this case, receipt fails faster
+      await expect(
+        getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+          txidVersion,
+          NetworkName.Polygon,
+          railgunWallet.id,
+          MOCK_SHIELD_TXID,
+        ),
+      ).to.be.rejectedWith(/RPC error/);
+    });
+
+    it('Should timeout when getTransaction hangs indefinitely', async function () {
+      this.timeout(10_000);
+
+      const mockProvider = {
+        getTransaction: async () => {
+          // Simulate a hanging promise that never resolves
+          return new Promise(() => {});
+        },
+        getTransactionReceipt: async () => createMockReceipt([]),
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      // Create a timeout wrapper to test hanging behavior
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Test timeout: getTransaction hung')), 2000)
+      );
+
+      const callPromise = getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+        txidVersion,
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_SHIELD_TXID,
+      );
+
+      await expect(
+        Promise.race([callPromise, timeoutPromise])
+      ).to.be.rejectedWith('Test timeout: getTransaction hung');
+    });
+
+    it('Should timeout when getTransactionReceipt hangs indefinitely', async function () {
+      this.timeout(10_000);
+
+      const mockProvider = {
+        getTransaction: async () => createMockTransaction(MOCK_USER_ADDRESS),
+        getTransactionReceipt: async () => {
+          // Simulate a hanging promise that never resolves
+          return new Promise(() => {});
+        },
+      } as any;
+
+      setFallbackProviderForNetwork(NetworkName.Polygon, mockProvider);
+
+      // Create a timeout wrapper to test hanging behavior
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Test timeout: getTransactionReceipt hung')), 2000)
+      );
+
+      const callPromise = getERC20AndNFTAmountRecipientsForUnshieldToOrigin(
+        txidVersion,
+        NetworkName.Polygon,
+        railgunWallet.id,
+        MOCK_SHIELD_TXID,
+      );
+
+      await expect(
+        Promise.race([callPromise, timeoutPromise])
+      ).to.be.rejectedWith('Test timeout: getTransactionReceipt hung');
+    });
+
     it('Should extract true token owner from Transfer events in EIP-7702 gasless transaction', async function () {
       this.timeout(60_000);
 
       const transferLog = createMockTransferLog(
         MOCK_USER_ADDRESS,
-        MOCK_RAILGUN_PROXY_ADDRESS!,
+        MOCK_RAILGUN_PROXY_ADDRESS,
       );
 
       const mockReceipt = createMockReceipt([transferLog]);
@@ -958,7 +1091,7 @@ describe('tx-unshield', () => {
 
       const transferLog = createMockTransferLog(
         MOCK_USER_ADDRESS,
-        MOCK_RAILGUN_PROXY_ADDRESS!,
+        MOCK_RAILGUN_PROXY_ADDRESS,
       );
 
       const mockReceipt = createMockReceipt([transferLog]);
@@ -996,7 +1129,7 @@ describe('tx-unshield', () => {
 
       const relevantTransferLog = createMockTransferLog(
         MOCK_USER_ADDRESS,
-        MOCK_RAILGUN_PROXY_ADDRESS!,
+        MOCK_RAILGUN_PROXY_ADDRESS,
       );
 
       const mockReceipt = createMockReceipt([
@@ -1074,7 +1207,7 @@ describe('tx-unshield', () => {
 
       const validLog = createMockTransferLog(
         MOCK_USER_ADDRESS,
-        MOCK_RAILGUN_PROXY_ADDRESS!,
+        MOCK_RAILGUN_PROXY_ADDRESS,
       );
 
       const mockReceipt = createMockReceipt([malformedLog, validLog]);
@@ -1151,12 +1284,12 @@ describe('tx-unshield', () => {
 
       const transferLog1 = createMockTransferLog(
         user1Address,
-        MOCK_RAILGUN_PROXY_ADDRESS!,
+        MOCK_RAILGUN_PROXY_ADDRESS,
       );
 
       const transferLog2 = createMockTransferLog(
         user2Address,
-        MOCK_RAILGUN_PROXY_ADDRESS!,
+        MOCK_RAILGUN_PROXY_ADDRESS,
       );
 
       const mockReceipt = createMockReceipt([transferLog1, transferLog2]);
