@@ -821,7 +821,7 @@ describe('tx-unshield', () => {
     ).rejectedWith('Invalid proof for this transaction');
   });
 
-  describe('EIP-7702 Token Owner Extraction (Unshield to Origin)', () => {
+  describe('Token unshield owner', () => {
     let originalProvider: FallbackProvider | undefined;
     let hadOriginalProvider: boolean;
 
