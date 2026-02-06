@@ -30,6 +30,14 @@
     "build-graphql-V3": "rm -rf src/services/railgun/quick-sync/V3/graphql/.graphclient && graphclient build --dir src/services/railgun/quick-sync/V3/graphql",
     "build-graphql-railgun-txids": "rm -rf src/services/railgun/railgun-txids/graphql/.graphclient && graphclient build --dir src/services/railgun/railgun-txids/graphql"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Railgun-Community/wallet.git"
+  },
+  "homepage": "https://github.com/Railgun-Community/wallet#readme",
+  "bugs": {
+    "url": "https://github.com/Railgun-Community/wallet/issues"
+  },
   "dependencies": {
     "@graphql-mesh/cache-localforage": "^0.7.20",
     "@graphql-mesh/cross-helpers": "^0.3.4",
