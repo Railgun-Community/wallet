@@ -24,4 +24,4 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           cmd: install
-      - run: yarn publish
+      - run: npm publish
