@@ -152,7 +152,8 @@ export const setGasDetailsForTransaction = (
       transaction.gasPrice = gasDetails.gasPrice;
       break;
     }
-    case EVMGasType.Type2: {
+    case EVMGasType.Type2: 
+    case EVMGasType.Type4: {
       // eslint-disable-next-line no-param-reassign
       transaction.maxFeePerGas = gasDetails.maxFeePerGas;
       // eslint-disable-next-line no-param-reassign
