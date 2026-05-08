@@ -22,6 +22,8 @@ import {
 import { reportAndSanitizeError } from '../../utils/error';
 import { ContractTransaction } from 'ethers';
 import { assertValidRailgunAddress } from '../railgun/wallets/wallets';
+import { createShieldBaseTokenTransaction7702 } from './tx-shield-base-token-7702';
+import { EphemeralAccount } from '../railgun/wallets/ephemeral-account';
 
 const generateShieldBaseTokenTransaction = async (
   txidVersion: TXIDVersion,
@@ -29,6 +31,7 @@ const generateShieldBaseTokenTransaction = async (
   railgunAddress: string,
   shieldPrivateKey: string,
   wrappedERC20Amount: RailgunERC20Amount,
+  ephemeralAccount?: EphemeralAccount,
 ): Promise<ContractTransaction> => {
   try {
     const { masterPublicKey, viewingPublicKey } =
@@ -49,9 +52,23 @@ const generateShieldBaseTokenTransaction = async (
       viewingPublicKey,
     );
 
-    const { chain } = NETWORK_CONFIG[networkName];
-    const transaction =
-      await RelayAdaptVersionedSmartContracts.populateShieldBaseToken(
+    const { chain, relayAdapt7702Contract } = NETWORK_CONFIG[networkName];
+
+    const has7702Support =
+      txidVersion === TXIDVersion.V2_PoseidonMerkle &&
+      typeof relayAdapt7702Contract === 'string' &&
+      relayAdapt7702Contract.length > 0;
+
+    const hasEphemeralAccount = ephemeralAccount instanceof EphemeralAccount;
+
+    const transaction = has7702Support && hasEphemeralAccount
+      ? await createShieldBaseTokenTransaction7702(
+        txidVersion,
+        networkName,
+        shieldRequest,
+        ephemeralAccount,
+      )
+      : await RelayAdaptVersionedSmartContracts.populateShieldBaseToken(
         txidVersion,
         chain,
         shieldRequest,
@@ -70,6 +87,7 @@ export const populateShieldBaseToken = async (
   shieldPrivateKey: string,
   wrappedERC20Amount: RailgunERC20Amount,
   gasDetails?: TransactionGasDetails,
+  ephemeralAccount?: EphemeralAccount,
 ): Promise<RailgunPopulateTransactionResponse> => {
   try {
     assertValidRailgunAddress(railgunAddress);
@@ -80,6 +98,7 @@ export const populateShieldBaseToken = async (
       railgunAddress,
       shieldPrivateKey,
       wrappedERC20Amount,
+      ephemeralAccount,
     );
 
     if (gasDetails) {
@@ -108,6 +127,7 @@ export const gasEstimateForShieldBaseToken = async (
   shieldPrivateKey: string,
   wrappedERC20Amount: RailgunERC20Amount,
   fromWalletAddress: string,
+  ephemeralAccount?: EphemeralAccount,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     assertValidRailgunAddress(railgunAddress);
@@ -119,6 +139,7 @@ export const gasEstimateForShieldBaseToken = async (
       railgunAddress,
       shieldPrivateKey,
       wrappedERC20Amount,
+      ephemeralAccount,
     );
 
     const sendWithPublicWallet = true;

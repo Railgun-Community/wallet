@@ -5,26 +5,32 @@ import {
   RailgunERC20AmountRecipient,
   RailgunNFTAmountRecipient,
   TXIDVersion,
-  NETWORK_CONFIG,
 } from '@railgun-community/shared-models';
 import {
   GenerateTransactionsProgressCallback,
   generateDummyProofTransactions,
   generateProofTransactions,
   generateTransact,
-  generateUnshieldBaseToken,
   nullifiersForTransactions,
 } from './tx-generator';
-import { assertValidEthAddress } from '../railgun/wallets/wallets';
+import {
+  assertValidEthAddress,
+  getCurrentEphemeralAddress,
+} from '../railgun/wallets/wallets';
 import { setCachedProvedTransaction } from './proof-cache';
 import {
   AdaptID,
-  RelayAdaptVersionedSmartContracts,
   ByteUtils,
+  RelayAdapt7702Helper,
+  TransactionStructV2,
 } from '@railgun-community/engine';
 import { assertNotBlockedAddress } from '../../utils/blocked-address';
-import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
+import {
+  createRelayAdapt7702UnshieldBaseTokenERC20AmountRecipients,
+  createUnshieldBaseTokenActionData7702,
+  createUnshieldBaseTokenTransaction7702,
+} from './tx-unshield-base-token-7702';
 
 export const generateUnshieldProof = async (
   txidVersion: TXIDVersion,
@@ -192,10 +198,17 @@ export const generateUnshieldBaseTokenProof = async (
       wrappedERC20Amount,
     ];
 
+    const ephemeralAddress = await getCurrentEphemeralAddress(
+      railgunWalletID,
+      encryptionKey,
+      networkName,
+    );
+
     const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
-      createRelayAdaptUnshieldERC20AmountRecipients(txidVersion, networkName, [
-        wrappedERC20Amount,
-      ]);
+      createRelayAdapt7702UnshieldBaseTokenERC20AmountRecipients(
+        [wrappedERC20Amount],
+        ephemeralAddress,
+      );
 
     // Empty NFT recipients.
     const nftAmountRecipients: RailgunNFTAmountRecipient[] = [];
@@ -220,26 +233,17 @@ export const generateUnshieldBaseTokenProof = async (
       mnemonicPassword,
     );
 
-    const { chain } = NETWORK_CONFIG[networkName];
+    const actionData = await createUnshieldBaseTokenActionData7702(
+      txidVersion,
+      networkName,
+      publicWalletAddress,
+      ephemeralAddress,
+      sendWithPublicWallet,
+    );
 
-    const relayAdaptParamsRandom = ByteUtils.randomHex(31);
-    const relayAdaptParams =
-      await RelayAdaptVersionedSmartContracts.getRelayAdaptParamsUnshieldBaseToken(
-        txidVersion,
-        chain,
-        dummyTxs,
-        publicWalletAddress,
-        relayAdaptParamsRandom,
-        sendWithPublicWallet,
-      );
-    const relayAdaptContract =
-      RelayAdaptVersionedSmartContracts.getRelayAdaptContract(
-        txidVersion,
-        chain,
-      );
     const relayAdaptID: AdaptID = {
-      contract: relayAdaptContract.address,
-      parameters: relayAdaptParams,
+      contract: ephemeralAddress,
+      parameters: RelayAdapt7702Helper.getZeroAdaptParams(),
     };
 
     const showSenderAddressToRecipient = false;
@@ -267,14 +271,14 @@ export const generateUnshieldBaseTokenProof = async (
         mnemonicPassword,
       );
 
-    const transaction = await generateUnshieldBaseToken(
+    const transaction = await createUnshieldBaseTokenTransaction7702(
       txidVersion,
-      provedTransactions,
       networkName,
-      publicWalletAddress,
-      relayAdaptParamsRandom,
-      false, // useDummyProof
-      sendWithPublicWallet,
+      railgunWalletID,
+      encryptionKey,
+      provedTransactions,
+      actionData,
+      ephemeralAddress,
     );
 
     const nullifiers = nullifiersForTransactions(provedTransactions);

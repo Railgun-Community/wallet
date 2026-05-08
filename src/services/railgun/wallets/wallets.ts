@@ -1,3 +1,4 @@
+import { Authorization, getAddress } from 'ethers';
 import {
   RailgunWallet,
   EngineEvent,
@@ -9,6 +10,9 @@ import {
   ByteUtils,
   POICurrentProofEventData,
   ViewOnlyWallet,
+  TransactionStructV2,
+  TransactionStructV3,
+  RelayAdapt7702,
 } from '@railgun-community/engine';
 import {
   RailgunWalletInfo,
@@ -19,8 +23,8 @@ import {
 } from '@railgun-community/shared-models';
 import { onBalancesUpdate, onWalletPOIProofProgress } from './balance-update';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { getAddress } from 'ethers';
 import { getEngine } from '../core/engine';
+import { getFallbackProviderForNetwork } from '../core/providers';
 
 export const awaitWalletScan = (walletID: string, chain: Chain) => {
   const wallet = walletForID(walletID);
@@ -411,4 +415,59 @@ const formatCreationBlockNumbers = (
   }
 
   return formattedCreationBlockNumbers;
+};
+
+export const sign7702Request = async (
+  walletID: string,
+  encryptionKey: string,
+  networkName: NetworkName,
+  contractAddress: string,
+  chainId: bigint,
+  transactions: (TransactionStructV2 | TransactionStructV3)[],
+  actionData: RelayAdapt7702.ActionDataStruct,
+): Promise<{ authorization: Authorization; signature: string }> => {
+  const wallet = fullWalletForID(walletID);
+  const provider = getFallbackProviderForNetwork(networkName);
+  const ephemeralWallet = (await wallet.getCurrentEphemeralWallet(
+    encryptionKey,
+    chainId,
+  )).connect(provider);
+  const nonce = await ephemeralWallet.getNonce('latest');
+
+  return wallet.sign7702Request(
+    encryptionKey,
+    contractAddress,
+    chainId,
+    transactions,
+    actionData,
+    nonce,
+  );
+};
+
+export const ratchetEphemeralAddress = async (
+  walletID: string,
+  networkName: NetworkName,
+): Promise<void> => {
+  const wallet = fullWalletForID(walletID);
+  const chainId = BigInt(NETWORK_CONFIG[networkName].chain.id);
+  return wallet.ratchetEphemeralAddress(chainId);
+};
+
+export const getCurrentEphemeralAddress = async (
+  walletID: string,
+  encryptionKey: string,
+  networkName: NetworkName,
+): Promise<string> => {
+  const wallet = await getCurrentEphemeralWallet(walletID, encryptionKey, networkName);
+  return wallet.address;
+};
+
+export const getCurrentEphemeralWallet = async (
+  walletID: string,
+  encryptionKey: string,
+  networkName: NetworkName,
+) => {
+  const wallet = fullWalletForID(walletID);
+  const chainId = BigInt(NETWORK_CONFIG[networkName].chain.id);
+  return wallet.getCurrentEphemeralWallet(encryptionKey, chainId);
 };

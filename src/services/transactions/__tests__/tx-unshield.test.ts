@@ -64,9 +64,11 @@ import {
   createRailgunWallet,
   fullWalletForID,
 } from '../../railgun/wallets/wallets';
+import * as walletsModule from '../../railgun/wallets/wallets';
 import { setFallbackProviderForNetwork, fallbackProviderMap } from '../../railgun/core/providers';
 import { setCachedProvedTransaction } from '../proof-cache';
 import { ContractTransaction, FallbackProvider } from 'ethers';
+import * as txUnshieldBaseToken7702Module from '../tx-unshield-base-token-7702';
 import {
   MOCK_SHIELD_TXID_FOR_BALANCES,
   MOCK_TOKEN_BALANCE,
@@ -80,6 +82,8 @@ let railProveStub: SinonStub;
 let railDummyProveStub: SinonStub;
 let railTransactStub: SinonStub;
 let relayAdaptPopulateUnshieldBaseToken: SinonStub;
+let createUnshieldBaseTokenTransaction7702Stub: SinonStub;
+let getCurrentEphemeralAddressStub: SinonStub;
 let addUnshieldDataSpy: SinonSpy;
 let erc20NoteSpy: SinonSpy;
 
@@ -88,6 +92,8 @@ let broadcasterFeeERC20AmountRecipient: RailgunERC20AmountRecipient;
 
 const polygonRelayAdaptContract =
   NETWORK_CONFIG[NetworkName.Polygon].relayAdaptContract;
+
+let originalPolygonRelayAdapt7702Contract: Optional<string>;
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -173,6 +179,14 @@ const spyOnSetUnshield = () => {
 describe('tx-unshield', () => {
   before(async function run() {
     this.timeout(60_000);
+
+    originalPolygonRelayAdapt7702Contract =
+      NETWORK_CONFIG[NetworkName.Polygon].relayAdapt7702Contract;
+    if (!NETWORK_CONFIG[NetworkName.Polygon].relayAdapt7702Contract) {
+      NETWORK_CONFIG[NetworkName.Polygon].relayAdapt7702Contract =
+        polygonRelayAdaptContract;
+    }
+
     await initTestEngine();
     await initTestEngineNetworks();
     const railgunWalletInfo = await createRailgunWallet(
@@ -230,6 +244,14 @@ describe('tx-unshield', () => {
       RelayAdaptVersionedSmartContracts,
       'populateUnshieldBaseToken',
     ).resolves({ data: '0x0123' } as ContractTransaction);
+    createUnshieldBaseTokenTransaction7702Stub = Sinon.stub(
+      txUnshieldBaseToken7702Module,
+      'createUnshieldBaseTokenTransaction7702',
+    ).resolves({ data: '0x0123' } as ContractTransaction);
+    getCurrentEphemeralAddressStub = Sinon.stub(
+      walletsModule,
+      'getCurrentEphemeralAddress',
+    ).resolves(polygonRelayAdaptContract);
 
     // For Unshield To Origin
     await createEngineWalletBalancesStub(
@@ -244,10 +266,15 @@ describe('tx-unshield', () => {
     erc20NoteSpy?.restore();
   });
   after(async () => {
+    NETWORK_CONFIG[NetworkName.Polygon].relayAdapt7702Contract =
+      originalPolygonRelayAdapt7702Contract ?? polygonRelayAdaptContract;
+
     railProveStub.restore();
     railDummyProveStub.restore();
     railTransactStub.restore();
     relayAdaptPopulateUnshieldBaseToken.restore();
+    createUnshieldBaseTokenTransaction7702Stub.restore();
+    getCurrentEphemeralAddressStub.restore();
     restoreEngineStubs();
     await closeTestEngine();
   });
@@ -475,18 +502,18 @@ describe('tx-unshield', () => {
 
   it('Should error on unshield base token gas estimate for ethers rejections', async () => {
     stubGasEstimateFailure();
-    await expect(
-      gasEstimateForUnprovenUnshieldBaseToken(
-        txidVersion,
-        NetworkName.Polygon,
-        MOCK_ETH_WALLET_ADDRESS,
-        railgunWallet.id,
-        MOCK_DB_ENCRYPTION_KEY,
-        MOCK_TOKEN_AMOUNTS[0],
-        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
-        MOCK_FEE_TOKEN_DETAILS,
-        false, // sendWithPublicWallet
-      ),
+      await expect(
+        gasEstimateForUnprovenUnshieldBaseToken(
+          txidVersion,
+          NetworkName.Polygon,
+          MOCK_ETH_WALLET_ADDRESS,
+          railgunWallet.id,
+          MOCK_DB_ENCRYPTION_KEY,
+          MOCK_TOKEN_AMOUNTS[0],
+          MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+          MOCK_FEE_TOKEN_DETAILS,
+          false, // sendWithPublicWallet
+        ),
     ).rejectedWith('test rejection - gas estimate');
   });
 
