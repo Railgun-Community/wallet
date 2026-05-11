@@ -17,10 +17,8 @@ jobs:
         with:
           node-version: '16'
           cache: 'yarn'
-      - name: Install yarn
-        uses: borales/actions-yarn@v4
-        with:
-          cmd: install
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
       - name: Yarn test
         shell: bash
         run: yarn test
