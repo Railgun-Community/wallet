@@ -77,6 +77,7 @@ export const gasEstimateForUnprovenTransfer = async (
   originalGasDetails: TransactionGasDetails,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
+  mnemonicPassword?: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     const overallBatchMinGasPrice = 0n;
@@ -96,6 +97,8 @@ export const gasEstimateForUnprovenTransfer = async (
           broadcasterFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          undefined, // originShieldTxidForSpendabilityOverride
+          mnemonicPassword,
         ),
       (txs: (TransactionStructV2 | TransactionStructV3)[]) =>
         generateTransact(

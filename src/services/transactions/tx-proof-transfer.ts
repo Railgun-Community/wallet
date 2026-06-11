@@ -27,6 +27,7 @@ export const generateTransferProof = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
+  mnemonicPassword?: string,
 ): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -48,6 +49,8 @@ export const generateTransferProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
+        undefined, // originShieldTxidForSpendabilityOverride
+        mnemonicPassword,
       );
     const transaction = await generateTransact(
       txidVersion,

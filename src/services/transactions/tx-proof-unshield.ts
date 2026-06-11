@@ -37,6 +37,7 @@ export const generateUnshieldProof = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
+  mnemonicPassword?: string,
 ): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -58,6 +59,8 @@ export const generateUnshieldProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
+        undefined, // originShieldTxidForSpendabilityOverride
+        mnemonicPassword,
       );
     const transaction = await generateTransact(
       txidVersion,
@@ -101,6 +104,7 @@ export const generateUnshieldToOriginProof = async (
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
   progressCallback: GenerateTransactionsProgressCallback,
+  mnemonicPassword?: string,
 ): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -123,6 +127,7 @@ export const generateUnshieldToOriginProof = async (
         undefined, // overallBatchMinGasPrice
         progressCallback,
         originalShieldTxid,
+        mnemonicPassword,
       );
     const transaction = await generateTransact(
       txidVersion,
@@ -168,6 +173,7 @@ export const generateUnshieldBaseTokenProof = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
+  mnemonicPassword?: string,
 ): Promise<void> => {
   try {
     assertNotBlockedAddress(publicWalletAddress);
@@ -210,6 +216,8 @@ export const generateUnshieldBaseTokenProof = async (
       broadcasterFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
+      undefined, // originShieldTxidForSpendabilityOverride
+      mnemonicPassword,
     );
 
     const { chain } = NETWORK_CONFIG[networkName];
@@ -255,6 +263,8 @@ export const generateUnshieldBaseTokenProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
+        undefined, // originShieldTxidForSpendabilityOverride
+        mnemonicPassword,
       );
 
     const transaction = await generateUnshieldBaseToken(

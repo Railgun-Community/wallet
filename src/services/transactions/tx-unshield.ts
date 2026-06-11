@@ -144,6 +144,7 @@ export const gasEstimateForUnprovenUnshield = async (
   originalGasDetails: TransactionGasDetails,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
+  mnemonicPassword?: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     const overallBatchMinGasPrice = 0n;
@@ -163,6 +164,8 @@ export const gasEstimateForUnprovenUnshield = async (
           broadcasterFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          undefined, // originShieldTxidForSpendabilityOverride
+          mnemonicPassword,
         ),
       (txs: (TransactionStructV2 | TransactionStructV3)[]) =>
         generateTransact(
@@ -196,6 +199,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
   originalGasDetails: TransactionGasDetails,
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
+  mnemonicPassword?: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
@@ -223,6 +227,8 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           broadcasterFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          undefined, // originShieldTxidForSpendabilityOverride
+          mnemonicPassword,
         ),
       (txs: (TransactionStructV2 | TransactionStructV3)[]) => {
         const relayAdaptParamsRandom = ByteUtils.randomHex(31);
@@ -438,6 +444,7 @@ export const gasEstimateForUnprovenUnshieldToOrigin = async (
   encryptionKey: string,
   erc20AmountRecipients: RailgunERC20AmountRecipient[],
   nftAmountRecipients: RailgunNFTAmountRecipient[],
+  mnemonicPassword?: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     // Use dead address for private transaction gas estimate
@@ -459,6 +466,7 @@ export const gasEstimateForUnprovenUnshieldToOrigin = async (
       true, // sendWithPublicWallet
       overallBatchMinGasPrice,
       originalShieldTxid, // originShieldTxidForSpendabilityOverride
+      mnemonicPassword,
     );
     const transaction = await generateTransact(
       txidVersion,
