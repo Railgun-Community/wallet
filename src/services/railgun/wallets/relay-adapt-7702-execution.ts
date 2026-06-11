@@ -19,6 +19,21 @@ export const getRelayAdapt7702ExecutionTypeForNetwork = (
     : RelayAdapt7702ExecutionType.LegacyPreExecuteNonce;
 };
 
+const isEmptyNonceReadError = (err: unknown): boolean => {
+  if (!(err instanceof Error)) {
+    return false;
+  }
+
+  const maybeCode = (err as { code?: unknown }).code;
+  if (maybeCode === 'BAD_DATA') {
+    return true;
+  }
+
+  return err.message.includes('could not decode result data')
+    && err.message.includes('nonce()')
+    && err.message.includes('0x');
+};
+
 export const getRelayAdapt7702ExecuteNonce = async (
   provider: Provider,
   ephemeralAddress: string,
@@ -28,12 +43,26 @@ export const getRelayAdapt7702ExecuteNonce = async (
     return undefined;
   }
 
+  const code = await provider.getCode(ephemeralAddress);
+  if (code === '0x') {
+    return 0n;
+  }
+
   const nonceContract = new Contract(
     ephemeralAddress,
     ABIRelayAdapt7702,
     provider,
   ) as unknown as RelayAdapt7702;
-  return nonceContract.nonce();
+
+  try {
+    return await nonceContract.nonce();
+  } catch (err) {
+    if (isEmptyNonceReadError(err)) {
+      return 0n;
+    }
+
+    throw err;
+  }
 };
 
 export const getRelayAdapt7702ExecutionDetails = async (
