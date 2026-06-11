@@ -10,6 +10,7 @@ import {
   RelayAdapt7702Helper,
   RelayAdaptVersionedSmartContracts,
   RailgunVersionedSmartContracts,
+  RelayAdapt7702ExecutionType,
   TXIDVersion,
 } from '@railgun-community/engine';
 import {
@@ -266,6 +267,10 @@ describe('tx-cross-contract-calls-7702', () => {
       },
       signature:
         '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+      executionDetails: {
+        executionType: RelayAdapt7702ExecutionType.ExecuteWithNonce,
+        executeNonce: 0n,
+      },
     });
 
     Sinon.stub(Wallets, 'getCurrentEphemeralAddress').resolves(

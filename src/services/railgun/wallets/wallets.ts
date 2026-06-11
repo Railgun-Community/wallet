@@ -13,6 +13,7 @@ import {
   TransactionStructV2,
   TransactionStructV3,
   RelayAdapt7702,
+  RelayAdapt7702ExecutionDetails,
 } from '@railgun-community/engine';
 import {
   RailgunWalletInfo,
@@ -25,6 +26,7 @@ import { onBalancesUpdate, onWalletPOIProofProgress } from './balance-update';
 import { reportAndSanitizeError } from '../../../utils/error';
 import { getEngine } from '../core/engine';
 import { getFallbackProviderForNetwork } from '../core/providers';
+import { getRelayAdapt7702ExecutionDetails } from './relay-adapt-7702-execution';
 
 export const awaitWalletScan = (walletID: string, chain: Chain) => {
   const wallet = walletForID(walletID);
@@ -425,7 +427,11 @@ export const sign7702Request = async (
   chainId: bigint,
   transactions: (TransactionStructV2 | TransactionStructV3)[],
   actionData: RelayAdapt7702.ActionDataStruct,
-): Promise<{ authorization: Authorization; signature: string }> => {
+): Promise<{
+  authorization: Authorization;
+  signature: string;
+  executionDetails: RelayAdapt7702ExecutionDetails;
+}> => {
   const wallet = fullWalletForID(walletID);
   const provider = getFallbackProviderForNetwork(networkName);
   const ephemeralWallet = (await wallet.getCurrentEphemeralWallet(
@@ -433,15 +439,27 @@ export const sign7702Request = async (
     chainId,
   )).connect(provider);
   const nonce = await ephemeralWallet.getNonce('latest');
+  const executionDetails = await getRelayAdapt7702ExecutionDetails(
+    provider,
+    networkName,
+    ephemeralWallet.address,
+  );
 
-  return wallet.sign7702Request(
+  const { authorization, signature } = await wallet.sign7702Request(
     encryptionKey,
     contractAddress,
     chainId,
     transactions,
     actionData,
     nonce,
+    executionDetails,
   );
+
+  return {
+    authorization,
+    signature,
+    executionDetails,
+  };
 };
 
 export const ratchetEphemeralAddress = async (

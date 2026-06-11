@@ -18,6 +18,7 @@ import {
   createPollingJsonRpcProviderForListeners,
 } from '@railgun-community/engine';
 import { FallbackProvider } from 'ethers'
+import { getRelayAdapt7702ExecutionTypeForNetwork } from '../wallets/relay-adapt-7702-execution';
 import {
   fallbackProviderMap,
   pollingProviderMap,
@@ -120,10 +121,13 @@ const loadProviderForNetwork = async (
   };
 
   // load 7702 contracts only if supported.
-  let adapt7702Contract; let railgunRegistry;
+  let adapt7702Contract; let railgunRegistry; let relayAdapt7702ExecutionType;
   if(supports7702){
     adapt7702Contract = isDefined(relayAdapt7702Contract) && relayAdapt7702Contract !== '' ? relayAdapt7702Contract : undefined;
     railgunRegistry = isDefined(railgunRegistryContract) && railgunRegistryContract !== '' ? railgunRegistryContract : undefined;
+    relayAdapt7702ExecutionType = isDefined(adapt7702Contract)
+      ? getRelayAdapt7702ExecutionTypeForNetwork(networkName)
+      : undefined;
   }
 
   // This function will set up the contracts for this chain.
@@ -141,7 +145,8 @@ const loadProviderForNetwork = async (
     poi?.launchBlock,
     supportsV3,
     adapt7702Contract,
-    railgunRegistry
+    railgunRegistry,
+    relayAdapt7702ExecutionType,
   );
 };
 

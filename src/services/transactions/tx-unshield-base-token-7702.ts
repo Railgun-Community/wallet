@@ -10,31 +10,15 @@ import {
   RelayAdapt7702,
   RelayAdapt__factory as RelayAdaptFactory,
   RelayAdapt7702Helper,
-  RelayAdapt7702__factory as RelayAdapt7702Factory,
   TransactionStructV2,
   TransactionStructV3,
 } from '@railgun-community/engine';
 import { ContractTransaction } from 'ethers';
 import { reportAndSanitizeError } from '../../utils/error';
 import { sign7702Request } from '../railgun/wallets/wallets';
-
-const RELAY_ADAPT_7702_EXECUTE_SIGNATURE =
-  'execute((((uint256,uint256),(uint256[2],uint256[2]),(uint256,uint256)),bytes32,bytes32[],bytes32[],(uint16,uint72,uint8,uint64,address,bytes32,(bytes32[4],bytes32,bytes32,bytes,bytes)[]),(bytes32,(uint8,address,uint256),uint120))[],(bool,uint256,(address,bytes,uint256)[]),bytes)';
+import { encodeRelayAdapt7702Execute } from '../railgun/wallets/relay-adapt-7702-execution';
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-
-const encodeRelayAdapt7702Execute = (
-  transactions: TransactionStructV2[],
-  actionData: RelayAdapt7702.ActionDataStruct,
-  signature: string,
-): string => {
-  const iface = RelayAdapt7702Factory.createInterface();
-  return (iface as any).encodeFunctionData(RELAY_ADAPT_7702_EXECUTE_SIGNATURE, [
-    transactions,
-    actionData,
-    signature,
-  ]);
-};
 
 export const createRelayAdapt7702UnshieldBaseTokenERC20AmountRecipients = (
   unshieldERC20Amounts: RailgunERC20Amount[],
@@ -110,7 +94,7 @@ export const createUnshieldBaseTokenTransaction7702 = async (
       throw new Error(`Missing relayAdapt7702Contract for network ${networkName}.`);
     }
 
-    const { authorization, signature } = await sign7702Request(
+    const { authorization, signature, executionDetails } = await sign7702Request(
       railgunWalletID,
       encryptionKey,
       networkName,
@@ -124,6 +108,7 @@ export const createUnshieldBaseTokenTransaction7702 = async (
       transactions as TransactionStructV2[],
       actionData,
       signature,
+      executionDetails,
     );
 
     return {

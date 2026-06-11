@@ -3,29 +3,17 @@ import {
   RelayAdapt7702,
   RelayAdapt__factory as RelayAdaptFactory,
   RelayAdapt7702Helper,
-  RelayAdapt7702__factory as RelayAdapt7702Factory,
   ShieldRequestStruct,
   TransactionStructV2,
 } from '@railgun-community/engine';
 import { Authorization, ContractTransaction } from 'ethers';
 import { reportAndSanitizeError } from '../../utils/error';
 import { EphemeralAccount } from '../railgun/wallets/ephemeral-account';
-
-const RELAY_ADAPT_7702_EXECUTE_SIGNATURE =
-  'execute((((uint256,uint256),(uint256[2],uint256[2]),(uint256,uint256)),bytes32,bytes32[],bytes32[],(uint16,uint72,uint8,uint64,address,bytes32,(bytes32[4],bytes32,bytes32,bytes,bytes)[]),(bytes32,(uint8,address,uint256),uint120))[],(bool,uint256,(address,bytes,uint256)[]),bytes)';
-
-const encodeRelayAdapt7702Execute = (
-  transactions: TransactionStructV2[],
-  actionData: RelayAdapt7702.ActionDataStruct,
-  signature: string,
-): string => {
-  const iface = RelayAdapt7702Factory.createInterface();
-  return (iface as any).encodeFunctionData(RELAY_ADAPT_7702_EXECUTE_SIGNATURE, [
-    transactions,
-    actionData,
-    signature,
-  ]);
-};
+import { getFallbackProviderForNetwork } from '../railgun/core/providers';
+import {
+  encodeRelayAdapt7702Execute,
+  getRelayAdapt7702ExecutionDetails,
+} from '../railgun/wallets/relay-adapt-7702-execution';
 
 export const createShieldBaseTokenActionData7702 = (
   txidVersion: TXIDVersion,
@@ -98,14 +86,26 @@ export const createShieldBaseTokenTransaction7702 = async (
       BigInt(network.chain.id),
       0,
     );
+    const provider = ephemeralAccount.signer.provider ?? getFallbackProviderForNetwork(networkName);
+    const executionDetails = await getRelayAdapt7702ExecutionDetails(
+      provider,
+      networkName,
+      ephemeralAddress,
+    );
     const signature = await RelayAdapt7702Helper.signExecutionAuthorization(
       ephemeralAccount.signer,
       transactions,
       actionData,
       BigInt(network.chain.id),
+      executionDetails,
     );
 
-    const data = encodeRelayAdapt7702Execute(transactions, actionData, signature);
+    const data = encodeRelayAdapt7702Execute(
+      transactions,
+      actionData,
+      signature,
+      executionDetails,
+    );
 
     return {
       to: ephemeralAddress,
