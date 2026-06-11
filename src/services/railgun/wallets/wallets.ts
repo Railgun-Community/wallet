@@ -164,6 +164,7 @@ const loadExistingWallet = async (
 const createWallet = async (
   encryptionKey: string,
   mnemonic: string,
+  mnemonicPassword: string,
   creationBlockNumbers: Optional<MapType<number>>,
   railgunWalletDerivationIndex?: number,
 ): Promise<RailgunWalletInfo> => {
@@ -171,12 +172,20 @@ const createWallet = async (
     formatCreationBlockNumbers(creationBlockNumbers);
 
   const engine = getEngine();
-  const wallet = await engine.createWalletFromMnemonic(
-    encryptionKey,
-    mnemonic,
-    railgunWalletDerivationIndex ?? 0,
-    formattedCreationBlockNumbers,
-  );
+  const wallet = mnemonicPassword === ''
+    ? await engine.createWalletFromMnemonic(
+      encryptionKey,
+      mnemonic,
+      railgunWalletDerivationIndex ?? 0,
+      formattedCreationBlockNumbers,
+    )
+    : await engine.createWalletFromMnemonicWithPassword(
+      encryptionKey,
+      mnemonic,
+      mnemonicPassword,
+      railgunWalletDerivationIndex ?? 0,
+      formattedCreationBlockNumbers,
+    );
   subscribeToEvents(wallet);
   return infoForWallet(wallet);
 };
@@ -209,11 +218,32 @@ export const createRailgunWallet = async (
     return await createWallet(
       encryptionKey,
       mnemonic,
+      '', // mnemonicPassword
       creationBlockNumbers,
       railgunWalletDerivationIndex,
     );
   } catch (err) {
     throw reportAndSanitizeError(createRailgunWallet.name, err);
+  }
+};
+
+export const createRailgunWalletFromMnemonicWithPassword = async (
+  encryptionKey: string,
+  mnemonic: string,
+  mnemonicPassword: string,
+  creationBlockNumbers: Optional<MapType<number>>,
+  railgunWalletDerivationIndex?: number,
+): Promise<RailgunWalletInfo> => {
+  try {
+    return await createWallet(
+      encryptionKey,
+      mnemonic,
+      mnemonicPassword,
+      creationBlockNumbers,
+      railgunWalletDerivationIndex,
+    );
+  } catch (err) {
+    throw reportAndSanitizeError(createRailgunWalletFromMnemonicWithPassword.name, err);
   }
 };
 

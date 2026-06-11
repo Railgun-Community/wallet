@@ -64,6 +64,7 @@ export const generateProofTransactions = async (
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
   originShieldTxidForSpendabilityOverride?: string,
+  mnemonicPassword?: string,
 ): Promise<{
   provedTransactions: (TransactionStructV2 | TransactionStructV3)[];
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
@@ -87,6 +88,7 @@ export const generateProofTransactions = async (
     overallBatchMinGasPrice,
     progressCallback,
     originShieldTxidForSpendabilityOverride,
+    mnemonicPassword,
   );
   return txs;
 };
@@ -121,6 +123,7 @@ export const generateDummyProofTransactions = async (
   sendWithPublicWallet: boolean,
   overallBatchMinGasPrice: Optional<bigint>,
   originShieldTxidForSpendabilityOverride?: string,
+  mnemonicPassword?: string,
 ): Promise<(TransactionStructV2 | TransactionStructV3)[]> => {
   if (!broadcasterFeeERC20Amount && !sendWithPublicWallet) {
     throw new Error('Must send with broadcaster or public wallet.');
@@ -157,6 +160,7 @@ export const generateDummyProofTransactions = async (
       overallBatchMinGasPrice,
       () => {}, // progressCallback (not necessary for dummy txs)
       originShieldTxidForSpendabilityOverride,
+      mnemonicPassword,
     )
   ).provedTransactions;
 };
@@ -233,6 +237,7 @@ const transactionsFromERC20Amounts = async (
   overallBatchMinGasPrice: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
   originShieldTxidForSpendabilityOverride?: string,
+  mnemonicPassword?: string,
 ): Promise<{
   provedTransactions: (TransactionStructV2 | TransactionStructV3)[];
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
@@ -311,6 +316,7 @@ const transactionsFromERC20Amounts = async (
     progressCallback,
     shouldGeneratePreTransactionPOIs,
     originShieldTxidForSpendabilityOverride,
+    mnemonicPassword,
   );
   return txBatches;
 };
@@ -475,6 +481,7 @@ const generateAllProofs = async (
   progressCallback: GenerateTransactionsProgressCallback,
   shouldGeneratePreTransactionPOIs: boolean,
   originShieldTxidForSpendabilityOverride?: string,
+  mnemonicPassword?: string,
 ): Promise<{
   provedTransactions: (TransactionStructV2 | TransactionStructV3)[];
   preTransactionPOIsPerTxidLeafPerList: PreTransactionPOIsPerTxidLeafPerList;
@@ -488,6 +495,7 @@ const generateAllProofs = async (
         txidVersion,
         encryptionKey,
         originShieldTxidForSpendabilityOverride,
+        mnemonicPassword,
       ),
       preTransactionPOIsPerTxidLeafPerList: {},
     };
@@ -500,5 +508,6 @@ const generateAllProofs = async (
     progressCallback,
     shouldGeneratePreTransactionPOIs,
     originShieldTxidForSpendabilityOverride,
+    mnemonicPassword,
   );
 };

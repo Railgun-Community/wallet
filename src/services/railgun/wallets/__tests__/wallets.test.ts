@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { getEngine } from '../../core/engine';
 import {
   createRailgunWallet,
+  createRailgunWalletFromMnemonicWithPassword,
   createViewOnlyRailgunWallet,
   fullWalletForID,
   getRailgunAddress,
@@ -98,6 +99,27 @@ describe('wallets', () => {
     );
     expect(loadWalletInfo.railgunAddress).to.be.a('string');
     expect(loadWalletInfo.id).to.equal(wallet.id);
+  });
+
+  it('Should create and load wallet from mnemonic with password', async () => {
+    const railgunWalletInfo = await createRailgunWalletFromMnemonicWithPassword(
+      MOCK_DB_ENCRYPTION_KEY,
+      MOCK_MNEMONIC_2,
+      'test mnemonic password',
+      undefined, // creationBlockNumbers
+    );
+
+    expect(railgunWalletInfo.railgunAddress).to.be.a('string');
+    expect(railgunWalletInfo.id).to.not.equal(wallet.id);
+
+    unloadWalletByID(railgunWalletInfo.id);
+    const loadWalletInfo = await loadWalletByID(
+      MOCK_DB_ENCRYPTION_KEY,
+      railgunWalletInfo.id,
+      false, // isViewOnlyWallet
+    );
+    expect(loadWalletInfo.id).to.equal(railgunWalletInfo.id);
+    expect(loadWalletInfo.railgunAddress).to.equal(railgunWalletInfo.railgunAddress);
   });
 
   it('Should load wallet from db after Engine wallet unload', async () => {

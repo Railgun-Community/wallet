@@ -200,6 +200,7 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
   feeTokenDetails: Optional<FeeTokenDetails>,
   sendWithPublicWallet: boolean,
   minGasLimit: Optional<bigint>,
+  mnemonicPassword?: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -251,6 +252,8 @@ export const gasEstimateForUnprovenCrossContractCalls = async (
           broadcasterFeeERC20Amount,
           sendWithPublicWallet,
           overallBatchMinGasPrice,
+          undefined, // originShieldTxidForSpendabilityOverride
+          mnemonicPassword,
         ),
       async (txs: (TransactionStructV2 | TransactionStructV3)[]) => {
         const relayAdaptParamsRandom = ByteUtils.randomHex(31);
@@ -315,6 +318,7 @@ export const generateCrossContractCallsProof = async (
   overallBatchMinGasPrice: Optional<bigint>,
   minGasLimit: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
+  mnemonicPassword?: string,
 ): Promise<void> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -349,6 +353,8 @@ export const generateCrossContractCallsProof = async (
       broadcasterFeeERC20AmountRecipient,
       sendWithPublicWallet,
       overallBatchMinGasPrice,
+      undefined, // originShieldTxidForSpendabilityOverride
+      mnemonicPassword,
     );
 
     // Generate relay adapt params from dummy transactions.
@@ -408,6 +414,8 @@ export const generateCrossContractCallsProof = async (
         false, // useDummyProof
         overallBatchMinGasPrice,
         progressCallback,
+        undefined, // originShieldTxidForSpendabilityOverride
+        mnemonicPassword,
       );
 
     const nullifiers = nullifiersForTransactions(provedTransactions);
