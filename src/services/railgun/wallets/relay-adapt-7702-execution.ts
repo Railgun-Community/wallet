@@ -1,7 +1,7 @@
 import { Network, NetworkName, NETWORK_CONFIG } from '@railgun-community/shared-models';
 import {
   ABIRelayAdapt7702,
-  ABIRelayAdapt7702_Legacy_PreExecuteNonce,
+  ABIRelayAdapt7702_Legacy_PreExecuteNonce as abiRelayAdapt7702LegacyPreExecuteNonce,
   RelayAdapt7702,
   RelayAdapt7702ExecutionDetails,
   RelayAdapt7702ExecutionType,
@@ -90,7 +90,7 @@ export const encodeRelayAdapt7702Execute = (
   executionDetails: RelayAdapt7702ExecutionDetails,
 ): string => {
   const abi = executionDetails.executionType === RelayAdapt7702ExecutionType.LegacyPreExecuteNonce
-    ? ABIRelayAdapt7702_Legacy_PreExecuteNonce
+    ? abiRelayAdapt7702LegacyPreExecuteNonce
     : ABIRelayAdapt7702;
   const iface = new Interface(abi);
   return RelayAdapt7702Helper.encodeExecute(

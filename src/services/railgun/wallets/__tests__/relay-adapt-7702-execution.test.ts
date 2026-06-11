@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { Interface, Provider } from 'ethers';
 import {
   ABIRelayAdapt7702,
-  ABIRelayAdapt7702_Legacy_PreExecuteNonce,
+  ABIRelayAdapt7702_Legacy_PreExecuteNonce as abiRelayAdapt7702LegacyPreExecuteNonce,
   RelayAdapt7702,
   RelayAdapt7702ExecutionType,
 } from '@railgun-community/engine';
@@ -133,7 +133,7 @@ describe('relay-adapt-7702-execution', () => {
     const data = encodeRelayAdapt7702Execute([], actionData, signature, {
       executionType: RelayAdapt7702ExecutionType.LegacyPreExecuteNonce,
     });
-    const parsed = new Interface(ABIRelayAdapt7702_Legacy_PreExecuteNonce).parseTransaction({ data });
+    const parsed = new Interface(abiRelayAdapt7702LegacyPreExecuteNonce).parseTransaction({ data });
 
     expect(parsed?.name).to.equal('execute');
     expect(parsed?.args[2]).to.equal(signature);
