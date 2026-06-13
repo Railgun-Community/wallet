@@ -395,6 +395,8 @@ describe('tx-cross-contract-calls-7702', () => {
 
     expect(response.gasEstimate).to.be.a('bigint');
     expect(response.gasEstimate >= MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2).to.be.true;
+    const signActionData = signEIP7702AuthorizationStub.firstCall.args[6];
+    expect(signActionData.requireSuccess).to.equal(false);
   }).timeout(10_000);
 
   it('Should get gas estimates for valid cross contract calls, public wallet', async () => {
@@ -419,6 +421,8 @@ describe('tx-cross-contract-calls-7702', () => {
     expect(response.broadcasterFeeCommitment).to.be.undefined;
     expect(response.gasEstimate).to.be.a('bigint');
     expect(response.gasEstimate >= MINIMUM_RELAY_ADAPT_CROSS_CONTRACT_CALLS_GAS_LIMIT_V2).to.be.true;
+    const signActionData = signEIP7702AuthorizationStub.firstCall.args[6];
+    expect(signActionData.requireSuccess).to.equal(false);
     expect(addUnshieldDataSpy.called).to.be.true;
     expect(addUnshieldDataSpy.args).to.deep.equal([
       [
@@ -591,6 +595,8 @@ describe('tx-cross-contract-calls-7702', () => {
       ], // actual proof - nft 1
     ]);
 
+    const signActionData = signEIP7702AuthorizationStub.firstCall.args[6];
+    expect(signActionData.requireSuccess).to.equal(false);
 
     const populateResponse = await populateProvedCrossContractCalls(
       txidVersion,

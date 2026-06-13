@@ -213,7 +213,7 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
           validCrossContractCalls,
           relayShieldRequests,
           ephemeralAddress,
-          true, // requireSuccess
+          false, // requireSuccess
           minimumGasLimit,
         );
 
@@ -369,7 +369,7 @@ export const generateCrossContractCallsProof7702 = async (
       validCrossContractCalls,
       relayShieldRequests,
       ephemeralAddress,
-      true, // requireSuccess
+      false, // requireSuccess
       minimumGasLimit,
     );
 
