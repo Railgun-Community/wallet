@@ -102,6 +102,31 @@ describe('wallets', () => {
   });
 
   it('Should create and load wallet from mnemonic with password', async () => {
+    const mnemonicPassword = 'test mnemonic password';
+    const railgunWalletInfo = await createRailgunWalletFromMnemonicWithPassword(
+      MOCK_DB_ENCRYPTION_KEY,
+      MOCK_MNEMONIC_2,
+      mnemonicPassword,
+      undefined, // creationBlockNumbers
+    );
+
+    expect(railgunWalletInfo.railgunAddress).to.be.a('string');
+    expect(railgunWalletInfo.id).to.not.equal(wallet.id);
+
+    // The mnemonic password is never persisted, so it must be supplied again on
+    // load to reproduce the wallet ID.
+    unloadWalletByID(railgunWalletInfo.id);
+    const loadWalletInfo = await loadWalletByID(
+      MOCK_DB_ENCRYPTION_KEY,
+      railgunWalletInfo.id,
+      false, // isViewOnlyWallet
+      mnemonicPassword,
+    );
+    expect(loadWalletInfo.id).to.equal(railgunWalletInfo.id);
+    expect(loadWalletInfo.railgunAddress).to.equal(railgunWalletInfo.railgunAddress);
+  });
+
+  it('Should fail to load a mnemonic-password wallet without the password', async () => {
     const railgunWalletInfo = await createRailgunWalletFromMnemonicWithPassword(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
@@ -109,17 +134,25 @@ describe('wallets', () => {
       undefined, // creationBlockNumbers
     );
 
-    expect(railgunWalletInfo.railgunAddress).to.be.a('string');
-    expect(railgunWalletInfo.id).to.not.equal(wallet.id);
-
+    // Missing password and wrong password must both be rejected — the engine
+    // verifies the supplied password reproduces the wallet ID.
     unloadWalletByID(railgunWalletInfo.id);
-    const loadWalletInfo = await loadWalletByID(
-      MOCK_DB_ENCRYPTION_KEY,
-      railgunWalletInfo.id,
-      false, // isViewOnlyWallet
-    );
-    expect(loadWalletInfo.id).to.equal(railgunWalletInfo.id);
-    expect(loadWalletInfo.railgunAddress).to.equal(railgunWalletInfo.railgunAddress);
+    await expect(
+      loadWalletByID(
+        MOCK_DB_ENCRYPTION_KEY,
+        railgunWalletInfo.id,
+        false, // isViewOnlyWallet
+      ),
+    ).rejectedWith('Could not load RAILGUN wallet');
+
+    await expect(
+      loadWalletByID(
+        MOCK_DB_ENCRYPTION_KEY,
+        railgunWalletInfo.id,
+        false, // isViewOnlyWallet
+        'wrong password',
+      ),
+    ).rejectedWith('Could not load RAILGUN wallet');
   });
 
   it('Should load wallet from db after Engine wallet unload', async () => {
