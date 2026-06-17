@@ -21,4 +21,25 @@ describe('ethers-util', () => {
       '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d',
     );
   });
+
+  it('Should derive a distinct pkey when a mnemonic password is supplied', () => {
+    const mnemonic =
+      'test test test test test test test test test test test junk';
+
+    // Omitting the password reproduces the legacy (no-password) key.
+    const noPassword = mnemonicTo0xPKey(mnemonic);
+    expect(noPassword).to.equal(
+      '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+    );
+    expect(mnemonicTo0xPKey(mnemonic, undefined, '')).to.equal(noPassword);
+
+    // A password derives a different key from the same mnemonic/index.
+    const withPassword = mnemonicTo0xPKey(
+      mnemonic,
+      undefined,
+      'test mnemonic password',
+    );
+    expect(withPassword).to.be.a('string').with.lengthOf(66);
+    expect(withPassword).to.not.equal(noPassword);
+  });
 });
