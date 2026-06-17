@@ -3,7 +3,6 @@ import chaiAsPromised from 'chai-as-promised';
 import { getEngine } from '../../core/engine';
 import {
   createRailgunWallet,
-  createRailgunWalletFromMnemonicWithPassword,
   createViewOnlyRailgunWallet,
   fullWalletForID,
   getRailgunAddress,
@@ -103,11 +102,12 @@ describe('wallets', () => {
 
   it('Should create and load wallet from mnemonic with password', async () => {
     const mnemonicPassword = 'test mnemonic password';
-    const railgunWalletInfo = await createRailgunWalletFromMnemonicWithPassword(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
-      mnemonicPassword,
       undefined, // creationBlockNumbers
+      undefined, // railgunWalletDerivationIndex
+      mnemonicPassword,
     );
 
     expect(railgunWalletInfo.railgunAddress).to.be.a('string');
@@ -127,11 +127,12 @@ describe('wallets', () => {
   });
 
   it('Should fail to load a mnemonic-password wallet without the password', async () => {
-    const railgunWalletInfo = await createRailgunWalletFromMnemonicWithPassword(
+    const railgunWalletInfo = await createRailgunWallet(
       MOCK_DB_ENCRYPTION_KEY,
       MOCK_MNEMONIC_2,
-      'test mnemonic password',
       undefined, // creationBlockNumbers
+      undefined, // railgunWalletDerivationIndex
+      'test mnemonic password',
     );
 
     // Missing password and wrong password must both be rejected — the engine

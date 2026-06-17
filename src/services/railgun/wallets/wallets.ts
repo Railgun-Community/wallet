@@ -221,37 +221,21 @@ export const createRailgunWallet = async (
   mnemonic: string,
   creationBlockNumbers: Optional<MapType<number>>,
   railgunWalletDerivationIndex?: number,
+  // Optional BIP39 mnemonic password (second factor). When omitted/empty the
+  // wallet is created without one, preserving the legacy wallet ID. It is never
+  // persisted and must be supplied again on load (loadWalletByID) and on spend.
+  mnemonicPassword?: string,
 ): Promise<RailgunWalletInfo> => {
   try {
     return await createWallet(
       encryptionKey,
       mnemonic,
-      '', // mnemonicPassword
+      mnemonicPassword ?? '',
       creationBlockNumbers,
       railgunWalletDerivationIndex,
     );
   } catch (err) {
     throw reportAndSanitizeError(createRailgunWallet.name, err);
-  }
-};
-
-export const createRailgunWalletFromMnemonicWithPassword = async (
-  encryptionKey: string,
-  mnemonic: string,
-  mnemonicPassword: string,
-  creationBlockNumbers: Optional<MapType<number>>,
-  railgunWalletDerivationIndex?: number,
-): Promise<RailgunWalletInfo> => {
-  try {
-    return await createWallet(
-      encryptionKey,
-      mnemonic,
-      mnemonicPassword,
-      creationBlockNumbers,
-      railgunWalletDerivationIndex,
-    );
-  } catch (err) {
-    throw reportAndSanitizeError(createRailgunWalletFromMnemonicWithPassword.name, err);
   }
 };
 
