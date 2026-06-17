@@ -140,6 +140,7 @@ const loadExistingWallet = async (
   encryptionKey: string,
   railgunWalletID: string,
   isViewOnlyWallet: boolean,
+  mnemonicPassword?: string,
 ): Promise<RailgunWalletInfo> => {
   const existingWallet = getExistingWallet(railgunWalletID);
   if (existingWallet) {
@@ -154,7 +155,14 @@ const loadExistingWallet = async (
       railgunWalletID,
     );
   } else {
-    wallet = await engine.loadExistingWallet(encryptionKey, railgunWalletID);
+    // The BIP39 mnemonic password is never persisted, so it must be supplied
+    // again on load for password-protected wallets. The engine verifies it
+    // reproduces the wallet ID and throws on a wrong/missing password.
+    wallet = await engine.loadExistingWallet(
+      encryptionKey,
+      railgunWalletID,
+      mnemonicPassword,
+    );
   }
 
   subscribeToEvents(wallet);
@@ -267,12 +275,14 @@ export const loadWalletByID = async (
   encryptionKey: string,
   railgunWalletID: string,
   isViewOnlyWallet: boolean,
+  mnemonicPassword?: string,
 ): Promise<RailgunWalletInfo> => {
   try {
     return await loadExistingWallet(
       encryptionKey,
       railgunWalletID,
       isViewOnlyWallet,
+      mnemonicPassword,
     );
   } catch (err) {
     const sanitizedError = reportAndSanitizeError(loadWalletByID.name, err);
