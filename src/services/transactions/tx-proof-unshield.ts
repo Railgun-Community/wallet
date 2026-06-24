@@ -202,6 +202,7 @@ export const generateUnshieldBaseTokenProof = async (
       railgunWalletID,
       encryptionKey,
       networkName,
+      mnemonicPassword,
     );
 
     const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
@@ -279,6 +280,7 @@ export const generateUnshieldBaseTokenProof = async (
       provedTransactions,
       actionData,
       ephemeralAddress,
+      mnemonicPassword,
     );
 
     const nullifiers = nullifiersForTransactions(provedTransactions);

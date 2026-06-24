@@ -82,6 +82,7 @@ export const createUnshieldBaseTokenTransaction7702 = async (
   transactions: (TransactionStructV2 | TransactionStructV3)[],
   actionData: RelayAdapt7702.ActionDataStruct,
   ephemeralAddress: string,
+  mnemonicPassword?: string,
 ): Promise<ContractTransaction> => {
   try {
     if (txidVersion !== TXIDVersion.V2_PoseidonMerkle) {
@@ -102,6 +103,7 @@ export const createUnshieldBaseTokenTransaction7702 = async (
       BigInt(network.chain.id),
       transactions as TransactionStructV2[],
       actionData,
+      mnemonicPassword,
     );
 
     const data = encodeRelayAdapt7702Execute(

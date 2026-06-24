@@ -215,6 +215,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
       railgunWalletID,
       encryptionKey,
       networkName,
+      mnemonicPassword,
     );
 
     const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
@@ -262,6 +263,7 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
             txs,
             actionData,
             ephemeralAddress,
+            mnemonicPassword,
           ),
         );
       },
