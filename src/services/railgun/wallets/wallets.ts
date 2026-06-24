@@ -427,6 +427,7 @@ export const sign7702Request = async (
   chainId: bigint,
   transactions: (TransactionStructV2 | TransactionStructV3)[],
   actionData: RelayAdapt7702.ActionDataStruct,
+  mnemonicPassword?: string,
 ): Promise<{
   authorization: Authorization;
   signature: string;
@@ -437,6 +438,7 @@ export const sign7702Request = async (
   const ephemeralWallet = (await wallet.getCurrentEphemeralWallet(
     encryptionKey,
     chainId,
+    mnemonicPassword,
   )).connect(provider);
   const nonce = await ephemeralWallet.getNonce('latest');
   const executionDetails = await getRelayAdapt7702ExecutionDetails(
@@ -453,6 +455,7 @@ export const sign7702Request = async (
     actionData,
     nonce,
     executionDetails,
+    mnemonicPassword,
   );
 
   return {
@@ -475,8 +478,14 @@ export const getCurrentEphemeralAddress = async (
   walletID: string,
   encryptionKey: string,
   networkName: NetworkName,
+  mnemonicPassword?: string,
 ): Promise<string> => {
-  const wallet = await getCurrentEphemeralWallet(walletID, encryptionKey, networkName);
+  const wallet = await getCurrentEphemeralWallet(
+    walletID,
+    encryptionKey,
+    networkName,
+    mnemonicPassword,
+  );
   return wallet.address;
 };
 
@@ -484,8 +493,9 @@ export const getCurrentEphemeralWallet = async (
   walletID: string,
   encryptionKey: string,
   networkName: NetworkName,
+  mnemonicPassword?: string,
 ) => {
   const wallet = fullWalletForID(walletID);
   const chainId = BigInt(NETWORK_CONFIG[networkName].chain.id);
-  return wallet.getCurrentEphemeralWallet(encryptionKey, chainId);
+  return wallet.getCurrentEphemeralWallet(encryptionKey, chainId, mnemonicPassword);
 };

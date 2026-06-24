@@ -6,10 +6,12 @@ import { EphemeralAccount } from './ephemeral-account';
 export class EphemeralKeyManager {
   private railgunWallet: RailgunWallet;
   private encryptionKey: string;
+  private mnemonicPassword?: string;
 
-  constructor(railgunWallet: RailgunWallet, encryptionKey: string) {
+  constructor(railgunWallet: RailgunWallet, encryptionKey: string, mnemonicPassword?: string) {
     this.railgunWallet = railgunWallet;
     this.encryptionKey = encryptionKey;
+    this.mnemonicPassword = mnemonicPassword;
   }
 
   async getAccount(chainId: bigint, index: number): Promise<EphemeralAccount> {
@@ -17,6 +19,7 @@ export class EphemeralKeyManager {
       this.encryptionKey,
       chainId,
       index,
+      this.mnemonicPassword,
     );
     return new EphemeralAccount(wallet);
   }
@@ -27,9 +30,9 @@ export class EphemeralKeyManager {
   }
 
   async getNextAccount(chainId: bigint): Promise<EphemeralAccount> {
-    const currentIndex = await this.railgunWallet.getEphemeralKeyIndex(chainId);
-    const nextIndex = currentIndex + 1;
-    await this.railgunWallet.setEphemeralKeyIndex(chainId, nextIndex);
+    // Use the engine's atomic, per-chain-serialized ratchet so concurrent callers can't
+    // reuse the same ephemeral key/nonce.
+    const nextIndex = await this.railgunWallet.incrementEphemeralKeyIndex(chainId);
     return this.getAccount(chainId, nextIndex);
   }
 
@@ -70,13 +73,8 @@ export class EphemeralKeyManager {
       currentIndex += 1;
     }
 
+    // Raise the stored index atomically so a concurrent ratchet cannot be clobbered.
     const nextIndex = maxUsedIndex + 1;
-    const storedIndex = await this.railgunWallet.getEphemeralKeyIndex(chainId);
-
-    if (nextIndex > storedIndex) {
-      await this.railgunWallet.setEphemeralKeyIndex(chainId, nextIndex);
-    }
-
-    return nextIndex;
+    return this.railgunWallet.setEphemeralKeyIndexIfGreater(chainId, nextIndex);
   }
 }

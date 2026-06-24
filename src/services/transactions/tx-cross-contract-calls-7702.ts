@@ -169,6 +169,7 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
       railgunWalletID,
       encryptionKey,
       networkName,
+      mnemonicPassword,
     );
 
     const relayAdaptUnshieldERC20AmountRecipients =
@@ -231,6 +232,7 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
           BigInt(chainId),
           transactions,
           actionData,
+          mnemonicPassword,
         );
 
         const data = encodeRelayAdapt7702Execute(
@@ -327,6 +329,7 @@ export const generateCrossContractCallsProof7702 = async (
       railgunWalletID,
       encryptionKey,
       networkName,
+      mnemonicPassword,
     );
 
     const relayAdaptUnshieldERC20AmountRecipients =
@@ -422,6 +425,7 @@ export const generateCrossContractCallsProof7702 = async (
       BigInt(chainId),
       transactions,
       actionData,
+      mnemonicPassword,
     );
 
     // Construct the transaction data
