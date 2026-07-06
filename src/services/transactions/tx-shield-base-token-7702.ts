@@ -80,13 +80,19 @@ export const createShieldBaseTokenTransaction7702 = async (
     );
 
     const transactions: TransactionStructV2[] = [];
+    const provider = ephemeralAccount.signer.provider ?? getFallbackProviderForNetwork(networkName);
+    // The EIP-7702 authorization nonce must equal the ephemeral EOA's current account nonce
+    // (it increments each time an authorization for this account is applied). A literal 0 is
+    // correct only for a never-delegated account; a reused ephemeral account has a non-zero
+    // nonce, so 0 would be stale and the authorization silently skipped on-chain. Read it live,
+    // matching the cross-contract and unshield paths (getNonce('latest')).
+    const authorizationNonce = await provider.getTransactionCount(ephemeralAddress, 'latest');
     const authorization: Authorization = await RelayAdapt7702Helper.signEIP7702Authorization(
       ephemeralAccount.signer,
       relayAdapt7702Contract,
       BigInt(network.chain.id),
-      0,
+      authorizationNonce,
     );
-    const provider = ephemeralAccount.signer.provider ?? getFallbackProviderForNetwork(networkName);
     const executionDetails = await getRelayAdapt7702ExecutionDetails(
       provider,
       networkName,
