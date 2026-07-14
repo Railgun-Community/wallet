@@ -435,16 +435,22 @@ export const sign7702Request = async (
 }> => {
   const wallet = fullWalletForID(walletID);
   const provider = getFallbackProviderForNetwork(networkName);
-  const ephemeralWallet = (await wallet.getCurrentEphemeralWallet(
+  // Single-source every ephemeral facet on the signer that will actually produce the
+  // authorization below. getCurrentEphemeralAddress resolves the signer's address (honoring the
+  // same override/provider precedence as sign7702Request), so the authorization nonce and the
+  // execute nonce are read from the authorization authority itself. Reading them from
+  // getCurrentEphemeralWallet instead desyncs when a custom signer provider is set (authority
+  // != nonce-source), which silently invalidates the on-chain authorization.
+  const ephemeralAddress = await wallet.getCurrentEphemeralAddress(
     encryptionKey,
     chainId,
     mnemonicPassword,
-  )).connect(provider);
-  const nonce = await ephemeralWallet.getNonce('latest');
+  );
+  const nonce = await provider.getTransactionCount(ephemeralAddress, 'latest');
   const executionDetails = await getRelayAdapt7702ExecutionDetails(
     provider,
     networkName,
-    ephemeralWallet.address,
+    ephemeralAddress,
   );
 
   const { authorization, signature } = await wallet.sign7702Request(
@@ -480,13 +486,13 @@ export const getCurrentEphemeralAddress = async (
   networkName: NetworkName,
   mnemonicPassword?: string,
 ): Promise<string> => {
-  const wallet = await getCurrentEphemeralWallet(
-    walletID,
-    encryptionKey,
-    networkName,
-    mnemonicPassword,
-  );
-  return wallet.address;
+  // Resolve the address of the signer that produces the EIP-7702 authorization (engine
+  // getCurrentEphemeralAddress -> getCurrentEphemeralSigner), NOT getCurrentEphemeralWallet.
+  // The two diverge when a custom signer provider is set; `to`/recipients must equal the
+  // authorization authority, so both are single-sourced on the signer here.
+  const wallet = fullWalletForID(walletID);
+  const chainId = BigInt(NETWORK_CONFIG[networkName].chain.id);
+  return wallet.getCurrentEphemeralAddress(encryptionKey, chainId, mnemonicPassword);
 };
 
 export const getCurrentEphemeralWallet = async (
