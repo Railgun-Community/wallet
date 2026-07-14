@@ -1,6 +1,7 @@
 export * from './proof-cache';
 export * from './tx-cross-contract-calls';
 export * from './tx-shield-base-token';
+export * from './tx-shield-base-token-7702';
 export * from './tx-shield';
 export * from './tx-notes';
 export * from './tx-gas-details';
@@ -11,3 +12,5 @@ export * from './tx-proof-unshield';
 export * from './tx-nullifiers';
 export * from './tx-transfer';
 export * from './tx-unshield';
+export * from './tx-cross-contract-calls-7702';
+export * from './tx-unshield-base-token-7702';

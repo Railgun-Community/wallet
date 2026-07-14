@@ -18,6 +18,7 @@ import {
   createPollingJsonRpcProviderForListeners,
 } from '@railgun-community/engine';
 import { FallbackProvider } from 'ethers'
+import { getRelayAdapt7702ExecutionTypeForNetwork } from '../wallets/relay-adapt-7702-execution';
 import {
   fallbackProviderMap,
   pollingProviderMap,
@@ -93,6 +94,9 @@ const loadProviderForNetwork = async (
     publicName,
     poi,
     supportsV3,
+    supports7702,
+    relayAdapt7702Contract,
+    railgunRegistryContract
   } = network;
   if (!proxyContract) {
     throw new Error(`Could not find Proxy contract for network: ${publicName}`);
@@ -116,6 +120,16 @@ const loadProviderForNetwork = async (
       deploymentBlockPoseidonMerkleAccumulatorV3 ?? 0,
   };
 
+  // load 7702 contracts only if supported.
+  let adapt7702Contract; let railgunRegistry; let relayAdapt7702ExecutionType;
+  if(supports7702){
+    adapt7702Contract = isDefined(relayAdapt7702Contract) && relayAdapt7702Contract !== '' ? relayAdapt7702Contract : undefined;
+    railgunRegistry = isDefined(railgunRegistryContract) && railgunRegistryContract !== '' ? railgunRegistryContract : undefined;
+    relayAdapt7702ExecutionType = isDefined(adapt7702Contract)
+      ? getRelayAdapt7702ExecutionTypeForNetwork(networkName)
+      : undefined;
+  }
+
   // This function will set up the contracts for this chain.
   // Throws if provider does not respond.
   await engine.loadNetwork(
@@ -130,6 +144,9 @@ const loadProviderForNetwork = async (
     deploymentBlocks,
     poi?.launchBlock,
     supportsV3,
+    adapt7702Contract,
+    railgunRegistry,
+    relayAdapt7702ExecutionType,
   );
 };
 
@@ -140,7 +157,7 @@ const loadProviderForNetwork = async (
 export const loadProvider = async (
   fallbackProviderJsonConfig: FallbackProviderJsonConfig,
   networkName: NetworkName,
-  pollingInterval = 15000,
+  pollingInterval = 60000,
 ): Promise<LoadProviderResponse> => {
   try {
     delete fallbackProviderMap[networkName];

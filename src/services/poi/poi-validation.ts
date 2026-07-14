@@ -26,6 +26,7 @@ export class POIValidator {
     transactionRequest: ContractTransaction,
     useRelayAdapt: boolean,
     pois: PreTransactionPOIsPerTxidLeafPerList,
+    useRelayAdapt7702 = false,
   ): Promise<{
     isValid: boolean;
     error?: string;
@@ -41,6 +42,7 @@ export class POIValidator {
       contractAddress = RailgunVersionedSmartContracts.getRelayAdaptContract(
         txidVersion,
         chain,
+        useRelayAdapt7702,
       ).address;
     } else {
       contractAddress = RailgunVersionedSmartContracts.getVerifier(
@@ -57,6 +59,7 @@ export class POIValidator {
       transactionRequest,
       useRelayAdapt,
       pois,
+      useRelayAdapt7702,
     );
   }
 

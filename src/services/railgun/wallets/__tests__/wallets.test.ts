@@ -5,6 +5,7 @@ import {
   createRailgunWallet,
   createViewOnlyRailgunWallet,
   fullWalletForID,
+  getCurrentEphemeralAddress,
   getRailgunAddress,
   getWalletMnemonic,
   getWalletShareableViewingKey,
@@ -13,6 +14,7 @@ import {
   validateRailgunAddress,
   viewOnlyWalletForID,
 } from '../wallets';
+import { HDNodeWallet } from 'ethers';
 import {
   MOCK_DB_ENCRYPTION_KEY,
   MOCK_MNEMONIC_2,
@@ -179,6 +181,29 @@ describe('wallets', () => {
         false, // isViewOnlyWallet
       ),
     ).rejectedWith('Could not load RAILGUN wallet');
+  });
+
+  it('Should resolve the current ephemeral address to a pinned override (7702 authority == to)', async () => {
+    // Level 2 single-sources `to`/recipients on the signer's address. With an override pinned,
+    // getCurrentEphemeralAddress must return the override address (the EIP-7702 authorization
+    // authority), not a separately-derived HD wallet — otherwise `to` != authority and the
+    // sponsored execute no-ops on-chain.
+    // Resolve the live wallet instance — an earlier spec unloads/reloads wallet.id, replacing
+    // the engine's instance, so mutate the one getCurrentEphemeralAddress will actually resolve.
+    const liveWallet = fullWalletForID(wallet.id);
+    const override = HDNodeWallet.createRandom();
+    await liveWallet.setCurrentEphemeralWallet(override);
+    try {
+      const address = await getCurrentEphemeralAddress(
+        wallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        NetworkName.Ethereum,
+      );
+      expect(address).to.equal(override.address);
+    } finally {
+      // Shared fixture — clear the override so it cannot leak into other specs.
+      liveWallet.ephemeralWalletOverride = undefined;
+    }
   });
 
   it('Should validate RAILGUN addresses', async () => {

@@ -29,11 +29,10 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 
-const stubGasEstimateSuccess = () => {
-  gasEstimateStub = Sinon.stub(
-    FallbackProvider.prototype,
-    'estimateGas',
-  ).resolves(BigInt('200'));
+const stubGasEstimateSuccess = (fallbackProvider: any) => {
+  gasEstimateStub = Sinon.stub(fallbackProvider, 'estimateGas').resolves(
+    BigInt('200'),
+  );
 };
 
 describe('tx-gas', () => {
@@ -77,10 +76,10 @@ describe('tx-gas', () => {
   }).timeout(6000);
 
   it('Should pull gas estimate for basic transaction - self-signed', async () => {
-    stubGasEstimateSuccess();
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
+    stubGasEstimateSuccess(fallbackProvider as any);
     setFallbackProviderForNetwork(
       NetworkName.Polygon,
       fallbackProvider as unknown as FallbackProvider,
@@ -110,10 +109,10 @@ describe('tx-gas', () => {
   }).timeout(60_000);
 
   it('Should pull gas estimate for basic transaction - broadcaster', async () => {
-    stubGasEstimateSuccess();
     const fallbackProvider = createFallbackProviderFromJsonConfig(
       MOCK_FALLBACK_PROVIDER_JSON_CONFIG_POLYGON,
     );
+    stubGasEstimateSuccess(fallbackProvider as any);
     setFallbackProviderForNetwork(
       NetworkName.Polygon,
       fallbackProvider as unknown as FallbackProvider,

@@ -1,3 +1,4 @@
+import { Authorization, getAddress } from 'ethers';
 import {
   RailgunWallet,
   EngineEvent,
@@ -9,6 +10,10 @@ import {
   ByteUtils,
   POICurrentProofEventData,
   ViewOnlyWallet,
+  TransactionStructV2,
+  TransactionStructV3,
+  RelayAdapt7702,
+  RelayAdapt7702ExecutionDetails,
 } from '@railgun-community/engine';
 import {
   RailgunWalletInfo,
@@ -19,8 +24,9 @@ import {
 } from '@railgun-community/shared-models';
 import { onBalancesUpdate, onWalletPOIProofProgress } from './balance-update';
 import { reportAndSanitizeError } from '../../../utils/error';
-import { getAddress } from 'ethers';
 import { getEngine } from '../core/engine';
+import { getFallbackProviderForNetwork } from '../core/providers';
+import { getRelayAdapt7702ExecutionDetails } from './relay-adapt-7702-execution';
 
 export const awaitWalletScan = (walletID: string, chain: Chain) => {
   const wallet = walletForID(walletID);
@@ -411,4 +417,91 @@ const formatCreationBlockNumbers = (
   }
 
   return formattedCreationBlockNumbers;
+};
+
+export const sign7702Request = async (
+  walletID: string,
+  encryptionKey: string,
+  networkName: NetworkName,
+  contractAddress: string,
+  chainId: bigint,
+  transactions: (TransactionStructV2 | TransactionStructV3)[],
+  actionData: RelayAdapt7702.ActionDataStruct,
+  mnemonicPassword?: string,
+): Promise<{
+  authorization: Authorization;
+  signature: string;
+  executionDetails: RelayAdapt7702ExecutionDetails;
+}> => {
+  const wallet = fullWalletForID(walletID);
+  const provider = getFallbackProviderForNetwork(networkName);
+  // Single-source every ephemeral facet on the signer that will actually produce the
+  // authorization below. getCurrentEphemeralAddress resolves the signer's address (honoring the
+  // same override/provider precedence as sign7702Request), so the authorization nonce and the
+  // execute nonce are read from the authorization authority itself. Reading them from
+  // getCurrentEphemeralWallet instead desyncs when a custom signer provider is set (authority
+  // != nonce-source), which silently invalidates the on-chain authorization.
+  const ephemeralAddress = await wallet.getCurrentEphemeralAddress(
+    encryptionKey,
+    chainId,
+    mnemonicPassword,
+  );
+  const nonce = await provider.getTransactionCount(ephemeralAddress, 'latest');
+  const executionDetails = await getRelayAdapt7702ExecutionDetails(
+    provider,
+    networkName,
+    ephemeralAddress,
+  );
+
+  const { authorization, signature } = await wallet.sign7702Request(
+    encryptionKey,
+    contractAddress,
+    chainId,
+    transactions,
+    actionData,
+    nonce,
+    executionDetails,
+    mnemonicPassword,
+  );
+
+  return {
+    authorization,
+    signature,
+    executionDetails,
+  };
+};
+
+export const ratchetEphemeralAddress = async (
+  walletID: string,
+  networkName: NetworkName,
+): Promise<void> => {
+  const wallet = fullWalletForID(walletID);
+  const chainId = BigInt(NETWORK_CONFIG[networkName].chain.id);
+  return wallet.ratchetEphemeralAddress(chainId);
+};
+
+export const getCurrentEphemeralAddress = async (
+  walletID: string,
+  encryptionKey: string,
+  networkName: NetworkName,
+  mnemonicPassword?: string,
+): Promise<string> => {
+  // Resolve the address of the signer that produces the EIP-7702 authorization (engine
+  // getCurrentEphemeralAddress -> getCurrentEphemeralSigner), NOT getCurrentEphemeralWallet.
+  // The two diverge when a custom signer provider is set; `to`/recipients must equal the
+  // authorization authority, so both are single-sourced on the signer here.
+  const wallet = fullWalletForID(walletID);
+  const chainId = BigInt(NETWORK_CONFIG[networkName].chain.id);
+  return wallet.getCurrentEphemeralAddress(encryptionKey, chainId, mnemonicPassword);
+};
+
+export const getCurrentEphemeralWallet = async (
+  walletID: string,
+  encryptionKey: string,
+  networkName: NetworkName,
+  mnemonicPassword?: string,
+) => {
+  const wallet = fullWalletForID(walletID);
+  const chainId = BigInt(NETWORK_CONFIG[networkName].chain.id);
+  return wallet.getCurrentEphemeralWallet(encryptionKey, chainId, mnemonicPassword);
 };

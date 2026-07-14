@@ -15,7 +15,6 @@ import {
   DUMMY_FROM_ADDRESS,
   generateDummyProofTransactions,
   generateTransact,
-  generateUnshieldBaseToken,
 } from './tx-generator';
 import { populateProvedTransaction } from './proof-cache';
 import {
@@ -24,7 +23,6 @@ import {
   TransactionStructV3,
 } from '@railgun-community/engine';
 import { gasEstimateResponseDummyProofIterativeBroadcasterFee } from './tx-gas-broadcaster-fee-estimator';
-import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
 import { gasEstimateResponse, getGasEstimate } from './tx-gas-details';
 import {
@@ -34,6 +32,15 @@ import {
   getSerializedNFTBalances,
 } from '../railgun';
 import { TransactionReceipt, TransactionResponse } from 'ethers';
+import {
+  assertValidEthAddress,
+  getCurrentEphemeralAddress,
+} from '../railgun/wallets/wallets';
+import {
+  createRelayAdapt7702UnshieldBaseTokenERC20AmountRecipients,
+  createUnshieldBaseTokenActionData7702,
+  createUnshieldBaseTokenTransaction7702,
+} from './tx-unshield-base-token-7702';
 
 const ERC20_TRANSFER_EVENT_SIGNATURE = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
@@ -202,10 +209,20 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
   mnemonicPassword?: string,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
+    assertValidEthAddress(publicWalletAddress);
+
+    const ephemeralAddress = await getCurrentEphemeralAddress(
+      railgunWalletID,
+      encryptionKey,
+      networkName,
+      mnemonicPassword,
+    );
+
     const relayAdaptUnshieldERC20AmountRecipients: RailgunERC20AmountRecipient[] =
-      createRelayAdaptUnshieldERC20AmountRecipients(txidVersion, networkName, [
-        wrappedERC20Amount,
-      ]);
+      createRelayAdapt7702UnshieldBaseTokenERC20AmountRecipients(
+        [wrappedERC20Amount],
+        ephemeralAddress,
+      );
 
     // Empty NFT Recipients.
     const nftAmountRecipients: RailgunNFTAmountRecipient[] = [];
@@ -231,15 +248,23 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
           mnemonicPassword,
         ),
       (txs: (TransactionStructV2 | TransactionStructV3)[]) => {
-        const relayAdaptParamsRandom = ByteUtils.randomHex(31);
-        return generateUnshieldBaseToken(
+        return createUnshieldBaseTokenActionData7702(
           txidVersion,
-          txs,
           networkName,
           publicWalletAddress,
-          relayAdaptParamsRandom,
-          true, // useDummyProof (for gas estimation)
+          ephemeralAddress,
           sendWithPublicWallet,
+        ).then(actionData =>
+          createUnshieldBaseTokenTransaction7702(
+            txidVersion,
+            networkName,
+            railgunWalletID,
+            encryptionKey,
+            txs,
+            actionData,
+            ephemeralAddress,
+            mnemonicPassword,
+          ),
         );
       },
       txidVersion,
