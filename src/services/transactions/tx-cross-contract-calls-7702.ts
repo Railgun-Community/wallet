@@ -86,12 +86,14 @@ const createActionData = async (
 // 7702 refactor for cross-contract calls
 
 // todo maybe import this from the og cross-contract call.
+// NOTE: empty crossContractCalls is allowed — a 7702 relay-adapt batch may do
+// only a shield (no unshield, no calls), e.g. shielding an ephemeral EOA's
+// already-received assets. The "batch must do something" invariant is enforced
+// by assertRelayAdapt7702BatchDoesSomething (calls OR shields OR unshields),
+// which is the correct check; requiring a call here was too strict.
 const createValidCrossContractCalls = (
   crossContractCalls: ContractTransaction[],
 ): ContractTransaction[] => {
-  if (!crossContractCalls.length) {
-    throw new Error('No cross contract calls in transaction.');
-  }
   try {
     return crossContractCalls.map(transactionRequest => {
       if (!transactionRequest.to || !transactionRequest.data) {
@@ -114,6 +116,30 @@ const createValidCrossContractCalls = (
       });
     }
     throw reportAndSanitizeError(createValidCrossContractCalls.name, cause);
+  }
+};
+
+// A relay-adapt 7702 batch must do something beyond paying the broadcaster:
+// at least one unshield, shield, or cross-contract call. Replaces the old
+// "must have >=1 cross-contract call" rule so a no-unshield shield-only batch
+// (shield an ephemeral EOA's already-received assets) is permitted.
+const assertRelayAdapt7702BatchDoesSomething = (
+  relayAdaptUnshieldERC20Amounts: RailgunERC20Amount[],
+  relayAdaptUnshieldNFTAmounts: RailgunNFTAmount[],
+  relayAdaptShieldERC20Recipients: RailgunERC20Recipient[],
+  relayAdaptShieldNFTRecipients: RailgunNFTAmountRecipient[],
+  crossContractCalls: ContractTransaction[],
+): void => {
+  if (
+    !relayAdaptUnshieldERC20Amounts.length &&
+    !relayAdaptUnshieldNFTAmounts.length &&
+    !relayAdaptShieldERC20Recipients.length &&
+    !relayAdaptShieldNFTRecipients.length &&
+    !crossContractCalls.length
+  ) {
+    throw new Error(
+      'Relay-adapt 7702 batch must include at least one unshield, shield, or cross-contract call.',
+    );
   }
 };
 
@@ -155,6 +181,14 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     setCachedProvedTransaction(undefined);
+
+    assertRelayAdapt7702BatchDoesSomething(
+      relayAdaptUnshieldERC20Amounts,
+      relayAdaptUnshieldNFTAmounts,
+      relayAdaptShieldERC20Recipients,
+      relayAdaptShieldNFTRecipients,
+      crossContractCalls,
+    );
 
     // Broadcaster fee estimation for 7702 must use Type4 fee semantics (maxFeePerGas).
     // Coerce legacy inputs (eg. Type1 + gasPrice) to Type4 where possible.
@@ -321,6 +355,14 @@ export const generateCrossContractCallsProof7702 = async (
 ): Promise<RelayAdapt7702Request> => {
   try {
     setCachedProvedTransaction(undefined);
+
+    assertRelayAdapt7702BatchDoesSomething(
+      relayAdaptUnshieldERC20Amounts,
+      relayAdaptUnshieldNFTAmounts,
+      relayAdaptShieldERC20Recipients,
+      relayAdaptShieldNFTRecipients,
+      crossContractCalls,
+    );
 
     const validCrossContractCalls =
       createValidCrossContractCalls(crossContractCalls);

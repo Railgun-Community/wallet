@@ -690,4 +690,57 @@ describe('tx-cross-contract-calls-7702', () => {
       `Cross-contract calls require to and data fields (7702).`,
     );
   });
+
+  // Relaxed: no unshield required, and cross-contract calls may be empty
+  // (a pure shield of an ephemeral EOA's already-received assets).
+
+  it('Should allow a no-unshield shield-only batch (empty cross-contract calls)', async () => {
+    stubRelayAdaptGasEstimate();
+    spyOnSetUnshield();
+    const response = await gasEstimateForUnprovenCrossContractCalls7702(
+      txidVersion,
+      TEST_NETWORK_NAME,
+      railgunWallet.id,
+      MOCK_DB_ENCRYPTION_KEY,
+      [], // unshieldERC20Amounts — none
+      [], // unshieldNFTAmounts — none
+      MOCK_ERC20_RECIPIENTS, // shieldERC20Recipients
+      MOCK_NFT_AMOUNT_RECIPIENTS, // shieldNFTRecipients
+      [], // crossContractCalls — none (pure shield)
+      MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+      MOCK_FEE_TOKEN_DETAILS,
+      false, // sendWithPublicWallet
+      minGasLimit,
+    );
+    // No unshield is added.
+    expect(addUnshieldDataSpy.called).to.be.false;
+    expect(response.gasEstimate).to.be.a('bigint');
+    // Only the appended shield call; no cross-contract calls.
+    const signActionData = signEIP7702AuthorizationStub.lastCall.args[6];
+    expect(signActionData.calls.length).to.equal(1);
+    expect(signActionData.requireSuccess).to.equal(false);
+  }).timeout(10_000);
+
+  it('Should reject a fully-empty relay-adapt 7702 batch (no unshield, shield, or call)', async () => {
+    stubGasEstimateSuccess();
+    await expect(
+      gasEstimateForUnprovenCrossContractCalls7702(
+        txidVersion,
+        TEST_NETWORK_NAME,
+        railgunWallet.id,
+        MOCK_DB_ENCRYPTION_KEY,
+        [], // unshieldERC20Amounts
+        [], // unshieldNFTAmounts
+        [], // shieldERC20Recipients
+        [], // shieldNFTRecipients
+        [], // crossContractCalls
+        MOCK_TRANSACTION_GAS_DETAILS_SERIALIZED_TYPE_2,
+        MOCK_FEE_TOKEN_DETAILS,
+        false,
+        minGasLimit,
+      ),
+    ).rejectedWith(
+      'must include at least one unshield, shield, or cross-contract call',
+    );
+  });
 }).timeout(30_000);
