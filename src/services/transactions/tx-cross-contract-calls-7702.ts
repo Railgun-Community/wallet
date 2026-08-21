@@ -12,6 +12,7 @@ import {
   EVMGasType,
   TXIDVersion,
   NETWORK_CONFIG,
+  isDefined,
 } from '@railgun-community/shared-models';
 import {
   GenerateTransactionsProgressCallback,
@@ -44,7 +45,11 @@ import { ContractTransaction } from 'ethers';
 import {
   createRelayAdaptShieldNFTRecipients,
 } from './tx-cross-contract-calls';
-import { getCurrentEphemeralAddress, sign7702Request } from '../railgun/wallets/wallets';
+import {
+  getCurrentEphemeralAddress,
+  getEphemeralAddressForIndex,
+  sign7702Request,
+} from '../railgun/wallets/wallets';
 import { encodeRelayAdapt7702Execute } from '../railgun/wallets/relay-adapt-7702-execution';
 
 
@@ -152,6 +157,7 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
   sendWithPublicWallet: boolean,
   minGasLimit: Optional<bigint>,
   mnemonicPassword?: string,
+  ephemeralIndex?: number,
 ): Promise<RailgunTransactionGasEstimateResponse> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -165,12 +171,20 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
     const validCrossContractCalls =
       createValidCrossContractCalls(crossContractCalls);
 
-    const ephemeralAddress = await getCurrentEphemeralAddress(
-      railgunWalletID,
-      encryptionKey,
-      networkName,
-      mnemonicPassword,
-    );
+    const ephemeralAddress = isDefined(ephemeralIndex)
+      ? await getEphemeralAddressForIndex(
+          railgunWalletID,
+          encryptionKey,
+          networkName,
+          ephemeralIndex,
+          mnemonicPassword,
+        )
+      : await getCurrentEphemeralAddress(
+          railgunWalletID,
+          encryptionKey,
+          networkName,
+          mnemonicPassword,
+        );
 
     const relayAdaptUnshieldERC20AmountRecipients =
       createRelayAdapt7702UnshieldERC20AmountRecipients(
@@ -233,6 +247,7 @@ export const gasEstimateForUnprovenCrossContractCalls7702 = async (
           transactions,
           actionData,
           mnemonicPassword,
+          ephemeralIndex,
         );
 
         const data = encodeRelayAdapt7702Execute(
@@ -318,6 +333,7 @@ export const generateCrossContractCallsProof7702 = async (
   minGasLimit: Optional<bigint>,
   progressCallback: GenerateTransactionsProgressCallback,
   mnemonicPassword?: string,
+  ephemeralIndex?: number,
 ): Promise<RelayAdapt7702Request> => {
   try {
     setCachedProvedTransaction(undefined);
@@ -325,12 +341,20 @@ export const generateCrossContractCallsProof7702 = async (
     const validCrossContractCalls =
       createValidCrossContractCalls(crossContractCalls);
 
-    const ephemeralAddress = await getCurrentEphemeralAddress(
-      railgunWalletID,
-      encryptionKey,
-      networkName,
-      mnemonicPassword,
-    );
+    const ephemeralAddress = isDefined(ephemeralIndex)
+      ? await getEphemeralAddressForIndex(
+          railgunWalletID,
+          encryptionKey,
+          networkName,
+          ephemeralIndex,
+          mnemonicPassword,
+        )
+      : await getCurrentEphemeralAddress(
+          railgunWalletID,
+          encryptionKey,
+          networkName,
+          mnemonicPassword,
+        );
 
     const relayAdaptUnshieldERC20AmountRecipients =
       createRelayAdapt7702UnshieldERC20AmountRecipients(
@@ -426,6 +450,7 @@ export const generateCrossContractCallsProof7702 = async (
       transactions,
       actionData,
       mnemonicPassword,
+      ephemeralIndex,
     );
 
     // Construct the transaction data

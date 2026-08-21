@@ -428,6 +428,7 @@ export const sign7702Request = async (
   transactions: (TransactionStructV2 | TransactionStructV3)[],
   actionData: RelayAdapt7702.ActionDataStruct,
   mnemonicPassword?: string,
+  ephemeralIndex?: number,
 ): Promise<{
   authorization: Authorization;
   signature: string;
@@ -435,40 +436,59 @@ export const sign7702Request = async (
 }> => {
   const wallet = fullWalletForID(walletID);
   const provider = getFallbackProviderForNetwork(networkName);
-  // Single-source every ephemeral facet on the signer that will actually produce the
-  // authorization below. getCurrentEphemeralAddress resolves the signer's address (honoring the
-  // same override/provider precedence as sign7702Request), so the authorization nonce and the
-  // execute nonce are read from the authorization authority itself. Reading them from
-  // getCurrentEphemeralWallet instead desyncs when a custom signer provider is set (authority
-  // != nonce-source), which silently invalidates the on-chain authorization.
-  const ephemeralAddress = await wallet.getCurrentEphemeralAddress(
-    encryptionKey,
-    chainId,
-    mnemonicPassword,
-  );
-  const nonce = await provider.getTransactionCount(ephemeralAddress, 'latest');
-  const executionDetails = await getRelayAdapt7702ExecutionDetails(
-    provider,
-    networkName,
-    ephemeralAddress,
-  );
 
-  const { authorization, signature } = await wallet.sign7702Request(
-    encryptionKey,
-    contractAddress,
-    chainId,
-    transactions,
-    actionData,
-    nonce,
-    executionDetails,
-    mnemonicPassword,
-  );
+  // The engine reads the override ahead of both the stored index and any custom signer provider,
+  // so pinning it here keeps the authorization authority, the `to` address and the nonce on one
+  // account. It is restored below: the override is shared state on the wallet.
+  const previousEphemeralWalletOverride = wallet.ephemeralWalletOverride;
+  if (isDefined(ephemeralIndex)) {
+    assertCanonicalEphemeralProvider(wallet);
+    wallet.ephemeralWalletOverride = await wallet.getEphemeralWallet(
+      encryptionKey,
+      chainId,
+      ephemeralIndex,
+      mnemonicPassword,
+    );
+  }
 
-  return {
-    authorization,
-    signature,
-    executionDetails,
-  };
+  try {
+    // Single-source every ephemeral facet on the signer that will actually produce the
+    // authorization below. getCurrentEphemeralAddress resolves the signer's address (honoring the
+    // same override/provider precedence as sign7702Request), so the authorization nonce and the
+    // execute nonce are read from the authorization authority itself. Reading them from
+    // getCurrentEphemeralWallet instead desyncs when a custom signer provider is set (authority
+    // != nonce-source), which silently invalidates the on-chain authorization.
+    const ephemeralAddress = await wallet.getCurrentEphemeralAddress(
+      encryptionKey,
+      chainId,
+      mnemonicPassword,
+    );
+    const nonce = await provider.getTransactionCount(ephemeralAddress, 'latest');
+    const executionDetails = await getRelayAdapt7702ExecutionDetails(
+      provider,
+      networkName,
+      ephemeralAddress,
+    );
+
+    const { authorization, signature } = await wallet.sign7702Request(
+      encryptionKey,
+      contractAddress,
+      chainId,
+      transactions,
+      actionData,
+      nonce,
+      executionDetails,
+      mnemonicPassword,
+    );
+
+    return {
+      authorization,
+      signature,
+      executionDetails,
+    };
+  } finally {
+    wallet.ephemeralWalletOverride = previousEphemeralWalletOverride;
+  }
 };
 
 export const ratchetEphemeralAddress = async (
@@ -478,6 +498,38 @@ export const ratchetEphemeralAddress = async (
   const wallet = fullWalletForID(walletID);
   const chainId = BigInt(NETWORK_CONFIG[networkName].chain.id);
   return wallet.ratchetEphemeralAddress(chainId);
+};
+
+// A custom ephemeral signer provider (eg. a hardware wallet) owns keys the engine cannot derive
+// from an integer index, so pinning an index there would sign with an unrelated mnemonic-derived
+// account. Callers that target an index must be on the canonical HD provider.
+const assertCanonicalEphemeralProvider = (wallet: RailgunWallet) => {
+  if (!wallet.isCanonicalEphemeralProvider()) {
+    throw new Error(
+      'Cannot target an ephemeral account by index: this wallet uses a custom ephemeral signer provider.',
+    );
+  }
+};
+
+// Resolves the address of a specific ephemeral account, so funds left behind on a rotated account
+// stay reachable. `getCurrentEphemeralAddress` covers the common case of the account in use now.
+export const getEphemeralAddressForIndex = async (
+  walletID: string,
+  encryptionKey: string,
+  networkName: NetworkName,
+  ephemeralIndex: number,
+  mnemonicPassword?: string,
+): Promise<string> => {
+  const wallet = fullWalletForID(walletID);
+  assertCanonicalEphemeralProvider(wallet);
+  const chainId = BigInt(NETWORK_CONFIG[networkName].chain.id);
+  const ephemeralWallet = await wallet.getEphemeralWallet(
+    encryptionKey,
+    chainId,
+    ephemeralIndex,
+    mnemonicPassword,
+  );
+  return ephemeralWallet.address;
 };
 
 export const getCurrentEphemeralAddress = async (
