@@ -26,6 +26,8 @@ import {
 import { gasEstimateResponseDummyProofIterativeBroadcasterFee } from './tx-gas-broadcaster-fee-estimator';
 import { createRelayAdaptUnshieldERC20AmountRecipients } from './tx-cross-contract-calls';
 import { reportAndSanitizeError } from '../../utils/error';
+import { parseRailgunTokenAddress } from '../railgun/util/bytes';
+import { getTokenOwnerWithFallback } from './token-owner';
 import { gasEstimateResponse, getGasEstimate } from './tx-gas-details';
 import {
   walletForID,
@@ -33,9 +35,7 @@ import {
   getSerializedERC20Balances,
   getSerializedNFTBalances,
 } from '../railgun';
-import { TransactionReceipt, TransactionResponse } from 'ethers';
 
-const ERC20_TRANSFER_EVENT_SIGNATURE = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 export const populateProvedUnshield = async (
   txidVersion: TXIDVersion,
@@ -260,80 +260,6 @@ export const gasEstimateForUnprovenUnshieldBaseToken = async (
   }
 };
 
-async function extractTokenOwnerFromTransferEvents(
-  receipt: TransactionReceipt,
-  railgunContractAddress: string
-): Promise<string> {
-  const railgunAddressLower = railgunContractAddress.toLowerCase();
-
-  const potentialOwners: Set<string> = new Set();
-
-  for (const log of receipt.logs) {
-    try {
-      if (log.topics.length < 3) {
-        continue;
-      }
-
-      if (log.topics[0] !== ERC20_TRANSFER_EVENT_SIGNATURE) {
-        continue;
-      }
-      // topics[0] = event signature hash
-      const toAddress = `0x${  log.topics[2].slice(-40).toLowerCase()}`;
-
-      if (toAddress === railgunAddressLower) {
-        const fromAddress = `0x${  log.topics[1].slice(-40)}`;
-        potentialOwners.add(fromAddress);
-      }
-    } catch (error) {
-      console.warn('Error parsing log for token owner extraction:', error);
-      continue;
-    }
-  }
-
-  if (potentialOwners.size === 1) {
-    const [owner] = Array.from(potentialOwners);
-    return owner;
-  }
-  // this handles cases where there are multiple deposits in one transaction
-  if (potentialOwners.size > 1) {
-    const [firstOwner] = Array.from(potentialOwners);
-    return firstOwner;
-  }
-
-  throw new Error(
-    'Could not find token owner: No Transfer event to Railgun contract detected in transaction'
-  );
-}
-
-async function getTokenOwnerWithFallback(
-  receipt: TransactionReceipt,
-  transaction: TransactionResponse,
-  railgunContractAddress: string,
-  networkName: NetworkName
-): Promise<string> {
-  try {
-    // first attempt is try to extract from Transfer events
-    const tokenOwner = await extractTokenOwnerFromTransferEvents(
-      receipt,
-      railgunContractAddress
-    );
-
-    const normalizedTokenOwner = tokenOwner.toLowerCase()
-    const normalizedRelayAdaptAddresses = [
-      NETWORK_CONFIG[networkName].relayAdaptContract.toLowerCase(),
-      ...NETWORK_CONFIG[networkName].relayAdaptHistory.map(a=>a.toLowerCase())
-    ]
-
-    if(normalizedRelayAdaptAddresses.includes(normalizedTokenOwner)){
-      return transaction.from;
-    }
-
-    return tokenOwner;
-  } catch (error) {
-    return transaction.from;
-  }
-}
-
 export const getERC20AndNFTAmountRecipientsForUnshieldToOrigin = async (
   txidVersion: TXIDVersion,
   networkName: NetworkName,
@@ -378,7 +304,10 @@ export const getERC20AndNFTAmountRecipientsForUnshieldToOrigin = async (
     receipt,
     transaction,
     railgunContractAddress,
-    networkName
+    networkName,
+    Object.values(balances).map(({ tokenData }) =>
+      parseRailgunTokenAddress(tokenData.tokenAddress),
+    ),
   );
   const erc20Amounts = getSerializedERC20Balances(balances);
   const nftAmounts = getSerializedNFTBalances(balances);
