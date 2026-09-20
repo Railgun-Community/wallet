@@ -28,8 +28,22 @@ export class POINodeRequest {
   private nodeURLs: string[];
 
   constructor(nodeURLs: string[]) {
+    nodeURLs.forEach(POINodeRequest.assertSecureNodeURL);
     this.nodeURLs = nodeURLs;
   }
+
+  /**
+   * POI responses are trusted for merkleroot and POI status validation,
+   * so plaintext transport is only allowed for local development nodes.
+   */
+  private static assertSecureNodeURL = (nodeURL: string): void => {
+    const { protocol, hostname } = new URL(nodeURL);
+    const isLocal = ['localhost', '127.0.0.1', '[::1]'].includes(hostname);
+    if (protocol === 'https:' || (protocol === 'http:' && isLocal)) {
+      return;
+    }
+    throw new Error('POI node URLs must use https.');
+  };
 
   private currentNodeURLIndex = 0;
 
