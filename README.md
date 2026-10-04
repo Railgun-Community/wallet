@@ -17,6 +17,12 @@ RAILGUN Wallet SDK enables dApp and DeFi developers to:
 - [Transfer tokens](https://railgun-privacy.gitbook.io/developer-guide/wallet/transactions/private-transfers) privately
 - [Interact with any smart contract](https://railgun-privacy.gitbook.io/developer-guide/wallet/transactions/cross-contract-calls) privately
 
+## Community examples
+
+- [Sepolia Lab](https://github.com/erdinc333/eth_sepolia_railgun) — A browser dashboard demonstrating Rabby connection, ETH shielding, private WETH balances with PPOI readiness, and broadcaster-assisted withdrawals to public addresses using the Wallet SDK.
+
+This example is independently maintained, unaudited, and intended for Sepolia testnet experimentation only.
+
 # Developer Guide
 
 Please see our [full developer guide](https://railgun-privacy.gitbook.io/developer-guide/wallet) for details on implementation.
